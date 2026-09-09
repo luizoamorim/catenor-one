@@ -6,6 +6,8 @@
 @docs/hackathon/PROVENANCE.md
 @docs/hackathon/BUILD_LOG.md
 @docs/hackathon/SUBMISSION_CHECKLIST.md
+@docs/architecture/ARCHITECTURE.md
+@docs/architecture/CLAUDE-RULES.md
 
 # Mission
 
