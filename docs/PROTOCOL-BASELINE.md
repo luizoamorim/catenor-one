@@ -7,7 +7,7 @@
 **Protocol version:** Draft v0.1  
 **Protocol repository:** https://github.com/luizoamorim/catenor  
 **Protocol website:** https://catenor.xyz  
-**Pinned protocol commit:** 2340961992161cf89e09a8b4c17123b9c0714eee  
+**Pinned protocol commit:** 66ef712694acfc987663f5ffa9bcc9d12d1fe80e  
 **Pinned at:** `2026-09-09`
 
 ## Pin the exact commit
