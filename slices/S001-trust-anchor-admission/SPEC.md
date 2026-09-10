@@ -6,8 +6,10 @@
 **Project:** Catenor One  
 **Protocol baseline:** Catenor Protocol Draft v0.1  
 **Slice:** `S001-trust-anchor-admission`  
-**Status:** Final draft for human approval  
+**Status:** Final draft for human approval — Rev 2 amendments applied (2026-09-10, T0.9)  
 **Architecture:** Modular Monolith + Vertical Slices + DDD-lite + Clean Architecture boundaries
+
+> **Rev 2 amendment summary (maintainer decisions recorded in `PLAN.md` §33):** no LLM in S001 · exactly 3 persistent CRE secrets (`SUMSUB_APP_TOKEN`, `SUMSUB_SECRET_KEY`, `CATENOR_INTERNAL_API_TOKEN`) · CRE workflow boundary `identity-confidential` with S001 operation/handler `trust-anchor-admission` · HTTPS requests executed from inside `handlerInTee` (not the separate CRE Confidential HTTP capability) · COMMITMENT_ONLY evidence retention, no raw provider evidence persisted, Railway bucket not used by S001 · Catenor-issued provider bindingRefs verified inside the TEE · bootstrap endorsement binds a `verificationMethodCommitment` · Sumsub sandbox for the hackathon · narrower Trust Anchor verification claim (§27). All other frozen S001 semantics are unchanged.
 
 ---
 
@@ -94,19 +96,22 @@ DID Document
 Credential Assertion Key
 Proof of Key Possession
 private Sumsub provider references
-real Sumsub verification
-Chainlink CRE Confidential Workflow
+private provider bindingRefs (Catenor-issued, used as Sumsub externalUserId)
+real Sumsub verification (Sumsub sandbox for the hackathon)
+Chainlink CRE Confidential Workflow identity-confidential
+S001 operation/handler trust-anchor-admission
 handlerInTee execution
 Vault DON secrets
-confidential HTTP
-auxiliary LLM call inside the TEE
+HTTPS requests executed from inside handlerInTee (CRE HTTPClient with TeeRuntime)
+provider-binding verification inside the TEE
+deterministic provider normalization and fact derivation
+evidence commitment (COMMITMENT_ONLY retention)
 deterministic Admission Policy
 Admission Decision
 bootstrap endorsement
 Trust Anchor Admission Record
 Trust Domain activation
 Railway PostgreSQL
-Railway private Storage Bucket
 public/private storage separation
 audit events
 Trust Anchor verification
@@ -115,6 +120,8 @@ real CRE deployment for hackathon completion
 ```
 
 S001 does **not** implement Sponsor Authorization, Agent Delegation, Investor Subject Continuity, tokenization approval, distribution, financial execution, Arc settlement, multi-anchor governance, or the full future Trust Anchor revocation model.
+
+S001 also does **not** include any LLM or other semantic-AI processing, encrypted evidence retention, raw provider-evidence persistence, or use of the Railway private Storage Bucket (which remains part of the wider Catenor One architecture for later slices).
 
 ---
 
@@ -228,6 +235,12 @@ identify the bootstrap admission verification method
 be accepted out-of-band before the first Trust Anchor exists
 ```
 
+In Catenor One, the hash-pinned Bootstrap Configuration also carries the Trust Domain's evidence-acceptance rules — accepted provider/environment, accepted provider verification levels and roles, and the evidence freshness threshold. The initial Catenor One reference/demo value is:
+
+```text
+evidenceMaxAgeDays = 180      [REF-IMPL] Catenor One reference value, not a Catenor Protocol rule
+```
+
 The bootstrap admission authority is not automatically a Catenor Trust Anchor. Its role is limited to establishing the initial trust boundary for this Trust Domain.
 
 ---
@@ -240,7 +253,9 @@ Catenor One MUST create a cryptographic bootstrap endorsement binding at least:
 
 ```text
 Trust Domain
+Bootstrap Configuration commitment
 candidate did:catenor
+assertion Verification Method commitment (verificationMethodCommitment)
 Admission Policy identifier/version
 policy commitment/hash
 Admission Decision reference or commitment
@@ -248,9 +263,20 @@ evidence commitment
 admission timestamp / validity context
 ```
 
+`verificationMethodCommitment` is a commitment to the complete canonical Verification Method used for Admission [REF-IMPL]:
+
+```text
+verificationMethodCommitment
+= SHA-256(JCS(canonical VerificationMethod {id, controller, type, publicKeyMultibase}))
+```
+
+It makes replacement of the public key under the same Verification Method ID detectable during Admission verification.
+
 Only after this endorsement verifies may the candidate become the Initial Active Trust Anchor.
 
-The exact proof envelope is a PLAN-level reference implementation decision.
+The bootstrap signing authority/key MUST be separate from the candidate Organization's assertion key, and the endorsement step MUST be human-initiated by an authorized bootstrap operator. S001 does not require a two-person rule; a quorum model may be added later.
+
+The exact proof envelope is a PLAN-level reference implementation decision (`PLAN.md` §16).
 
 ---
 
@@ -311,7 +337,7 @@ Credential Assertion Key != Financial Execution Key
 
 S001 does not require a financial execution wallet.
 
-Catenor One will evaluate Privy through its current official agent/skill/docs as the reference signing/key-management adapter during PLAN. If the current Privy model is not appropriate for the Credential Assertion Key, S001 may use another secure reference signer while keeping the port boundary and documenting the reason.
+After reviewing Privy's current official docs/skill, PLAN provisionally selects a Privy-backed dedicated Ed25519-capable signer per Organization, with a strict policy preventing financial transaction execution. This selection is conditional on a spike confirming signing semantics that allow independent Ed25519 verification. If the spike fails, implementation STOPS for human review; no other signer or crypto profile is introduced without approval. The port boundary is kept either way.
 
 ---
 
@@ -343,21 +369,23 @@ Key possession proves control of the key. It does not prove organization legitim
 
 S001 requires a **real Sumsub integration** for the live hackathon path.
 
-Catenor One may perform applicant creation/onboarding outside the confidential workflow where necessary. At Admission verification time, however, sensitive verification MUST be performed through confidential HTTP from inside the TEE.
+Catenor One may perform applicant creation/onboarding outside the confidential workflow where necessary. At Admission verification time, however, sensitive verification MUST be performed by HTTPS requests executed from inside the TEE (`handlerInTee`).
 
 ```text
 private provider reference
         ↓
 handlerInTee()
         ↓
-Sumsub confidential HTTPS
+HTTPS → Sumsub (executed inside the TEE)
         ↓
 private provider response
         ↓
-normalize / verify inside TEE
+provider-binding check / normalize / verify inside TEE
         ↓
 minimized verified facts
 ```
+
+For the hackathon, the live path uses **real Sumsub API calls against the Sumsub sandbox with synthetic Organization / representative data**. Documentation and the Judge Inspector MUST say "Sumsub sandbox" and MUST NOT imply production KYB of a real company.
 
 The intended reference flow supports at least:
 
@@ -370,13 +398,55 @@ where the selected Sumsub configuration provides them.
 
 Sumsub `applicantId` values are private operational data. They are not Catenor identifiers and MUST NOT appear in the public DID Document or public logs.
 
-Exact Sumsub endpoints and mappings are PLAN/implementation decisions based on current official documentation.
+Exact Sumsub endpoints and mappings are PLAN/implementation decisions based on current official documentation and on observed Sumsub sandbox responses.
+
+## 12.1 Provider binding
+
+To prevent applicant substitution, provider applicant references are bound to the candidate through Catenor-issued binding references:
+
+```text
+1. authorized operator starts Initial Admission (no applicant IDs yet)
+2. Catenor creates the candidate ORGANIZATION Subject, did:catenor and private
+   provider bindingRefs for COMPANY and REPRESENTATIVE
+3. Catenor returns the bindingRefs to the authenticated operator only
+4. operator creates/configures the Sumsub company and representative applicants
+   with externalUserId = the matching Catenor bindingRef
+5. operator attaches the resulting applicant IDs to the Admission session
+6. inside handlerInTee: applicant.externalUserId == expected bindingRef (both applicants)
+7. only then does confidential provider verification proceed
+```
+
+bindingRefs are opaque, not derived from identity data, not the DID, and are PRIVATE operational state: they MUST NOT appear in public DID state, public API projections, the Judge Inspector or normal logs.
+
+If an applicant's `externalUserId` does not match the expected bindingRef, confidential verification MUST NOT establish any of the required facts and Admission MUST NOT result in `ALLOW`.
+
+## 12.2 Representative authority evidence
+
+`REPRESENTATIVE_AUTHORITY_CONFIRMED` is derived from deterministic provider evidence only — for example company ↔ representative linkage, an accepted representative role, representative verification, company verification, and provider-side membership / beneficiary / authority relations where available. Exact field rules are confirmed against real Sumsub sandbox responses. If the provider configuration used cannot provider-verifiably establish the role, the implementation MUST NOT fake certainty: it uses the strongest evidence actually available and documents the limitation (PLAN and Judge Inspector).
 
 ---
 
 # 13. Chainlink CRE Confidential integration
 
 S001 requires a Chainlink CRE **Confidential Workflow**.
+
+## 13.1 Workflow boundary
+
+```text
+WORKFLOW = security boundary + cohesive business responsibility + lifecycle/deployment boundary
+HANDLER  = specific operation / entry point inside that responsibility
+```
+
+S001 contributes the first operation/handler of the cohesive confidential identity workflow:
+
+```text
+identity-confidential
+└── trust-anchor-admission      (S001)
+```
+
+Future confidential identity operations (for example S002 Subject Continuity / identity-provider reconciliation) are expected to be added as further handlers of the same workflow. Catenor One does not create one CRE workflow per slice or micro-function, nor one workflow for all responsibilities. This is implementation architecture only; it does not change S001 protocol semantics.
+
+## 13.2 Confidential pattern
 
 The sensitive path MUST use the current confidential pattern based on:
 
@@ -385,27 +455,31 @@ handlerInTee(...)
 TeeRuntime
 Vault DON secrets
 batched getSecrets()
-confidential HTTP
+HTTPS requests executed from inside the TEE (CRE HTTPClient with TeeRuntime)
 private intermediate values
 minimized output
 ```
 
+Terminology: **HTTPS requests are executed from inside the confidential TEE boundary.** S001 uses the normal CRE `HTTPClient` with `TeeRuntime`, as in the official Confidential Workflow pattern. It does not use the separate CRE *Confidential HTTP* capability (`ConfidentialHTTPClient`), and Catenor One MUST NOT claim that it does.
+
 Conceptually:
 
 ```text
-Trigger
+Trigger (opaque run metadata + sealed private context)
    ↓
 Workflow DON
    ↓
 request TEE execution
    ↓
-handlerInTee()
+handlerInTee()  →  operation trust-anchor-admission
    │
    ├── getSecrets()
+   ├── open sealed private context
    ├── HTTPS → Sumsub
-   ├── HTTPS → LLM
+   ├── provider-binding check
    ├── private normalization
-   ├── deterministic guardrails
+   ├── deterministic fact derivation / guardrails
+   ├── evidence commitment
    └── minimized result
    ↓
 calling system
@@ -413,7 +487,7 @@ calling system
 
 Secret values, sensitive HTTP response payloads and sensitive intermediate values MUST NOT be deliberately exposed outside the confidential boundary.
 
-The exact trigger mechanism is a PLAN-level decision based on the current deployable CRE model.
+The exact trigger mechanism is a PLAN-level decision based on the current deployable CRE model (`PLAN.md` §17–18). The design MUST fit the documented CRE per-execution HTTP request quota conservatively.
 
 ---
 
@@ -424,89 +498,70 @@ Simulation is required for development and reproducible tests, but **simulation 
 Hackathon Definition of Done requires:
 
 ```text
-real deployed CRE Confidential Workflow
-real TEE handler execution
+real deployed CRE Confidential Workflow (identity-confidential)
+real TEE handler execution (trust-anchor-admission)
 real Vault DON secret retrieval
-real confidential HTTP call to Sumsub
+real HTTPS call to Sumsub (sandbox) executed from inside the TEE
 real Admission result
 ```
 
-If the LLM is enabled in the live path, the deployed workflow SHOULD use a real LLM API as well.
+The preferred deployment registry is the CRE **private** registry; another registry is used only with explicit human approval.
 
 The repository MUST retain sanitized judge-verifiable evidence under `artifacts/chainlink/`, such as deployment identifiers/config, deployment output, simulation output, live execution evidence, minimized results, and negative-path evidence.
 
 Mocks MUST be labeled as mocks and MUST NOT be presented as deployed sponsor integrations.
 
-The official CRE bootcamp/template pattern is a reference for `handlerInTee`, `TeeRuntime`, batched secrets, confidential HTTP and deterministic guardrails. Catenor One adopts the pattern, not the liquidation domain logic.
+The official CRE bootcamp/template pattern is a reference for `handlerInTee`, `TeeRuntime`, batched secrets, HTTPS from inside the TEE and deterministic guardrails. Catenor One adopts the pattern, not the liquidation domain logic. The workflow project is created from the official CRE scaffolding (`cre init` with the official TypeScript Confidential Workflow template) rather than hand-written boilerplate.
 
 ---
 
 # 15. CRE Vault DON secrets
 
-Baseline persistent third-party secrets:
+S001 persistent CRE secrets:
 
 ```text
 SUMSUB_APP_TOKEN
 SUMSUB_SECRET_KEY
-LLM_API_KEY
+CATENOR_INTERNAL_API_TOKEN
 ```
 
-Baseline count:
+Count:
 
 ```text
 3 persistent CRE secrets
 ```
 
-They SHOULD be fetched in a batched `getSecrets()` call when supported.
+`CATENOR_INTERNAL_API_TOKEN` is the approved shared root secret for confidential Catenor ↔ TEE transport: sealing the per-admission private context delivered to `handlerInTee` and authenticating the TEE → Catenor API result callback (`PLAN.md` §18–19). It is also held by the Catenor API as a protected deployment secret.
+
+They SHOULD be fetched in a single batched `getSecrets()` call.
+
+No additional long-lived CRE secret may be added without explicit justification and human approval.
 
 The S001 Admission Policy is intentionally public and its normal policy parameters are therefore **not** Vault DON secrets.
 
-If PLAN determines that secure transport between Catenor One and the deployed TEE requires another long-lived credential, such as:
-
-```text
-CATENOR_INTERNAL_API_TOKEN
-```
-
-it may be added explicitly, bringing the persistent CRE secret count to 4. The PLAN MUST document why it is necessary.
-
-Dynamic applicant/provider identifiers are private application data, not long-lived Vault DON credentials.
+Dynamic applicant/provider identifiers and bindingRefs are private application data, not long-lived Vault DON credentials.
 
 ---
 
-# 16. LLM role
+# 16. Deterministic evidence processing (no LLM in S001)
 
-S001 includes an LLM as an **auxiliary confidential component**.
-
-Possible uses:
+S001 contains **no LLM** and no other semantic-AI component. All eight Admission Policy facts are established by deterministic code:
 
 ```text
-corporate-evidence extraction
-structured normalization assistance
-representative/role extraction
-human-readable evidence explanation
+Sumsub (sandbox)
+→ Chainlink CRE Confidential Workflow identity-confidential / trust-anchor-admission
+→ handlerInTee
+→ provider-binding check
+→ deterministic provider normalization
+→ deterministic fact derivation
+→ minimized verified facts + evidence commitment
+→ Catenor Admission Policy
+→ ALLOW / DENY
 ```
 
-Sensitive LLM calls SHOULD happen from inside the TEE using confidential HTTP.
+S001 requires no LLM secret, no LLM HTTP request, no LLM provider integration and no LLM artifacts.
 
-Critical invariant:
-
-```text
-LLM output != verified Admission fact by itself
-```
-
-The LLM may propose or extract. Deterministic code MUST hold the security boundary.
-
-Example:
-
-```text
-LLM proposes representativeRole = "Director"
-                ↓
-deterministic validation against accepted evidence
-                ↓
-REPRESENTATIVE_AUTHORITY_CONFIRMED = true | false
-```
-
-An LLM timeout, malformed result or hallucination MUST NOT create an ALLOW condition.
+LLM-inside-TEE is recorded only as a possible future technique for S002 Subject Continuity, if unstructured or ambiguous private evidence actually requires semantic interpretation. It is out of scope for S001 and will be specified, if needed, by that slice.
 
 ---
 
@@ -548,10 +603,12 @@ Each security-critical fact must have traceable provenance.
 | `ORGANIZATION_STATUS_VALID` | accepted organization/provider evidence |
 | `ORGANIZATION_AML_CLEAR` | accepted AML verification result |
 | `AUTHORIZED_REPRESENTATIVE_VERIFIED` | real representative identity verification |
-| `REPRESENTATIVE_AUTHORITY_CONFIRMED` | accepted business/corporate authority evidence + deterministic validation |
+| `REPRESENTATIVE_AUTHORITY_CONFIRMED` | deterministic provider evidence: company ↔ representative linkage, accepted role, representative + company verification (§12.2) |
 | `ASSERTION_KEY_POSSESSION_VALID` | cryptographic challenge/signature verification |
 | `ASSERTION_KEY_PURPOSE_VALID` | DID Document + assertion-purpose validation |
-| `EVIDENCE_FRESH` | provider/evidence timestamps + configured freshness rule |
+| `EVIDENCE_FRESH` | provider/evidence timestamps + configured freshness rule (Bootstrap Configuration; 180 days [REF-IMPL]) |
+
+All facts are derived deterministically. The six evidence facts are established inside `handlerInTee` only after the provider-binding check (§12.1) succeeds.
 
 No fact may become `true` solely because an unsigned mutable application row says so.
 
@@ -573,6 +630,8 @@ policy hash / commitment
 The exact canonical serialization/hash algorithm is a PLAN-level reference implementation choice.
 
 Policy evaluation MUST be deterministic, fail closed, distinguish missing evidence from true evidence, and never convert ERROR/INDETERMINATE into ALLOW.
+
+For `policy:trust-anchor-admission:v1`, a missing required fact results in `DENY` (the frozen rule is `otherwise: DENY`). The private evaluation trace MUST still record each requirement as `SATISFIED`, `FALSE` or `MISSING`; `FALSE` and `MISSING` are never collapsed internally.
 
 ---
 
@@ -630,7 +689,7 @@ Working shape:
 }
 ```
 
-The exact wire representation remains reference-implementation behavior.
+The exact wire representation remains reference-implementation behavior. `trustDomain` and `bootstrapEndorsementRef` are Catenor One [REF-IMPL] extensions of the protocol's draft Admission Record shape; a protocol amendment proposal will follow separately.
 
 ---
 
@@ -642,9 +701,10 @@ For the hackathon reference implementation, application infrastructure uses Rail
 Railway
 ├── apps/web
 ├── apps/api
-├── PostgreSQL
-└── private Storage Bucket
+└── PostgreSQL
 ```
+
+The Railway private Storage Bucket remains part of the wider Catenor One architecture for later slices; S001 does not provision or use it.
 
 No AWS infrastructure is required for S001.
 
@@ -652,9 +712,8 @@ External systems:
 
 ```text
 Chainlink CRE / Vault DON / TEE
-Sumsub
-LLM provider
-Privy when selected for signing/key management
+Sumsub (sandbox for the hackathon)
+Privy (operator authentication; assertion and bootstrap signers, subject to the signing spike)
 ```
 
 Arc is not part of S001.
@@ -696,88 +755,80 @@ Private operational state may include:
 
 ```text
 Canonical Subject record
+provider bindingRefs (COMPANY, REPRESENTATIVE)
 Sumsub company applicant reference
 representative applicant reference
 Admission session/state
-evidence references
+verified fact results and references
+evidence commitment + its normalized commitment preimage and provider-response digests (no raw content)
+CRE execution references
 Decision references
 Trust Domain membership/index
 audit references
 opaque secure-signer references
 ```
 
+Trust Anchor lifecycle status in the public projection is an operational projection in S001 (§27).
+
 ---
 
-# 24. Railway private Evidence Vault
+# 24. Evidence retention — COMMITMENT_ONLY in S001
 
-Sensitive evidence objects SHOULD be stored in the Railway private Storage Bucket as encrypted evidence when the deployed CRE architecture can do so without leaking plaintext outside the confidential boundary.
-
-Examples:
+S001 uses **COMMITMENT_ONLY** evidence retention. It does not retain encrypted evidence objects and does not implement any custom evidence-encryption scheme.
 
 ```text
-organization evidence snapshot
-representative evidence snapshot
-corporate authority evidence
-provider response snapshot
-LLM result where retention is justified
-signed sensitive credential artifacts
-audit evidence
+TEE
+→ provider responses remain private inside the confidential boundary
+→ provider-binding check, deterministic normalization and fact derivation
+→ evidenceCommitment
+→ only the minimized result leaves the TEE
 ```
 
-The operational database stores references and metadata rather than large raw evidence blobs.
-
-Conceptually:
+Catenor stores, in private PostgreSQL state:
 
 ```text
-Private PostgreSQL
-    evidenceId
-    objectRef
-    evidenceCommitment
-        │
-        ▼
-Railway Private Bucket
-    encrypted evidence package
+provider references and bindingRefs
+admission metadata
+verified fact results / references
+Decision reference
+evidenceCommitment
+the normalized commitment preimage and provider-response digests (minimum needed to recompute the commitment)
+CRE execution reference
 ```
+
+Catenor MUST NOT store, in any database, bucket, log or artifact:
+
+```text
+raw Sumsub responses
+raw PII
+private provider evidence snapshots
+```
+
+The Railway private Storage Bucket remains part of the wider Catenor One architecture for later slices that need retained evidence objects. S001 does not provision or use it.
 
 ---
 
 # 25. TEE-to-storage privacy rule
 
-Raw confidential provider/LLM responses MUST NOT leave the TEE in plaintext merely so the backend can persist them.
+Raw confidential provider responses MUST NOT leave the TEE in plaintext merely so the backend can persist them.
 
-Preferred model:
-
-```text
-raw evidence inside TEE
-        ↓
-normalize
-        ↓
-construct evidence package
-        ↓
-hash / commitment
-        ↓
-encrypt before crossing confidential boundary
-        ↓
-Railway private bucket
-```
-
-The exact encryption and upload mechanism MUST be selected during PLAN using current official CRE capabilities/documentation.
-
-If the deployed CRE model cannot retain a historical encrypted snapshot without exposing raw plaintext, S001 MUST prefer:
+S001 applies the safe model by design:
 
 ```text
-do not persist the raw snapshot
+do not persist any raw provider snapshot
 +
 persist minimized facts
 +
-persist evidence commitment/reference where meaningful
+persist the evidence commitment with its normalized preimage and provider-response digests
 +
-retain private provider reference for authorized re-verification
+retain private provider references for authorized re-verification with the provider
 ```
 
-over leaking raw evidence.
+Evidence-commitment semantics:
 
-Any evidence decryption private key MUST NOT be stored in PostgreSQL or inside the same bucket as the encrypted evidence.
+> The commitment can be recomputed against the retained normalized commitment preimage and provider-response digests. It binds the Admission to what was observed during confidential execution, but does not preserve or reconstruct the raw provider evidence.
+
+Any later slice that retains encrypted evidence MUST use an approved, standard encryption scheme, and its decryption private key MUST NOT be stored in PostgreSQL or inside the same bucket as the encrypted evidence.
 
 ---
 
@@ -791,12 +842,24 @@ Requirements:
 
 ```text
 raw PII MUST NOT be placed in public workflow config/trigger fields
+Sumsub applicant IDs and bindingRefs MUST NOT appear in plaintext in trigger payloads visible to the Workflow DON
 Sumsub applicant IDs MUST NOT appear in public logs
 session identifiers SHOULD be opaque
 private context MUST use an authenticated/confidential delivery or fetch mechanism
 ```
 
-If a long-lived internal credential is required for this mechanism, it must be explicitly modeled as a Vault DON secret.
+Approved S001 mechanism (conditional on a CRE runtime spike confirming the required symmetric cryptography inside the TEE runtime):
+
+```text
+Catenor API seals the per-admission private context with a key derived from CATENOR_INTERNAL_API_TOKEN
+→ HTTP trigger carries only opaque run metadata + ciphertext
+→ handlerInTee retrieves CATENOR_INTERNAL_API_TOKEN from Vault DON
+→ private context is opened inside the TEE
+```
+
+The private context may contain the session reference, expected provider bindingRefs, Sumsub applicant IDs, the Trust Domain reference, and expiry / anti-replay data. If the runtime cannot safely support this, implementation STOPS for human review; a TEE → Catenor API context fetch is a fallback only after explicit human approval, because it changes the HTTP request budget and threat model.
+
+`CATENOR_INTERNAL_API_TOKEN` is the long-lived credential for this mechanism and is modeled as a Vault DON secret (§15).
 
 ---
 
@@ -818,7 +881,7 @@ BOOTSTRAP_ENDORSEMENT_CREATED
 TRUST_ANCHOR_ADMITTED
 ```
 
-Failure path includes `TRUST_ANCHOR_ADMISSION_DENIED`.
+Failure path includes `TRUST_ANCHOR_ADMISSION_DENIED`, and confidential-verification failures (including provider-binding mismatch) are recorded without exposing applicant IDs, bindingRefs or provider data.
 
 A verifier must be able to establish:
 
@@ -826,7 +889,7 @@ A verifier must be able to establish:
 1. recognized Trust Domain Bootstrap Configuration
 2. resolvable candidate DID
 3. valid DID Document
-4. valid assertion Verification Method
+4. valid assertion Verification Method, matching the endorsed verificationMethodCommitment
 5. matching Admission Record
 6. matching Trust Domain
 7. identifiable Admission Policy/version
@@ -842,6 +905,12 @@ Result:
 ```text
 TRUST_ANCHOR_VALID = true | false
 ```
+
+Verification claim (S001):
+
+> S001 cryptographically verifies Admission provenance and bootstrap endorsement, while current lifecycle status is read from the Catenor One operational status projection.
+
+Cryptographically verifiable in S001: the Bootstrap Configuration commitment, the Admission Policy commitment, the candidate assertion Verification Method (via `verificationMethodCommitment`), the Admission Decision binding, the bootstrap endorsement, and Admission Record integrity/binding. Items 11–12 (current `ACTIVE` / non-revoked status) come from the operational projection; S001 does not claim they are cryptographically proven. A later slice/protocol profile can make status and revocation independently verifiable.
 
 ---
 
@@ -871,6 +940,8 @@ bootstrap configuration mismatch
 candidate deactivated
 tampered Admission Record
 required CRE/Sumsub evidence unavailable
+provider binding mismatch (Sumsub externalUserId ≠ Catenor bindingRef)
+assertion Verification Method key replaced under the same Verification Method ID
 ```
 
 No failed path may create or activate a Trust Anchor.
@@ -879,9 +950,7 @@ No failed path may create or activate a Trust Anchor.
 
 # 29. Failure behavior
 
-LLM failure MUST NOT create ALLOW.
-
-If LLM use is advisory/explanatory, deterministic Admission may continue without it. If the LLM is used for extraction that is necessary to establish a required fact, inability to deterministically confirm that fact results in DENY or REQUIRES_REVIEW.
+If a provider applicant's `externalUserId` does not match the expected Catenor bindingRef, the confidential run establishes no facts and Admission MUST NOT result in `ALLOW`.
 
 If Sumsub or required confidential verification is unavailable or malformed:
 
@@ -925,12 +994,13 @@ key possession != Trust Anchor eligibility
 authentication != Admission
 self-assertion != initial trust
 database row != cryptographic Admission proof
-LLM recommendation != verified fact
+provider applicant not bound to the Catenor bindingRef != verified evidence
 missing required evidence != ALLOW
 ERROR / unknown != ALLOW
 Admission Decision != execution authorization
 raw confidential response must not leave TEE in plaintext for persistence
-provider references remain private
+raw provider responses are never persisted by Catenor
+provider references and bindingRefs remain private
 public Admission output is minimized
 logs contain no secrets or raw PII
 ```
@@ -943,14 +1013,14 @@ Happy path should show:
 
 ```text
 1. Candidate Organization enters Admission.
-2. Catenor creates/resolves canonical did:catenor.
-3. DID Document and public assertion key are visible.
-4. Proof of Key Possession succeeds.
-5. DEPLOYED Chainlink CRE Confidential Workflow executes.
-6. handlerInTee retrieves Vault DON secrets.
-7. TEE performs real confidential Sumsub verification.
-8. TEE performs auxiliary confidential LLM call when enabled.
-9. Only minimized verified facts leave confidential computation.
+2. Catenor creates/resolves canonical did:catenor and private provider bindingRefs.
+3. Operator attaches the Sumsub sandbox applicant references created with those bindingRefs.
+4. DID Document and public assertion key are visible.
+5. Proof of Key Possession succeeds.
+6. DEPLOYED Chainlink CRE Confidential Workflow identity-confidential executes the trust-anchor-admission operation.
+7. handlerInTee retrieves Vault DON secrets.
+8. TEE verifies the provider binding and performs real Sumsub sandbox verification over HTTPS from inside the TEE.
+9. Only minimized verified facts and the evidence commitment leave confidential computation.
 10. Admission Policy v1 deterministically returns ALLOW.
 11. Bootstrap endorsement is created/verified.
 12. Admission Record is created.
@@ -981,9 +1051,8 @@ CRE deployed workflow identifier/config
 real CRE deployment output
 real confidential execution evidence
 negative-path evidence
-sanitized Sumsub integration evidence
-sanitized LLM live-call evidence when used
-evidence commitment / encrypted-object metadata when implemented
+sanitized Sumsub integration evidence (labeled "Sumsub sandbox")
+evidence commitment (COMMITMENT_ONLY retention)
 ```
 
 Sponsor-specific artifacts belong under the existing `artifacts/` directories.
@@ -1000,8 +1069,8 @@ For S001:
 Chainlink CRE official agent/skill/docs → required
 Privy official agent/skill/docs         → required before selecting assertion-key adapter
 Sumsub current official API docs        → required
-LLM provider current official docs      → required
 Arc                                     → not used in S001
+LLM                                     → not used in S001
 ```
 
 Integration tooling may determine adapter details. It MUST NOT redefine Catenor domain semantics.
@@ -1039,71 +1108,78 @@ Database
 Public state
 → application Resolver/API projection, not public DB access
 
-Evidence storage
-→ Railway private Storage Bucket
+Evidence retention
+→ COMMITMENT_ONLY; raw provider responses never persisted by Catenor
+→ Railway private Storage Bucket not provisioned or used by S001
 
 Confidential compute
 → Chainlink CRE Confidential
 
+CRE workflow boundary
+→ identity-confidential (cohesive confidential identity workflow)
+
+S001 operation / handler
+→ trust-anchor-admission
+
 Sensitive handler
-→ handlerInTee
+→ handlerInTee (HTTPS requests executed from inside the TEE)
 
 CRE completion requirement
 → real deployment required; simulation alone insufficient
 
-Identity evidence provider
-→ real Sumsub integration
+CRE deployment registry
+→ private registry (another registry only with human approval)
 
-LLM
-→ confidential auxiliary component; never final authority
+Identity evidence provider
+→ real Sumsub integration (Sumsub sandbox, synthetic data, labeled as sandbox, for the hackathon)
+
+Provider binding
+→ Catenor-issued bindingRef = Sumsub externalUserId, verified inside the TEE; mismatch → no facts, no ALLOW
+
+Evidence processing
+→ deterministic only; no LLM in S001
 
 Admission Policy
 → public, versioned `policy:trust-anchor-admission:v1`
 
 Initial trust
-→ Trust Domain Bootstrap Configuration + bootstrap endorsement
+→ Trust Domain Bootstrap Configuration + bootstrap endorsement (binds verificationMethodCommitment)
 
-Baseline persistent CRE credentials
+Persistent CRE secrets
 → SUMSUB_APP_TOKEN
 → SUMSUB_SECRET_KEY
-→ LLM_API_KEY
-
-Arc
-→ not part of S001
-```
-
----
-
+→ CATENOR_INTERNAL_API_TOKEN
 
 Bootstrap access
 → environment allowlist via ALLOWED_BOOTSTRAP_EMAILS for v1
 → application access control only
 → does not imply Trust Anchor eligibility
 
+Arc
+→ not part of S001
+```
+
 # 37. Open PLAN decisions
 
-These remain implementation decisions and must be proposed in `PLAN.md` rather than silently invented while coding:
+These implementation decisions were proposed and approved in `PLAN.md` Rev 2 (2026-09-10); several remain conditional on the spikes listed there. They must not be silently changed while coding:
 
 ```text
 exact did:catenor random identifier encoding
-exact crypto suite/profile
-exact assertion-key implementation
+exact crypto suite/profile                                 (conditional on the Privy signing spike)
+exact assertion-key implementation                         (conditional on the Privy signing spike)
 whether Privy is used for S001 assertion signing after official review
 exact CRE trigger type
-exact private per-admission context transport into TEE
-whether CATENOR_INTERNAL_API_TOKEN is necessary
-exact Sumsub endpoints and applicant mapping
-exact LLM provider/model and auxiliary task
+exact private per-admission context transport into TEE    (conditional on the CRE runtime spike)
+CATENOR_INTERNAL_API_TOKEN purpose                         (approved: channel/root secret)
+exact Sumsub endpoints and applicant mapping               (confirmed against Sumsub sandbox responses)
 exact policy canonical serialization/hash algorithm
 exact evidence commitment format
-exact encrypted evidence-package format
-exact TEE → Railway Bucket upload mechanism
-exact evidence encryption/decryption key mechanism
 exact Prisma schema/table names
 exact resolver/API routes
 exact bootstrap endorsement proof envelope
 exact audit persistence representation
 exact frontend flow
+encrypted evidence-package format / bucket upload / evidence key mechanism   → not applicable to S001 (COMMITMENT_ONLY)
 ```
 
 If an official integration constraint makes a frozen requirement infeasible, implementation MUST stop and surface the incompatibility for human review instead of silently weakening the requirement.

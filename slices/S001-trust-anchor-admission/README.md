@@ -11,13 +11,14 @@ Bootstrap Access Gate
         ↓
 Trust Domain Bootstrap Configuration
         ↓
-Canonical Organization / did:catenor
+Canonical Organization / did:catenor + private provider bindingRefs
         ↓
 Credential Assertion Key + Proof of Possession
         ↓
-Chainlink CRE Confidential Verification
+Chainlink CRE Confidential Workflow identity-confidential
+(operation trust-anchor-admission, handlerInTee)
         ↓
-Real Sumsub evidence + auxiliary LLM
+Real Sumsub sandbox evidence → deterministic facts + evidence commitment
         ↓
 Deterministic Admission Policy
         ↓
@@ -39,9 +40,7 @@ Read in this order:
 5. repository `docs/architecture/CLAUDE-RULES.md`
 6. repository `docs/PROTOCOL-BASELINE.md`
 
-`PLAN.md` and `TASKS.md` are intentionally not finalized in this package.
-
-They must be proposed only after reviewing the source-of-truth documents and current official integration tooling.
+`PLAN.md` (Rev 2) and `TASKS.md` were approved on 2026-09-10 after review of the source-of-truth documents and current official integration tooling. The Rev 2 amendments are applied to `SPEC.md`, `ACCEPTANCE.md` and `TEST-VECTORS.md` (T0.9).
 
 ## Architecture
 
@@ -54,12 +53,14 @@ S001 follows:
 Hackathon completion requires:
 
 ```text
-real Chainlink CRE Confidential deployment
-real handlerInTee execution
-real Vault DON secret retrieval
-real confidential Sumsub request
+real Chainlink CRE Confidential deployment (identity-confidential, private registry)
+real handlerInTee execution (trust-anchor-admission)
+real Vault DON secret retrieval (3 secrets)
+real Sumsub sandbox request executed over HTTPS from inside the TEE
 real end-to-end Admission result
 ```
+
+S001 uses no LLM. Evidence retention is COMMITMENT_ONLY: Catenor never persists raw Sumsub responses.
 
 Simulation is part of development, but simulation alone is not completion.
 

@@ -413,10 +413,21 @@ Contracts are slice-driven. S001 does not require a contract by default.
 
 ```text
 workflows/
+├── identity-confidential/        cohesive confidential identity workflow
+│     ├── trust-anchor-admission    S001 operation/handler
+│     └── subject-continuity        planned S002 operation/handler
 ├── credential-recertifier/
-├── subject-continuity/
 └── distribution/
 ```
+
+Workflow boundary rule (approved in S001 `PLAN.md` Rev 2, decision D20; ADR to follow per D24):
+
+```text
+WORKFLOW = security boundary + cohesive business responsibility + lifecycle/deployment boundary
+HANDLER  = specific operation / entry point inside that responsibility
+```
+
+Do not create one CRE workflow per vertical slice or micro-function, nor one workflow for all Catenor One responsibilities. The empty `workflows/subject-continuity/` placeholder from the initial scaffold is superseded by the planned `identity-confidential` handler and will be reconciled when S002 starts.
 
 Workflows implement infrastructure behavior; they do not own canonical domain semantics.
 

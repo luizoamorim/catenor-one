@@ -4,7 +4,9 @@
 **Project:** Catenor One  
 **Protocol baseline:** Catenor Protocol Draft v0.1  
 **Slice:** `S001-trust-anchor-admission`  
-**Status:** Draft for human approval
+**Status:** Draft for human approval — Rev 2 amendments applied (2026-09-10, T0.9)
+
+> **Rev 2:** retired criteria keep their IDs as `RETIRED` (never reused) so traceability stays stable: AC-S001-031, 032, 033, 034, 041 (LLM removed from S001). AC-S001-057 and 059 are marked not applicable to S001 (COMMITMENT_ONLY retention). New criteria are appended with new IDs and placed in their topical section: AC-S001-075 (provider-binding mismatch) and AC-S001-076 (Verification Method commitment).
 
 ---
 
@@ -329,12 +331,12 @@ it MUST NOT contain:
 
 ```text
 Sumsub applicant IDs
+Catenor provider bindingRefs
 raw KYB/KYC data
 PII
 private provider mappings
 private Account Bindings
 private keys
-raw confidential LLM data
 ```
 
 ---
@@ -528,6 +530,8 @@ the deployed confidential workflow performs a real request to Sumsub for the req
 
 A local fixture or mock MUST NOT satisfy this live acceptance criterion.
 
+For the hackathon, real API calls against the **Sumsub sandbox** with synthetic Organization / representative data satisfy this criterion, provided all documentation and the Judge Inspector label it "Sumsub sandbox" and do not imply production KYB of a real company.
+
 ---
 
 ## AC-S001-020 — Sumsub identifiers remain private
@@ -544,7 +548,7 @@ public API projections, DID Documents, judge-facing public state, and normal log
 
 **THEN**
 
-raw provider applicant identifiers MUST NOT be exposed.
+raw provider applicant identifiers and Catenor provider bindingRefs MUST NOT be exposed.
 
 ---
 
@@ -584,6 +588,41 @@ the result MUST remain non-ALLOW.
 
 ---
 
+## AC-S001-075 — Provider-binding mismatch fails closed
+
+**Priority:** P0
+
+*(Added in Rev 2; placed here by topic.)*
+
+**GIVEN**
+
+```text
+Catenor issued the private provider bindingRefs for COMPANY and REPRESENTATIVE
+AND
+provider applicant references were attached to the Admission session
+AND
+the externalUserId of at least one attached Sumsub applicant does not match
+the Catenor-generated expected bindingRef
+```
+
+**WHEN**
+
+confidential provider verification runs
+
+**THEN**
+
+```text
+confidential verification MUST NOT establish any of the required Admission facts
+AND
+Admission MUST NOT result in ALLOW
+AND
+no bootstrap endorsement, successful Admission Record or ACTIVE status is created
+```
+
+The failure is auditable without exposing applicant IDs, bindingRefs or provider data.
+
+---
+
 # 11. Chainlink CRE Confidential
 
 ## AC-S001-023 — Sensitive verification executes inside handlerInTee
@@ -606,7 +645,7 @@ the sensitive path executes through:
 handlerInTee(...)
 ```
 
-using the current supported Confidential Workflow runtime.
+using the current supported Confidential Workflow runtime, as the `trust-anchor-admission` operation of the `identity-confidential` workflow, with provider HTTPS requests executed from inside the TEE (CRE `HTTPClient` with `TeeRuntime`).
 
 ---
 
@@ -626,15 +665,13 @@ third-party credentials are needed
 
 the handler retrieves the configured secrets from the supported Chainlink secret mechanism.
 
-Baseline:
+S001 persistent secrets (exactly 3):
 
 ```text
 SUMSUB_APP_TOKEN
 SUMSUB_SECRET_KEY
-LLM_API_KEY
+CATENOR_INTERNAL_API_TOKEN
 ```
-
-where the LLM is enabled.
 
 ---
 
@@ -755,80 +792,25 @@ the project preserves sanitized judge-verifiable evidence that the real deployed
 
 ---
 
-# 12. LLM
+# 12. Retired criteria (removed component)
 
-## AC-S001-031 — LLM cannot directly decide Admission
+S001 contains no LLM; all Admission facts are derived deterministically (SPEC §16). The following IDs are retained as RETIRED for traceability and are never reused.
 
-**Priority:** P0
+## AC-S001-031 — RETIRED
 
-**GIVEN**
+**Status:** RETIRED (Rev 2). The component it constrained was removed from S001. The intent that no non-deterministic input can override a false deterministic requirement is covered by AC-S001-036 / 037 and TV-S001-F11.
 
-the LLM produces an output recommending or implying approval
+## AC-S001-032 — RETIRED
 
-**WHEN**
+**Status:** RETIRED (Rev 2). Not applicable to S001. In-TEE execution of sensitive provider requests is covered by AC-S001-023 / 026.
 
-one deterministic required Admission condition is false
+## AC-S001-033 — RETIRED
 
-**THEN**
+**Status:** RETIRED (Rev 2). The component it constrained was removed from S001. Provider failure behavior remains covered by AC-S001-021 / 022.
 
-the final Admission Decision MUST still be `DENY`.
+## AC-S001-034 — RETIRED
 
----
-
-## AC-S001-032 — Sensitive LLM request is made confidentially
-
-**Priority:** P1
-
-**GIVEN**
-
-the LLM is used to inspect sensitive corporate evidence
-
-**WHEN**
-
-the live workflow calls the LLM
-
-**THEN**
-
-the sensitive call SHOULD originate from inside the confidential handler rather than from an ordinary public/backend execution path.
-
----
-
-## AC-S001-033 — LLM failure never becomes ALLOW
-
-**Priority:** P0
-
-**GIVEN**
-
-the LLM:
-
-```text
-times out
-returns malformed output
-returns an unsupported result
-or fails
-```
-
-**WHEN**
-
-that output is relevant to a required Admission fact
-
-**THEN**
-
-the system MUST NOT infer that the fact is true.
-
----
-
-## AC-S001-034 — Mock LLM is clearly marked in non-live environments
-
-**Priority:** P1
-
-**GIVEN**
-
-a local/simulation fixture replaces the LLM
-
-**THEN**
-
-the resulting logs/artifacts MUST identify it as a mock.
+**Status:** RETIRED (Rev 2). Mock labeling for all integrations is covered by AC-S001-072.
 
 ---
 
@@ -977,31 +959,13 @@ the result is `DENY`.
 
 Identity verification alone does not establish authority to act for an Organization.
 
+`REPRESENTATIVE_AUTHORITY_CONFIRMED` is derived only from deterministic provider evidence (SPEC §12.2). If the provider configuration cannot provider-verifiably establish the role, the limitation MUST be documented and shown in the Judge Inspector rather than presented as certainty.
+
 ---
 
-## AC-S001-041 — LLM-only representative authority is insufficient
+## AC-S001-041 — RETIRED
 
-**Priority:** P0
-
-**GIVEN**
-
-an LLM extracts:
-
-```text
-role = director
-```
-
-**BUT**
-
-the result cannot be confirmed through the accepted deterministic/evidence path
-
-**WHEN**
-
-`REPRESENTATIVE_AUTHORITY_CONFIRMED` is derived
-
-**THEN**
-
-it MUST NOT be set to true solely because of the LLM output.
+**Status:** RETIRED (Rev 2). The component it constrained was removed from S001. That authority can only come from deterministic provider evidence is covered by AC-S001-040 and TV-S001-F06.
 
 ---
 
@@ -1013,7 +977,7 @@ it MUST NOT be set to true solely because of the LLM output.
 
 **GIVEN**
 
-the required evidence timestamps/status satisfy the configured freshness rule
+the required evidence timestamps/status satisfy the configured freshness rule (Bootstrap Configuration; Catenor One reference value 180 days [REF-IMPL])
 
 **WHEN**
 
@@ -1067,7 +1031,9 @@ the Initial Trust Anchor is finalized
 
 **THEN**
 
-a bootstrap endorsement is created that cryptographically binds the required Admission context.
+a bootstrap endorsement is created that cryptographically binds the required Admission context, including the Bootstrap Configuration commitment and the `verificationMethodCommitment` of the assertion Verification Method (SPEC §8).
+
+The endorsement step is initiated by an authorized bootstrap operator and signed by a bootstrap signing authority separate from the candidate's assertion key.
 
 ---
 
@@ -1110,6 +1076,39 @@ activation is attempted
 **THEN**
 
 the candidate MUST NOT become an active Trust Anchor.
+
+---
+
+## AC-S001-076 — Verification Method key replacement is detectable
+
+**Priority:** P0
+
+*(Added in Rev 2; placed here by topic.)*
+
+**GIVEN**
+
+the bootstrap endorsement binds
+
+```text
+verificationMethodCommitment
+= SHA-256(JCS(canonical VerificationMethod {id, controller, type, publicKeyMultibase}))
+```
+
+**AND**
+
+the public key of the assertion Verification Method is replaced while keeping the same Verification Method ID (before activation or after admission)
+
+**WHEN**
+
+activation or Trust Anchor verification is performed
+
+**THEN**
+
+```text
+the recomputed verificationMethodCommitment does not match the endorsed value
+AND
+activation is rejected / TRUST_ANCHOR_VALID = false
+```
 
 ---
 
@@ -1306,7 +1305,7 @@ and public application responses MUST NOT accidentally include private operation
 
 **GIVEN**
 
-Sumsub applicant references are stored for the Organization/representative
+Sumsub applicant references and Catenor provider bindingRefs are stored for the Organization/representative
 
 **WHEN**
 
@@ -1318,7 +1317,7 @@ they are classified and accessed as private operational data.
 
 ---
 
-# 21. Evidence Vault
+# 21. Evidence retention (COMMITMENT_ONLY)
 
 ## AC-S001-056 — Raw evidence is not stored as plaintext merely for convenience
 
@@ -1338,71 +1337,49 @@ the implementation MUST NOT intentionally pass the raw plaintext response to the
 
 ---
 
-## AC-S001-057 — Encrypted evidence package is used when safely supported
+## AC-S001-057 — NOT APPLICABLE TO S001
 
-**Priority:** P1
-
-**GIVEN**
-
-the selected deployed CRE pattern safely supports encrypted evidence retention
-
-**WHEN**
-
-evidence is retained
-
-**THEN**
-
-the retained sensitive object is encrypted before crossing the confidential boundary and stored in the Railway private bucket.
+**Status:** Not applicable to S001 (Rev 2). S001 uses COMMITMENT_ONLY retention by design and retains no encrypted evidence objects; no custom evidence encryption is implemented and the Railway bucket is not used. The ID is reserved for a later slice that retains evidence with an approved, standard encryption scheme.
 
 ---
 
-## AC-S001-058 — Safe fallback if encrypted retention is not supported
+## AC-S001-058 — S001 uses COMMITMENT_ONLY evidence retention
 
 **Priority:** P0
 
 **GIVEN**
 
-the current deployed CRE model cannot safely persist a raw encrypted evidence snapshot without exposing plaintext outside the TEE
+S001 confidential verification has completed
 
 **WHEN**
 
-S001 is implemented
+Catenor persists the result
 
 **THEN**
 
-the implementation MUST prefer:
+Catenor persists only:
 
 ```text
-no raw evidence snapshot
-+
 minimized verified facts
 +
-evidence commitment/reference where meaningful
+evidenceCommitment with its normalized commitment preimage and provider-response digests
 +
-private provider reference for authorized re-verification
+private provider references (and bindingRefs) for authorized re-verification with the provider
++
+CRE execution reference
 ```
 
-rather than weakening confidentiality.
+**AND**
+
+no raw Sumsub response, raw PII or private provider evidence snapshot is persisted in any database, bucket, log or artifact.
+
+The commitment can be recomputed against the retained normalized commitment preimage and provider-response digests. It binds the Admission to what was observed during confidential execution, but does not preserve or reconstruct the raw provider evidence.
 
 ---
 
-## AC-S001-059 — Evidence decryption key is not stored beside evidence
+## AC-S001-059 — NOT APPLICABLE TO S001
 
-**Priority:** P1
-
-**GIVEN**
-
-encrypted evidence objects are retained
-
-**THEN**
-
-the private decryption key MUST NOT be stored:
-
-```text
-in normal PostgreSQL state
-or
-inside the same bucket object/package as the ciphertext
-```
+**Status:** Not applicable to S001 (Rev 2) — vacuously satisfied: no encrypted evidence objects and no evidence decryption key exist. Any later slice that retains encrypted evidence MUST keep its decryption key out of normal PostgreSQL state and out of the ciphertext's bucket object/package.
 
 ---
 
@@ -1498,7 +1475,7 @@ the verifier confirms:
 ```text
 recognized Trust Domain bootstrap
 DID resolves
-Verification Method exists
+Verification Method exists and matches the endorsed verificationMethodCommitment
 Admission Record exists
 policy commitment matches
 Admission Decision = ALLOW
@@ -1512,6 +1489,8 @@ and returns:
 ```text
 TRUST_ANCHOR_VALID = true
 ```
+
+The verification output and UI MUST state the S001 claim precisely: S001 cryptographically verifies Admission provenance and bootstrap endorsement, while current lifecycle status (`ACTIVE` / non-revoked) is read from the Catenor One operational status projection. It MUST NOT claim that current status is cryptographically proven.
 
 ---
 
@@ -1575,10 +1554,11 @@ Trust Domain bootstrap configuration
 canonical did:catenor
 public DID Document
 assertion key possession
-deployed Chainlink CRE workflow
+provider bindingRefs attached and verified inside the TEE
+deployed Chainlink CRE workflow identity-confidential (operation trust-anchor-admission)
 handlerInTee confidential execution
-real Sumsub verification
-minimized verified facts
+real Sumsub sandbox verification over HTTPS from inside the TEE
+minimized verified facts + evidence commitment
 deterministic Admission Policy = ALLOW
 bootstrap endorsement
 Admission Record
@@ -1631,10 +1611,15 @@ Policy/version/hash
 ALLOW/DENY
 Admission Record projection
 audit timeline
-CRE deployment reference
+CRE deployment reference (identity-confidential / trust-anchor-admission)
+provider environment label: "Sumsub sandbox"
+representative-authority evidence class and any documented limitation
+verification checks labeled cryptographic vs operational projection
 sponsor integration artifacts
 negative-path replay
 ```
+
+It MUST NOT expose applicant IDs, bindingRefs, operator emails or provider data.
 
 ---
 
@@ -1684,19 +1669,25 @@ one failure/negative path where practical
 
 **Priority:** P1
 
-The repository/demo contains enough sanitized evidence to show that the live path used Sumsub without exposing private user/provider data.
+The repository/demo contains enough sanitized evidence to show that the live path used the Sumsub sandbox without exposing private user/provider data, applicant IDs or bindingRefs. The evidence is labeled "Sumsub sandbox".
 
 ---
 
-## AC-S001-072 — LLM integration is truthfully represented
+## AC-S001-072 — Integrations are truthfully represented
 
 **Priority:** P0
 
-If the live path uses a real LLM call, the demo/docs may state that.
+*(Rev 2: generalized from the retired LLM-specific wording.)*
 
-If only a mock is used in a particular environment, that environment MUST be labeled as mocked.
+```text
+mocks / fixtures MUST be labeled as MOCK wherever they appear (logs, artifacts, UI)
+simulation MUST be labeled as simulation (the local simulator is not a TEE) and never presented as deployment
+the Sumsub environment MUST be labeled "Sumsub sandbox" and MUST NOT imply production KYB of a real company
+CRE usage MUST be described as "HTTPS requests executed from inside the confidential TEE boundary",
+  never as use of the separate Confidential HTTP capability
+```
 
-No mock may be represented as a real sponsor/provider integration.
+No mock, simulation or sandbox may be represented as a production or deployed sponsor/provider integration.
 
 ---
 
@@ -1755,7 +1746,10 @@ private signing key in PostgreSQL
 raw CRE secret in Git
 raw provider secret in logs
 raw confidential Sumsub response emitted publicly
-LLM directly authorizes Trust Anchor Admission
+raw Sumsub response persisted by Catenor
+Admission Policy fact set from anything other than a deterministic verifier
+provider-binding mismatch yields verified facts or ALLOW
+Verification Method key replaced under the same ID still verifies
 bootstrap email alone creates Trust Anchor
 self-signed "I am trusted" creates Trust Anchor
 DENY creates ACTIVE status
@@ -1778,7 +1772,9 @@ The following cases must exist before S001 is considered complete:
 | Required policy fact false | `DENY`, no active Trust Anchor |
 | Missing required fact | non-ALLOW |
 | Sumsub/CRE required verification unavailable | non-ALLOW |
+| Provider-binding mismatch (`externalUserId` ≠ bindingRef) | no verified facts, non-ALLOW |
 | Invalid bootstrap endorsement | no activation |
+| Verification Method key replaced under the same ID | activation rejected / `TRUST_ANCHOR_VALID = false` |
 | Tampered Admission state | `TRUST_ANCHOR_VALID = false` |
 | Happy-path Trust Anchor verification | `TRUST_ANCHOR_VALID = true` |
 
@@ -1804,7 +1800,7 @@ negative-path tests pass
 CRE simulation passes
 CRE Confidential Workflow is deployed for real
 live TEE execution is evidenced
-real Sumsub call is evidenced
+real Sumsub sandbox call from inside the TEE is evidenced
 
 happy path succeeds
 required DENY path succeeds

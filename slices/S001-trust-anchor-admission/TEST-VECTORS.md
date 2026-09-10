@@ -4,7 +4,9 @@
 **Project:** Catenor One  
 **Protocol baseline:** Catenor Protocol Draft v0.1  
 **Slice:** `S001-trust-anchor-admission`  
-**Status:** Draft for human approval
+**Status:** Draft for human approval — Rev 2 amendments applied (2026-09-10, T0.9)
+
+> **Rev 2:** retired vectors keep their IDs as `RETIRED` (never reused): TV-S001-E08, E09, E10, F12. TV-S001-I05 is not applicable to S001 (COMMITMENT_ONLY). New vectors: TV-S001-E11 (provider-binding mismatch), TV-S001-G06 and TV-S001-J07 (Verification Method key replacement under the same ID).
 
 ---
 
@@ -141,6 +143,27 @@ These values are PRIVATE application fixtures.
 
 They MUST NOT appear in public DID state or normal public logs.
 
+Catenor-issued provider binding references (fixture values; the implementation generates opaque random values in the charset confirmed against the Sumsub sandbox):
+
+```text
+COMPANY_BINDING_REF
+= catenor-binding-fixture-company-001
+
+REPRESENTATIVE_BINDING_REF
+= catenor-binding-fixture-representative-001
+```
+
+Expected binding for the happy path:
+
+```text
+company applicant externalUserId        = COMPANY_BINDING_REF
+representative applicant externalUserId = REPRESENTATIVE_BINDING_REF
+```
+
+bindingRefs are PRIVATE operational state and follow the same exposure rules as applicant IDs.
+
+Live vectors use the **Sumsub sandbox** with synthetic Organization / representative data.
+
 ---
 
 # 6. Assertion-key fixtures
@@ -167,6 +190,20 @@ SIGNER_REF
 ```
 
 `SIGNER_REF` is private operational metadata.
+
+Verification Method commitment bound by the bootstrap endorsement [REF-IMPL]:
+
+```text
+VERIFICATION_METHOD_COMMITMENT
+= SHA-256(JCS({
+    "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "controller": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "type": "Multikey",
+    "publicKeyMultibase": "z6MkFixtureAssertionPublicKey001"
+  }))
+```
+
+The concrete hex value is produced by the golden-vector generator once PLAN freezes the encoding.
 
 Private key material MUST NOT be stored in these vectors or committed to the repository.
 
@@ -220,7 +257,7 @@ A. Bootstrap Access
 B. Bootstrap Configuration
 C. Canonical Identity
 D. Assertion Key / Proof of Possession
-E. Chainlink CRE + Sumsub + LLM
+E. Chainlink CRE (identity-confidential) + Sumsub
 F. Admission Policy
 G. Bootstrap Endorsement
 H. Admission Record / Activation
@@ -597,7 +634,9 @@ Admission Policy = DENY
 
 ---
 
-# E. Chainlink CRE + Sumsub + LLM
+# E. Chainlink CRE (identity-confidential) + Sumsub
+
+All E vectors exercise the `trust-anchor-admission` operation of the `identity-confidential` workflow. Provider HTTPS requests are executed from inside `handlerInTee` (CRE `HTTPClient` with `TeeRuntime`).
 
 ## TV-S001-E01 — CRE simulation happy path
 
@@ -605,9 +644,11 @@ Admission Policy = DENY
 
 ### Inputs
 
-Mock provider fixtures return:
+Mock provider fixtures (labeled MOCK) return:
 
 ```text
+company applicant externalUserId = COMPANY_BINDING_REF
+representative applicant externalUserId = REPRESENTATIVE_BINDING_REF
 company KYB = verified
 company status = valid
 AML = clear
@@ -621,9 +662,11 @@ evidence freshness = valid
 Inside the workflow:
 
 ```text
-handlerInTee executes
-secrets are resolved through the configured secret mechanism
-confidential HTTP path executes
+handlerInTee executes (operation trust-anchor-admission)
+secrets are resolved through the configured secret mechanism (one batched call)
+sealed private context is opened inside the TEE
+HTTPS requests execute from inside handlerInTee (mock provider endpoint)
+provider-binding check passes
 minimal result is produced
 ```
 
@@ -674,17 +717,18 @@ DENY
 ### Preconditions
 
 ```text
-real CRE Confidential Workflow deployed
-Vault DON contains required secrets
-real Sumsub test/live candidate reference available
+real CRE Confidential Workflow identity-confidential deployed (private registry)
+Vault DON contains the 3 required secrets
+real Sumsub sandbox applicant references attached, bound to Catenor bindingRefs
 ```
 
 ### Expected
 
 ```text
-real TEE handler execution
-real confidential Sumsub HTTPS call
-sanitized live execution artifact preserved
+real TEE handler execution (trust-anchor-admission)
+real Sumsub sandbox HTTPS calls executed from inside the TEE
+provider-binding check passes
+sanitized live execution artifact preserved (labeled "Sumsub sandbox")
 minimal result returned
 ```
 
@@ -780,14 +824,14 @@ raw full provider response
 
 ---
 
-## TV-S001-E07 — Baseline CRE secret names are present
+## TV-S001-E07 — S001 CRE secret names are present
 
-### Expected configured persistent secret names
+### Expected configured persistent secret names (exactly 3)
 
 ```text
 SUMSUB_APP_TOKEN
 SUMSUB_SECRET_KEY
-LLM_API_KEY
+CATENOR_INTERNAL_API_TOKEN
 ```
 
 ### Expected
@@ -800,87 +844,61 @@ secret values never printed in normal logs
 
 ---
 
-## TV-S001-E08 — Auxiliary LLM returns valid structured extraction
+## TV-S001-E08 — RETIRED
 
-### Input inside TEE
-
-Synthetic corporate authority text:
-
-```text
-"The board authorizes Alice Example, Director,
-to act on behalf of Organization A for this admission."
-```
-
-### Example LLM candidate output
-
-```json
-{
-  "representative": "Alice Example",
-  "role": "Director",
-  "authorityClaim": "act on behalf of Organization A"
-}
-```
-
-### Expected
-
-The system MAY use this output as extraction assistance.
-
-It MUST still perform the configured deterministic/evidence validation before setting:
-
-```text
-REPRESENTATIVE_AUTHORITY_CONFIRMED = true
-```
+**Status:** RETIRED (Rev 2). The component it exercised was removed from S001; ID reserved and never reused.
 
 ---
 
-## TV-S001-E09 — LLM hallucinates authority
+## TV-S001-E09 — RETIRED
 
-### Input evidence
-
-```text
-document contains no authority grant
-```
-
-### LLM output
-
-```json
-{
-  "role": "Director",
-  "authorityConfirmed": true
-}
-```
-
-### Expected
-
-```text
-REPRESENTATIVE_AUTHORITY_CONFIRMED != true solely from LLM output
-Admission MUST NOT ALLOW based on this hallucination
-```
+**Status:** RETIRED (Rev 2). ID reserved. That authority is never set true without deterministic provider evidence is covered by TV-S001-F06.
 
 ---
 
-## TV-S001-E10 — LLM timeout
+## TV-S001-E10 — RETIRED
+
+**Status:** RETIRED (Rev 2). The component it exercised was removed from S001; ID reserved and never reused.
+
+---
+
+## TV-S001-E11 — Provider-binding mismatch
+
+**Environment:** unit + CRE simulation (+ live where practical)
+
+### Preconditions
+
+```text
+Catenor issued COMPANY_BINDING_REF and REPRESENTATIVE_BINDING_REF
+company and representative applicant references attached to the Admission session
+key possession valid
+```
+
+### Input
+
+One of:
+
+```text
+company applicant externalUserId        = some-other-reference
+representative applicant externalUserId = some-other-reference
+applicant has no externalUserId
+```
 
 ### Expected
 
-If LLM is advisory only:
-
 ```text
-workflow may continue without LLM result
-provided all required facts can be established independently
+provider-binding check fails inside handlerInTee before fact derivation
+no Admission facts are established by the confidential run
+run result = ERROR (e.g. PROVIDER_BINDING_MISMATCH)
+Admission MUST NOT ALLOW
+no bootstrap endorsement, no successful Admission Record, status != ACTIVE
 ```
 
-If LLM-backed extraction is required to establish a required fact:
+### Must NOT happen
 
 ```text
-that fact remains unverified
-Admission result = non-ALLOW
-```
-
-Never:
-
-```text
-LLM timeout → assume true
+any of the six evidence facts returned as true
+applicant IDs or bindingRefs appearing in logs, callback errors, audit details or judge views
 ```
 
 ---
@@ -1092,20 +1110,9 @@ Unknown/untrusted fields cannot override required facts.
 
 ---
 
-## TV-S001-F12 — LLM says ALLOW but policy input fails
+## TV-S001-F12 — RETIRED
 
-### Input
-
-```text
-llmRecommendation = "ALLOW"
-ORGANIZATION_AML_CLEAR = false
-```
-
-### Expected
-
-```text
-decision = DENY
-```
+**Status:** RETIRED (Rev 2). ID reserved and never reused. That an untrusted, non-policy input cannot override a false required fact is covered by TV-S001-F11.
 
 ---
 
@@ -1119,8 +1126,11 @@ decision = DENY
 Admission Policy = ALLOW
 Bootstrap Configuration = valid
 candidate DID = expected DID
+verificationMethodCommitment = VERIFICATION_METHOD_COMMITMENT
 policy hash = expected hash
 evidence commitment = expected commitment
+endorsement requested by an authorized bootstrap operator
+signed by the bootstrap signing authority (not the candidate's assertion key)
 ```
 
 ### Expected
@@ -1204,6 +1214,32 @@ endorsement signature produced by unauthorized key
 
 ```text
 bootstrapEndorsementValid = false
+activation rejected
+```
+
+---
+
+## TV-S001-G06 — Verification Method key replaced before activation
+
+### Input
+
+Endorsement binds:
+
+```text
+verificationMethodCommitment = VERIFICATION_METHOD_COMMITMENT   (publicKeyMultibase = z6MkFixtureAssertionPublicKey001)
+```
+
+Before activation, the DID Document's `#assertion-key-1` is changed to:
+
+```text
+publicKeyMultibase = z6MkFixtureReplacementKey999   (same Verification Method id)
+```
+
+### Expected
+
+```text
+recomputed verificationMethodCommitment != endorsed value
+endorsement verification = false
 activation rejected
 ```
 
@@ -1299,7 +1335,11 @@ Expected grep/assertion conceptually:
 ```text
 public_output contains COMPANY_APPLICANT_ID = false
 public_output contains REPRESENTATIVE_APPLICANT_ID = false
+public_output contains COMPANY_BINDING_REF = false
+public_output contains REPRESENTATIVE_BINDING_REF = false
 ```
+
+"public output" includes public API projections, DID Documents and Judge Inspector responses.
 
 ---
 
@@ -1333,51 +1373,52 @@ After successful Admission:
 ```text
 normal PostgreSQL textual columns do not contain RAW_SECRET_DOCUMENT_VALUE_001
 normal application logs do not contain RAW_SECRET_DOCUMENT_VALUE_001
+TEE → API callback payload does not contain RAW_SECRET_DOCUMENT_VALUE_001
 ```
 
-If evidence is retained:
-
-```text
-bucket object = encrypted
-```
+S001 retains no evidence objects (COMMITMENT_ONLY); no bucket object is written.
 
 ---
 
-## TV-S001-I04 — Safe evidence-retention fallback
+## TV-S001-I04 — COMMITMENT_ONLY evidence retention
 
 ### Preconditions
 
 ```text
-deployed CRE implementation cannot securely encrypt/upload raw evidence before leaving the confidential boundary
+S001 uses COMMITMENT_ONLY retention by design
+confidential verification completed
 ```
 
 ### Expected
 
 ```text
-raw evidence snapshot is NOT persisted
+raw provider response / evidence snapshot is NOT persisted anywhere by Catenor
+no bucket object is written
 ```
 
-May persist:
+Persisted (private PostgreSQL only):
 
 ```text
 minimized facts
 evidence commitment
-private Sumsub provider ref
-re-verification metadata
+normalized commitment preimage + provider-response digests (no raw content)
+private Sumsub provider refs + bindingRefs
+CRE execution reference
 ```
+
+Commitment check:
+
+```text
+recompute(evidenceCommitment) from the retained normalized preimage + digests = stored evidenceCommitment
+```
+
+The commitment binds the Admission to what was observed during confidential execution; it does not preserve or reconstruct the raw provider evidence.
 
 ---
 
-## TV-S001-I05 — Evidence object and decryption key are separated
+## TV-S001-I05 — NOT APPLICABLE TO S001
 
-If encrypted evidence retention is implemented:
-
-### Expected
-
-```text
-bucket ciphertext does not embed private decryption key
-PostgreSQL does not contain private decryption key
-```
+**Status:** Not applicable to S001 (Rev 2). No encrypted evidence objects and no evidence decryption key exist (COMMITMENT_ONLY). Verified by deployment/config review that none exist. Reserved for a later slice that retains encrypted evidence.
 
 ---
 
@@ -1408,12 +1449,12 @@ no private assertion-key material
 
 ```text
 DID resolves
-Verification Method valid
+Verification Method valid and matches the endorsed verificationMethodCommitment
 Admission Record valid
 policy hash matches
 Decision = ALLOW
 bootstrap endorsement valid
-status = ACTIVE
+status = ACTIVE   (operational status projection)
 ```
 
 ### Expected
@@ -1421,6 +1462,8 @@ status = ACTIVE
 ```text
 TRUST_ANCHOR_VALID = true
 ```
+
+The result distinguishes cryptographically verified checks (Admission provenance, bootstrap endorsement) from lifecycle status read from the operational status projection.
 
 ---
 
@@ -1512,6 +1555,33 @@ status = DEACTIVATED
 current TRUST_ANCHOR_VALID = false
 ```
 
+In S001 the lifecycle status is an operational projection (status changes only through the test harness); J05/J06 verify that a non-ACTIVE projection is never reported as valid.
+
+---
+
+## TV-S001-J07 — Verification Method key replaced after admission
+
+### Preconditions
+
+```text
+Trust Anchor admitted with verificationMethodCommitment = VERIFICATION_METHOD_COMMITMENT
+```
+
+### Input
+
+After admission, the resolved DID Document's `#assertion-key-1` keeps its id but carries:
+
+```text
+publicKeyMultibase = z6MkFixtureReplacementKey999
+```
+
+### Expected
+
+```text
+recomputed verificationMethodCommitment != endorsed value
+TRUST_ANCHOR_VALID = false
+```
+
 ---
 
 # K. Idempotency / Lifecycle
@@ -1590,9 +1660,9 @@ new attempt may ALLOW
 ```text
 authorized bootstrap operator
 valid Bootstrap Configuration
-real Sumsub candidate reference
-deployed CRE Confidential Workflow
-valid Vault DON secrets
+Sumsub sandbox applicants created with the Catenor bindingRefs as externalUserId
+deployed CRE Confidential Workflow identity-confidential (private registry)
+valid Vault DON secrets (3)
 working assertion signer
 valid required evidence
 ```
@@ -1603,15 +1673,15 @@ valid required evidence
 1. operator authenticates
 2. bootstrap access accepted
 3. candidate Organization created/resolved
-4. did:catenor generated
-5. assertion key provisioned
-6. DID Document resolves
-7. key-possession challenge succeeds
-8. deployed CRE workflow executes
-9. handlerInTee fetches secrets
-10. real Sumsub confidential HTTPS call succeeds
-11. optional real LLM confidential call succeeds
-12. minimized facts returned
+4. did:catenor generated and private provider bindingRefs issued
+5. operator attaches the Sumsub sandbox applicant references
+6. assertion key provisioned
+7. DID Document resolves
+8. key-possession challenge succeeds
+9. deployed identity-confidential workflow executes the trust-anchor-admission operation
+10. handlerInTee fetches secrets and opens the sealed private context
+11. provider-binding check passes; real Sumsub sandbox HTTPS calls from inside the TEE succeed
+12. minimized facts + evidence commitment returned
 13. policy evaluates ALLOW
 14. bootstrap endorsement verifies
 15. Admission Record created
@@ -1625,7 +1695,7 @@ valid required evidence
 ```text
 CRE deployment reference
 live execution evidence
-sanitized provider integration evidence
+sanitized provider integration evidence (labeled "Sumsub sandbox")
 Admission Decision
 Admission Record
 DID Document
@@ -1674,7 +1744,7 @@ Example:
 ORGANIZATION_AML_CLEAR = false
 ```
 
-or another safe test fixture supported by the provider/demo environment.
+or another safe test fixture supported by the provider/demo environment (Sumsub sandbox).
 
 ### Expected
 
@@ -1727,9 +1797,10 @@ real government document numbers
 real private keys
 SUMSUB_SECRET_KEY
 SUMSUB_APP_TOKEN
-LLM_API_KEY
+CATENOR_INTERNAL_API_TOKEN
 private provider payloads
 private applicant IDs unless safely redacted
+provider bindingRefs unless safely redacted
 ```
 
 Use:
@@ -1760,7 +1831,7 @@ Infrastructure integration tests
 → E, I
 
 CRE simulation
-→ E01, E02
+→ E01, E02, E04, E05, E06, E11
 
 Live deployed integration
 → E03, L01, L02
@@ -1803,12 +1874,14 @@ wrong key purpose
 
 all policy facts true
 each policy fact false
-missing policy fact
-LLM recommendation cannot override policy
+missing policy fact (DENY; trace records MISSING, not FALSE)
+unknown / untrusted input cannot override policy
+provider-binding mismatch establishes no facts
 
 valid bootstrap endorsement
 invalid endorsement
 policy hash mismatch
+Verification Method key replaced under the same ID
 
 Admission success
 Admission DENY
@@ -1829,11 +1902,14 @@ Before real deployment:
 ```text
 simulation happy path
 simulation AML/policy DENY
-secret loading works
-confidential HTTP mock path works
-LLM mock path works if enabled
+simulation provider-binding mismatch → no facts
+secret loading works (3 secrets, one batched call)
+sealed private context opens inside handlerInTee
+in-TEE HTTPS mock provider path works
 raw sensitive fixture does not appear in output
 ```
+
+The local simulator is not a real TEE; simulation output is labeled as simulation.
 
 ---
 
@@ -1842,9 +1918,9 @@ raw sensitive fixture does not appear in output
 Before S001 is considered hackathon-complete:
 
 ```text
-real CRE deployment
-real handlerInTee execution
-real Sumsub confidential call
+real CRE deployment (identity-confidential, private registry)
+real handlerInTee execution (trust-anchor-admission)
+real Sumsub sandbox call over HTTPS from inside the TEE
 real minimized output
 real happy-path Admission
 real ACTIVE Trust Anchor
@@ -1852,7 +1928,7 @@ real verification = true
 live invalid-key DENY
 ```
 
-A real LLM call is strongly preferred for the live path if integration time permits.
+A live evidence/policy DENY (TV-S001-L03) is strongly preferred if the Sumsub sandbox permits it.
 
 ---
 

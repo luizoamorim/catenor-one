@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Catenor One — S001 Trust Anchor Admission Mock</title>
+  <title>Catenor One — S001 Trust Anchor Admission (visualization only)</title>
   <style>
     :root{
       --bg:#f4f1ea;
@@ -203,6 +203,7 @@
       <div class="pill">Technical Judge Inspector · S001 reference flow</div>
     </div>
   </header>
+  <div class="note" style="margin:12px auto 0;max-width:1200px"><b>Visualization only.</b> Illustrative values; not live sponsor evidence. Live state: <code>/judge/s001</code> · live execution evidence: <code>artifacts/chainlink/s001/</code>, <code>artifacts/privy/s001/</code>.</div>
 
   <main class="main">
     <aside class="panel sidebar">
@@ -222,7 +223,7 @@
         <div class="thesis">Private evidence in → verified facts out → explicit bootstrap trust → auditable authority.</div>
         <div class="flow">
           <div class="box"><b>1. Access</b><span>Authorized bootstrap operator</span></div>
-          <div class="box"><b>2. Evidence</b><span>Sumsub + optional LLM</span></div>
+          <div class="box"><b>2. Evidence</b><span>Sumsub sandbox → deterministic facts</span></div>
           <div class="box"><b>3. Decision</b><span>Catenor Admission Policy</span></div>
           <div class="box"><b>4. Authority</b><span>Admission Record + ACTIVE root</span></div>
         </div>
@@ -322,9 +323,10 @@ const steps = [
         <div class="card">
           <h4>Private provider bindings</h4>
           <div class="kv">
-            <div class="k">Company provider</div><div class="v">SUMSUB</div>
-            <div class="k">Company applicantId</div><div class="v">67f0••••b82a</div>
-            <div class="k">Representative applicantId</div><div class="v">68a4••••91fd</div>
+            <div class="k">Provider</div><div class="v">SUMSUB SANDBOX</div>
+            <div class="k">bindingRefs issued first</div><div class="v">COMPANY, REPRESENTATIVE (redacted)</div>
+            <div class="k">Applicant externalUserId</div><div class="v">= Catenor bindingRef</div>
+            <div class="k">Applicant IDs attached</div><div class="v">after setup (redacted)</div>
             <div class="k">Public?</div><div class="v">NO</div>
           </div>
         </div>
@@ -363,36 +365,37 @@ const steps = [
       </div>`
   },
   {
-    id:"cre", title:"Confidential Verification", sub:"Chainlink CRE handlerInTee",
-    desc:"The deployed CRE Confidential Workflow performs sensitive evidence retrieval and processing inside the TEE. Secrets and raw provider/LLM responses do not become ordinary backend data.",
+    id:"cre", title:"Confidential Verification", sub:"CRE identity-confidential · trust-anchor-admission",
+    desc:"The deployed CRE Confidential Workflow identity-confidential runs the trust-anchor-admission operation inside the TEE. HTTPS requests to the Sumsub sandbox are executed from inside the confidential TEE boundary; secrets and raw provider responses never become ordinary backend data.",
     render:(s)=>`
       <div class="confidential">
-        <div class="conf-title">Inside Chainlink CRE Confidential / handlerInTee()</div>
+        <div class="conf-title">Inside Chainlink CRE Confidential / handlerInTee() · identity-confidential → trust-anchor-admission</div>
         <div class="grid2">
           <div class="card">
-            <h4>Vault DON secrets — batched</h4>
+            <h4>Vault DON secrets — one batched call</h4>
             <div class="secret-list">
               <span class="secret">SUMSUB_APP_TOKEN</span>
               <span class="secret">SUMSUB_SECRET_KEY</span>
-              <span class="secret">LLM_API_KEY</span>
+              <span class="secret">CATENOR_INTERNAL_API_TOKEN</span>
             </div>
-            <div class="note">Baseline: 3 persistent CRE secrets. Applicant IDs are private application data, not Vault credentials.</div>
+            <div class="note">Exactly 3 persistent CRE secrets. Applicant IDs and bindingRefs arrive sealed per run; they are not Vault credentials.</div>
           </div>
           <div class="card">
-            <h4>Confidential HTTP</h4>
+            <h4>HTTPS from inside the TEE</h4>
             <div class="kv">
-              <div class="k">1</div><div class="v">TEE → Sumsub</div>
-              <div class="k">2</div><div class="v">TEE → LLM (auxiliary)</div>
-              <div class="k">3</div><div class="v">normalize private responses</div>
-              <div class="k">4</div><div class="v">derive minimized facts</div>
+              <div class="k">1</div><div class="v">open sealed private context</div>
+              <div class="k">2</div><div class="v">TEE → Sumsub sandbox (company, representative)</div>
+              <div class="k">3</div><div class="v">provider-binding check: externalUserId = bindingRef</div>
+              <div class="k">4</div><div class="v">deterministic normalization → minimized facts + evidence commitment</div>
             </div>
           </div>
         </div>
       </div>
       <div class="grid2" style="margin-top:16px">
         <div class="card">
-          <h4>Sumsub result inside TEE</h4>
+          <h4>Sumsub sandbox result inside TEE</h4>
           <div class="kv">
+            <div class="k">Provider binding</div><div class="v">matched</div>
             <div class="k">Company KYB</div><div class="v">verified</div>
             <div class="k">Company status</div><div class="v">valid</div>
             <div class="k">AML</div><div class="v">${s==='aml'?'NOT_CLEAR':'clear'}</div>
@@ -400,40 +403,40 @@ const steps = [
           </div>
         </div>
         <div class="card">
-          <h4>LLM role</h4>
-          <p>Auxiliary extraction/explanation only. Example: identify representative role from a corporate authority document, then feed that result into deterministic validation.</p>
-          <div class="note"><b>LLM output ≠ verified fact by itself.</b></div>
+          <h4>Deterministic facts only</h4>
+          <p>Every Admission fact is derived by deterministic code from provider evidence. Representative authority uses company ↔ representative linkage, an accepted role and both verifications; any provider-side limitation is shown, not hidden.</p>
+          <div class="note"><b>Binding mismatch → no facts → no ALLOW.</b> Synthetic organization · Sumsub sandbox · not production KYB.</div>
         </div>
       </div>`
   },
   {
     id:"storage", title:"Evidence & Storage", sub:"Railway-only reference infrastructure",
-    desc:"Catenor One keeps public/resolvable state and private operational state in one private Railway PostgreSQL, while encrypted evidence objects live in a private Railway bucket. Keys and CRE secrets remain outside both.",
+    desc:"Catenor One keeps public/resolvable state and private operational state in one private Railway PostgreSQL. S001 uses COMMITMENT_ONLY evidence retention: no raw provider evidence is stored anywhere. Keys and CRE secrets remain outside the database.",
     render:()=>`
       <div class="grid2">
         <div class="card">
           <h4>Railway PostgreSQL</h4>
           <div class="kv">
-            <div class="k">Public projection</div><div class="v">DID docs, status, policy refs</div>
-            <div class="k">Private state</div><div class="v">Sumsub IDs, evidence refs, admission state</div>
+            <div class="k">Public projection</div><div class="v">DID docs, status projection, policy refs</div>
+            <div class="k">Private state</div><div class="v">provider refs + bindingRefs, facts, commitment preimage + response digests, admission state</div>
             <div class="k">Direct public DB</div><div class="v">NO</div>
             <div class="k">Public access</div><div class="v">Resolver / API only</div>
           </div>
         </div>
         <div class="card">
-          <h4>Railway Private Bucket</h4>
+          <h4>Evidence retention: COMMITMENT_ONLY</h4>
           <div class="kv">
-            <div class="k">Objects</div><div class="v">encrypted evidence packages</div>
-            <div class="k">Plaintext provider response</div><div class="v">NO</div>
-            <div class="k">DB stores</div><div class="v">objectRef + commitment</div>
+            <div class="k">Raw Sumsub response stored</div><div class="v">NO</div>
+            <div class="k">Evidence objects / bucket</div><div class="v">none in S001</div>
+            <div class="k">DB stores</div><div class="v">facts + evidence commitment</div>
           </div>
         </div>
       </div>
-      <div class="note"><b>Fallback rule:</b> if the deployed CRE model cannot safely persist an encrypted raw snapshot, we retain minimized facts + commitments + private provider refs rather than leak plaintext outside the TEE.</div>`
+      <div class="note"><b>Commitment semantics:</b> the commitment can be recomputed against the retained normalized preimage and provider-response digests. It binds the Admission to what was observed in the TEE, but does not preserve or reconstruct the raw provider evidence.</div>`
   },
   {
     id:"policy", title:"Admission Policy", sub:"Deterministic ALLOW / DENY",
-    desc:"Catenor's public, versioned Admission Policy evaluates verified facts. This is the final admission logic; the LLM never decides Trust Anchor status.",
+    desc:"Catenor's public, versioned Admission Policy evaluates verified facts. This deterministic evaluation is the final admission logic; missing required facts result in DENY.",
     render:(s)=>{
       const deny = s==='key'||s==='aml';
       return `
@@ -472,6 +475,7 @@ const steps = [
           <div class="kv">
             <div class="k">Trust Domain</div><div class="v">trust-domain:catenor-one-demo</div>
             <div class="k">Candidate DID</div><div class="v">did:catenor:8f0c92d7e5f04e40</div>
+            <div class="k">Verification Method commitment</div><div class="v">0x9d2a…4c1e</div>
             <div class="k">Policy hash</div><div class="v">0x83c1…a92e</div>
             <div class="k">Evidence commitment</div><div class="v">0x51be…70af</div>
           </div>
@@ -479,7 +483,8 @@ const steps = [
         <div class="card">
           <h4>Verification</h4>
           <div class="kv">
-            <div class="k">Bootstrap method</div><div class="v">bootstrap-verification-method:1</div>
+            <div class="k">Initiated by</div><div class="v">authorized bootstrap operator</div>
+            <div class="k">Bootstrap method</div><div class="v">bootstrap-verification-method:1 (separate key)</div>
             <div class="k">Signature</div><div class="v">VALID</div>
             <div class="k">Result</div><div class="v">ENDORSED</div>
           </div>
@@ -530,13 +535,15 @@ const steps = [
         <div class="card">
           <h4>Verifier checks</h4>
           <div class="kv">
-            <div class="k">Bootstrap config</div><div class="v">MATCH</div>
+            <div class="k">Bootstrap config · crypto</div><div class="v">MATCH</div>
             <div class="k">DID resolves</div><div class="v">YES</div>
-            <div class="k">Policy hash</div><div class="v">MATCH</div>
-            <div class="k">Admission decision</div><div class="v">${deny?'DENY':'ALLOW'}</div>
-            <div class="k">Bootstrap endorsement</div><div class="v">${deny?'MISSING':'VALID'}</div>
-            <div class="k">Current status</div><div class="v">${deny?'NOT_ACTIVE':'ACTIVE'}</div>
+            <div class="k">VM commitment · crypto</div><div class="v">${deny?'—':'MATCH'}</div>
+            <div class="k">Policy hash · crypto</div><div class="v">MATCH</div>
+            <div class="k">Admission decision · crypto</div><div class="v">${deny?'DENY':'ALLOW'}</div>
+            <div class="k">Bootstrap endorsement · crypto</div><div class="v">${deny?'MISSING':'VALID'}</div>
+            <div class="k">Current status · operational projection</div><div class="v">${deny?'NOT_ACTIVE':'ACTIVE'}</div>
           </div>
+          <div class="note">Admission provenance and the bootstrap endorsement are verified cryptographically; current lifecycle status is read from the operational status projection.</div>
         </div>
         <div class="decision ${deny?'deny':'allow'}">
           <div class="eyebrow">Verification result</div>
@@ -552,9 +559,9 @@ const archNodes = [
   ["Catenor Web","Next.js / Railway"],
   ["Catenor API","NestJS modular monolith"],
   ["Domain","Identity · Authority · Policy"],
-  ["Chainlink CRE","handlerInTee / Vault DON"],
-  ["Sumsub + LLM","Private external evidence"],
-  ["Railway Data","Postgres + private bucket"],
+  ["Chainlink CRE","identity-confidential / handlerInTee / Vault DON"],
+  ["Sumsub sandbox","Private external evidence"],
+  ["Railway Data","Private Postgres · COMMITMENT_ONLY"],
   ["Trust Domain","Admission Record / ACTIVE root"]
 ];
 
@@ -657,11 +664,11 @@ function renderLog(){
     if(current>=2) lines.push(`<span class="ok">[SUBJECT]</span> did:catenor:8f0c92d7e5f04e40`);
     if(current>=3) lines.push(`<span class="${scenario==='key'?'bad':'ok'}">[KEY]</span> proof-of-possession ${scenario==='key'?'FAILED':'verified'}`);
     if(current>=4 && scenario!=="key"){
-      lines.push(`<span class="ok">[CRE]</span> deployed confidential workflow invoked`);
+      lines.push(`<span class="ok">[CRE]</span> identity-confidential invoked (operation trust-anchor-admission)`);
       lines.push(`<span class="ok">[TEE]</span> handlerInTee() entered`);
       lines.push(`<span class="ok">[SECRETS]</span> 3 Vault DON secrets fetched`);
-      lines.push(`<span class="ok">[SUMSUB]</span> confidential HTTPS response processed`);
-      lines.push(`<span class="ok">[LLM]</span> auxiliary private extraction processed`);
+      lines.push(`<span class="ok">[SUMSUB]</span> sandbox HTTPS responses processed inside the TEE`);
+      lines.push(`<span class="ok">[BINDING]</span> externalUserId matches Catenor bindingRef`);
       lines.push(`<span class="${scenario==='aml'?'bad':'ok'}">[FACT]</span> ORGANIZATION_AML_CLEAR=${scenario==='aml'?'false':'true'}`);
     }
     if(current>=6 && scenario!=="key"){

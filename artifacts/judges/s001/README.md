@@ -14,13 +14,14 @@ It demonstrates:
 - Trust Domain bootstrap;
 - canonical `did:catenor`;
 - DID Document;
+- private provider bindingRefs (Catenor-issued, used as Sumsub `externalUserId`);
 - assertion-key Proof of Possession;
-- Chainlink CRE `handlerInTee`;
-- Vault DON secret boundary;
-- Sumsub + auxiliary LLM;
-- Railway operational/evidence storage;
+- Chainlink CRE Confidential Workflow `identity-confidential`, operation `trust-anchor-admission` (`handlerInTee`);
+- Vault DON secret boundary (3 secrets);
+- Sumsub sandbox evidence, requested over HTTPS from inside the TEE, with deterministic fact derivation;
+- Railway private PostgreSQL (COMMITMENT_ONLY evidence retention — no raw provider evidence stored);
 - deterministic Admission Policy;
-- Bootstrap Endorsement;
+- Bootstrap Endorsement (binds `verificationMethodCommitment`);
 - Admission Record;
 - Trust Anchor verification;
 - happy and DENY scenarios.
@@ -40,7 +41,9 @@ What happens when a critical requirement fails?
 Can the resulting authority be independently explained?
 ```
 
-The HTML is a visualization/mock until wired to live slice state.
+The HTML is a **visualization only** until wired to live slice state (the live inspector will be served at `/judge/s001`).
 It must never be represented as evidence that a sponsor integration is live.
+
+Labeling rules: the identity provider environment is the **Sumsub sandbox** (synthetic organization — not production KYB); CRE provider calls are "HTTPS requests executed from inside the confidential TEE boundary" (not the separate Confidential HTTP capability); Trust Anchor verification cryptographically verifies Admission provenance and bootstrap endorsement, while current lifecycle status comes from the operational status projection.
 
 Live execution evidence belongs in the corresponding sponsor artifact directories.

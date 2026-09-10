@@ -87,9 +87,12 @@ packages/
   sdk/
 
 workflows/
+  identity-confidential/      # cohesive confidential identity workflow
+                              #   S001 handler: trust-anchor-admission
+                              #   planned S002 handler: subject-continuity
   credential-recertifier/
-  subject-continuity/
   distribution/
+  (subject-continuity/ — empty scaffold placeholder, superseded; see docs/architecture/ARCHITECTURE.md §12)
 
 contracts/
 artifacts/
