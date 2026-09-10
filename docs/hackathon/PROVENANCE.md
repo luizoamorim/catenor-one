@@ -3,7 +3,7 @@
 > Records the origin of code, specifications, assets, dependencies, and prior work used by Catenor One.
 
 **Status:** Living document  
-**Last updated:** 2026-09-09
+**Last updated:** 2026-09-10
 
 ---
 
@@ -259,3 +259,230 @@ AI-assisted:
 Human modifications:
 Notes:
 ```
+---
+
+## 12. 2026-09-10 — Official Chainlink CRE agent skill
+
+Type:
+
+```text
+Official sponsor skill / implementation reference
+```
+
+Source:
+
+```text
+smartcontractkit/chainlink-agent-skills
+chainlink-cre-skill
+```
+
+Installed version:
+
+```text
+0.0.22
+```
+
+Installed in project scope through:
+
+```text
+npx skills add smartcontractkit/chainlink-agent-skills
+```
+
+Project paths:
+
+```text
+.agents/skills/chainlink-cre-skill
+.claude/skills/chainlink-cre-skill -> ../../.agents/skills/chainlink-cre-skill
+skills-lock.json
+```
+
+Purpose:
+
+- CRE CLI/scaffolding guidance;
+- Confidential Workflows implementation guidance;
+- simulation/deployment guidance;
+- QuickJS/WASM/runtime constraints;
+- security-boundary guidance.
+
+Reuse status:
+
+> No production Catenor One implementation code was copied from the skill during the documentation/planning phase.
+
+Current official live documentation is treated as authoritative if it conflicts with stale skill content.
+
+License:
+
+> Use is governed by the upstream repository/package terms. Review any copied source/example code separately before committing it as application code.
+
+AI-assisted:
+
+- Claude Code may load/use the skill.
+- A Catenor One `cre-engineer` subagent is planned to use it under restricted responsibilities.
+
+---
+
+## 13. 2026-09-10 — Chainlink Confidential Workflow references
+
+Type:
+
+```text
+Official documentation / educational reference
+```
+
+Sources consulted include:
+
+```text
+Chainlink CRE Confidential Workflows documentation
+Chainlink CRE Confidential bootcamp
+official CRE templates
+official CRE CLI/SDK references
+```
+
+Purpose:
+
+- understand `handlerInTee`;
+- `TeeRuntime`;
+- batched secret retrieval;
+- HTTPS requests executed inside the TEE;
+- simulation vs real deployment;
+- deployment registries;
+- workflow/runtime limits.
+
+Reuse status:
+
+> Architecture and implementation patterns were studied. Liquidation/demo-specific domain logic is not part of Catenor One.
+
+If code is later copied/adapted from a template/example, record the exact source, commit/version, license and files affected.
+
+---
+
+## 14. 2026-09-10 — S001 AI-assisted planning artifacts
+
+Type:
+
+```text
+AI-assisted specification / implementation planning
+```
+
+Sources:
+
+```text
+ChatGPT
+Claude Code
+approved Catenor Protocol baseline
+Catenor One architecture baseline
+official sponsor/provider documentation
+```
+
+Artifacts:
+
+```text
+slices/S001-trust-anchor-admission/SPEC.md
+slices/S001-trust-anchor-admission/ACCEPTANCE.md
+slices/S001-trust-anchor-admission/TEST-VECTORS.md
+slices/S001-trust-anchor-admission/PLAN.md
+slices/S001-trust-anchor-admission/TASKS.md
+artifacts/judges/s001/
+docs/hackathon/prompts/
+docs/hackathon/plans/
+```
+
+Human role:
+
+- selected/rejected architectural proposals;
+- removed LLM from S001;
+- selected commitment-only evidence retention;
+- approved provider-binding sequencing;
+- approved the `identity-confidential` CRE workflow boundary;
+- approved the P0 Fast Lane;
+- approved/refined the bootstrap endorsement and verification model.
+
+No production S001 code existed at completion of this planning phase.
+
+---
+
+## 15. 2026-09-10 — S001 Judge Inspector visual artifact
+
+Type:
+
+```text
+AI-assisted HTML visualization
+```
+
+Tool:
+
+```text
+ChatGPT
+```
+
+Purpose:
+
+- visualize the Trust Anchor Admission flow;
+- demonstrate happy/DENY scenarios conceptually;
+- help judges inspect technical architecture separately from the simplified product UI.
+
+Important limitation:
+
+> The static HTML visualization is not itself evidence that Chainlink, Privy or Sumsub integration is deployed or live.
+
+Live sponsor evidence must be stored separately under the relevant `artifacts/` directories.
+
+---
+
+## 16. 2026-09-10 — Hedera ATS selected as planned execution layer
+
+Type:
+
+```text
+Architecture / sponsor-integration decision
+```
+
+Decision:
+
+```text
+Hedera Asset Tokenization Studio
+→ planned tokenized RWA lifecycle/compliance/execution layer
+```
+
+Current Catenor One integration roles:
+
+```text
+Chainlink CRE Confidential
+→ private verification/computation
+
+Catenor
+→ canonical identity, authority, delegation and policy
+
+Privy
+→ authentication, wallets/signers/execution controls
+
+Hedera ATS
+→ tokenized asset lifecycle/compliance/execution
+```
+
+Arc was explored earlier but is no longer the primary hackathon execution/settlement target.
+
+Reuse status:
+
+> No Hedera ATS implementation code had been imported at the time of this decision. Any SDK/template/code introduced later must be recorded with source/version/license.
+
+---
+
+## 17. 2026-09-10 — Current slice sequence
+
+The implementation roadmap was revised before downstream slices were implemented:
+
+```text
+S001 Trust Anchor Admission
+S002 Subject Continuity / Identity Provider Reconciliation
+S003 Sponsor Authorization
+S004 Agent Delegation
+S005 Investor Identity & Account Binding
+S006 Policy Decision
+S007 Hedera Tokenization / Compliance Execution
+S008 Audit & Explainability
+```
+
+The renumbering affects not-yet-implemented slices only.
+
+S001 remains the first implementation slice.

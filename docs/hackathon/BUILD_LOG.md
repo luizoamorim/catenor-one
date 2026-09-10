@@ -331,6 +331,345 @@ Commit:
 
 ---
 
+---
+
+## 2026-09-10 — Catenor One architecture baseline frozen
+
+**Goal:** Define the implementation architecture before writing slice code.
+
+Architecture selected:
+
+```text
+Modular Monolith
++
+Vertical Slices
++
+DDD-lite
++
+Clean Architecture boundaries
+```
+
+Reference stack/boundaries established:
+
+```text
+apps/web
+→ Next.js
+
+apps/api
+→ NestJS modular monolith
+
+packages/*
+→ framework/vendor-independent domain code
+
+Railway
+→ application deployment + PostgreSQL
+→ private bucket available for later evidence use
+
+Chainlink CRE Confidential
+→ confidential verification adapter/workflows
+
+Privy
+→ authentication, wallets/signers, execution controls where appropriate
+
+Hedera ATS
+→ planned RWA tokenization/compliance/execution layer
+```
+
+Key architectural rule:
+
+> Sponsor/provider integrations implement Catenor-defined ports and MUST NOT redefine Catenor domain semantics.
+
+Commit:
+
+```text
+1336ac648aa4727022bc9b8501c23dd3e7c74c6e
+```
+
+AI assistance:
+
+- ChatGPT used to design/review the architecture baseline and ADR structure.
+- Human maintainer selected and approved the final architecture.
+
+---
+
+## 2026-09-10 — S001 Trust Anchor Admission source-of-truth defined
+
+**Goal:** Define S001 completely before implementation.
+
+S001 documentation established:
+
+```text
+slices/S001-trust-anchor-admission/
+├── SPEC.md
+├── ACCEPTANCE.md
+├── TEST-VECTORS.md
+└── README.md
+```
+
+The S001 design includes:
+
+```text
+Bootstrap Access Gate
+Trust Domain Bootstrap Configuration
+ORGANIZATION Canonical Subject
+did:catenor
+Credential Assertion Key
+Proof of Key Possession
+real Sumsub sandbox integration
+Chainlink CRE Confidential verification
+deterministic Admission Policy
+bootstrap endorsement
+Trust Anchor Admission Record
+ACTIVE operational status projection
+Trust Anchor verification
+```
+
+A technical Judge Inspector prototype was also created under:
+
+```text
+artifacts/judges/s001/
+```
+
+No production S001 implementation existed at this stage.
+
+AI assistance:
+
+- ChatGPT drafted/reviewed SPEC, acceptance criteria, test vectors, architecture diagrams, and Judge Inspector prototypes.
+- Human maintainer reviewed and froze the semantics before implementation planning.
+
+---
+
+## 2026-09-10 — Official Chainlink CRE skill added
+
+**Goal:** Use current sponsor tooling/documentation instead of implementing CRE APIs from model memory.
+
+Installed in project scope:
+
+```text
+smartcontractkit/chainlink-agent-skills
+└── chainlink-cre-skill
+```
+
+Version:
+
+```text
+0.0.22
+```
+
+Project paths:
+
+```text
+.agents/skills/chainlink-cre-skill
+.claude/skills/chainlink-cre-skill
+```
+
+The `.claude` path is a symlink to the canonical project-local skill.
+
+Relevant reference material includes:
+
+```text
+project-scaffolding
+confidential-workflows
+simulation
+workflow-patterns
+triggers
+http-client
+sdk-reference
+cli-reference
+operations
+concepts
+```
+
+Decision:
+
+- CRE implementation will use official current documentation/skill guidance.
+- Live documentation takes precedence if the installed skill is stale.
+- A project-specific `cre-engineer` Claude Code subagent will later load this skill.
+- The subagent may implement CRE mechanics but MUST NOT redefine Catenor protocol/application semantics.
+
+No CRE workflow code was created in this step.
+
+Commit:
+
+```text
+separate tooling commit; record SHA when available
+```
+
+---
+
+## 2026-09-10 — S001 PLAN / TASKS created and human-reviewed
+
+**Goal:** Convert the frozen S001 requirements into a concrete implementation plan without beginning production code.
+
+Claude Code produced:
+
+```text
+slices/S001-trust-anchor-admission/PLAN.md
+slices/S001-trust-anchor-admission/TASKS.md
+```
+
+The first plan mapped every S001 test vector to a concrete verification method/task and surfaced integration blockers before code.
+
+Human review then amended the plan.
+
+Major decisions:
+
+```text
+CRE workflow boundary
+→ workflows/identity-confidential
+→ trust-anchor-admission is the first operation/handler
+
+LLM
+→ removed completely from S001
+
+Evidence retention
+→ COMMITMENT_ONLY
+→ no raw Sumsub provider responses persisted
+→ no custom ECIES scheme
+
+Sumsub provider binding
+→ Catenor bindingRefs are created before applicant IDs are attached
+→ externalUserId mismatch blocks Admission
+
+CRE secrets
+→ SUMSUB_APP_TOKEN
+→ SUMSUB_SECRET_KEY
+→ CATENOR_INTERNAL_API_TOKEN
+
+CRE registry
+→ private preferred
+
+Missing required fact
+→ DENY
+→ private trace distinguishes MISSING from FALSE
+
+Freshness
+→ 180-day Catenor One reference value in hash-pinned Bootstrap Configuration
+
+Trust Anchor verification
+→ Admission provenance/bootstrap endorsement are cryptographically verifiable
+→ current lifecycle status remains an operational projection in S001
+```
+
+The plan also introduced a P0 Fast Lane focused on a real end-to-end hackathon demo before non-critical P1/P2 improvements.
+
+No production code, dependencies, migrations, `cre init`, or deployments were performed during planning.
+
+---
+
+## 2026-09-10 — S001 source-of-truth cleanup completed
+
+**Goal:** Realign SPEC / ACCEPTANCE / TEST-VECTORS with the approved PLAN revision before implementation.
+
+Updated documentation now agrees on:
+
+```text
+no LLM in S001
+three CRE secrets
+identity-confidential workflow boundary
+correct provider-binding sequence
+provider-binding mismatch failure
+COMMITMENT_ONLY retention
+verificationMethodCommitment
+180-day reference freshness
+Sumsub sandbox labeling
+narrow Trust Anchor verification claim
+```
+
+Removed/retired LLM-specific acceptance criteria and test vectors without renumbering existing identifiers unnecessarily.
+
+Additional test/acceptance coverage was added for:
+
+```text
+provider-binding mismatch
+Verification Method/public-key replacement detection
+```
+
+Result:
+
+```text
+S001 source of truth
+↔ PLAN
+↔ TASKS
+```
+
+cross-checked successfully before implementation.
+
+No production code was written.
+
+---
+
+## 2026-09-10 — Execution target updated to Hedera ATS
+
+**Decision:** Hedera Asset Tokenization Studio (ATS) becomes the planned RWA tokenization/compliance/execution layer for Catenor One.
+
+Current integration roles:
+
+```text
+Chainlink CRE Confidential
+→ private verification/computation
+
+Catenor Protocol / Catenor One
+→ canonical identity, authority, delegation, policy decisions
+
+Privy
+→ authentication, wallets/signers and execution controls where appropriate
+
+Hedera ATS
+→ tokenized real-world asset lifecycle, compliance and execution
+```
+
+Arc is no longer the primary hackathon execution/settlement target.
+
+This decision does not change S001.
+
+Future slice direction:
+
+```text
+S001 Trust Anchor Admission
+S002 Subject Continuity / Identity Provider Reconciliation
+S003 Sponsor Authorization
+S004 Agent Delegation
+S005 Investor Identity & Account Binding
+S006 Policy Decision
+S007 Hedera Tokenization / Compliance Execution
+S008 Audit & Explainability
+```
+
+No Hedera integration code existed at the time of this decision.
+
+---
+
+## 2026-09-10 — Subject Continuity promoted to explicit next scenario
+
+**Goal:** Preserve canonical identity when wallets/providers change.
+
+Planned S002:
+
+```text
+Existing did:catenor
++
+new Identity Verification Provider evidence
+↓
+identity-confidential
+↓
+private reconciliation
+↓
+MATCH | REVIEW | NO_MATCH
+```
+
+Reference implementation direction:
+
+- Sumsub + Persona provider reconciliation;
+- private provider bindings;
+- deterministic matching rules;
+- ambiguous evidence → `REVIEW`;
+- false-merge avoidance prioritized;
+- optional future LLM-in-TEE only if unstructured/ambiguous evidence genuinely requires it.
+
+S002 remains unimplemented while S001 is completed first.
+
+
 ## Entry template
 
 ```md

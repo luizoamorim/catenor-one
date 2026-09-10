@@ -3,7 +3,7 @@
 > Catenor One uses AI-assisted development as part of a human-directed, spec-driven engineering workflow.
 
 **Status:** Living document  
-**Last updated:** 2026-09-09
+**Last updated:** 2026-09-10
 
 ## Principles
 
@@ -58,15 +58,22 @@ Human direction included:
 
 ## Claude Code
 
-Used/planned for:
+Used for:
 - repository inspection;
-- planning from approved specs;
+- S001 implementation planning from approved SPEC / ACCEPTANCE / TEST-VECTORS;
+- generation and revision of `PLAN.md` / `TASKS.md`;
+- test-vector traceability checks;
+- S001 source-of-truth consistency cleanup;
+- current sponsor/provider documentation review during planning.
+
+Planned for:
 - coding;
 - integration work;
 - tests;
 - refactoring;
 - build/lint/typecheck fixes;
-- docs-site implementation;
+- CRE implementation through a scoped `cre-engineer` subagent;
+- deployment/debugging support;
 - consistency checks.
 
 Claude Code must:
@@ -144,3 +151,101 @@ commit SHA when available
 Do not fabricate missing transcripts.
 
 If exact prompt text is unavailable, label it `Prompt summary`.
+
+## Official sponsor skills / agent tooling
+
+### Chainlink CRE skill
+
+Installed in project scope:
+
+```text
+smartcontractkit/chainlink-agent-skills
+└── chainlink-cre-skill v0.0.22
+```
+
+Canonical project path:
+
+```text
+.agents/skills/chainlink-cre-skill
+```
+
+Claude Code path:
+
+```text
+.claude/skills/chainlink-cre-skill
+```
+
+Purpose:
+
+- current CRE CLI guidance;
+- official scaffolding;
+- Confidential Workflows;
+- `handlerInTee`;
+- `TeeRuntime`;
+- secrets;
+- HTTP inside TEE;
+- simulation;
+- deployment;
+- activation;
+- execution inspection.
+
+Rule:
+
+> The sponsor skill helps implement adapters/workflows. It does not define Catenor identity, authority, delegation or policy semantics.
+
+Current live Chainlink documentation must be consulted where it differs from the installed skill.
+
+### Project-specific `cre-engineer` subagent
+
+Planned project subagent:
+
+```text
+.claude/agents/cre-engineer.md
+```
+
+It will load the official `chainlink-cre-skill`.
+
+Allowed scope:
+
+```text
+CRE CLI
+cre init / official scaffolding
+QuickJS/WASM compatibility
+handlerInTee / TeeRuntime
+secrets
+simulation
+deployment
+activation
+debugging
+```
+
+Forbidden scope:
+
+```text
+redefining Catenor Protocol
+changing canonical identity semantics
+changing authority/delegation semantics
+changing approved policies
+changing S001 requirements
+```
+
+The main Claude context and the human maintainer retain authority over protocol/application design.
+
+## 2026-09-10 S001 planning record
+
+Claude Code created and revised S001 `PLAN.md` / `TASKS.md` from the approved source-of-truth documents.
+
+ChatGPT was used to review the generated plan with the human maintainer and identify amendments including:
+
+```text
+identity-confidential workflow boundary
+removal of the LLM from S001
+COMMITMENT_ONLY evidence retention
+provider-binding sequence correction
+P0 Fast Lane
+narrower verification claims
+```
+
+Claude Code then aligned S001 SPEC / ACCEPTANCE / TEST-VECTORS with those approved decisions.
+
+No production code had been written at the completion of this planning/source-of-truth phase.
