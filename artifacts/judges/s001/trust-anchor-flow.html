@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catenor One — S001 Trust Anchor Admission Mock</title>
+  <style>
+    :root{
+      --bg:#f4f1ea;
+      --paper:#fbfaf7;
+      --paper2:#f7f4ee;
+      --ink:#1b1d1d;
+      --muted:#6d706d;
+      --line:#d8d4cb;
+      --line2:#e8e4dc;
+      --soft:#efebe3;
+      --ok:#2f6b4f;
+      --okbg:#eaf3ed;
+      --warn:#8b632c;
+      --warnbg:#f6efe2;
+      --bad:#8b3d3d;
+      --badbg:#f8e9e8;
+      --accent:#2a2d2d;
+      --shadow:0 18px 50px rgba(36,34,28,.08);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height:1.45;
+    }
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .shell{min-height:100vh}
+    .top{
+      position:sticky;top:0;z-index:20;
+      background:rgba(244,241,234,.88);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(216,212,203,.8);
+    }
+    .top-inner{
+      max-width:1460px;margin:0 auto;padding:18px 28px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:-.02em}
+    .mark{
+      width:34px;height:34px;border:1px solid var(--ink);border-radius:50%;
+      position:relative;flex:0 0 auto;
+    }
+    .mark:before,.mark:after{
+      content:"";position:absolute;width:6px;height:6px;background:var(--ink);border-radius:50%;
+    }
+    .mark:before{left:4px;top:8px}
+    .mark:after{right:4px;bottom:8px}
+    .mark i{
+      position:absolute;width:6px;height:6px;background:var(--ink);border-radius:50%;
+      right:3px;top:5px;
+    }
+    .brand small{display:block;color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+    .pill{
+      border:1px solid var(--line);
+      background:var(--paper);
+      padding:8px 12px;border-radius:999px;color:var(--muted);font-size:12px;
+    }
+    .main{max-width:1460px;margin:0 auto;padding:28px;display:grid;grid-template-columns:300px minmax(0,1fr) 340px;gap:22px}
+    .panel{
+      background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+    }
+    .sidebar{padding:20px;align-self:start;position:sticky;top:92px}
+    .sidebar h3,.right h3{margin:0 0 14px;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+    .steps{display:grid;gap:8px}
+    .step-btn{
+      width:100%;text-align:left;border:1px solid transparent;background:transparent;
+      padding:12px;border-radius:12px;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;
+      color:var(--muted);
+    }
+    .step-btn:hover{background:var(--paper2)}
+    .step-btn.active{background:var(--ink);color:white}
+    .step-btn.done{color:var(--ink)}
+    .num{
+      width:26px;height:26px;border-radius:50%;border:1px solid currentColor;
+      display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px
+    }
+    .step-title{font-size:13px;font-weight:650}
+    .step-sub{font-size:11px;opacity:.7;margin-top:2px}
+    .center{min-width:0}
+    .hero{
+      padding:38px 40px 30px;background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);
+    }
+    .eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:11px;color:var(--muted);font-weight:700}
+    .hero h1{font-size:48px;line-height:1.02;margin:12px 0 14px;letter-spacing:-.045em;font-weight:700;max-width:850px}
+    .hero p{font-size:17px;color:var(--muted);max-width:820px;margin:0}
+    .hero .thesis{
+      margin-top:26px;border-top:1px solid var(--line2);padding-top:20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      color:#343737;font-size:13px
+    }
+    .scenario-bar{margin-top:16px;padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .scenario-bar span{font-size:12px;color:var(--muted);margin-right:4px}
+    .scenario{
+      border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 11px;font-size:12px;color:var(--muted)
+    }
+    .scenario.active{background:var(--ink);color:white;border-color:var(--ink)}
+    .stage{margin-top:18px;padding:0;overflow:hidden}
+    .stage-head{padding:24px 26px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .stage-head h2{margin:5px 0 5px;font-size:25px;letter-spacing:-.03em}
+    .stage-head p{margin:0;color:var(--muted);font-size:13px;max-width:720px}
+    .status{
+      padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid var(--line)
+    }
+    .status.pending{color:var(--muted);background:var(--paper2)}
+    .status.ok{color:var(--ok);background:var(--okbg);border-color:#cce0d3}
+    .status.bad{color:var(--bad);background:var(--badbg);border-color:#e8c9c7}
+    .stage-body{padding:26px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{
+      background:var(--paper2);border:1px solid var(--line2);border-radius:16px;padding:18px;
+    }
+    .card h4{margin:0 0 10px;font-size:13px}
+    .card p{font-size:12px;color:var(--muted);margin:0}
+    .label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}
+    .input{
+      width:100%;border:1px solid var(--line);background:white;border-radius:12px;padding:12px 13px;color:var(--ink)
+    }
+    .code{
+      margin-top:12px;background:#202222;color:#f7f4ee;border-radius:14px;padding:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;overflow:auto;line-height:1.55
+    }
+    .kv{display:grid;grid-template-columns:155px 1fr;gap:9px 14px;font-size:12px}
+    .kv .k{color:var(--muted)}
+    .kv .v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+    .note{
+      border-left:3px solid var(--ink);padding:12px 14px;background:var(--soft);border-radius:0 12px 12px 0;
+      font-size:12px;margin-top:16px
+    }
+    .actions{
+      padding:18px 26px;border-top:1px solid var(--line2);display:flex;justify-content:space-between;gap:12px;align-items:center
+    }
+    .btn{
+      border:1px solid var(--line);background:var(--paper);padding:10px 14px;border-radius:11px;font-size:12px;font-weight:650
+    }
+    .btn.primary{background:var(--ink);color:white;border-color:var(--ink)}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .right{padding:20px;align-self:start;position:sticky;top:92px}
+    .mini{
+      border:1px solid var(--line2);background:var(--paper2);border-radius:14px;padding:14px;margin-bottom:12px;
+    }
+    .mini-title{font-size:12px;font-weight:700;margin-bottom:7px}
+    .mini p{font-size:11px;color:var(--muted);margin:0}
+    .arch{display:grid;gap:8px}
+    .arch-node{
+      border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:white;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px
+    }
+    .arch-node.active{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+    .arch-node .tag{color:var(--muted);font-size:10px}
+    .arrow{text-align:center;color:#aaa;font-size:12px}
+    .log{
+      background:#202222;color:#e8e6df;border-radius:14px;padding:13px;height:230px;overflow:auto;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.6
+    }
+    .log .ok{color:#a9d6b9}.log .bad{color:#f1a7a2}.log .muted{color:#989d9d}
+    .facts{display:grid;gap:8px}
+    .fact{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line2);padding:8px 0;font-size:11px}
+    .fact:last-child{border-bottom:0}
+    .fact .result{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700}
+    .result.true{color:var(--ok)} .result.false{color:var(--bad)} .result.na{color:var(--muted)}
+    .footer{max-width:1460px;margin:0 auto;padding:0 28px 36px;color:var(--muted);font-size:11px}
+    .flow{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px
+    }
+    .flow .box{border:1px solid var(--line);background:var(--paper2);border-radius:12px;padding:11px;font-size:11px;text-align:center}
+    .flow .box b{display:block;font-size:11px;color:var(--ink);margin-bottom:3px}.flow .box span{color:var(--muted)}
+    .confidential{
+      border:1px dashed #8f918e;border-radius:16px;padding:16px;margin-top:16px;background:#f5f3ed;
+    }
+    .conf-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+    .secret-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+    .secret{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;background:#202222;color:white;border-radius:999px;padding:6px 8px}
+    .decision{
+      text-align:center;padding:26px 14px;border-radius:18px;border:1px solid var(--line);background:var(--paper2)
+    }
+    .decision .big{font-size:46px;font-weight:800;letter-spacing:-.05em;margin:4px 0}
+    .decision.allow .big{color:var(--ok)} .decision.deny .big{color:var(--bad)}
+    @media(max-width:1150px){
+      .main{grid-template-columns:260px 1fr}.right{display:none}
+    }
+    @media(max-width:800px){
+      .main{grid-template-columns:1fr;padding:14px}.sidebar{position:static}.hero h1{font-size:36px}.grid2{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr 1fr}.top-inner{padding:14px}.hero{padding:28px 24px}
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <div class="mark"><i></i></div>
+        <div>Catenor One<small>S001 — Trust Anchor Admission</small></div>
+      </div>
+      <div class="pill">Technical Judge Inspector · S001 reference flow</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="panel sidebar">
+      <h3>Admission flow</h3>
+      <div class="steps" id="steps"></div>
+    </aside>
+
+    <section class="center">
+      <section class="hero">
+        <div class="eyebrow">Reference implementation · ETHOnline 2026</div>
+        <div style="margin-top:12px;display:inline-flex;gap:7px;flex-wrap:wrap"><span class="pill">Canonical Identity</span><span class="pill">Verifiable Authority</span><span class="pill">Confidential Verification</span></div>
+        <h1>Trust should be inspectable, not assumed.</h1>
+        <p>
+          A candidate Organization becomes the Initial Trust Anchor only after bootstrap access,
+          real-world evidence, cryptographic key control, confidential verification and deterministic policy all agree.
+        </p>
+        <div class="thesis">Private evidence in → verified facts out → explicit bootstrap trust → auditable authority.</div>
+        <div class="flow">
+          <div class="box"><b>1. Access</b><span>Authorized bootstrap operator</span></div>
+          <div class="box"><b>2. Evidence</b><span>Sumsub + optional LLM</span></div>
+          <div class="box"><b>3. Decision</b><span>Catenor Admission Policy</span></div>
+          <div class="box"><b>4. Authority</b><span>Admission Record + ACTIVE root</span></div>
+        </div>
+      </section>
+
+      <div class="panel scenario-bar">
+        <span>Scenario:</span>
+        <button class="scenario active" data-scenario="happy">Happy path</button>
+        <button class="scenario" data-scenario="email">Unauthorized email</button>
+        <button class="scenario" data-scenario="key">Invalid assertion key</button>
+        <button class="scenario" data-scenario="aml">AML not clear</button>
+      </div>
+
+      <section class="panel stage" id="stage"></section>
+    </section>
+
+    <aside class="panel right">
+      <h3>Runtime boundary</h3>
+      <div class="arch" id="arch"></div>
+
+      <h3 style="margin-top:22px">Verified facts</h3>
+      <div class="mini">
+        <div class="facts" id="facts"></div>
+      </div>
+
+      <h3 style="margin-top:22px">Audit / demo log</h3>
+      <div class="log" id="log"></div>
+    </aside>
+  </main>
+
+  <div class="footer">
+    Catenor Protocol is the standard. Catenor One is an implementation of that standard. · S001 Judge Inspector · Technical visualization, not live sponsor evidence.
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    id:"access", title:"Bootstrap Access Gate", sub:"Who may initiate S001",
+    desc:"Only an explicitly authorized bootstrap operator can start the Initial Trust Anchor admission flow. This gate is implementation access control — not Trust Anchor eligibility.",
+    render:(s)=>`
+      <div class="grid2">
+        <div class="card">
+          <span class="label">Operator email</span>
+          <input class="input" value="${s==='email'?'outsider@example.com':'luiz@example.com'}" readonly>
+          <div class="note"><b>V1 implementation:</b> <code>ALLOWED_BOOTSTRAP_EMAILS</code>. A Privy-managed allowlist may replace this later.</div>
+        </div>
+        <div class="card">
+          <h4>Gate semantics</h4>
+          <div class="kv">
+            <div class="k">Access allowed</div><div class="v">${s==='email'?'false':'true'}</div>
+            <div class="k">Trust implied</div><div class="v">false</div>
+            <div class="k">Admission bypassed</div><div class="v">false</div>
+            <div class="k">Trust Domain</div><div class="v">trust-domain:catenor-one-demo</div>
+          </div>
+        </div>
+      </div>
+      ${s==='email'?'<div class="decision deny"><div class="eyebrow">Access gate</div><div class="big">BLOCKED</div><p>Admission never starts.</p></div>':''}
+    `
+  },
+  {
+    id:"bootstrap", title:"Trust Domain Bootstrap", sub:"Accept initial trust boundary",
+    desc:"The first Trust Anchor cannot authorize itself. Catenor One starts from an out-of-band accepted Bootstrap Configuration that pins the Trust Domain, Admission Policy and bootstrap verification method.",
+    render:()=>`
+      <div class="grid2">
+        <div class="card">
+          <h4>Bootstrap Configuration</h4>
+          <div class="code">{
+  "trustDomain": "trust-domain:catenor-one-demo",
+  "admissionPolicy": "policy:trust-anchor-admission:v1",
+  "policyHash": "0x83c1…a92e",
+  "bootstrapVerificationMethod":
+    "bootstrap-verification-method:1"
+}</div>
+        </div>
+        <div class="card">
+          <h4>What this means</h4>
+          <p>The configuration does not claim the candidate is trusted. It defines <b>how the first candidate must prove eligibility</b> before authority can begin.</p>
+          <div class="note">Cryptography verifies continuity and integrity. The initial trust boundary is accepted out-of-band.</div>
+        </div>
+      </div>`
+  },
+  {
+    id:"subject", title:"Canonical Organization", sub:"Create did:catenor",
+    desc:"Create or resolve the candidate as a canonical ORGANIZATION Subject using an opaque, high-entropy identifier independent from PII and provider identifiers.",
+    render:()=>`
+      <div class="grid2">
+        <div class="card">
+          <h4>Candidate</h4>
+          <div class="kv">
+            <div class="k">Type</div><div class="v">ORGANIZATION</div>
+            <div class="k">Legal display</div><div class="v">Organization A</div>
+            <div class="k">Canonical DID</div><div class="v">did:catenor:8f0c92d7e5f04e40</div>
+            <div class="k">DID derived from PII?</div><div class="v">NO</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Private provider bindings</h4>
+          <div class="kv">
+            <div class="k">Company provider</div><div class="v">SUMSUB</div>
+            <div class="k">Company applicantId</div><div class="v">67f0••••b82a</div>
+            <div class="k">Representative applicantId</div><div class="v">68a4••••91fd</div>
+            <div class="k">Public?</div><div class="v">NO</div>
+          </div>
+        </div>
+      </div>`
+  },
+  {
+    id:"key", title:"Assertion Key", sub:"DID Document + proof of possession",
+    desc:"Create a dedicated Credential Assertion Key, publish only its public verification material and prove possession using a single-use challenge bound to this Admission.",
+    render:(s)=>`
+      <div class="grid2">
+        <div class="card">
+          <h4>Public DID Document</h4>
+          <div class="code">{
+  "id": "did:catenor:8f0c92d7e5f04e40",
+  "verificationMethod": [{
+    "id": "did:catenor:8f0c92d7e5f04e40#assertion-key-1",
+    "controller": "did:catenor:8f0c92d7e5f04e40",
+    "type": "Multikey",
+    "publicKeyMultibase": "z6Mk…"
+  }],
+  "assertionMethod": [
+    "did:catenor:8f0c92d7e5f04e40#assertion-key-1"
+  ]
+}</div>
+        </div>
+        <div class="card">
+          <h4>Proof of Key Possession</h4>
+          <div class="kv">
+            <div class="k">Challenge</div><div class="v">challenge:adm:01:••••</div>
+            <div class="k">Single use</div><div class="v">true</div>
+            <div class="k">Bound to DID</div><div class="v">true</div>
+            <div class="k">Signature valid</div><div class="v">${s==='key'?'false':'true'}</div>
+          </div>
+          ${s==='key'?'<div class="note" style="border-left-color:var(--bad);background:var(--badbg)">Invalid signature → fail closed. Sumsub cannot compensate for missing key control.</div>':'<div class="note">Credential Assertion Key is cryptographically distinct from any Financial Execution Key.</div>'}
+        </div>
+      </div>`
+  },
+  {
+    id:"cre", title:"Confidential Verification", sub:"Chainlink CRE handlerInTee",
+    desc:"The deployed CRE Confidential Workflow performs sensitive evidence retrieval and processing inside the TEE. Secrets and raw provider/LLM responses do not become ordinary backend data.",
+    render:(s)=>`
+      <div class="confidential">
+        <div class="conf-title">Inside Chainlink CRE Confidential / handlerInTee()</div>
+        <div class="grid2">
+          <div class="card">
+            <h4>Vault DON secrets — batched</h4>
+            <div class="secret-list">
+              <span class="secret">SUMSUB_APP_TOKEN</span>
+              <span class="secret">SUMSUB_SECRET_KEY</span>
+              <span class="secret">LLM_API_KEY</span>
+            </div>
+            <div class="note">Baseline: 3 persistent CRE secrets. Applicant IDs are private application data, not Vault credentials.</div>
+          </div>
+          <div class="card">
+            <h4>Confidential HTTP</h4>
+            <div class="kv">
+              <div class="k">1</div><div class="v">TEE → Sumsub</div>
+              <div class="k">2</div><div class="v">TEE → LLM (auxiliary)</div>
+              <div class="k">3</div><div class="v">normalize private responses</div>
+              <div class="k">4</div><div class="v">derive minimized facts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:16px">
+        <div class="card">
+          <h4>Sumsub result inside TEE</h4>
+          <div class="kv">
+            <div class="k">Company KYB</div><div class="v">verified</div>
+            <div class="k">Company status</div><div class="v">valid</div>
+            <div class="k">AML</div><div class="v">${s==='aml'?'NOT_CLEAR':'clear'}</div>
+            <div class="k">Representative KYC</div><div class="v">verified</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>LLM role</h4>
+          <p>Auxiliary extraction/explanation only. Example: identify representative role from a corporate authority document, then feed that result into deterministic validation.</p>
+          <div class="note"><b>LLM output ≠ verified fact by itself.</b></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"storage", title:"Evidence & Storage", sub:"Railway-only reference infrastructure",
+    desc:"Catenor One keeps public/resolvable state and private operational state in one private Railway PostgreSQL, while encrypted evidence objects live in a private Railway bucket. Keys and CRE secrets remain outside both.",
+    render:()=>`
+      <div class="grid2">
+        <div class="card">
+          <h4>Railway PostgreSQL</h4>
+          <div class="kv">
+            <div class="k">Public projection</div><div class="v">DID docs, status, policy refs</div>
+            <div class="k">Private state</div><div class="v">Sumsub IDs, evidence refs, admission state</div>
+            <div class="k">Direct public DB</div><div class="v">NO</div>
+            <div class="k">Public access</div><div class="v">Resolver / API only</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Railway Private Bucket</h4>
+          <div class="kv">
+            <div class="k">Objects</div><div class="v">encrypted evidence packages</div>
+            <div class="k">Plaintext provider response</div><div class="v">NO</div>
+            <div class="k">DB stores</div><div class="v">objectRef + commitment</div>
+          </div>
+        </div>
+      </div>
+      <div class="note"><b>Fallback rule:</b> if the deployed CRE model cannot safely persist an encrypted raw snapshot, we retain minimized facts + commitments + private provider refs rather than leak plaintext outside the TEE.</div>`
+  },
+  {
+    id:"policy", title:"Admission Policy", sub:"Deterministic ALLOW / DENY",
+    desc:"Catenor's public, versioned Admission Policy evaluates verified facts. This is the final admission logic; the LLM never decides Trust Anchor status.",
+    render:(s)=>{
+      const deny = s==='key'||s==='aml';
+      return `
+      <div class="grid2">
+        <div class="card">
+          <h4>policy:trust-anchor-admission:v1</h4>
+          <div class="code">requires:
+  ORGANIZATION_KYB_VERIFIED: true
+  ORGANIZATION_STATUS_VALID: true
+  ORGANIZATION_AML_CLEAR: true
+  AUTHORIZED_REPRESENTATIVE_VERIFIED: true
+  REPRESENTATIVE_AUTHORITY_CONFIRMED: true
+  ASSERTION_KEY_POSSESSION_VALID: true
+  ASSERTION_KEY_PURPOSE_VALID: true
+  EVIDENCE_FRESH: true</div>
+        </div>
+        <div class="decision ${deny?'deny':'allow'}">
+          <div class="eyebrow">Deterministic policy result</div>
+          <div class="big">${deny?'DENY':'ALLOW'}</div>
+          <p>${deny?'At least one required verified fact is false.':'All required verified facts are true.'}</p>
+        </div>
+      </div>`;
+    }
+  },
+  {
+    id:"endorsement", title:"Bootstrap Endorsement", sub:"Authorize the initial root",
+    desc:"For the first Trust Anchor only, a successful Admission Decision is bound to the accepted bootstrap authority. This prevents the candidate from manufacturing its own initial trust.",
+    render:(s)=>{
+      const deny=s==='key'||s==='aml';
+      return deny?`
+        <div class="decision deny"><div class="eyebrow">Bootstrap authority</div><div class="big">NOT ISSUED</div><p>No endorsement can be created for a DENY decision.</p></div>
+      `:`
+      <div class="grid2">
+        <div class="card">
+          <h4>Endorsement binds</h4>
+          <div class="kv">
+            <div class="k">Trust Domain</div><div class="v">trust-domain:catenor-one-demo</div>
+            <div class="k">Candidate DID</div><div class="v">did:catenor:8f0c92d7e5f04e40</div>
+            <div class="k">Policy hash</div><div class="v">0x83c1…a92e</div>
+            <div class="k">Evidence commitment</div><div class="v">0x51be…70af</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Verification</h4>
+          <div class="kv">
+            <div class="k">Bootstrap method</div><div class="v">bootstrap-verification-method:1</div>
+            <div class="k">Signature</div><div class="v">VALID</div>
+            <div class="k">Result</div><div class="v">ENDORSED</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+  {
+    id:"record", title:"Admission Record", sub:"Create auditable root state",
+    desc:"Only an ALLOW decision with a valid bootstrap endorsement may create the Trust Anchor Admission Record and transition the Organization to ACTIVE.",
+    render:(s)=>{
+      const deny=s==='key'||s==='aml';
+      return deny?`
+      <div class="decision deny">
+        <div class="eyebrow">Admission Record</div>
+        <div class="big">NOT CREATED</div>
+        <p>Fail closed: no active root exists.</p>
+      </div>`:`
+      <div class="grid2">
+        <div class="card">
+          <h4>CatenorTrustAnchorAdmissionRecord</h4>
+          <div class="code">{
+  "trustAnchor": "did:catenor:8f0c92d7e5f04e40",
+  "trustDomain": "trust-domain:catenor-one-demo",
+  "admissionPolicy": "policy:trust-anchor-admission:v1",
+  "policyHash": "0x83c1…a92e",
+  "decision": "ADMIT_TRUST_ANCHOR",
+  "evidenceCommitment": "0x51be…70af",
+  "decisionRef": "decision:admission:001",
+  "bootstrapEndorsementRef": "endorsement:bootstrap:001"
+}</div>
+        </div>
+        <div class="decision allow">
+          <div class="eyebrow">Trust Domain status</div>
+          <div class="big">ACTIVE</div>
+          <p>Initial Trust Anchor established.</p>
+        </div>
+      </div>`;
+    }
+  },
+  {
+    id:"verify", title:"Verify Trust Anchor", sub:"Explain why authority is valid",
+    desc:"A downstream verifier can now inspect the basis of root authority without gaining access to raw private evidence.",
+    render:(s)=>{
+      const deny=s==='key'||s==='aml';
+      return `
+      <div class="grid2">
+        <div class="card">
+          <h4>Verifier checks</h4>
+          <div class="kv">
+            <div class="k">Bootstrap config</div><div class="v">MATCH</div>
+            <div class="k">DID resolves</div><div class="v">YES</div>
+            <div class="k">Policy hash</div><div class="v">MATCH</div>
+            <div class="k">Admission decision</div><div class="v">${deny?'DENY':'ALLOW'}</div>
+            <div class="k">Bootstrap endorsement</div><div class="v">${deny?'MISSING':'VALID'}</div>
+            <div class="k">Current status</div><div class="v">${deny?'NOT_ACTIVE':'ACTIVE'}</div>
+          </div>
+        </div>
+        <div class="decision ${deny?'deny':'allow'}">
+          <div class="eyebrow">Verification result</div>
+          <div class="big">${deny?'FALSE':'TRUE'}</div>
+          <p>TRUST_ANCHOR_VALID = ${deny?'false':'true'}</p>
+        </div>
+      </div>`;
+    }
+  }
+];
+
+const archNodes = [
+  ["Catenor Web","Next.js / Railway"],
+  ["Catenor API","NestJS modular monolith"],
+  ["Domain","Identity · Authority · Policy"],
+  ["Chainlink CRE","handlerInTee / Vault DON"],
+  ["Sumsub + LLM","Private external evidence"],
+  ["Railway Data","Postgres + private bucket"],
+  ["Trust Domain","Admission Record / ACTIVE root"]
+];
+
+let current=0, scenario="happy";
+const stepRoot=document.getElementById("steps");
+const stage=document.getElementById("stage");
+const arch=document.getElementById("arch");
+const facts=document.getElementById("facts");
+const log=document.getElementById("log");
+
+function isFailureBeforeStep(){
+  if(scenario==="email") return 0;
+  if(scenario==="key") return 3;
+  if(scenario==="aml") return 4;
+  return 99;
+}
+function effectiveFact(name){
+  if(scenario==="email") return "na";
+  if(name==="ASSERTION_KEY_POSSESSION_VALID" && scenario==="key") return false;
+  if(name==="ORGANIZATION_AML_CLEAR" && scenario==="aml") return false;
+  if(current<3 && name.startsWith("ASSERTION")) return "na";
+  if(current<4 && !name.startsWith("ASSERTION")) return "na";
+  return true;
+}
+const factNames=[
+  "ORGANIZATION_KYB_VERIFIED",
+  "ORGANIZATION_STATUS_VALID",
+  "ORGANIZATION_AML_CLEAR",
+  "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+  "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+  "ASSERTION_KEY_POSSESSION_VALID",
+  "ASSERTION_KEY_PURPOSE_VALID",
+  "EVIDENCE_FRESH"
+];
+
+function renderSteps(){
+  stepRoot.innerHTML=steps.map((x,i)=>`
+    <button class="step-btn ${i===current?'active':''} ${i<current?'done':''}" onclick="go(${i})">
+      <div class="num">${i+1}</div>
+      <div><div class="step-title">${x.title}</div><div class="step-sub">${x.sub}</div></div>
+    </button>`).join("");
+}
+function renderArch(){
+  let activeMap=[0,1,2,2,3,5,2,2,6,6];
+  arch.innerHTML=archNodes.map((n,i)=>`
+    ${i?'<div class="arrow">↓</div>':''}
+    <div class="arch-node ${i===activeMap[current]?'active':''}">
+      <b>${n[0]}</b><span class="tag">${n[1]}</span>
+    </div>`).join("");
+}
+function renderFacts(){
+  facts.innerHTML=factNames.map(n=>{
+    const r=effectiveFact(n);
+    const text=r==="na"?"—":String(r).toUpperCase();
+    const cls=r==="na"?"na":(r?"true":"false");
+    return `<div class="fact"><span>${n}</span><span class="result ${cls}">${text}</span></div>`;
+  }).join("");
+}
+function statusFor(){
+  const failAt=isFailureBeforeStep();
+  if(scenario==="email" && current===0) return ["bad","BLOCKED"];
+  if(current===failAt && (scenario==="key"||scenario==="aml")) return ["bad","FAILED"];
+  if(current>failAt && (scenario!=="happy")) return ["bad","NOT EXECUTED"];
+  if(current===0) return ["ok","AUTHORIZED"];
+  if(current<=4) return ["ok","VERIFIED"];
+  if(current===5) return ["ok","PERSISTED SAFELY"];
+  if(current===6) return [(scenario==="happy"?"ok":"bad"), scenario==="happy"?"ALLOW":"DENY"];
+  if(current===7) return [(scenario==="happy"?"ok":"bad"), scenario==="happy"?"ENDORSED":"NOT ISSUED"];
+  if(current===8) return [(scenario==="happy"?"ok":"bad"), scenario==="happy"?"ACTIVE":"NOT CREATED"];
+  return [(scenario==="happy"?"ok":"bad"), scenario==="happy"?"VALID":"INVALID"];
+}
+function renderStage(){
+  const x=steps[current], st=statusFor();
+  const failedEarlier=current>isFailureBeforeStep() && scenario!=="happy";
+  stage.innerHTML=`
+    <div class="stage-head">
+      <div><div class="eyebrow">Step ${current+1} of ${steps.length}</div><h2>${x.title}</h2><p>${x.desc}</p></div>
+      <span class="status ${st[0]}">${st[1]}</span>
+    </div>
+    <div class="stage-body">
+      ${failedEarlier?`<div class="decision deny"><div class="eyebrow">Fail-closed execution</div><div class="big">STOPPED</div><p>A previous required condition failed. This step cannot produce an authority artifact.</p></div>`:x.render(scenario)}
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="go(${Math.max(0,current-1)})" ${current===0?'disabled':''}>← Previous</button>
+      <span style="font-size:11px;color:var(--muted)">S001 reference flow</span>
+      <button class="btn primary" onclick="go(${Math.min(steps.length-1,current+1)})" ${current===steps.length-1?'disabled':''}>Next →</button>
+    </div>`;
+}
+function renderLog(){
+  let lines=[
+    `<span class="muted">[S001]</span> scenario=${scenario}`,
+    `<span class="ok">[BOOT]</span> trust-domain:catenor-one-demo loaded`
+  ];
+  if(scenario==="email"){
+    lines.push(`<span class="bad">[ACCESS]</span> bootstrap operator not allowlisted`);
+    lines.push(`<span class="bad">[STOP]</span> Admission not initiated`);
+  }else{
+    lines.push(`<span class="ok">[ACCESS]</span> bootstrap operator authorized`);
+    if(current>=1) lines.push(`<span class="ok">[BOOTSTRAP]</span> admission policy v1 pinned`);
+    if(current>=2) lines.push(`<span class="ok">[SUBJECT]</span> did:catenor:8f0c92d7e5f04e40`);
+    if(current>=3) lines.push(`<span class="${scenario==='key'?'bad':'ok'}">[KEY]</span> proof-of-possession ${scenario==='key'?'FAILED':'verified'}`);
+    if(current>=4 && scenario!=="key"){
+      lines.push(`<span class="ok">[CRE]</span> deployed confidential workflow invoked`);
+      lines.push(`<span class="ok">[TEE]</span> handlerInTee() entered`);
+      lines.push(`<span class="ok">[SECRETS]</span> 3 Vault DON secrets fetched`);
+      lines.push(`<span class="ok">[SUMSUB]</span> confidential HTTPS response processed`);
+      lines.push(`<span class="ok">[LLM]</span> auxiliary private extraction processed`);
+      lines.push(`<span class="${scenario==='aml'?'bad':'ok'}">[FACT]</span> ORGANIZATION_AML_CLEAR=${scenario==='aml'?'false':'true'}`);
+    }
+    if(current>=6 && scenario!=="key"){
+      lines.push(`<span class="${scenario==='aml'?'bad':'ok'}">[POLICY]</span> ${scenario==='aml'?'DENY':'ALLOW'}`);
+    }
+    if(current>=7 && scenario==="happy") lines.push(`<span class="ok">[BOOTSTRAP]</span> endorsement verified`);
+    if(current>=8 && scenario==="happy") lines.push(`<span class="ok">[AUTHORITY]</span> Initial Trust Anchor ACTIVE`);
+    if(current>=9 && scenario==="happy") lines.push(`<span class="ok">[VERIFY]</span> TRUST_ANCHOR_VALID=true`);
+  }
+  log.innerHTML=lines.join("<br>");
+  log.scrollTop=log.scrollHeight;
+}
+function go(i){
+  current=i; renderAll();
+}
+function renderAll(){
+  renderSteps();renderArch();renderFacts();renderStage();renderLog();
+}
+document.querySelectorAll(".scenario").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".scenario").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    scenario=btn.dataset.scenario;
+    current=0;
+    renderAll();
+  });
+});
+renderAll();
+</script>
+</body>
+</html>

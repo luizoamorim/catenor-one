@@ -1,0 +1,1916 @@
+# S001 — Trust Anchor Admission
+## Test Vectors
+
+**Project:** Catenor One  
+**Protocol baseline:** Catenor Protocol Draft v0.1  
+**Slice:** `S001-trust-anchor-admission`  
+**Status:** Draft for human approval
+
+---
+
+# 1. Purpose
+
+This document defines concrete, reproducible test vectors for S001.
+
+Each vector specifies:
+
+```text
+preconditions
+input
+expected verified facts
+expected policy result
+expected side effects
+expected public/private artifacts
+```
+
+The vectors are designed to be implementation-independent.
+
+Exact API routes, database table names, crypto profile, and sponsor SDK calls belong in `PLAN.md`.
+
+---
+
+# 2. Test identities and constants
+
+Unless a vector overrides them, use the following fixture values.
+
+## Trust Domain
+
+```text
+TRUST_DOMAIN_ID
+= trust-domain:catenor-one-demo
+```
+
+## Admission Policy
+
+```text
+POLICY_ID
+= policy:trust-anchor-admission:v1
+```
+
+Conceptual policy content:
+
+```yaml
+id: policy:trust-anchor-admission:v1
+
+action: ADMIT_TRUST_ANCHOR
+
+requires:
+  ORGANIZATION_KYB_VERIFIED: true
+  ORGANIZATION_STATUS_VALID: true
+  ORGANIZATION_AML_CLEAR: true
+  AUTHORIZED_REPRESENTATIVE_VERIFIED: true
+  REPRESENTATIVE_AUTHORITY_CONFIRMED: true
+  ASSERTION_KEY_POSSESSION_VALID: true
+  ASSERTION_KEY_PURPOSE_VALID: true
+  EVIDENCE_FRESH: true
+```
+
+The exact canonical serialization and resulting `policyHash` are implementation decisions.
+
+Fixtures may use:
+
+```text
+POLICY_HASH
+= 0xpolicyhash_demo_v1
+```
+
+until PLAN freezes the hashing profile.
+
+---
+
+# 3. Bootstrap operator fixtures
+
+```text
+AUTHORIZED_OPERATOR_EMAIL
+= bootstrap.owner@example.com
+
+SECOND_AUTHORIZED_OPERATOR_EMAIL
+= bootstrap.reviewer@example.com
+
+UNAUTHORIZED_OPERATOR_EMAIL
+= outsider@example.com
+```
+
+Environment fixture:
+
+```text
+ALLOWED_BOOTSTRAP_EMAILS=
+bootstrap.owner@example.com,bootstrap.reviewer@example.com
+```
+
+---
+
+# 4. Candidate fixtures
+
+## Candidate Organization
+
+```text
+displayName
+= Organization A
+
+subjectType
+= ORGANIZATION
+```
+
+Example canonical DID fixture:
+
+```text
+CANDIDATE_DID
+= did:catenor:8f0c92d7e5f04e40a41faee32e5e180b
+```
+
+This value is fixture-only.
+
+The implementation MUST generate the actual identifier using the selected cryptographically secure random profile.
+
+---
+
+# 5. Sumsub fixtures
+
+Private provider references:
+
+```text
+COMPANY_APPLICANT_ID
+= sumsub_company_fixture_001
+
+REPRESENTATIVE_APPLICANT_ID
+= sumsub_person_fixture_001
+```
+
+These values are PRIVATE application fixtures.
+
+They MUST NOT appear in public DID state or normal public logs.
+
+---
+
+# 6. Assertion-key fixtures
+
+Conceptual verification method:
+
+```text
+VERIFICATION_METHOD_ID
+= did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1
+```
+
+Example public key fixture:
+
+```text
+PUBLIC_KEY
+= z6MkFixtureAssertionPublicKey001
+```
+
+Example signer reference:
+
+```text
+SIGNER_REF
+= signer:fixture:assertion-key-1
+```
+
+`SIGNER_REF` is private operational metadata.
+
+Private key material MUST NOT be stored in these vectors or committed to the repository.
+
+---
+
+# 7. Challenge fixtures
+
+Valid conceptual challenge:
+
+```json
+{
+  "challengeId": "challenge:admission:001",
+  "subject": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+  "operation": "ADMIT_TRUST_ANCHOR",
+  "trustDomain": "trust-domain:catenor-one-demo",
+  "nonce": "opaque-random-nonce-001",
+  "issuedAt": "2026-09-09T22:00:00Z",
+  "expiresAt": "2026-09-09T22:05:00Z"
+}
+```
+
+Exact signed payload canonicalization is a PLAN decision.
+
+---
+
+# 8. Verified-facts fixture
+
+Canonical happy-path fact set:
+
+```json
+{
+  "ORGANIZATION_KYB_VERIFIED": true,
+  "ORGANIZATION_STATUS_VALID": true,
+  "ORGANIZATION_AML_CLEAR": true,
+  "AUTHORIZED_REPRESENTATIVE_VERIFIED": true,
+  "REPRESENTATIVE_AUTHORITY_CONFIRMED": true,
+  "ASSERTION_KEY_POSSESSION_VALID": true,
+  "ASSERTION_KEY_PURPOSE_VALID": true,
+  "EVIDENCE_FRESH": true
+}
+```
+
+---
+
+# 9. Test-vector classification
+
+Vectors are grouped into:
+
+```text
+A. Bootstrap Access
+B. Bootstrap Configuration
+C. Canonical Identity
+D. Assertion Key / Proof of Possession
+E. Chainlink CRE + Sumsub + LLM
+F. Admission Policy
+G. Bootstrap Endorsement
+H. Admission Record / Activation
+I. Storage / Privacy
+J. Trust Anchor Verification
+K. Idempotency / Lifecycle
+L. Live Hackathon Integration
+```
+
+---
+
+# A. Bootstrap Access
+
+## TV-S001-A01 — Authorized bootstrap operator
+
+**Purpose:** Confirm that an allowed operator may start S001.
+
+### Input
+
+```text
+operatorEmail = bootstrap.owner@example.com
+Initial Trust Anchor exists = false
+```
+
+### Expected
+
+```text
+bootstrapAccessAllowed = true
+Admission session may be created
+Trust Anchor eligibility remains unevaluated
+```
+
+### Must NOT happen
+
+```text
+Trust Anchor becomes ACTIVE
+Admission Policy auto-ALLOW
+```
+
+---
+
+## TV-S001-A02 — Unauthorized bootstrap operator
+
+### Input
+
+```text
+operatorEmail = outsider@example.com
+Initial Trust Anchor exists = false
+```
+
+### Expected
+
+```text
+bootstrapAccessAllowed = false
+Admission flow does not start
+```
+
+### Expected side effects
+
+```text
+no Admission Record
+no bootstrap endorsement
+no active Trust Anchor
+```
+
+---
+
+## TV-S001-A03 — Authorized email with invalid evidence
+
+### Input
+
+```text
+operatorEmail = bootstrap.owner@example.com
+
+verified facts:
+ORGANIZATION_AML_CLEAR = false
+all other required facts = true
+```
+
+### Expected
+
+```text
+bootstrapAccessAllowed = true
+Admission Policy = DENY
+Trust Anchor status != ACTIVE
+```
+
+This proves:
+
+```text
+bootstrap access != Trust Anchor eligibility
+```
+
+---
+
+# B. Bootstrap Configuration
+
+## TV-S001-B01 — Valid Bootstrap Configuration
+
+### Input
+
+```json
+{
+  "trustDomain": "trust-domain:catenor-one-demo",
+  "admissionPolicy": "policy:trust-anchor-admission:v1",
+  "policyHash": "0xpolicyhash_demo_v1",
+  "bootstrapVerificationMethod": "bootstrap-verification-method:1"
+}
+```
+
+### Expected
+
+```text
+configurationAccepted = true
+```
+
+---
+
+## TV-S001-B02 — Runtime policy hash mismatch
+
+### Input
+
+```text
+bootstrap.policyHash = 0xpolicyhash_demo_v1
+runtime canonical policy hash = 0xdifferent_hash
+```
+
+### Expected
+
+```text
+Admission MUST NOT finalize
+Policy result MUST NOT become authoritative ALLOW
+no active Trust Anchor
+```
+
+---
+
+## TV-S001-B03 — Candidate self-signs "I am a Trust Anchor"
+
+### Input
+
+```text
+candidate self-signed assertion = valid cryptographic signature
+Admission Decision = missing
+bootstrap endorsement = missing
+```
+
+### Expected
+
+```text
+Trust Anchor activation = rejected
+```
+
+Reason:
+
+```text
+self-signature proves key control
+not initial trust
+```
+
+---
+
+# C. Canonical Identity
+
+## TV-S001-C01 — Create opaque canonical Organization DID
+
+### Input
+
+```text
+subjectType = ORGANIZATION
+legalName = Organization A
+companyApplicantId = sumsub_company_fixture_001
+representativeApplicantId = sumsub_person_fixture_001
+```
+
+### Expected
+
+```text
+did starts with did:catenor:
+identifier is opaque/high entropy
+subjectType = ORGANIZATION
+```
+
+### Must NOT be true
+
+```text
+did contains "Organization A"
+did contains applicant IDs
+did contains operator email
+```
+
+---
+
+## TV-S001-C02 — Same legal name does not determine DID
+
+### Input
+
+Create two independent test candidates with:
+
+```text
+legalName = Organization A
+```
+
+### Expected
+
+```text
+DID_1 != DID_2
+```
+
+unless the application intentionally resolves both records as the same already-known canonical Subject through an explicit identity resolution mechanism.
+
+The legal name alone MUST NOT determine the DID.
+
+---
+
+## TV-S001-C03 — Public DID Document is minimized
+
+### Expected public fixture
+
+```json
+{
+  "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+  "verificationMethod": [
+    {
+      "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+      "controller": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+      "type": "Multikey",
+      "publicKeyMultibase": "z6MkFixtureAssertionPublicKey001"
+    }
+  ],
+  "assertionMethod": [
+    "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1"
+  ]
+}
+```
+
+### Must NOT contain
+
+```text
+sumsub_company_fixture_001
+sumsub_person_fixture_001
+email
+PII
+private key
+financial Account Binding
+```
+
+---
+
+# D. Assertion Key / Proof of Possession
+
+## TV-S001-D01 — Valid assertion-key proof
+
+### Preconditions
+
+```text
+challenge is fresh
+challenge has not been consumed
+challenge is bound to CANDIDATE_DID
+challenge operation = ADMIT_TRUST_ANCHOR
+signature made by assertion-key-1
+```
+
+### Expected
+
+```text
+ASSERTION_KEY_POSSESSION_VALID = true
+```
+
+---
+
+## TV-S001-D02 — Wrong key signs challenge
+
+### Input
+
+```text
+challenge = valid
+signature = produced by unrelated key
+```
+
+### Expected
+
+```text
+ASSERTION_KEY_POSSESSION_VALID = false
+Admission Policy = DENY
+no bootstrap endorsement
+no active Trust Anchor
+```
+
+---
+
+## TV-S001-D03 — Expired challenge
+
+### Input
+
+```text
+challenge.expiresAt = 2026-09-09T22:05:00Z
+verification time = 2026-09-09T22:06:00Z
+signature = otherwise cryptographically valid
+```
+
+### Expected
+
+```text
+ASSERTION_KEY_POSSESSION_VALID = false
+```
+
+---
+
+## TV-S001-D04 — Challenge replay
+
+### Sequence
+
+```text
+1. challenge:admission:001 verified successfully
+2. challenge marked consumed
+3. identical signed challenge submitted again
+```
+
+### Expected first request
+
+```text
+valid
+```
+
+### Expected second request
+
+```text
+rejected
+ASSERTION_KEY_POSSESSION_VALID != true for second attempt
+```
+
+---
+
+## TV-S001-D05 — Challenge belongs to another DID
+
+### Input
+
+```text
+challenge.subject = did:catenor:A
+verification requested for did:catenor:B
+signature otherwise valid
+```
+
+### Expected
+
+```text
+verification = false
+Admission cannot ALLOW
+```
+
+---
+
+## TV-S001-D06 — Verification Method not authorized for assertion
+
+### Input
+
+DID Document contains key:
+
+```text
+did:catenor:...#authentication-key-1
+```
+
+but it is not listed in `assertionMethod`.
+
+The challenge is signed by that key.
+
+### Expected
+
+```text
+ASSERTION_KEY_PURPOSE_VALID = false
+Admission Policy = DENY
+```
+
+---
+
+# E. Chainlink CRE + Sumsub + LLM
+
+## TV-S001-E01 — CRE simulation happy path
+
+**Environment:** local/simulation
+
+### Inputs
+
+Mock provider fixtures return:
+
+```text
+company KYB = verified
+company status = valid
+AML = clear
+representative KYC = verified
+authority evidence = valid
+evidence freshness = valid
+```
+
+### Expected
+
+Inside the workflow:
+
+```text
+handlerInTee executes
+secrets are resolved through the configured secret mechanism
+confidential HTTP path executes
+minimal result is produced
+```
+
+### Expected minimized output
+
+```json
+{
+  "ORGANIZATION_KYB_VERIFIED": true,
+  "ORGANIZATION_STATUS_VALID": true,
+  "ORGANIZATION_AML_CLEAR": true,
+  "AUTHORIZED_REPRESENTATIVE_VERIFIED": true,
+  "REPRESENTATIVE_AUTHORITY_CONFIRMED": true,
+  "EVIDENCE_FRESH": true,
+  "evidenceCommitment": "0xevidence_demo_001"
+}
+```
+
+---
+
+## TV-S001-E02 — CRE simulation DENY path
+
+**Environment:** local/simulation
+
+### Input change
+
+```text
+AML = not clear
+```
+
+### Expected minimized result
+
+```text
+ORGANIZATION_AML_CLEAR = false
+```
+
+### Expected policy result
+
+```text
+DENY
+```
+
+---
+
+## TV-S001-E03 — Real deployed CRE happy path
+
+**Environment:** deployed hackathon path
+
+### Preconditions
+
+```text
+real CRE Confidential Workflow deployed
+Vault DON contains required secrets
+real Sumsub test/live candidate reference available
+```
+
+### Expected
+
+```text
+real TEE handler execution
+real confidential Sumsub HTTPS call
+sanitized live execution artifact preserved
+minimal result returned
+```
+
+A mock response MUST NOT satisfy this vector.
+
+---
+
+## TV-S001-E04 — Sumsub authentication failure
+
+### Input
+
+One of:
+
+```text
+invalid SUMSUB_APP_TOKEN
+invalid SUMSUB_SECRET_KEY
+invalid generated provider signature
+```
+
+### Expected
+
+```text
+required provider evidence cannot be verified
+workflow result is non-ALLOW
+no verified facts are fabricated
+```
+
+---
+
+## TV-S001-E05 — Sumsub required evidence unavailable
+
+### Input
+
+Provider request:
+
+```text
+timeout
+5xx
+unavailable
+unexpected unavailable status
+```
+
+### Expected
+
+```text
+Admission MUST NOT ALLOW
+```
+
+Possible result:
+
+```text
+ERROR
+INDETERMINATE
+DENY
+```
+
+depending on implementation profile.
+
+It must never become `ALLOW`.
+
+---
+
+## TV-S001-E06 — Raw Sumsub response is not emitted
+
+### Input
+
+Mock/live provider response contains synthetic sensitive fields:
+
+```json
+{
+  "applicantId": "sumsub_company_fixture_001",
+  "legalName": "Organization A",
+  "sensitiveDocumentNumber": "PRIVATE_FIXTURE_123",
+  "reviewResult": "GREEN"
+}
+```
+
+### Expected normal workflow output
+
+MAY contain:
+
+```text
+ORGANIZATION_KYB_VERIFIED = true
+evidenceCommitment
+```
+
+MUST NOT contain:
+
+```text
+PRIVATE_FIXTURE_123
+raw full provider response
+```
+
+---
+
+## TV-S001-E07 — Baseline CRE secret names are present
+
+### Expected configured persistent secret names
+
+```text
+SUMSUB_APP_TOKEN
+SUMSUB_SECRET_KEY
+LLM_API_KEY
+```
+
+### Expected
+
+```text
+secret values never committed to Git
+secret values never written to judge artifacts
+secret values never printed in normal logs
+```
+
+---
+
+## TV-S001-E08 — Auxiliary LLM returns valid structured extraction
+
+### Input inside TEE
+
+Synthetic corporate authority text:
+
+```text
+"The board authorizes Alice Example, Director,
+to act on behalf of Organization A for this admission."
+```
+
+### Example LLM candidate output
+
+```json
+{
+  "representative": "Alice Example",
+  "role": "Director",
+  "authorityClaim": "act on behalf of Organization A"
+}
+```
+
+### Expected
+
+The system MAY use this output as extraction assistance.
+
+It MUST still perform the configured deterministic/evidence validation before setting:
+
+```text
+REPRESENTATIVE_AUTHORITY_CONFIRMED = true
+```
+
+---
+
+## TV-S001-E09 — LLM hallucinates authority
+
+### Input evidence
+
+```text
+document contains no authority grant
+```
+
+### LLM output
+
+```json
+{
+  "role": "Director",
+  "authorityConfirmed": true
+}
+```
+
+### Expected
+
+```text
+REPRESENTATIVE_AUTHORITY_CONFIRMED != true solely from LLM output
+Admission MUST NOT ALLOW based on this hallucination
+```
+
+---
+
+## TV-S001-E10 — LLM timeout
+
+### Expected
+
+If LLM is advisory only:
+
+```text
+workflow may continue without LLM result
+provided all required facts can be established independently
+```
+
+If LLM-backed extraction is required to establish a required fact:
+
+```text
+that fact remains unverified
+Admission result = non-ALLOW
+```
+
+Never:
+
+```text
+LLM timeout → assume true
+```
+
+---
+
+# F. Admission Policy
+
+## TV-S001-F01 — All facts true
+
+### Input
+
+Use canonical happy-path verified-facts fixture.
+
+### Expected
+
+```text
+decision = ALLOW
+```
+
+---
+
+## TV-S001-F02 — Organization KYB false
+
+### Input override
+
+```text
+ORGANIZATION_KYB_VERIFIED = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F03 — Organization status invalid
+
+### Input override
+
+```text
+ORGANIZATION_STATUS_VALID = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F04 — AML not clear
+
+### Input override
+
+```text
+ORGANIZATION_AML_CLEAR = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F05 — Representative identity unverified
+
+### Input override
+
+```text
+AUTHORIZED_REPRESENTATIVE_VERIFIED = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F06 — Representative identity verified but authority not confirmed
+
+### Input
+
+```text
+AUTHORIZED_REPRESENTATIVE_VERIFIED = true
+REPRESENTATIVE_AUTHORITY_CONFIRMED = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+This vector proves:
+
+```text
+identity != authority
+```
+
+---
+
+## TV-S001-F07 — Assertion key possession invalid
+
+### Input
+
+```text
+ASSERTION_KEY_POSSESSION_VALID = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F08 — Wrong key purpose
+
+### Input
+
+```text
+ASSERTION_KEY_PURPOSE_VALID = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F09 — Evidence stale
+
+### Input
+
+```text
+EVIDENCE_FRESH = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+## TV-S001-F10 — Required fact missing
+
+### Input
+
+Remove:
+
+```text
+ORGANIZATION_AML_CLEAR
+```
+
+from policy input.
+
+### Expected
+
+```text
+decision != ALLOW
+```
+
+Recommended:
+
+```text
+DENY
+or
+INDETERMINATE
+```
+
+according to chosen implementation profile.
+
+---
+
+## TV-S001-F11 — Extra unknown fact does not bypass policy
+
+### Input
+
+Happy facts except:
+
+```text
+ORGANIZATION_AML_CLEAR = false
+```
+
+plus:
+
+```text
+SUPER_TRUSTED_BY_UI = true
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+Unknown/untrusted fields cannot override required facts.
+
+---
+
+## TV-S001-F12 — LLM says ALLOW but policy input fails
+
+### Input
+
+```text
+llmRecommendation = "ALLOW"
+ORGANIZATION_AML_CLEAR = false
+```
+
+### Expected
+
+```text
+decision = DENY
+```
+
+---
+
+# G. Bootstrap Endorsement
+
+## TV-S001-G01 — Valid ALLOW is endorsed
+
+### Preconditions
+
+```text
+Admission Policy = ALLOW
+Bootstrap Configuration = valid
+candidate DID = expected DID
+policy hash = expected hash
+evidence commitment = expected commitment
+```
+
+### Expected
+
+```text
+bootstrapEndorsement = created
+bootstrapEndorsement verifies = true
+```
+
+---
+
+## TV-S001-G02 — DENY cannot be endorsed as successful admission
+
+### Input
+
+```text
+Admission Policy = DENY
+```
+
+### Expected
+
+```text
+no successful bootstrap endorsement
+no active Trust Anchor
+```
+
+---
+
+## TV-S001-G03 — Endorsement candidate DID mismatch
+
+### Input
+
+Endorsement was created for:
+
+```text
+did:catenor:A
+```
+
+Activation requested for:
+
+```text
+did:catenor:B
+```
+
+### Expected
+
+```text
+endorsement verification = false
+activation rejected
+```
+
+---
+
+## TV-S001-G04 — Endorsement policy hash mismatch
+
+### Input
+
+```text
+endorsement.policyHash = 0xpolicyhash_demo_v1
+runtime Admission Record policyHash = 0xaltered
+```
+
+### Expected
+
+```text
+endorsement verification = false
+activation rejected
+```
+
+---
+
+## TV-S001-G05 — Invalid bootstrap signature
+
+### Input
+
+```text
+endorsement signature produced by unauthorized key
+```
+
+### Expected
+
+```text
+bootstrapEndorsementValid = false
+activation rejected
+```
+
+---
+
+# H. Admission Record / Activation
+
+## TV-S001-H01 — Successful Admission Record
+
+### Preconditions
+
+```text
+policy decision = ALLOW
+bootstrap endorsement = valid
+```
+
+### Expected conceptual record
+
+```json
+{
+  "type": "CatenorTrustAnchorAdmissionRecord",
+  "trustDomain": "trust-domain:catenor-one-demo",
+  "trustAnchor": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+  "admissionPolicy": "policy:trust-anchor-admission:v1",
+  "policyHash": "0xpolicyhash_demo_v1",
+  "decision": "ADMIT_TRUST_ANCHOR",
+  "verificationMethod": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+  "evidenceCommitment": "0xevidence_demo_001",
+  "decisionRef": "decision:admission:001",
+  "bootstrapEndorsementRef": "endorsement:bootstrap:001"
+}
+```
+
+### Expected state
+
+```text
+Trust Anchor status = ACTIVE
+```
+
+---
+
+## TV-S001-H02 — DENY creates no successful Admission Record
+
+### Preconditions
+
+```text
+policy decision = DENY
+```
+
+### Expected
+
+```text
+no successful Trust Anchor Admission Record
+Trust Anchor status != ACTIVE
+```
+
+A denial Decision/audit record may exist.
+
+---
+
+## TV-S001-H03 — ALLOW without bootstrap endorsement
+
+### Input
+
+```text
+policy decision = ALLOW
+bootstrap endorsement = missing
+```
+
+### Expected
+
+```text
+Trust Anchor status != ACTIVE
+```
+
+---
+
+# I. Storage / Privacy
+
+## TV-S001-I01 — Private provider refs stay private
+
+### Private DB fixture may contain
+
+```text
+sumsub_company_fixture_001
+sumsub_person_fixture_001
+```
+
+### Public resolver responses MUST NOT contain them.
+
+Expected grep/assertion conceptually:
+
+```text
+public_output contains COMPANY_APPLICANT_ID = false
+public_output contains REPRESENTATIVE_APPLICANT_ID = false
+```
+
+---
+
+## TV-S001-I02 — Public projection is API-exposed, not public PostgreSQL
+
+### Expected architecture condition
+
+```text
+Railway PostgreSQL endpoint/database is application infrastructure
+public DID resolution occurs through Catenor Resolver/API
+```
+
+This is validated through deployment/config review rather than a pure unit test.
+
+---
+
+## TV-S001-I03 — Raw evidence plaintext must not be persisted by normal API
+
+### Input
+
+Synthetic raw confidential value:
+
+```text
+RAW_SECRET_DOCUMENT_VALUE_001
+```
+
+### Expected
+
+After successful Admission:
+
+```text
+normal PostgreSQL textual columns do not contain RAW_SECRET_DOCUMENT_VALUE_001
+normal application logs do not contain RAW_SECRET_DOCUMENT_VALUE_001
+```
+
+If evidence is retained:
+
+```text
+bucket object = encrypted
+```
+
+---
+
+## TV-S001-I04 — Safe evidence-retention fallback
+
+### Preconditions
+
+```text
+deployed CRE implementation cannot securely encrypt/upload raw evidence before leaving the confidential boundary
+```
+
+### Expected
+
+```text
+raw evidence snapshot is NOT persisted
+```
+
+May persist:
+
+```text
+minimized facts
+evidence commitment
+private Sumsub provider ref
+re-verification metadata
+```
+
+---
+
+## TV-S001-I05 — Evidence object and decryption key are separated
+
+If encrypted evidence retention is implemented:
+
+### Expected
+
+```text
+bucket ciphertext does not embed private decryption key
+PostgreSQL does not contain private decryption key
+```
+
+---
+
+## TV-S001-I06 — Private signing key is absent from DB and repo
+
+### Search scope
+
+```text
+repository
+Railway database fixture
+application logs
+artifacts/
+```
+
+### Expected
+
+```text
+no private assertion-key material
+```
+
+---
+
+# J. Trust Anchor Verification
+
+## TV-S001-J01 — Happy-path Trust Anchor verification
+
+### Preconditions
+
+```text
+DID resolves
+Verification Method valid
+Admission Record valid
+policy hash matches
+Decision = ALLOW
+bootstrap endorsement valid
+status = ACTIVE
+```
+
+### Expected
+
+```text
+TRUST_ANCHOR_VALID = true
+```
+
+---
+
+## TV-S001-J02 — Tampered evidence commitment
+
+### Input
+
+Stored Admission Record originally:
+
+```text
+evidenceCommitment = 0xevidence_demo_001
+```
+
+Tampered:
+
+```text
+evidenceCommitment = 0xtampered
+```
+
+### Expected
+
+```text
+TRUST_ANCHOR_VALID = false
+```
+
+where the selected proof/record binding makes the tampering detectable.
+
+---
+
+## TV-S001-J03 — Tampered policy reference/hash
+
+### Input
+
+Admission Record policy hash changed after admission.
+
+### Expected
+
+```text
+TRUST_ANCHOR_VALID = false
+```
+
+---
+
+## TV-S001-J04 — Missing bootstrap endorsement
+
+### Expected
+
+```text
+TRUST_ANCHOR_VALID = false
+```
+
+for the Initial Trust Anchor profile.
+
+---
+
+## TV-S001-J05 — Suspended Trust Anchor
+
+### Input
+
+```text
+status = SUSPENDED
+```
+
+### Expected
+
+```text
+current TRUST_ANCHOR_VALID != true
+```
+
+---
+
+## TV-S001-J06 — Revoked/deactivated Trust Anchor
+
+### Input
+
+```text
+status = REVOKED
+```
+
+or:
+
+```text
+status = DEACTIVATED
+```
+
+### Expected
+
+```text
+current TRUST_ANCHOR_VALID = false
+```
+
+---
+
+# K. Idempotency / Lifecycle
+
+## TV-S001-K01 — Retry after successful admission
+
+### Preconditions
+
+Candidate already:
+
+```text
+did = CANDIDATE_DID
+Trust Anchor status = ACTIVE
+```
+
+### Input
+
+Same canonical Subject requests Initial Trust Anchor Admission again.
+
+### Expected
+
+One of:
+
+```text
+return existing active Admission state
+or
+ALREADY_ADMITTED
+```
+
+### Must NOT happen
+
+```text
+new active root for same Subject
+new accidental canonical DID
+```
+
+---
+
+## TV-S001-K02 — Retry failed admission
+
+### Preconditions
+
+Previous Admission attempt:
+
+```text
+decision = DENY
+Trust Anchor status != ACTIVE
+```
+
+### Input
+
+Candidate retries with corrected evidence.
+
+### Expected
+
+A new Admission attempt/session MAY be created.
+
+The failed historical attempt remains auditable.
+
+If all current requirements now pass:
+
+```text
+new attempt may ALLOW
+```
+
+---
+
+# L. Live Hackathon Integration
+
+## TV-S001-L01 — Live end-to-end happy path
+
+**Priority:** mandatory
+
+### Preconditions
+
+```text
+authorized bootstrap operator
+valid Bootstrap Configuration
+real Sumsub candidate reference
+deployed CRE Confidential Workflow
+valid Vault DON secrets
+working assertion signer
+valid required evidence
+```
+
+### Sequence
+
+```text
+1. operator authenticates
+2. bootstrap access accepted
+3. candidate Organization created/resolved
+4. did:catenor generated
+5. assertion key provisioned
+6. DID Document resolves
+7. key-possession challenge succeeds
+8. deployed CRE workflow executes
+9. handlerInTee fetches secrets
+10. real Sumsub confidential HTTPS call succeeds
+11. optional real LLM confidential call succeeds
+12. minimized facts returned
+13. policy evaluates ALLOW
+14. bootstrap endorsement verifies
+15. Admission Record created
+16. Trust Anchor becomes ACTIVE
+17. verifier returns TRUST_ANCHOR_VALID = true
+18. sanitized audit timeline is visible
+```
+
+### Required artifacts
+
+```text
+CRE deployment reference
+live execution evidence
+sanitized provider integration evidence
+Admission Decision
+Admission Record
+DID Document
+audit timeline
+```
+
+---
+
+## TV-S001-L02 — Live invalid key DENY
+
+**Priority:** mandatory recommended demo failure
+
+### Preconditions
+
+Real/live infrastructure available.
+
+### Input
+
+Use an invalid/wrong assertion-key signature.
+
+### Expected
+
+```text
+ASSERTION_KEY_POSSESSION_VALID = false
+Policy = DENY
+no bootstrap endorsement
+no successful Admission Record
+status != ACTIVE
+```
+
+The failure should be visible in the Judge Inspector without exposing secrets.
+
+---
+
+## TV-S001-L03 — Live evidence/policy DENY
+
+**Priority:** strongly preferred
+
+### Input
+
+Use a controlled non-production/test case that produces at least one false required Admission fact.
+
+Example:
+
+```text
+ORGANIZATION_AML_CLEAR = false
+```
+
+or another safe test fixture supported by the provider/demo environment.
+
+### Expected
+
+```text
+Policy = DENY
+no active Trust Anchor
+```
+
+If the external provider environment cannot safely produce this condition, the project may demonstrate the deterministic negative path through a controlled fixture, provided it is clearly labeled and the live happy path remains real.
+
+---
+
+# 10. Test artifact naming
+
+Suggested artifact layout:
+
+```text
+artifacts/
+├── chainlink/
+│   └── s001/
+│       ├── simulation-happy.txt
+│       ├── simulation-deny.txt
+│       ├── deployment.txt
+│       ├── live-happy.txt
+│       └── live-deny.txt
+│
+├── privy/
+│   └── s001/
+│       └── assertion-signer-evidence.*
+│
+└── judges/
+    └── s001/
+        ├── README.md
+        ├── trust-anchor-flow.html
+        ├── happy-path.*
+        └── deny-path.*
+```
+
+If Privy is not selected for the S001 assertion signer after official-agent review, the corresponding artifact path should reflect the actual implementation.
+
+---
+
+# 11. Sanitization rules for test artifacts
+
+Artifacts MUST NOT contain:
+
+```text
+real PII
+real government document numbers
+real private keys
+SUMSUB_SECRET_KEY
+SUMSUB_APP_TOKEN
+LLM_API_KEY
+private provider payloads
+private applicant IDs unless safely redacted
+```
+
+Use:
+
+```text
+sanitized identifiers
+truncated hashes
+synthetic fixtures
+redacted screenshots
+```
+
+where necessary.
+
+---
+
+# 12. Test implementation guidance
+
+Recommended mapping:
+
+```text
+Domain unit tests
+→ C, D, F, G, J
+
+Application/use-case tests
+→ A, B, H, K
+
+Infrastructure integration tests
+→ E, I
+
+CRE simulation
+→ E01, E02
+
+Live deployed integration
+→ E03, L01, L02
+
+End-to-end Judge Inspector
+→ L01, L02, L03
+```
+
+Do not force every vector into the same test runner.
+
+Some architecture/deployment/privacy vectors are best validated by:
+
+```text
+automated integration test
+deployment assertion
+artifact inspection
+or
+manual judge/demo checklist
+```
+
+The PLAN must map each test vector to a concrete verification method.
+
+---
+
+# 13. Minimum automated test set
+
+At minimum, automated tests should cover:
+
+```text
+authorized bootstrap access
+unauthorized bootstrap access
+valid DID/value object generation
+DID privacy assertions
+valid key proof
+wrong key
+expired challenge
+replay
+wrong DID
+wrong key purpose
+
+all policy facts true
+each policy fact false
+missing policy fact
+LLM recommendation cannot override policy
+
+valid bootstrap endorsement
+invalid endorsement
+policy hash mismatch
+
+Admission success
+Admission DENY
+idempotent retry
+Trust Anchor verification success
+tampered record failure
+non-active root failure
+
+private/public serialization boundaries
+```
+
+---
+
+# 14. Minimum CRE simulation set
+
+Before real deployment:
+
+```text
+simulation happy path
+simulation AML/policy DENY
+secret loading works
+confidential HTTP mock path works
+LLM mock path works if enabled
+raw sensitive fixture does not appear in output
+```
+
+---
+
+# 15. Minimum live set
+
+Before S001 is considered hackathon-complete:
+
+```text
+real CRE deployment
+real handlerInTee execution
+real Sumsub confidential call
+real minimized output
+real happy-path Admission
+real ACTIVE Trust Anchor
+real verification = true
+live invalid-key DENY
+```
+
+A real LLM call is strongly preferred for the live path if integration time permits.
+
+---
+
+# 16. Judge-facing result summary
+
+The Judge Inspector should be able to replay or explain at least:
+
+## Scenario 1 — Happy path
+
+```text
+ACCESS           ✓
+BOOTSTRAP        ✓
+DID              ✓
+KEY POSSESSION   ✓
+SUMSUB / CRE     ✓
+POLICY           ALLOW
+ENDORSEMENT      ✓
+ADMISSION        ACTIVE
+VERIFY           TRUE
+```
+
+## Scenario 2 — Unauthorized bootstrap email
+
+```text
+ACCESS           ✗
+ADMISSION        NOT STARTED
+ACTIVE ROOT      NO
+```
+
+## Scenario 3 — Invalid assertion key
+
+```text
+ACCESS           ✓
+DID              ✓
+KEY POSSESSION   ✗
+POLICY           DENY
+ENDORSEMENT      NO
+ACTIVE ROOT      NO
+VERIFY           FALSE
+```
+
+## Scenario 4 — Required evidence false
+
+```text
+ACCESS           ✓
+KEY POSSESSION   ✓
+CONFIDENTIAL     ✓
+POLICY FACT      ✗
+POLICY           DENY
+ACTIVE ROOT      NO
+```
+
+---
+
+# 17. Final test principle
+
+> **Every positive authority state must have a test showing why it is valid, and every critical requirement must have a negative vector proving that it cannot be bypassed.**
+
+For S001:
+
+> **No evidence, no trust. No key control, no trust. No policy ALLOW, no trust. No bootstrap endorsement, no root.**
