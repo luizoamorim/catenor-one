@@ -624,3 +624,20 @@ Template-derived files: `main.ts`, `package.json`, `tsconfig.json`, `workflow.ya
 Workflow package license set to Apache-2.0 (the template scaffold said `UNLICENSED`). The scaffold's unused `ethereum-mainnet` RPC entry was removed.
 
 S001 demo tooling (2026-09-11, `apps/api` dev dependency): `tsx` 4.23.13 (MIT) runs the TypeScript demo command `pnpm demo:s001`.
+
+---
+
+## 24. 2026-09-11 — Hedera ATS testnet execution adapter (Part B)
+
+| Item | Source | Version | License |
+|---|---|---|---|
+| `@hashgraph/asset-tokenization-contracts` (typechain bindings + Solidity sources) | npm / `hashgraph/asset-tokenization-studio` | 8.0.0 | Apache-2.0 |
+| `ethers` | npm | 6.17.0 | MIT |
+
+- Used by `apps/api/src/infrastructure/execution/hedera-ats-executor.ts`, which is original Catenor One code.
+- The testnet factory and resolver addresses come from the ATS repository's `packages/ats/contracts/deployments/hedera-testnet` records.
+  The documentation site's deployed-address page still lists v4.
+- The role constant and ISIN check come from the package's `contracts/constants/roles.sol` and `contracts/factory/isinValidator.sol`.
+  They were read to mirror the behavior; no Solidity was copied.
+- The research that selected this path was done by a general-purpose Claude Code subagent. It checked current npm packages, the ATS repository and the live testnet with read-only `eth_call`s; its throwaway scripts stayed in the session scratchpad and none were committed.
+- `@hashgraph/asset-tokenization-sdk` 8.0.0 was evaluated and not adopted. It has no server-side private-key wallet mode, and its ESM build does not import under Node.

@@ -908,6 +908,37 @@ Human review: pending (checkpoint report).
 
 Commit: c0b3342, 6a24714, plus the docs commit that contains this entry.
 
+## 2026-09-11 — Part B Hedera ATS testnet executor (ready, not yet executed)
+
+Goal: connect the approved Part B ALLOW to exactly one real Hedera ATS testnet action.
+
+Work completed:
+
+- **Executor (commit d8a3af0):** `HederaAtsTestnetExecutor` sends one `Factory.deployEquity` transaction to the ATS v8 testnet factory. It creates the security token for `asset:catenor-one-demo:001`, uses a synthetic ISIN that passes the factory's checksum, and puts the grant reference in the regulation `info` field.
+  - Built on the typechain bindings from `@hashgraph/asset-tokenization-contracts` 8.0.0 with ethers 6.17.0.
+  - Refuses any chain other than Hedera testnet (296).
+  - The operator key is read from the git-ignored `apps/api/.env` and never printed.
+- **Demo:** after an ALLOW, `pnpm demo:s001` now runs Part B:
+  1. grant signed with the Trust Anchor's Privy assertion key;
+  2. two DENY requests, with the operator nonce read before and after and required to stay unchanged;
+  3. Org B's ALLOW sends the one transaction.
+- **Opt-in live test:** `pnpm test:hedera-live`. It spends testnet HBAR and is skipped without `CATENOR_HEDERA_LIVE=1` and the key.
+
+Validation:
+
+- `pnpm check` green (318 unit tests).
+- Part B integration 2/2.
+- Read-only `eth_call` of `deployEquity` with the exact arguments against the live testnet factory returned an equity address.
+- **No Hedera transaction has been sent yet.**
+
+Blocked (maintainer action): a Hedera testnet ECDSA account with an EVM alias and about 25 HBAR, with its key as `HEDERA_OPERATOR_EVM_PRIVATE_KEY` in `apps/api/.env`.
+
+AI assistance: Claude Code main session; a general-purpose research subagent for current Hedera ATS packages, addresses and testnet behavior.
+
+Human review: pending.
+
+Commit: d8a3af0, plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md

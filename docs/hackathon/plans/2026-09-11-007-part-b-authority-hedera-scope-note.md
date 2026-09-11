@@ -87,3 +87,20 @@ Hedera ATS testnet: issue/mint 100 tokens (transaction id recorded as artifact)
   executor is never invoked.
 - Not implemented (out of the approved scope): Sponsor Authorization / Agent Delegation / full Hedera lifecycle; request
   authentication of Org B beyond the subject match (Org B's request is operator-initiated in the demo).
+
+## Execution mapping (implemented, commit d8a3af0) — Catenor One [REF-IMPL]
+
+- `TOKENIZE_ASSET` on `asset:catenor-one-demo:001` → exactly **one** Hedera ATS testnet transaction:
+  `Factory.deployEquity` on the ATS v8 testnet factory (`0.0.9213391`, resolver `0.0.9212226`). It creates the ATS
+  security token for the demo asset: SYNTHETIC name/symbol and ISIN `XXCATENOR01` + check digit; KYC, identity
+  registry, compliance and external lists off; no units issued. The regulation `info` field carries
+  `catenor-one:TOKENIZE_ASSET:<resource>:grant:<grantId>`, linking the on-chain token to the authorizing grant.
+- Sent by a Catenor One testnet operator account (ECDSA secp256k1 with EVM alias). It is the execution adapter only:
+  not Org B's authority, not a Catenor signing key. It holds the token's admin and issuer roles.
+- DENY evidence: the operator account nonce is read before and after the DENY requests and must not change.
+- Contract bindings: `@hashgraph/asset-tokenization-contracts` 8.0.0 (typechain) with ethers 6.17.0. The ATS SDK was
+  not used because it has no server-side private-key wallet mode.
+- The exact arguments were checked read-only against the live factory with `eth_call` (2026-09-11). **No transaction
+  has been sent yet:** the maintainer must provide the operator account (`HEDERA_OPERATOR_EVM_PRIVATE_KEY` in the
+  git-ignored `apps/api/.env`, about 25 testnet HBAR).
+- Out of scope, POST-DEMO: issuing units, transfers, redemption, and KYC/compliance modules on the ATS side.
