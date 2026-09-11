@@ -157,7 +157,13 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - the blind DRY RUN (A 6 / B 4 HBAR, nothing sent);
     - the controlled plan: `policy:distribution-eligibility:v1`, A ALLOW → PAY, B DENY → HOLD, with protocol Decisions and the audit chain.
   - **Hedera lifecycle DONE (CP9):** the ATS dividend on the rehearsal equity (dividend id 1) records ownership-based entitlement A 6 / B 4; ATS moves no funds.
-  - **Pending:** the live Agent payout of 6 HBAR to A only (maintainer-authorized). It needs the Agent payout signer boundary (plain transfer, empty calldata, exactly A's bound account, exactly the planned amount) and the pre-seeded, funded Agent wallet. B gets no signature.
+  - **Payout signer boundary DONE (CP10):**
+    - the transaction is built from the approved plan and the private binding: PAY only, chain 296, plain transfer, empty calldata, exact bound recipient, exact plan amount, balance check;
+    - the Privy-signed transaction must equal it;
+    - the pre-seeded Agent wallet is verified at CREATE DISTRIBUTION AGENT;
+    - preflight: A's exact 6 HBAR payout is dry-signed by Privy and recovers to the Agent wallet; B gets no transaction and no signature request; the negative cases are refused before Privy or denied by the policy.
+    - Evidence: `artifacts/privy/final-demo/cp10-agent-payout-preflight.md`.
+  - **Pending:** fund the Agent wallet `0x5037…FC51` (it reads 0 HBAR and Mirror Node finds no account), then the maintainer-authorized live payout of 6 HBAR to A (`--agent-payout-live`).
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 

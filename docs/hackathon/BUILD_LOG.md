@@ -1301,6 +1301,48 @@ Artifacts: `artifacts/hedera/final-demo/dividend-lifecycle.md`, `dividend-grant-
 
 Commit: the `feat(hedera)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP10: selective Agent payout — signer boundary + preflight (nothing broadcast)
+
+Goal: the pre-seeded Agent wallet, the Catenor payout signer boundary, and a dry-signature preflight (prompt 2026-09-11-018); STOP before the live payout.
+
+Work completed:
+
+- **Pre-seeded Agent resolution** (`PRIVY_AGENT_WALLET_ADDRESS`): CREATE DISTRIBUTION AGENT resolves the wallet via the Privy API and verifies all of:
+  - the owner is set;
+  - exactly one policy;
+  - the runtime quorum is the only signer, override-scoped;
+  - the policy owner is the wallet owner;
+  - the rules equal the approved boundary exactly (`agentPolicyMatches`).
+  - Otherwise it refuses. Result `PRE_SEEDED_VERIFIED`, recorded in the audit.
+- **`PrivyAgentPayoutExecutor`:**
+  - `buildPayoutTransaction` (pure) requires plan PAY, chain 296, a plain transfer with empty calldata, recipient == the private bound account and amount == the plan amount;
+  - a balance check before gas estimation or any signature;
+  - Privy signs, and the signed transaction must equal the built one;
+  - `DistributionService.approvedPayout` takes PAY/HOLD and the amount from the plan and the recipient from the private binding.
+  - Demo Part C: PAY holders are dry-signed (live only with `--agent-payout-live`); HOLD holders never reach the executor; Privy signature requests are recorded; the Agent nonce is read before and after.
+- **Demo run** `pnpm demo:s001 --distribution`:
+  - plan A PAY 6 / B HOLD 4 (CRE SIMULATION, REAL Sumsub sandbox);
+  - A's payout was refused `INSUFFICIENT_AGENT_BALANCE` before Privy;
+  - B: no transaction, no signature request;
+  - 0 Privy requests; Agent nonce 0 → 0; audit chain valid.
+- **`preflight:payout`**, all PASS:
+  - policy exact;
+  - refused before Privy: HOLD, amount ≠ plan, calldata, recipient ≠ bound account (0 requests);
+  - Privy DENY: recipient not A/B, 21 HBAR, chain 1;
+  - the exact A 6 HBAR payout is Privy dry-signed and recovers to the Agent wallet;
+  - Investor B: 0 signature requests; nonce unchanged.
+- **BLOCK:** the Agent wallet `0x5037…FC51` reads 0 HBAR (Mirror Node: account not found). The maintainer's 20 HBAR funding has not reached this address on testnet.
+
+Validation: `pnpm check` green (see commit).
+
+AI assistance: Claude Code main session.
+
+Human review: maintainer requirements in prompt 2026-09-11-018.
+
+Artifacts: `artifacts/privy/final-demo/cp10-agent-payout-preflight.md`.
+
+Commit: the `feat(distribution)` and `docs(hackathon)` commits of this checkpoint.
+
 ## Entry template
 
 ```md
