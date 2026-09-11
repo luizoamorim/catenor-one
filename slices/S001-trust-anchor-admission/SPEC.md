@@ -11,6 +11,10 @@
 
 > **Rev 2 amendment summary (maintainer decisions recorded in `PLAN.md` §33):** no LLM in S001 · exactly 3 persistent CRE secrets (`SUMSUB_APP_TOKEN`, `SUMSUB_SECRET_KEY`, `CATENOR_INTERNAL_API_TOKEN`) · CRE workflow boundary `identity-confidential` with S001 operation/handler `trust-anchor-admission` · HTTPS requests executed from inside `handlerInTee` (not the separate CRE Confidential HTTP capability) · COMMITMENT_ONLY evidence retention, no raw provider evidence persisted, Railway bucket not used by S001 · Catenor-issued provider bindingRefs verified inside the TEE · bootstrap endorsement binds a `verificationMethodCommitment` · Sumsub sandbox for the hackathon · narrower Trust Anchor verification claim (§27). All other frozen S001 semantics are unchanged.
 
+> **Rev 2.3 amendment (maintainer decisions Q4/Q5, `PLAN.md` D31/D32):** explicit **evidence profiles** (§12.3) — the Full Sumsub Sandbox Profile is preferred; if Sumsub Company/KYB entitlement is unavailable, the live path may use the **Hybrid Demo Profile** (company evidence SYNTHETIC MOCK, representative verification REAL Sumsub sandbox), hash-pinned in the Bootstrap Configuration, bound by the bootstrap endorsement and visibly labeled · no universal AML rejection-label deny-list (provider rejection labels are reason codes, not Catenor policy rules). Fact names and `policy:trust-anchor-admission:v1` are unchanged.
+
+> **Phase 0 status (2026-09-10, `PLAN.md` Rev 2.6):** Privy signing spike T0.5 passed with an approved design amendment (Catenor signer boundary; owner/runtime-signer separation; separate Bootstrap Endorsement Key wallet) · CRE runtime spike T0.7 approved — its results are SIMULATION-CONFIRMED only; deployed-TEE behavior is re-checked at the first deployed run. No S001 semantics or fact names changed.
+
 ---
 
 # 1. Purpose
@@ -337,7 +341,7 @@ Credential Assertion Key != Financial Execution Key
 
 S001 does not require a financial execution wallet.
 
-After reviewing Privy's current official docs/skill, PLAN provisionally selects a Privy-backed dedicated Ed25519-capable signer per Organization, with a strict policy preventing financial transaction execution. This selection is conditional on a spike confirming signing semantics that allow independent Ed25519 verification. If the spike fails, implementation STOPS for human review; no other signer or crypto profile is introduced without approval. The port boundary is kept either way.
+After reviewing Privy's current official docs/skill and spike T0.5 (passed with an approved design amendment, `PLAN.md` §13, D1), the Catenor One reference implementation uses a dedicated Privy Ed25519 wallet (Solana) as the Organization's Credential Assertion Key, with a strict policy preventing financial transaction execution, and a completely separate Privy Ed25519 wallet as the Bootstrap Endorsement Key. Signatures verify independently as plain Ed25519; the exact signing-message format and length are enforced by the Catenor signer boundary. This Catenor-managed signing infrastructure is a **reference-implementation choice**: it is not a Catenor Protocol requirement, and the protocol does not require any Trust Anchor to use Privy or to place its key under Catenor-managed custody. No other signer or crypto profile is introduced without approval. The port boundary is kept.
 
 ---
 
@@ -385,7 +389,7 @@ provider-binding check / normalize / verify inside TEE
 minimized verified facts
 ```
 
-For the hackathon, the live path uses **real Sumsub API calls against the Sumsub sandbox with synthetic Organization / representative data**. Documentation and the Judge Inspector MUST say "Sumsub sandbox" and MUST NOT imply production KYB of a real company.
+For the hackathon, the live path uses **real Sumsub API calls against the Sumsub sandbox with synthetic Organization / representative data** under the preferred Full Sumsub Sandbox Profile, or — only if Sumsub Company/KYB entitlement is unavailable — the **Hybrid Demo Profile** of §12.3 (company evidence SYNTHETIC MOCK, representative verification REAL Sumsub sandbox). Documentation and the Judge Inspector MUST say "Sumsub sandbox" and MUST NOT imply production KYB of a real company.
 
 The intended reference flow supports at least:
 
@@ -394,7 +398,7 @@ Organization / company applicant reference
 Authorized representative / individual applicant reference
 ```
 
-where the selected Sumsub configuration provides them.
+where the selected Sumsub configuration provides them. Under the Hybrid Demo Profile the Organization / company reference is a SYNTHETIC MOCK fixture reference (§12.3); the representative / individual reference is always a real Sumsub sandbox applicant.
 
 Sumsub `applicantId` values are private operational data. They are not Catenor identifiers and MUST NOT appear in the public DID Document or public logs.
 
@@ -411,6 +415,8 @@ To prevent applicant substitution, provider applicant references are bound to th
 3. Catenor returns the bindingRefs to the authenticated operator only
 4. operator creates/configures the Sumsub company and representative applicants
    with externalUserId = the matching Catenor bindingRef
+   (Hybrid Demo Profile: only the representative applicant exists at Sumsub; the company
+   reference is the SYNTHETIC MOCK fixture reference and its binding check is recorded as MOCK)
 5. operator attaches the resulting applicant IDs to the Admission session
 6. inside handlerInTee: applicant.externalUserId == expected bindingRef (both applicants)
 7. only then does confidential provider verification proceed
@@ -422,7 +428,33 @@ If an applicant's `externalUserId` does not match the expected bindingRef, confi
 
 ## 12.2 Representative authority evidence
 
-`REPRESENTATIVE_AUTHORITY_CONFIRMED` is derived from deterministic provider evidence only — for example company ↔ representative linkage, an accepted representative role, representative verification, company verification, and provider-side membership / beneficiary / authority relations where available. Exact field rules are confirmed against real Sumsub sandbox responses. If the provider configuration used cannot provider-verifiably establish the role, the implementation MUST NOT fake certainty: it uses the strongest evidence actually available and documents the limitation (PLAN and Judge Inspector).
+`REPRESENTATIVE_AUTHORITY_CONFIRMED` is derived from deterministic provider evidence only — for example company ↔ representative linkage, an accepted representative role, representative verification, company verification, and provider-side membership / beneficiary / authority relations where available. Exact field rules are confirmed against real Sumsub sandbox responses. If the provider configuration used cannot provider-verifiably establish the role, the implementation MUST NOT fake certainty: it uses the strongest evidence actually available and documents the limitation (PLAN and Judge Inspector). Under the Hybrid Demo Profile the company ↔ representative linkage comes from SYNTHETIC MOCK company evidence; the evidence class is stated as "SYNTHETIC MOCK linkage + REAL Sumsub sandbox representative verification" and never as provider-verified authority.
+
+## 12.3 Evidence profiles (Rev 2.3, maintainer decision Q4)
+
+| Profile | Company evidence | Representative verification | Status |
+|---|---|---|---|
+| **Full Sumsub Sandbox Profile** | REAL Sumsub sandbox (company / KYB) | REAL Sumsub sandbox | preferred |
+| **Hybrid Demo Profile** | SYNTHETIC MOCK fixture behind the provider-normalization boundary | REAL Sumsub sandbox | allowed only while Sumsub Company/KYB entitlement is unavailable |
+
+In both profiles the Chainlink CRE Confidential Workflow is a REAL deployed workflow and Catenor policy evaluation, bootstrap endorsement and Admission are REAL executions. The representative leg is REAL in every profile.
+
+The Hybrid Demo Profile is permitted only if all of the following hold:
+
+```text
+H1  the Bootstrap Configuration explicitly identifies the company evidence source as MOCK
+    (evidence profile = HYBRID_DEMO; company evidence source = SYNTHETIC_MOCK)
+H2  that configuration remains hash-pinned and is bound by the bootstrap endorsement; any confidential
+    result whose evidence profile / sources differ from the pinned configuration is rejected (no facts, no ALLOW)
+H3  the Judge Inspector, artifacts and README visibly state:
+      "Company evidence: SYNTHETIC MOCK"
+      "Representative verification: REAL SUMSUB SANDBOX"
+H4  nothing claims "Sumsub verified the organization" or "real Sumsub KYB end-to-end"
+H5  real Sumsub Company/KYB remains the preferred adapter and replaces the fixture without changing
+    domain or policy semantics when entitlement becomes available
+```
+
+The MOCK company fixture is never presented as real Sumsub KYB.
 
 ---
 
@@ -610,6 +642,8 @@ Each security-critical fact must have traceable provenance.
 
 All facts are derived deterministically. The six evidence facts are established inside `handlerInTee` only after the provider-binding check (§12.1) succeeds.
 
+Evidence source (§12.3): under the Hybrid Demo Profile, `ORGANIZATION_KYB_VERIFIED`, `ORGANIZATION_STATUS_VALID`, `ORGANIZATION_AML_CLEAR`, the company part of `EVIDENCE_FRESH` and the linkage part of `REPRESENTATIVE_AUTHORITY_CONFIRMED` are derived from SYNTHETIC MOCK company evidence and MUST be labeled as such; they are never presented as a real business/KYB verification result. `AUTHORIZED_REPRESENTATIVE_VERIFIED` is always derived from REAL Sumsub sandbox evidence. Provider rejection labels (e.g. `SANCTIONS`, `PEP`) are retained only as sanitized reason codes; they are not independent Catenor policy rules.
+
 No fact may become `true` solely because an unsigned mutable application row says so.
 
 ---
@@ -713,7 +747,7 @@ External systems:
 ```text
 Chainlink CRE / Vault DON / TEE
 Sumsub (sandbox for the hackathon)
-Privy (operator authentication; assertion and bootstrap signers, subject to the signing spike)
+Privy (operator authentication; separate assertion and bootstrap signing wallets — spike T0.5 passed)
 ```
 
 Arc is not part of S001.
@@ -756,7 +790,7 @@ Private operational state may include:
 ```text
 Canonical Subject record
 provider bindingRefs (COMPANY, REPRESENTATIVE)
-Sumsub company applicant reference
+Sumsub company applicant reference (Hybrid Demo Profile: SYNTHETIC MOCK company reference)
 representative applicant reference
 Admission session/state
 verified fact results and references
@@ -848,7 +882,7 @@ session identifiers SHOULD be opaque
 private context MUST use an authenticated/confidential delivery or fetch mechanism
 ```
 
-Approved S001 mechanism (conditional on a CRE runtime spike confirming the required symmetric cryptography inside the TEE runtime):
+Approved S001 mechanism (the required symmetric cryptography was SIMULATION-CONFIRMED in CRE runtime spike T0.7; deployed-TEE behavior is re-checked at the first deployed run):
 
 ```text
 Catenor API seals the per-admission private context with a key derived from CATENOR_INTERNAL_API_TOKEN
@@ -1014,12 +1048,14 @@ Happy path should show:
 ```text
 1. Candidate Organization enters Admission.
 2. Catenor creates/resolves canonical did:catenor and private provider bindingRefs.
-3. Operator attaches the Sumsub sandbox applicant references created with those bindingRefs.
+3. Operator attaches the Sumsub sandbox applicant references created with those bindingRefs
+   (Hybrid Demo Profile: the REAL representative applicant + the SYNTHETIC MOCK company reference).
 4. DID Document and public assertion key are visible.
 5. Proof of Key Possession succeeds.
 6. DEPLOYED Chainlink CRE Confidential Workflow identity-confidential executes the trust-anchor-admission operation.
 7. handlerInTee retrieves Vault DON secrets.
-8. TEE verifies the provider binding and performs real Sumsub sandbox verification over HTTPS from inside the TEE.
+8. TEE verifies the provider binding and performs real Sumsub sandbox verification over HTTPS from inside the TEE
+   (representative always REAL; company per evidence profile, labeled "Company evidence: SYNTHETIC MOCK" under the Hybrid Demo Profile).
 9. Only minimized verified facts and the evidence commitment leave confidential computation.
 10. Admission Policy v1 deterministically returns ALLOW.
 11. Bootstrap endorsement is created/verified.
@@ -1052,6 +1088,7 @@ real CRE deployment output
 real confidential execution evidence
 negative-path evidence
 sanitized Sumsub integration evidence (labeled "Sumsub sandbox")
+evidence-profile labels (Hybrid Demo Profile: "Company evidence: SYNTHETIC MOCK", "Representative verification: REAL SUMSUB SANDBOX")
 evidence commitment (COMMITMENT_ONLY retention)
 ```
 
@@ -1133,6 +1170,10 @@ CRE deployment registry
 Identity evidence provider
 → real Sumsub integration (Sumsub sandbox, synthetic data, labeled as sandbox, for the hackathon)
 
+Evidence profile (Rev 2.3)
+→ Full Sumsub Sandbox Profile preferred; Hybrid Demo Profile (company SYNTHETIC MOCK, representative REAL Sumsub sandbox)
+  only while Company/KYB entitlement is unavailable, hash-pinned, endorsement-bound and labeled (§12.3)
+
 Provider binding
 → Catenor-issued bindingRef = Sumsub externalUserId, verified inside the TEE; mismatch → no facts, no ALLOW
 
@@ -1161,15 +1202,16 @@ Arc
 
 # 37. Open PLAN decisions
 
-These implementation decisions were proposed and approved in `PLAN.md` Rev 2 (2026-09-10); several remain conditional on the spikes listed there. They must not be silently changed while coding:
+These implementation decisions were proposed and approved in `PLAN.md` Rev 2 (2026-09-10) and updated after the Phase 0 spikes (Rev 2.6). They must not be silently changed while coding:
 
 ```text
 exact did:catenor random identifier encoding
-exact crypto suite/profile                                 (conditional on the Privy signing spike)
-exact assertion-key implementation                         (conditional on the Privy signing spike)
-whether Privy is used for S001 assertion signing after official review
+exact crypto suite/profile                                 (Ed25519 primitive confirmed by T0.5; eddsa-jcs-2022
+                                                           interoperability to be tested in implementation — PLAN D3)
+exact assertion-key implementation                         (dedicated Privy Solana wallet — T0.5 passed, PLAN D1)
+whether Privy is used for S001 assertion signing           (decided: yes — PLAN D1)
 exact CRE trigger type
-exact private per-admission context transport into TEE    (conditional on the CRE runtime spike)
+exact private per-admission context transport into TEE    (sealed context — SIMULATION-CONFIRMED in T0.7, PLAN D11/D37)
 CATENOR_INTERNAL_API_TOKEN purpose                         (approved: channel/root secret)
 exact Sumsub endpoints and applicant mapping               (confirmed against Sumsub sandbox responses)
 exact policy canonical serialization/hash algorithm

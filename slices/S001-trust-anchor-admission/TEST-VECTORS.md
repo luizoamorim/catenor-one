@@ -8,6 +8,8 @@
 
 > **Rev 2:** retired vectors keep their IDs as `RETIRED` (never reused): TV-S001-E08, E09, E10, F12. TV-S001-I05 is not applicable to S001 (COMMITMENT_ONLY). New vectors: TV-S001-E11 (provider-binding mismatch), TV-S001-G06 and TV-S001-J07 (Verification Method key replacement under the same ID).
 
+> **Rev 2.3 (maintainer decision Q4, `PLAN.md` D31):** evidence profiles (SPEC §12.3). Live vectors run under the preferred Full Sumsub Sandbox Profile or, only while Sumsub Company/KYB entitlement is unavailable, the Hybrid Demo Profile (company evidence SYNTHETIC MOCK, representative verification REAL Sumsub sandbox). New vectors: TV-S001-B04 (evidence-source mismatch), TV-S001-L04 (Hybrid Demo Profile labeling).
+
 ---
 
 # 1. Purpose
@@ -162,7 +164,14 @@ representative applicant externalUserId = REPRESENTATIVE_BINDING_REF
 
 bindingRefs are PRIVATE operational state and follow the same exposure rules as applicant IDs.
 
-Live vectors use the **Sumsub sandbox** with synthetic Organization / representative data.
+Live vectors use the **Sumsub sandbox** with synthetic Organization / representative data. Under the Hybrid Demo Profile (SPEC §12.3) the company reference is the SYNTHETIC MOCK fixture reference instead of a Sumsub applicant:
+
+```text
+COMPANY_APPLICANT_ID (Hybrid Demo Profile)
+= mock:company-fixture:MOCK_COMPANY_ACTIVE_GREEN
+```
+
+The representative reference is always a real Sumsub sandbox applicant in live vectors.
 
 ---
 
@@ -416,6 +425,28 @@ Reason:
 ```text
 self-signature proves key control
 not initial trust
+```
+
+---
+
+## TV-S001-B04 — Evidence-source mismatch
+
+*(Added in Rev 2.3, maintainer decision Q4.)*
+
+### Input
+
+```text
+pinned Bootstrap Configuration: evidence profile = HYBRID_DEMO, company source = SYNTHETIC_MOCK
+case 1: workflow config company evidence source = REAL_SUMSUB_SANDBOX
+case 2: confidential result reports evidence profile / company source different from the pinned configuration
+```
+
+### Expected
+
+```text
+case 1: confidential execution ends in ERROR; no facts
+case 2: the API rejects the result; no facts
+no ALLOW, no bootstrap endorsement, no ACTIVE status
 ```
 
 ---
@@ -719,20 +750,22 @@ DENY
 ```text
 real CRE Confidential Workflow identity-confidential deployed (private registry)
 Vault DON contains the 3 required secrets
-real Sumsub sandbox applicant references attached, bound to Catenor bindingRefs
+real Sumsub sandbox representative applicant reference attached, bound to its Catenor bindingRef
+company reference per evidence profile: real Sumsub sandbox applicant (Full Sumsub Sandbox Profile) or the
+  SYNTHETIC MOCK fixture reference (Hybrid Demo Profile), as pinned in the Bootstrap Configuration
 ```
 
 ### Expected
 
 ```text
 real TEE handler execution (trust-anchor-admission)
-real Sumsub sandbox HTTPS calls executed from inside the TEE
+real Sumsub sandbox HTTPS calls executed from inside the TEE (representative; company too under the Full profile)
 provider-binding check passes
 sanitized live execution artifact preserved (labeled "Sumsub sandbox")
 minimal result returned
 ```
 
-A mock response MUST NOT satisfy this vector.
+A mock response MUST NOT satisfy the representative leg of this vector. Under the Hybrid Demo Profile the company leg is the SYNTHETIC MOCK fixture and the artifact MUST state "Company evidence: SYNTHETIC MOCK" and "Representative verification: REAL SUMSUB SANDBOX" (TV-S001-L04).
 
 ---
 
@@ -1661,6 +1694,8 @@ new attempt may ALLOW
 authorized bootstrap operator
 valid Bootstrap Configuration
 Sumsub sandbox applicants created with the Catenor bindingRefs as externalUserId
+  (Hybrid Demo Profile: representative applicant only; company = SYNTHETIC MOCK fixture reference)
+evidence profile pinned in the Bootstrap Configuration (FULL_SUMSUB_SANDBOX preferred, or HYBRID_DEMO)
 deployed CRE Confidential Workflow identity-confidential (private registry)
 valid Vault DON secrets (3)
 working assertion signer
@@ -1674,13 +1709,13 @@ valid required evidence
 2. bootstrap access accepted
 3. candidate Organization created/resolved
 4. did:catenor generated and private provider bindingRefs issued
-5. operator attaches the Sumsub sandbox applicant references
+5. operator attaches the Sumsub sandbox applicant references (Hybrid Demo Profile: REAL representative + SYNTHETIC MOCK company reference)
 6. assertion key provisioned
 7. DID Document resolves
 8. key-possession challenge succeeds
 9. deployed identity-confidential workflow executes the trust-anchor-admission operation
 10. handlerInTee fetches secrets and opens the sealed private context
-11. provider-binding check passes; real Sumsub sandbox HTTPS calls from inside the TEE succeed
+11. provider-binding check passes; real Sumsub sandbox HTTPS calls from inside the TEE succeed (representative always; company per evidence profile)
 12. minimized facts + evidence commitment returned
 13. policy evaluates ALLOW
 14. bootstrap endorsement verifies
@@ -1696,6 +1731,7 @@ valid required evidence
 CRE deployment reference
 live execution evidence
 sanitized provider integration evidence (labeled "Sumsub sandbox")
+evidence-profile labels (Hybrid Demo Profile): "Company evidence: SYNTHETIC MOCK", "Representative verification: REAL SUMSUB SANDBOX"
 Admission Decision
 Admission Record
 DID Document
@@ -1744,7 +1780,13 @@ Example:
 ORGANIZATION_AML_CLEAR = false
 ```
 
-or another safe test fixture supported by the provider/demo environment (Sumsub sandbox).
+or another safe test fixture supported by the provider/demo environment (Sumsub sandbox). Confirmed feasible with REAL Sumsub sandbox evidence (T0.8):
+
+```text
+representative applicant forced RED (reviewRejectType FINAL, reason code SANCTIONS)
+→ AUTHORIZED_REPRESENTATIVE_VERIFIED = false
+→ REPRESENTATIVE_AUTHORITY_CONFIRMED = false
+```
 
 ### Expected
 
@@ -1754,6 +1796,32 @@ no active Trust Anchor
 ```
 
 If the external provider environment cannot safely produce this condition, the project may demonstrate the deterministic negative path through a controlled fixture, provided it is clearly labeled and the live happy path remains real.
+
+---
+
+## TV-S001-L04 — Hybrid Demo Profile is truthfully labeled
+
+**Priority:** mandatory when the Hybrid Demo Profile is used
+
+*(Added in Rev 2.3, maintainer decision Q4.)*
+
+### Preconditions
+
+```text
+live path executed under the Hybrid Demo Profile
+```
+
+### Expected
+
+```text
+the pinned Bootstrap Configuration shows evidence profile HYBRID_DEMO, company source SYNTHETIC_MOCK,
+  representative source REAL_SUMSUB_SANDBOX, and its hash is the one bound by the bootstrap endorsement
+the Judge Inspector, artifacts and README visibly show:
+  "Company evidence: SYNTHETIC MOCK"
+  "Representative verification: REAL SUMSUB SANDBOX"
+a scan of README, artifacts, Judge Inspector text and submission text finds no
+  "Sumsub verified the organization" and no "real Sumsub KYB end-to-end"
+```
 
 ---
 
@@ -1920,7 +1988,8 @@ Before S001 is considered hackathon-complete:
 ```text
 real CRE deployment (identity-confidential, private registry)
 real handlerInTee execution (trust-anchor-admission)
-real Sumsub sandbox call over HTTPS from inside the TEE
+real Sumsub sandbox call over HTTPS from inside the TEE (representative leg in every profile;
+  company leg under the Full Sumsub Sandbox Profile, otherwise TV-S001-L04 under the Hybrid Demo Profile)
 real minimized output
 real happy-path Admission
 real ACTIVE Trust Anchor
@@ -1928,7 +1997,7 @@ real verification = true
 live invalid-key DENY
 ```
 
-A live evidence/policy DENY (TV-S001-L03) is strongly preferred if the Sumsub sandbox permits it.
+A live evidence/policy DENY (TV-S001-L03) is strongly preferred; T0.8 confirmed it is feasible with a REAL Sumsub sandbox representative RED review.
 
 ---
 
@@ -1943,7 +2012,8 @@ ACCESS           ✓
 BOOTSTRAP        ✓
 DID              ✓
 KEY POSSESSION   ✓
-SUMSUB / CRE     ✓
+SUMSUB / CRE     ✓   (Hybrid Demo Profile: "Company evidence: SYNTHETIC MOCK" ·
+                      "Representative verification: REAL SUMSUB SANDBOX")
 POLICY           ALLOW
 ENDORSEMENT      ✓
 ADMISSION        ACTIVE

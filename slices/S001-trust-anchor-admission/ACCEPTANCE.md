@@ -8,6 +8,8 @@
 
 > **Rev 2:** retired criteria keep their IDs as `RETIRED` (never reused) so traceability stays stable: AC-S001-031, 032, 033, 034, 041 (LLM removed from S001). AC-S001-057 and 059 are marked not applicable to S001 (COMMITMENT_ONLY retention). New criteria are appended with new IDs and placed in their topical section: AC-S001-075 (provider-binding mismatch) and AC-S001-076 (Verification Method commitment).
 
+> **Rev 2.3 (maintainer decision Q4, `PLAN.md` D31):** AC-S001-019 is amended to name the evidence profile explicitly (SPEC §12.3) — the representative leg stays REAL in every profile; a SYNTHETIC MOCK company leg is allowed only under the Hybrid Demo Profile and only together with the new **AC-S001-077**. The requirement is made explicit, not weakened: AC-019 is reported as "met under the Hybrid Demo Profile (company evidence SYNTHETIC MOCK)", never as fully met on MOCK company evidence.
+
 ---
 
 # 1. Purpose
@@ -516,9 +518,11 @@ verification MUST fail.
 
 **Priority:** P0
 
+*(Amended in Rev 2.3 — evidence profiles, SPEC §12.3.)*
+
 **GIVEN**
 
-a real candidate provider reference is available
+a real candidate provider reference is available for the representative, and the active evidence profile is pinned in the Bootstrap Configuration
 
 **WHEN**
 
@@ -526,12 +530,21 @@ the live S001 Admission path is executed
 
 **THEN**
 
-the deployed confidential workflow performs a real request to Sumsub for the required verification state/evidence.
+```text
+representative leg (every profile)
+  the deployed confidential workflow performs a real request to Sumsub for the representative
+  verification state/evidence; a local fixture or mock MUST NOT satisfy this leg
 
-A local fixture or mock MUST NOT satisfy this live acceptance criterion.
+company leg
+  Full Sumsub Sandbox Profile (preferred): the deployed confidential workflow performs a real request
+    to Sumsub for the company verification state/evidence; a fixture or mock MUST NOT satisfy it
+  Hybrid Demo Profile (only while Sumsub Company/KYB entitlement is unavailable): company evidence MAY
+    come from the SYNTHETIC MOCK fixture, only if AC-S001-077 is satisfied
+```
 
-For the hackathon, real API calls against the **Sumsub sandbox** with synthetic Organization / representative data satisfy this criterion, provided all documentation and the Judge Inspector label it "Sumsub sandbox" and do not imply production KYB of a real company.
+For the hackathon, real API calls against the **Sumsub sandbox** with synthetic Organization / representative data satisfy the real legs, provided all documentation and the Judge Inspector label it "Sumsub sandbox" and do not imply production KYB of a real company.
 
+Reporting rule: when the Hybrid Demo Profile is used, this criterion is reported as **"met under the Hybrid Demo Profile (company evidence SYNTHETIC MOCK)"** — never as fully met, and never as real Sumsub KYB.
 ---
 
 ## AC-S001-020 — Sumsub identifiers remain private
@@ -620,6 +633,37 @@ no bootstrap endorsement, successful Admission Record or ACTIVE status is create
 ```
 
 The failure is auditable without exposing applicant IDs, bindingRefs or provider data.
+
+---
+
+## AC-S001-077 — Hybrid Demo Profile is explicit, pinned and truthfully labeled
+
+**Priority:** P0
+
+*(Added in Rev 2.3, maintainer decision Q4; placed here by topic.)*
+
+**GIVEN**
+
+the live path uses the Hybrid Demo Profile (company evidence SYNTHETIC MOCK, representative verification REAL Sumsub sandbox)
+
+**WHEN**
+
+the Bootstrap Configuration, confidential results, Judge Inspector, artifacts, README and submission text are inspected
+
+**THEN**
+
+```text
+the hash-pinned Bootstrap Configuration explicitly identifies the company evidence source as MOCK
+  (evidence profile HYBRID_DEMO, company source SYNTHETIC_MOCK, representative source REAL_SUMSUB_SANDBOX)
+AND the bootstrap endorsement binds that configuration (through its hash)
+AND a confidential result whose evidence profile / sources differ from the pinned configuration is
+    rejected: no facts, no ALLOW
+AND the Judge Inspector, artifacts and README visibly state
+    "Company evidence: SYNTHETIC MOCK"
+    "Representative verification: REAL SUMSUB SANDBOX"
+AND nothing claims "Sumsub verified the organization" or "real Sumsub KYB end-to-end"
+AND replacing the fixture with real Sumsub Company/KYB requires no change to domain or policy semantics
+```
 
 ---
 
@@ -1557,7 +1601,8 @@ assertion key possession
 provider bindingRefs attached and verified inside the TEE
 deployed Chainlink CRE workflow identity-confidential (operation trust-anchor-admission)
 handlerInTee confidential execution
-real Sumsub sandbox verification over HTTPS from inside the TEE
+real Sumsub sandbox verification over HTTPS from inside the TEE (representative always; company per
+  evidence profile — Hybrid Demo Profile labeled per AC-S001-077)
 minimized verified facts + evidence commitment
 deterministic Admission Policy = ALLOW
 bootstrap endorsement
@@ -1613,6 +1658,7 @@ Admission Record projection
 audit timeline
 CRE deployment reference (identity-confidential / trust-anchor-admission)
 provider environment label: "Sumsub sandbox"
+evidence-profile labels (Hybrid Demo Profile): "Company evidence: SYNTHETIC MOCK", "Representative verification: REAL SUMSUB SANDBOX"
 representative-authority evidence class and any documented limitation
 verification checks labeled cryptographic vs operational projection
 sponsor integration artifacts
@@ -1669,7 +1715,7 @@ one failure/negative path where practical
 
 **Priority:** P1
 
-The repository/demo contains enough sanitized evidence to show that the live path used the Sumsub sandbox without exposing private user/provider data, applicant IDs or bindingRefs. The evidence is labeled "Sumsub sandbox".
+The repository/demo contains enough sanitized evidence to show that the live path used the Sumsub sandbox without exposing private user/provider data, applicant IDs or bindingRefs. The evidence is labeled "Sumsub sandbox" and, under the Hybrid Demo Profile, states "Company evidence: SYNTHETIC MOCK" and "Representative verification: REAL SUMSUB SANDBOX".
 
 ---
 
@@ -1683,6 +1729,8 @@ The repository/demo contains enough sanitized evidence to show that the live pat
 mocks / fixtures MUST be labeled as MOCK wherever they appear (logs, artifacts, UI)
 simulation MUST be labeled as simulation (the local simulator is not a TEE) and never presented as deployment
 the Sumsub environment MUST be labeled "Sumsub sandbox" and MUST NOT imply production KYB of a real company
+under the Hybrid Demo Profile, SYNTHETIC MOCK company evidence MUST be labeled as such and MUST NOT be described
+  as "Sumsub verified the organization" or "real Sumsub KYB end-to-end" (AC-S001-077)
 CRE usage MUST be described as "HTTPS requests executed from inside the confidential TEE boundary",
   never as use of the separate Confidential HTTP capability
 ```
@@ -1749,6 +1797,8 @@ raw confidential Sumsub response emitted publicly
 raw Sumsub response persisted by Catenor
 Admission Policy fact set from anything other than a deterministic verifier
 provider-binding mismatch yields verified facts or ALLOW
+evidence-source mismatch (result vs pinned Bootstrap Configuration) yields verified facts or ALLOW
+SYNTHETIC MOCK company evidence presented as real Sumsub KYB
 Verification Method key replaced under the same ID still verifies
 bootstrap email alone creates Trust Anchor
 self-signed "I am trusted" creates Trust Anchor
@@ -1773,6 +1823,7 @@ The following cases must exist before S001 is considered complete:
 | Missing required fact | non-ALLOW |
 | Sumsub/CRE required verification unavailable | non-ALLOW |
 | Provider-binding mismatch (`externalUserId` ≠ bindingRef) | no verified facts, non-ALLOW |
+| Evidence-source mismatch (result ≠ pinned Bootstrap Configuration) | no verified facts, non-ALLOW |
 | Invalid bootstrap endorsement | no activation |
 | Verification Method key replaced under the same ID | activation rejected / `TRUST_ANCHOR_VALID = false` |
 | Tampered Admission state | `TRUST_ANCHOR_VALID = false` |
@@ -1800,7 +1851,8 @@ negative-path tests pass
 CRE simulation passes
 CRE Confidential Workflow is deployed for real
 live TEE execution is evidenced
-real Sumsub sandbox call from inside the TEE is evidenced
+real Sumsub sandbox call from inside the TEE is evidenced (representative leg in every profile;
+  company leg under the Full Sumsub Sandbox Profile, or AC-S001-077 under the Hybrid Demo Profile)
 
 happy path succeeds
 required DENY path succeeds
