@@ -1266,6 +1266,41 @@ Human review: maintainer decisions in prompt 2026-09-11-016.
 
 Commit: the `feat(hedera)` and `docs(hackathon)` commits of this checkpoint.
 
+## 2026-09-11 — Final demo CP9: LIVE ATS dividend lifecycle on the rehearsal equity (Privy SPV signer path)
+
+Goal: the two maintainer-authorized lifecycle transactions (prompt 2026-09-11-017); STOP before any Agent payout.
+
+Work completed:
+
+- **Maintainer steps:**
+  - `add-spv-lifecycle-rules.mjs --apply` added the two SPV lifecycle rules;
+  - `preflight:lifecycle` PASS.
+- **`lifecycle:dividend`** (one step per run; READ-ONLY unless `--broadcast`; expected nonce and role preconditions; one attempt; no retry; no raw key):
+  - **Transaction 1** `grantRole(ROLE_CORPORATE_ACTION, SPV)`:
+    - tx `0x8b4baf363089b7eb4c225bb8fe202e9ac81aebe2fdfe4f1ffd26a84c102740e7`, SUCCESS (receipt and Mirror Node);
+    - `RoleGranted`; the SPV now holds the role; nonce 3 → 4;
+    - 179,949 gas = 0.20694135 HBAR.
+  - **Transaction 2** `setDividend(recordDate now+120 s, executionDate now+300 s, amount 1, amountDecimals 2)`:
+    - tx `0x8ae0c07651a545d8a54092813ab21cbb05c58d130a7b99b6dc11004b712a5bcb`, SUCCESS;
+    - `DividendSet` corporateActionId `0x…01`, **dividendId 1**; nonce 4 → 5;
+    - 532,107 gas = 0.61192305 HBAR.
+  - **Read-back after the record date:** A 600 units → entitlement 6; B 400 → 4; total 10 (`recordDateReached` true).
+- SPV balance 90.54943841 HBAR.
+
+Thesis preserved: ATS records ownership-based entitlement (B stays entitled to 4); Catenor's controlled plan pays A only (CP7).
+
+Validation: `pnpm check` green (see commit).
+
+Not done: the Agent payout (awaiting the pre-seeded Agent wallet funding and authorization).
+
+AI assistance: Claude Code main session.
+
+Human review: the maintainer authorized both transactions explicitly (prompt 2026-09-11-017).
+
+Artifacts: `artifacts/hedera/final-demo/dividend-lifecycle.md`, `dividend-grant-role.json`, `dividend-set.json`, `dividend-entitlements.json`.
+
+Commit: the `feat(hedera)` commit that contains this entry.
+
 ## Entry template
 
 ```md

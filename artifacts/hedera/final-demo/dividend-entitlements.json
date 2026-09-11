@@ -1,0 +1,23 @@
+{
+  "label": "READ-ONLY dividend entitlements (ownership-based; ATS moves no funds)",
+  "dividendId": "1",
+  "dividend": {
+    "recordDate": "1789159882",
+    "executionDate": "1789160062",
+    "amount": "1",
+    "amountDecimals": 2,
+    "snapshotId": "0",
+    "isDisabled": false
+  },
+  "investorA": {
+    "tokenBalance": "600",
+    "recordDateReached": true,
+    "entitlement": 6
+  },
+  "investorB": {
+    "tokenBalance": "400",
+    "recordDateReached": true,
+    "entitlement": 4
+  },
+  "totalEntitlement": 10
+}

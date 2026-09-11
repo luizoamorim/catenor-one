@@ -156,7 +156,8 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - the revenue event (in-script trigger; HTTP button pending, FD-8);
     - the blind DRY RUN (A 6 / B 4 HBAR, nothing sent);
     - the controlled plan: `policy:distribution-eligibility:v1`, A ALLOW → PAY, B DENY → HOLD, with protocol Decisions and the audit chain.
-  - **Pending:** the live payout/lifecycle action for A only (Hedera, after the lifecycle choice), including the Agent payout signer boundary (plain transfer, exact recipient and amount).
+  - **Hedera lifecycle DONE (CP9):** the ATS dividend on the rehearsal equity (dividend id 1) records ownership-based entitlement A 6 / B 4; ATS moves no funds.
+  - **Pending:** the live Agent payout of 6 HBAR to A only (maintainer-authorized). It needs the Agent payout signer boundary (plain transfer, empty calldata, exactly A's bound account, exactly the planned amount) and the pre-seeded, funded Agent wallet. B gets no signature.
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 
@@ -183,7 +184,12 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
    - It is added by the maintainer-run `add-spv-issuance-rule.mjs` (owner key outside the runtime).
    - A chain-only rule is never used.
    - **Open for FD-2:** a runtime-created SPV policy needs the equity-specific issuance rule after `deployEquity` (the equity address is unknown before). The owner key never enters the runtime, so how that rule is added is decided at FD-2 and not assumed here.
-3. **Lifecycle / distribution operation.** DECIDED: the ATS dividend corporate action on the rehearsal equity (CP8, prepared, not broadcast).
+3. **Lifecycle / distribution operation.** DONE on the rehearsal equity (CP9, LIVE 2026-09-11): the ATS dividend corporate action.
+   - `grantRole` tx `0x8b4baf36…40e7`;
+   - `setDividend` tx `0x8ae0c076…5bcb`, dividend id 1;
+   - entitlements A 6 / B 4 / total 10;
+   - evidence: `artifacts/hedera/final-demo/dividend-lifecycle.md`.
+   - Prepared in CP8:
    - Minimum sequence (READ-ONLY verified; `initializeDividend` was already done by the Factory):
      1. `grantRole(ROLE_CORPORATE_ACTION, SPV)`, about 194K gas, about 0.23 HBAR;
      2. `setDividend({recordDate: now+120 s, executionDate: now+300 s, amount 1, amountDecimals 2})`, gas limit 1M, up to 1.18 HBAR up front;

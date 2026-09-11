@@ -1,0 +1,67 @@
+{
+  "label": "LIVE — one lifecycle transaction (Hedera Testnet)",
+  "step": "set",
+  "call": "setDividend({recordDate: 1789159882, executionDate: 1789160062, amount: 1, amountDecimals: 2})",
+  "from": "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93 (Privy SPV wallet)",
+  "to": "0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418",
+  "chainId": 296,
+  "nonce": 4,
+  "gasLimit": 1000000,
+  "estimatedGas": "560364",
+  "before": {
+    "nonce": 4,
+    "hasCorporateRole": true,
+    "dividends": "0",
+    "hbar": "91.16136146"
+  },
+  "transaction": "0x8ae0c07651a545d8a54092813ab21cbb05c58d130a7b99b6dc11004b712a5bcb",
+  "hashscan": "https://hashscan.io/testnet/transaction/0x8ae0c07651a545d8a54092813ab21cbb05c58d130a7b99b6dc11004b712a5bcb",
+  "gasUsed": "532107",
+  "gasPriceWeibar": "1150000000000",
+  "actualCostHbar": "0.61192305",
+  "after": {
+    "nonce": 5,
+    "hasCorporateRole": true,
+    "hbar": "90.54943841"
+  },
+  "dividendSet": {
+    "corporateActionId": "0x0000000000000000000000000000000000000000000000000000000000000001",
+    "dividendId": "1",
+    "recordDate": "1789159882",
+    "executionDate": "1789160062",
+    "amount": "1",
+    "amountDecimals": 2
+  },
+  "readBack": {
+    "dividendId": "1",
+    "dividend": {
+      "recordDate": "1789159882",
+      "executionDate": "1789160062",
+      "amount": "1",
+      "amountDecimals": 2,
+      "snapshotId": "0",
+      "isDisabled": false
+    },
+    "investorA": {
+      "tokenBalance": "0",
+      "recordDateReached": false,
+      "entitlement": null
+    },
+    "investorB": {
+      "tokenBalance": "0",
+      "recordDateReached": false,
+      "entitlement": null
+    }
+  },
+  "mirrorNode": {
+    "result": "SUCCESS",
+    "gasUsed": 532107,
+    "timestamp": "1789159765.757313558"
+  },
+  "checks": {
+    "receiptSuccess": true,
+    "mirrorNodeSuccess": true,
+    "nonceIncrementedByOne": true,
+    "dividendSetEvent": true
+  }
+}

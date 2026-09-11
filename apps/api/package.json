@@ -16,7 +16,8 @@
     "verify:ats": "node --conditions=@catenor-one/source --import tsx scripts/hedera/verify-ats-equity.ts",
     "preflight:issuance": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-issuance.ts",
     "issue:investor": "node --conditions=@catenor-one/source --import tsx scripts/hedera/issue-to-investor.ts",
-    "preflight:lifecycle": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-lifecycle.ts"
+    "preflight:lifecycle": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-lifecycle.ts",
+    "lifecycle:dividend": "node --conditions=@catenor-one/source --import tsx scripts/hedera/dividend-lifecycle.ts"
   },
   "dependencies": {
     "@catenor-one/audit": "workspace:*",

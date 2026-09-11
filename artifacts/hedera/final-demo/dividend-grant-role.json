@@ -1,0 +1,39 @@
+{
+  "label": "LIVE — one lifecycle transaction (Hedera Testnet)",
+  "step": "grant",
+  "call": "grantRole(ROLE_CORPORATE_ACTION 0xa1acfc499025c99f55059195e6276f639d34a18aad7b8121b9192b7f438c55cd, SPV 0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93)",
+  "from": "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93 (Privy SPV wallet)",
+  "to": "0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418",
+  "chainId": 296,
+  "nonce": 3,
+  "gasLimit": 500000,
+  "estimatedGas": "194421",
+  "before": {
+    "nonce": 3,
+    "hasCorporateRole": false,
+    "dividends": "0",
+    "hbar": "91.36830281"
+  },
+  "transaction": "0x8b4baf363089b7eb4c225bb8fe202e9ac81aebe2fdfe4f1ffd26a84c102740e7",
+  "hashscan": "https://hashscan.io/testnet/transaction/0x8b4baf363089b7eb4c225bb8fe202e9ac81aebe2fdfe4f1ffd26a84c102740e7",
+  "gasUsed": "179949",
+  "gasPriceWeibar": "1150000000000",
+  "actualCostHbar": "0.20694135",
+  "after": {
+    "nonce": 4,
+    "hasCorporateRole": true,
+    "hbar": "91.16136146"
+  },
+  "mirrorNode": {
+    "result": "SUCCESS",
+    "gasUsed": 179949,
+    "timestamp": "1789159734.729972104"
+  },
+  "checks": {
+    "receiptSuccess": true,
+    "mirrorNodeSuccess": true,
+    "nonceIncrementedByOne": true,
+    "spvHoldsCorporateActionRole": true,
+    "roleGrantedEvent": true
+  }
+}

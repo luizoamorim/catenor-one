@@ -735,3 +735,5 @@ CP8 (2026-09-11), original Catenor One code without new dependencies:
 
 The ATS role and function facts come from the `@hashgraph/asset-tokenization-contracts` 8.0.0 sources and types (`contracts/constants/roles.sol`, `contracts/facets/dividend/`), found by `hedera-engineer`. The Privy calldata-rule shapes come from the live CP8 probe by `privy-engineer`.
 
+CP9 (2026-09-11): `apps/api/scripts/hedera/dividend-lifecycle.ts` is original Catenor One code. Live results: `grantRole` tx `0x8b4baf363089b7eb4c225bb8fe202e9ac81aebe2fdfe4f1ffd26a84c102740e7` and `setDividend` tx `0x8ae0c07651a545d8a54092813ab21cbb05c58d130a7b99b6dc11004b712a5bcb` (dividend 1) on the rehearsal equity (`artifacts/hedera/final-demo/dividend-lifecycle.md`).
+
