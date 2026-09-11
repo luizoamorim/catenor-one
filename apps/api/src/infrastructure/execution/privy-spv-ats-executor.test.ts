@@ -7,7 +7,9 @@ import { ATS, DEPLOY_GAS_LIMIT, HEDERA_TESTNET } from './hedera-ats-executor.js'
 import {
   ISSUE_GAS_LIMIT,
   PrivySpvAtsExecutor,
+  corporateActionRoleGrantCalldata,
   issueByPartitionCalldata,
+  setDividendCalldata,
   type PreparedTransaction,
   type PrivyEvmSigningApi,
 } from './privy-spv-ats-executor.js';
@@ -214,6 +216,59 @@ describe('issueByPartition (FD-4) — Catenor-built calldata + signer boundary',
     await expect(
       executor.issueByPartition({ equity: EQUITY, tokenHolder: holder, amount: 600n }),
     ).rejects.toThrow(/signer boundary/);
+    expect(broadcast).not.toHaveBeenCalled();
+  });
+});
+
+describe('dividend lifecycle (CP8) — Catenor-built calldata', () => {
+  const spvAddr = Wallet.createRandom().address;
+  const iface = IAsset__factory.createInterface();
+  const terms = {
+    recordDate: 1_789_150_000n,
+    executionDate: 1_789_150_180n,
+    amount: 1n,
+    amountDecimals: 2,
+  };
+
+  it('grantRole is fixed to ROLE_CORPORATE_ACTION for the SPV account', () => {
+    const [role, account] = iface.decodeFunctionData(
+      'grantRole',
+      corporateActionRoleGrantCalldata(spvAddr),
+    );
+    expect(role).toBe(ATS.corporateActionRole);
+    expect(account).toBe(spvAddr);
+  });
+
+  it('setDividend encodes exactly the validated terms', () => {
+    const [d] = iface.decodeFunctionData('setDividend', setDividendCalldata(terms, 2));
+    expect([d.recordDate, d.executionDate, d.amount, Number(d.amountDecimals)]).toEqual([
+      terms.recordDate,
+      terms.executionDate,
+      1n,
+      2,
+    ]);
+  });
+
+  it('refuses another amountDecimals (Privy cannot enforce this uint8 field), zero amount and bad dates', () => {
+    expect(() => setDividendCalldata({ ...terms, amountDecimals: 3 }, 2)).toThrow(/amountDecimals/);
+    expect(() => setDividendCalldata({ ...terms, amount: 0n }, 2)).toThrow(/amount/);
+    expect(() =>
+      setDividendCalldata({ ...terms, executionDate: terms.recordDate - 1n }, 2),
+    ).toThrow(/dates/);
+    expect(() => setDividendCalldata({ ...terms, recordDate: 0n }, 2)).toThrow(/dates/);
+  });
+
+  it('never broadcasts a lifecycle call whose Privy signature covers other calldata', async () => {
+    const { executor, broadcast } = fixture({
+      signedTamper: (t) => ({
+        ...t,
+        data: corporateActionRoleGrantCalldata(Wallet.createRandom().address),
+      }),
+    });
+    const prepared = await executor.prepareCorporateActionRoleGrant(
+      '0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418',
+    );
+    await expect(executor.executePrepared(prepared)).rejects.toThrow(/signer boundary/);
     expect(broadcast).not.toHaveBeenCalled();
   });
 });

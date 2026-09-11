@@ -19,3 +19,16 @@ export const DEMO_INVESTORS = {
     issueUnits: 400n,
   },
 } as const;
+
+/**
+ * ATS dividend (corporate action) for the rehearsal equity: rate = amount / 10^amountDecimals per unit = 0.01, so
+ * the on-chain entitlements are A 600 × 0.01 = 6 and B 400 × 0.01 = 4 (ownership-based). The actual payout is decided
+ * by Catenor (A PAY, B HOLD) — ATS records the lifecycle action and moves no funds.
+ */
+export const DEMO_DIVIDEND = {
+  amount: 1n,
+  amountDecimals: 2,
+  /** recordDate = now + recordDelaySeconds; executionDate = now + executionDelaySeconds. */
+  recordDelaySeconds: 120,
+  executionDelaySeconds: 300,
+} as const;

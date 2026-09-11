@@ -90,6 +90,56 @@ export interface IssuancePreflight extends PreparedCall {
   readonly amount: bigint;
 }
 
+/** Gas limits for the dividend lifecycle (READ-ONLY estimate grantRole ≈ 194K; setDividend ≈ 0.3–0.5M). */
+export const GRANT_ROLE_GAS_LIMIT = 500_000;
+export const SET_DIVIDEND_GAS_LIMIT = 1_000_000;
+
+/** One ATS dividend (IDividendTypes.Dividend): rate = amount / 10^amountDecimals per whole unit (decimals 0). */
+export interface DividendTerms {
+  readonly recordDate: bigint;
+  readonly executionDate: bigint;
+  readonly amount: bigint;
+  readonly amountDecimals: number;
+}
+
+/** grantRole(ROLE_CORPORATE_ACTION, SPV) — the ONLY role grant Catenor builds (fixed role, fixed account). */
+export function corporateActionRoleGrantCalldata(spv: string): string {
+  if (!isAddress(spv) || spv === ZeroAddress) throw new Error('grantRole: invalid SPV address');
+  return IAsset__factory.createInterface().encodeFunctionData('grantRole', [
+    ATS.corporateActionRole,
+    spv,
+  ]);
+}
+
+/**
+ * setDividend calldata from structured, validated terms only. The Privy SPV rule pins the function (setDividend on
+ * the equity); Privy cannot enforce the uint8 amountDecimals field (CP8 probe), so it is checked here.
+ */
+export function setDividendCalldata(terms: DividendTerms, expectedAmountDecimals: number): string {
+  if (terms.amountDecimals !== expectedAmountDecimals) {
+    throw new Error(`setDividend: amountDecimals must be ${expectedAmountDecimals}`);
+  }
+  if (
+    !Number.isInteger(terms.amountDecimals) ||
+    terms.amountDecimals < 0 ||
+    terms.amountDecimals > 18
+  ) {
+    throw new Error('setDividend: invalid amountDecimals');
+  }
+  if (terms.amount <= 0n) throw new Error('setDividend: amount must be positive');
+  if (terms.recordDate <= 0n || terms.executionDate < terms.recordDate) {
+    throw new Error('setDividend: invalid dates (0 < recordDate <= executionDate)');
+  }
+  return IAsset__factory.createInterface().encodeFunctionData('setDividend', [
+    {
+      recordDate: terms.recordDate,
+      executionDate: terms.executionDate,
+      amount: terms.amount,
+      amountDecimals: terms.amountDecimals,
+    },
+  ]);
+}
+
 /** Gas limit for one issueByPartition (READ-ONLY estimate ≈ 0.2–0.5M); unused gas is refunded. */
 export const ISSUE_GAS_LIMIT = 1_000_000;
 
@@ -281,6 +331,42 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
     const raw = await this.signPrepared(prepared);
     const sent = await this.provider.broadcastTransaction(raw);
     return deployedEquityResult(sent.hash, await sent.wait(1, 180_000), this.provider);
+  }
+
+  /** READ-ONLY: grantRole(ROLE_CORPORATE_ACTION, SPV) on the equity, simulated from the SPV address (DEFAULT_ADMIN). */
+  async prepareCorporateActionRoleGrant(equity: string): Promise<PreparedCall> {
+    if (!isAddress(equity)) throw new Error('grantRole: invalid equity address');
+    const spv = await this.spvAddress();
+    return this.prepareCall(equity, corporateActionRoleGrantCalldata(spv), GRANT_ROLE_GAS_LIMIT);
+  }
+
+  /** READ-ONLY: setDividend(terms) on the equity, simulated from the SPV address (needs ROLE_CORPORATE_ACTION). */
+  async prepareSetDividend(
+    equity: string,
+    terms: DividendTerms,
+    expectedAmountDecimals: number,
+  ): Promise<PreparedCall> {
+    if (!isAddress(equity)) throw new Error('setDividend: invalid equity address');
+    return this.prepareCall(
+      equity,
+      setDividendCalldata(terms, expectedAmountDecimals),
+      SET_DIVIDEND_GAS_LIMIT,
+    );
+  }
+
+  /** Broadcasts one prepared lifecycle call after the signer boundary; returns the receipt hash and status. */
+  async executePrepared(prepared: PreparedCall) {
+    const raw = await this.signPrepared(prepared);
+    const sent = await this.provider.broadcastTransaction(raw);
+    const receipt = await sent.wait(1, 180_000);
+    if (receipt === null || receipt.status !== 1) {
+      throw new Error(`transaction ${sent.hash} did not succeed`);
+    }
+    return {
+      transactionId: sent.hash,
+      explorerUrl: `${HEDERA_TESTNET.explorer}/transaction/${sent.hash}`,
+      gasUsed: receipt.gasUsed,
+    };
   }
 
   /** One issueByPartition: prepare (READ-ONLY) → Privy signature → signer boundary → broadcast → receipt → balance. */
