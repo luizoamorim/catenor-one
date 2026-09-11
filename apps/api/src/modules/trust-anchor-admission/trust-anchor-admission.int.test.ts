@@ -1,13 +1,19 @@
 // S001 vertical path on real PostgreSQL through the application service. Signers and the confidential
 // verifier are the labeled FAKE adapters (no Privy, no Sumsub, no CRE here) — this proves the orchestration,
 // persistence and domain rules end to end, not any sponsor integration.
-import { verifyChain } from '@catenor-one/audit';
+import { commit, verifyChain } from '@catenor-one/audit';
 import {
   bootstrapConfigurationHash,
   parseBootstrapConfiguration,
   type TrustAnchorVerificationResult,
 } from '@catenor-one/authority';
 import { attachProofValue, prepareProof } from '@catenor-one/credentials';
+import {
+  assertionKeyId,
+  createDidDocument,
+  createVerificationMethod,
+  type CatenorDid,
+} from '@catenor-one/identity';
 import { policyHash } from '@catenor-one/policy';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { ed25519 } from '@noble/curves/ed25519.js';
@@ -235,6 +241,22 @@ describe('S001 DENY paths', () => {
         { claim: 'ORGANIZATION_KYB_VERIFIED', status: 'MISSING', reasons: [] },
       ]),
     );
+    // [REF-IMPL] local decision evidence — no confidential/provider evidence is claimed
+    const record = await client.decisionRecord.findFirst({
+      where: { session: { sessionRef: started.sessionRef } },
+    });
+    expect(record?.evidenceCommitment).toBe(
+      commit({
+        profile: 'catenor-one/local-decision-evidence/v1',
+        subject: started.did,
+        trustDomain: h.trustDomain,
+        verificationMethod: challenge.verificationMethod,
+        keyPossessionResult: 'INVALID',
+        keyPurposeResult: 'VALID',
+        reason: ['SIGNATURE_INVALID'],
+        confidentialVerification: 'NOT_REQUESTED',
+      }),
+    );
   });
 
   it('REAL-shaped representative RED → AUTHORIZED_REPRESENTATIVE_VERIFIED FALSE → DENY; endorsement refused', async () => {
@@ -286,9 +308,14 @@ describe('S001 DENY paths', () => {
     );
     const run = await client.confidentialVerificationRun.findUnique({ where: { runId } });
     expect(run).toMatchObject({ status: 'BINDING_MISMATCH', facts: null });
-    expect(await h.service.evaluateAdmission(started.sessionRef)).toMatchObject({
-      outcome: 'DENY',
+    await expect(h.service.evaluateAdmission(started.sessionRef)).rejects.toMatchObject({
+      code: 'EVIDENCE_COMMITMENT_UNDEFINED',
     });
+    expect(
+      await client.decisionRecord.count({
+        where: { session: { sessionRef: started.sessionRef } },
+      }),
+    ).toBe(0);
   });
 
   it('a result whose evidence sources differ from the pinned configuration is rejected with no facts (TV-B04)', async () => {
@@ -304,8 +331,52 @@ describe('S001 DENY paths', () => {
       accepted: false,
       reason: 'EVIDENCE_SOURCE_MISMATCH',
     });
-    expect(await h.service.evaluateAdmission(started.sessionRef)).toMatchObject({
-      outcome: 'DENY',
+    await expect(h.service.evaluateAdmission(started.sessionRef)).rejects.toMatchObject({
+      code: 'EVIDENCE_COMMITMENT_UNDEFINED',
     });
+    expect(
+      await client.decisionRecord.count({
+        where: { session: { sessionRef: started.sessionRef } },
+      }),
+    ).toBe(0);
+  });
+});
+
+describe('U4 assertion key provisioning', () => {
+  it('reuses an existing ACTIVE assertion key of the Subject instead of creating another wallet', async () => {
+    const h = await harness('trust-domain:reuse-key');
+    const started = await h.service.startInitialAdmission({ operatorRef: 'operator-ref:test' });
+    const signer = new FakeAssertionSigner();
+    const existing = await signer.createKey();
+    const vm = createVerificationMethod(
+      assertionKeyId(started.did as CatenorDid, 1),
+      started.did as CatenorDid,
+      existing.publicKeyMultibase,
+    );
+    await new PrismaUnitOfWork(client).run(async (p) => {
+      const subject = await p.subjects.findSubjectByDid(started.did);
+      await p.didState.publishAssertionKey({
+        document: createDidDocument(started.did as CatenorDid, [vm], [vm.id]),
+        lifecycle: 'ACTIVE',
+        verificationMethod: vm,
+        subjectId: subject!.id,
+        keyReference: {
+          subject: started.did as CatenorDid,
+          verificationMethod: vm.id,
+          signerRef: existing.signerRef,
+          purpose: 'CREDENTIAL_ASSERTION',
+          status: 'ACTIVE',
+        },
+        adapter: 'fake',
+      });
+    });
+    const walletsBefore = await client.keyManagementReference.count();
+    const provisioned = await h.service.provisionAssertionKey(started.sessionRef);
+    expect(provisioned.verificationMethod).toEqual(vm);
+    expect(await client.keyManagementReference.count()).toBe(walletsBefore);
+    const session = await client.admissionSession.findUnique({
+      where: { sessionRef: started.sessionRef },
+    });
+    expect(session).toMatchObject({ state: 'KEY_PROVISIONED', assertionVerificationMethod: vm.id });
   });
 });

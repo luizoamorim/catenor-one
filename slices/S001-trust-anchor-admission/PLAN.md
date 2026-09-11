@@ -1308,6 +1308,8 @@ Evaluation (U9):
 4 persist DecisionRecord + DecisionTrace (FALSE vs MISSING kept distinct); ALLOW → DecisionProjection
 ```
 
+Decision `evidenceCommitment` source (D38, [REF-IMPL]): an accepted confidential run → its confidential evidence commitment (§23). A Decision made **before** any confidential verification was requested (D23 key-possession failure) → `SHA-256(JCS({profile: "catenor-one/local-decision-evidence/v1", subject, trustDomain, verificationMethod, keyPossessionResult, keyPurposeResult, reason, confidentialVerification: "NOT_REQUESTED"}))` — it never claims confidential or provider evidence. No profile is approved for a Decision after confidential runs that all failed; such a session stays undecided and cannot ALLOW.
+
 ---
 
 # 23. Evidence commitment strategy
@@ -1840,6 +1842,8 @@ Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7
 | D32 | AML labels (Q5) | **APPROVED**: no universal Catenor AML deny-list; `ORGANIZATION_AML_CLEAR` = completed + GREEN + no labels → true, RED → false, pending/incomplete → false, unavailable/unparseable → MISSING; **correction (approved with Rev 2.3):** completed GREEN + rejection labels present → MISSING with private reason `INCONSISTENT_PROVIDER_STATE` (§20.8 N6); labels kept as sanitized reason codes only (§20.4, §20.8 N5) |
 | D33 | Assertion-message control (T0.5) | **APPROVED**: Privy `message.byte_length` is not a security primitive for binary assertion messages; the Catenor signer boundary accepts structured input, builds the canonical message, validates format and exact length, then calls Privy `signMessage` and verifies (§13.4). The assertion payload is **not** changed to text to suit Privy. 64 bytes is a profile value, not a protocol requirement |
 | D34 | Privy authorization model (T0.5) | **APPROVED**: assertion management-owner authorization key = wallet owner (administrative only, not in the runtime); assertion runtime-signer authorization key = additional signer scoped by P_ASSERT; the runtime signer cannot change ownership/policies/signers or export (§13.0, §13.1.1; verified in T5.2). P-256 authorization keys are control keys, not the Credential Assertion Key |
+| D38 | Early-DENY evidence commitment (2026-09-11) | **APPROVED as Catenor One [REF-IMPL]**: local decision evidence profile `catenor-one/local-decision-evidence/v1` for Decisions made before confidential verification is requested (§22); no run-status lists; the protocol Decision shape is unchanged |
+| D39 | Assertion-wallet creation in U4 (2026-09-11) | **APPROVED for the reference implementation**: U4 reuses the Subject's existing ACTIVE assertion key / Verification Method; otherwise creates the Privy assertion wallet from public values only (management-owner private material never in the runtime), persists `signerRef` + public key and publishes the VM from that key. Residual risk accepted for the hackathon: an orphan Privy wallet if wallet creation succeeds and persistence fails (no compensation subsystem) |
 | D35 | Transaction-sending denial (T0.5) | **RECORDED**: transaction signing denial CONFIRMED; sending denial UNCONFIRMED LIVE — no wallet funding or broadcast to test it; default-deny documentation-supported only; not a Phase 0 blocker |
 
 ## 33.3 Final decisions on Rev 2 questions (maintainer, 2026-09-10)

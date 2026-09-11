@@ -215,6 +215,32 @@ export class TrustAnchorAdmissionService {
         `cannot provision a key in ${pre.aggregate.currentPhase}`,
       );
     }
+    // Reuse an existing ACTIVE assertion key of this Subject; only create a wallet when none exists.
+    const existing = await this.deps.uow.run((p) => existingAssertionKey(p, pre.did));
+    if (existing !== undefined) {
+      await this.deps.uow.run(async (p) => {
+        const s = await this.load(p, sessionRef);
+        s.aggregate.provisionKey(existing.verificationMethod.id);
+        await p.admissions.updateSession(s.session.id, {
+          state: s.aggregate.currentPhase,
+          assertionVerificationMethod: existing.verificationMethod.id,
+        });
+        await this.audit(
+          p,
+          s.session.trustDomain,
+          sessionRef,
+          s.did,
+          'KEY_ADDED',
+          this.timestamp(),
+          {
+            reused: true,
+          },
+        );
+      });
+      return existing;
+    }
+    // Residual risk (accepted for the hackathon, no compensation subsystem): if the external wallet is
+    // created but the transaction below fails, an orphan signer wallet remains with no Catenor reference.
     const key = await this.deps.assertionSigner.createKey({
       subject: pre.did,
       purpose: 'CREDENTIAL_ASSERTION',
@@ -537,18 +563,22 @@ export class TrustAnchorAdmissionService {
         expectedPolicyHash: config.admissionPolicyHash,
         facts: FactSet.from(inputs),
       });
-      const evidenceCommitment =
-        accepted?.evidenceCommitment ??
-        // [REF-IMPL, flagged for maintainer review] a Decision reached without any accepted confidential
-        // run (failed key proof, D23; failed runs) commits to the key-possession outcome instead.
-        commit({
-          profile: 'catenor-one/evidence-commitment/no-confidential-evidence/v1',
-          sessionRef,
-          trustDomain: s.session.trustDomain,
-          subject: s.did,
-          keyPossessionReasons: s.session.keyPossessionReasons,
-          runs: s.runs.map((r) => ({ runId: r.runId, status: r.status, code: r.code ?? null })),
-        });
+      let evidenceCommitment: string;
+      if (accepted?.evidenceCommitment) {
+        evidenceCommitment = accepted.evidenceCommitment; // confidential evidence commitment (PLAN §23)
+      } else if (s.runs.length === 0) {
+        // [REF-IMPL] local decision evidence (maintainer decision 2026-09-11): a Decision made BEFORE any
+        // confidential verification was requested (D23 key-possession failure) commits only to the local
+        // evidence basis — it never pretends that confidential/provider evidence exists.
+        evidenceCommitment = commit(localDecisionEvidence(s));
+      } else {
+        // No approved evidence-commitment profile exists for a Decision after confidential runs that all
+        // failed; such a session stays undecided (its failed runs carry no facts and can never ALLOW).
+        throw new AdmissionError(
+          'EVIDENCE_COMMITMENT_UNDEFINED',
+          'no approved evidence-commitment profile for a Decision after failed confidential runs',
+        );
+      }
       const decisionRef = this.deps.ids.id('decision');
       const decision = createDecision({
         policy: config.admissionPolicy,
@@ -785,6 +815,39 @@ export class TrustAnchorAdmissionService {
   private timestamp(): string {
     return rfc3339(this.deps.clock.now());
   }
+}
+
+/** The Subject's published ACTIVE Credential Assertion key, if one exists. */
+async function existingAssertionKey(p: PersistencePorts, did: string) {
+  const resolved = await p.didState.resolve(did);
+  for (const vmId of resolved?.document.assertionMethod ?? []) {
+    const keyRef = await p.didState.findKeyReference(vmId);
+    const vm = resolved && findVerificationMethod(resolved.document, vmId);
+    if (vm && keyRef?.purpose === 'CREDENTIAL_ASSERTION' && keyRef.status === 'ACTIVE') {
+      return { verificationMethod: vm, document: resolved.document };
+    }
+  }
+  return undefined;
+}
+
+const keyResult = (value: boolean | undefined) =>
+  value === undefined ? 'MISSING' : value ? 'VALID' : 'INVALID';
+
+/**
+ * [REF-IMPL] `catenor-one/local-decision-evidence/v1` — the evidence basis of a Decision made before any
+ * confidential verification exists. evidenceCommitment = SHA-256(JCS(object)).
+ */
+function localDecisionEvidence(s: Loaded) {
+  return {
+    profile: 'catenor-one/local-decision-evidence/v1',
+    subject: s.did,
+    trustDomain: s.session.trustDomain,
+    verificationMethod: s.session.assertionVerificationMethod ?? null,
+    keyPossessionResult: keyResult(s.session.keyPossessionValid),
+    keyPurposeResult: keyResult(s.session.keyPurposeValid),
+    reason: [...s.session.keyPossessionReasons],
+    confidentialVerification: 'NOT_REQUESTED',
+  };
 }
 
 /** One challenge per session: its id is derived from the session. */
