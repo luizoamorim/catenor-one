@@ -554,3 +554,47 @@ Harness: `scratch/sumsub-spike/` (git-ignored), written from the documented requ
 | `@scure/base` | npm | 2.4.0 | MIT |
 
 Used only under `scratch/privy-spike/` (git-ignored) against a Privy development app with synthetic data; no spike code is imported by Catenor One. Official documentation consulted: docs.privy.io (list in `slices/S001-trust-anchor-admission/spikes/T0.5-privy-assertion-key.md` §1). Sanitized findings are committed in that file.
+
+---
+
+## 22. 2026-09-10 — S001 P0 foundation and domain packages: tooling, dependencies and vendored references
+
+Introduced in the repository (first S001 implementation work; TASKS T1.1–T1.5, T2.1–T2.9).
+
+| Item | Version | License | Where |
+|---|---|---|---|
+| pnpm (workspace) | 10.11.0 | MIT | root |
+| Node.js (`.nvmrc`) | 24 | MIT | root |
+| TypeScript | 6.0.3 | Apache-2.0 | root (7.x not used: typescript-eslint 8.70 supports TypeScript < 6.1) |
+| Vitest | 5.0.0 | MIT | root |
+| ESLint, @eslint/js, typescript-eslint, globals | 10.10.0, 10.0.1, 8.70.0, 17.12.0 | MIT | root |
+| Prettier | 3.9.6 | MIT | root |
+| dependency-cruiser | 18.2.0 | MIT | root (PLAN §2.3 boundaries) |
+| ajv, ajv-formats | 8.20.0, 3.0.1 | MIT | test-vectors (tests only) |
+| @types/node | 24.13.4 | MIT | root |
+| @noble/hashes, @noble/curves, @scure/base | 2.4.0 | MIT | domain packages (D17 allowlist) |
+| canonicalize (RFC 8785 JCS) | 5.0.0 | Apache-2.0 | packages/audit |
+| GitHub Actions: actions/checkout, actions/setup-node, pnpm/action-setup | v7, v7, v6 | MIT | `.github/workflows/ci.yml` |
+
+Vendored reference artifacts (unmodified, test inputs only):
+
+- **Catenor Protocol JSON Schemas** (`policy`, `decision`, `audit-event`) copied byte-for-byte with `git show 66ef712694acfc987663f5ffa9bcc9d12d1fe80e:schemas/<name>.schema.json` into `schemas/catenor-protocol/66ef712694acfc987663f5ffa9bcc9d12d1fe80e/` (Apache-2.0, same maintainer; SHA-256 recorded there and checked by a test). **Maintainer approval recorded 2026-09-11** (CLAUDE.md "From-scratch discipline"): approved on the condition that the files stay unmodified copies of the pinned commit with hashes and provenance recorded.
+- **RFC 8785 test data** (§3.2.2, §3.2.3, Appendix B) transcribed into `test-vectors/s001/rfc8785-jcs.json`.
+- **W3C vc-di-eddsa Appendix B.3 (`eddsa-jcs-2022`) test vector** (Examples 29–39) extracted from https://www.w3.org/TR/vc-di-eddsa/ into `test-vectors/s001/w3c-vc-di-eddsa-jcs-2022.json`; the published test *secret* key is deliberately not copied (verification needs only public material).
+
+No application code was copied from any prior project, template or third-party example. The domain packages are original Catenor One code written in this work session.
+
+Golden-vector signing keys (2026-09-11): TEST-ONLY, NON-SECRET Ed25519 keys derived from public labels (`seed = SHA-256(UTF-8(label))`, `test-vectors/src/test-keys.ts`); they are not secrets and sign nothing outside test vectors.
+
+T3.2 persistence dependencies (2026-09-11, `apps/api`):
+
+| Item | Version | License | Where |
+|---|---|---|---|
+| prisma (CLI), @prisma/client, @prisma/adapter-pg | 7.10.0 | Apache-2.0 | apps/api (npm `latest` tag pointed at 8.0.0-rc.13; the stable 7.10.0 is pinned) |
+| pg, @types/pg | 8.23.0, 8.23.1 | MIT | apps/api (dev; integration tests) |
+| testcontainers, @testcontainers/postgresql | 12.1.0 | MIT | apps/api (dev; integration tests) |
+| Docker image `postgres:17.11-alpine` | 17.11 | PostgreSQL License | integration tests only (T15.1 must confirm the Railway major version) |
+
+pnpm build scripts of `prisma`, `@prisma/engines`, `cpu-features`, `ssh2`, `protobufjs` were left unapproved; the Prisma CLI fetches its schema engine on first use.
+
+Scratch-only review tooling for T3.1 (2026-09-11; not repository dependencies, not committed): Prisma CLI / `@prisma/client` 7.10.0 (Apache-2.0) for `validate`, `format` and offline `migrate diff`; PGlite 0.4.3 (`@electric-sql/pglite`, Apache-2.0) as a throwaway in-memory Postgres to syntax-check the draft CHECK constraints.

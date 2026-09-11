@@ -763,6 +763,64 @@ Human review: approved in the final Phase 0 documentation review (2026-09-10).
 
 Commit: 2772744 (source of truth, T0.9), 60ba490 (PLAN/TASKS + spike findings), f8657a9 (cre-engineer subagent), plus the Phase 0 records commit that contains this entry.
 
+---
+
+## 2026-09-10 — S001 P0 Fast Lane: foundation + framework-free domain packages
+
+Goal: start S001 implementation from the frozen SPEC / ACCEPTANCE / TEST-VECTORS / PLAN / TASKS (Rev 2.6).
+
+Work completed:
+
+- **Phase 1:** pnpm monorepo (TypeScript 6.0.3, Node 24, ESM), ESLint + Prettier, Vitest, dependency-cruiser boundaries (PLAN §2.3), CI workflow, secret-scan stub, `@catenor-one/test-vectors` loader, pinned protocol schemas vendored with hash checks.
+- **Phase 2:** `packages/audit` (RFC 8785 JCS, commitments, audit hash chain), `packages/identity` (`did:catenor`, Multikey, minimized DID Document, key purposes), `packages/policy` (Admission Policy v1 + golden hash, evaluator with FALSE ≠ MISSING, protocol Decision), `packages/credentials` (`eddsa-jcs-2022`), `packages/authority` (Bootstrap Configuration with evidence profiles, key possession, bootstrap endorsement with `verificationMethodCommitment`, admission state machine, 12-check Trust Anchor verifier), S001 golden vectors.
+
+Validation (local): `pnpm check` green — 233 tests (18 files), lint, typecheck, build, boundaries (deliberate violations shown to fail), secret scan (negative control shown to fail). The official W3C `eddsa-jcs-2022` vector and all RFC 8785 vectors pass. GitHub Actions has not run yet (nothing pushed).
+
+AI assistance: Claude Code (implementation, tests, verification). No subagent was used — the work had no CRE-specific mechanics.
+
+Human review: checkpoint reviewed 2026-09-11 — vendored protocol schemas approved (unmodified copies, hashes/provenance recorded); TypeScript 6.0.3 pin and duplicate-fact rejection approved in principle; key-possession FALSE-vs-MISSING and golden-vector determinism held for maintainer decision (no code change); audit hash-chain encoding kept as Catenor One [REF-IMPL].
+
+T3.1 (proposal only): `apps/api/prisma/schema.prisma` drafted from PLAN §10.1 for maintainer review — Postgres schemas `catenor_public` / `catenor_private` via native `schemas` (validated generally available in Prisma 7.10.0, the latest stable; npm's `latest` tag currently points at 8.0.0-rc.13). Checked with a scratch-only Prisma 7.10.0 install (`validate`, `format`, offline `migrate diff --from-empty`); no Prisma dependency added to the repo, no migration, no database.
+
+Commit: 28474f2 (monorepo foundation + domain packages), plus the docs commit that contains this entry.
+
+## 2026-09-11 — S001 T3.1 review decisions applied (before final schema review)
+
+Goal: apply the maintainer's T3.1 review decisions without creating a migration or installing Prisma in the repo.
+
+Work completed:
+
+- **Key possession (option B):** challenge-level failures give `ASSERTION_KEY_POSSESSION_VALID = false` and no purpose fact (trace MISSING); purpose is `false` only when actually evaluated; infrastructure failures produce no fact. Domain tests updated, policy unchanged.
+- **Audit chain [REF-IMPL]:** `trustDomain` is part of the hashed body — `eventHash = SHA-256(JCS(event ∪ {trustDomain}) ‖ prevHash)`; tests show moving an event into another Trust Domain breaks it.
+- **Golden vectors:** TEST-ONLY, NON-SECRET Ed25519 keys derived from public labels (`@catenor-one/test-vectors/test-keys`); known-answer test cross-checked with `node:crypto`; two regenerations byte-identical; new dependency-cruiser rule shown to fail on imports from a domain package, an app and a non-vector script.
+- **Schema revision 2:** accurate public/private wording (no claim that schemas or missing relations are an access-control boundary); initial root enforced by one column per domain + UNIQUE + composite FK to its Admission Record + conditional set-once update; signer-mapping invariant documented; `ProviderBinding` kept provider-generic (no DB `provider = 'sumsub'`); 37 CHECK constraints drafted for T3.2.
+
+Validation: `pnpm check` green; schema `validate` / `format` clean; offline SQL preview and the CHECK draft applied to a throwaway in-memory PGlite (scratch only, discarded) with every negative probe rejected by the intended constraint.
+
+AI assistance: Claude Code main session.
+
+Human review: maintainer T3.1 review 2026-09-11; final schema review pending.
+
+Commit: 28474f2 (domain changes) and 0c5cb18 (schema revision), plus the docs commit that contains this entry.
+
+## 2026-09-11 — S001 T3.1 approved; T3.2 initial migration on real PostgreSQL
+
+Goal: apply the final T3.1 schema adjustments and create/test the initial migration (no Railway).
+
+Work completed:
+
+- **T3.1 final:** DecisionTrace provenance CHECK and challenge `operation = 'ADMIT_TRUST_ANCHOR'`; immutability triggers for `TrustDomainProjection.initialTrustAnchorDid` (set once from NULL), `KeyManagementReference.signerRef`, `VerificationMethodProjection.publicKeyMultibase`; explicit `onDelete: Restrict` / `onUpdate: Restrict` on all 14 relations; `VerificationMethodProjection.createdAt` (projection metadata only). T3.1 marked complete.
+- **T3.2:** `apps/api` persistence scaffold (`package.json`, `prisma.config.ts`, `tsconfig.json`); Prisma / `@prisma/client` / `@prisma/adapter-pg` 7.10.0; migration `20260911034806_init` = `prisma migrate diff --from-empty` DDL + reviewed raw SQL (39 CHECKs, 3 triggers); Testcontainers integration suite (`pnpm test:integration`, `postgres:17.11-alpine`) using the real `prisma migrate deploy`; CI step added.
+- Found and fixed while testing (before any database existed outside tests): one CHECK name exceeded PostgreSQL's 63-byte identifier limit (silently truncated) → renamed; the run-result CHECK allowed a non-accepted run to carry facts or a commitment alone → rewritten to "both present when accepted, neither otherwise", the approved intent. Immutability triggers made row-level with a `WHEN (changed)` guard instead of `UPDATE OF column`, which PostgreSQL does not fire for changes made by other BEFORE triggers.
+
+Validation: 78 integration tests green (twice); `pnpm check` green (251 unit tests); no drift between the deployed database and `schema.prisma`.
+
+AI assistance: Claude Code main session.
+
+Human review: T3.1 final review approved 2026-09-11 (maintainer); T3.2 results pending review.
+
+Commit: 0c5cb18 (persistence schema, migration, integration tests), plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md
