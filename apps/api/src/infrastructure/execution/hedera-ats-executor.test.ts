@@ -28,7 +28,7 @@ describe('isinCheckDigit (mirrors the ATS factory isinValidator.sol)', () => {
 describe('deployEquityArguments', () => {
   const operator = Wallet.createRandom().address;
   const args = deployEquityArguments({
-    resource: 'asset:catenor-one-demo:001',
+    resource: 'spv:catenor-demo-001',
     grantId: 'capability-grant-1',
     operator,
   });
@@ -56,13 +56,13 @@ describe('deployEquityArguments', () => {
 
   it('links the on-chain token to the Catenor grant that authorized it', () => {
     expect(args.regulationData.additionalSecurityData.info).toBe(
-      'catenor-one:TOKENIZE_ASSET:asset:catenor-one-demo:001:grant:capability-grant-1',
+      'catenor-one:TOKENIZE_ASSET:spv:catenor-demo-001:grant:capability-grant-1',
     );
   });
 
   it('refuses a resource without an ATS mapping', () => {
     expect(() =>
-      deployEquityArguments({ resource: 'asset:catenor-one-demo:002', grantId: 'g', operator }),
+      deployEquityArguments({ resource: 'spv:catenor-demo-002', grantId: 'g', operator }),
     ).toThrow(/no ATS mapping/);
   });
 });
@@ -72,7 +72,7 @@ describe('HederaAtsTestnetExecutor', () => {
     const mainnet = { getNetwork: async () => ({ chainId: 295n }) } as unknown as Provider;
     const executor = new HederaAtsTestnetExecutor(Wallet.createRandom().privateKey, mainnet);
     await expect(
-      executor.tokenize({ resource: 'asset:catenor-one-demo:001', requester: 'x', grantId: 'g' }),
+      executor.tokenize({ resource: 'spv:catenor-demo-001', requester: 'x', grantId: 'g' }),
     ).rejects.toThrow(/Hedera testnet \(296\) only/);
   });
 

@@ -1,8 +1,11 @@
 // Hedera Asset Tokenization Studio (ATS) — testnet execution adapter for Part B (hackathon, Catenor One [REF-IMPL]).
 // Invoked by AssetTokenizationService ONLY after a Catenor ALLOW. The authorized action is exactly ONE transaction:
 // `Factory.deployEquity` on the live ATS testnet factory, which creates the ATS security token for the demo asset
-// (`asset:catenor-one-demo:001`). No units are issued. The transaction carries the Catenor grant reference in the
+// (`spv:catenor-demo-001`). No units are issued. The transaction carries the Catenor grant reference in the
 // regulation `info` field so the on-chain token links back to the grant that authorized it.
+//
+// DEV/TEST ONLY (final demo, 2026-09-11): the demo path uses PrivySpvAtsExecutor (privy-spv-ats-executor.ts) — the
+// Privy-managed SPV wallet signs; HEDERA_OPERATOR_EVM_PRIVATE_KEY is not used by the final demo.
 //
 // Execution separation: the transaction is sent by a Catenor One Hedera testnet operator account (ECDSA secp256k1,
 // EVM alias). That account is an execution adapter — it is not Org B's authority and not a Catenor signing key
@@ -34,13 +37,14 @@ export const ATS = {
   regulationSubTypeNone: 0,
 } as const;
 
-const DEPLOY_GAS_LIMIT = 15_000_000;
+/** Hedera's per-transaction maximum; unused gas is refunded, but the sender must hold gasLimit × gasPrice up front. */
+export const DEPLOY_GAS_LIMIT = 15_000_000;
 
 // The typechain bindings are CommonJS, so their `ethers` types resolve to ethers' lib.commonjs declarations while
 // this ESM module resolves lib.esm — two nominally different copies of the same ethers 6.17.0 API. ethers accepts
 // any object with the ContractRunner shape at runtime, so the runner is passed through this narrow cast.
 type AtsRunner = Parameters<typeof Factory__factory.connect>[1];
-const asRunner = (runner: Wallet | Provider) => runner as unknown as AtsRunner;
+export const asRunner = (runner: Wallet | Provider) => runner as unknown as AtsRunner;
 
 /** ISO 6166 check digit, mirroring the ATS factory's isinValidator.sol (letters → 10..35, Luhn over the digits). */
 export function isinCheckDigit(first11: string): string {
@@ -65,7 +69,7 @@ export function isinCheckDigit(first11: string): string {
 export const DEMO_ASSETS: Readonly<
   Record<string, { readonly name: string; readonly symbol: string; readonly isinBody: string }>
 > = {
-  'asset:catenor-one-demo:001': {
+  'spv:catenor-demo-001': {
     name: 'Catenor One Demo Asset 001 (SYNTHETIC)',
     symbol: 'C1DA001',
     isinBody: 'XXCATENOR01',
@@ -134,6 +138,34 @@ export function deployEquityArguments(input: {
   return { equityData, regulationData };
 }
 
+/** Receipt → EquityDeployed address → read-back of the new ATS token's name (no transaction). */
+export async function deployedEquityResult(
+  hash: string,
+  // Structural: the CommonJS typechain receipt and the ESM ethers receipt are nominally different types.
+  receipt: {
+    readonly status: number | null;
+    readonly logs: readonly { readonly topics: readonly string[]; readonly data: string }[];
+  } | null,
+  provider: Provider,
+) {
+  if (receipt === null || receipt.status !== 1) {
+    throw new Error(`deployEquity transaction ${hash} did not succeed`);
+  }
+  const factory = Factory__factory.createInterface();
+  const deployed = receipt.logs
+    .map((log) => factory.parseLog(log))
+    .find((parsed) => parsed?.name === 'EquityDeployed');
+  const equityAddress = deployed?.args['equityAddress'] as string | undefined;
+  if (equityAddress === undefined) throw new Error(`no EquityDeployed event in ${hash}`);
+  const name = await IAsset__factory.connect(equityAddress, asRunner(provider)).name();
+  return {
+    transactionId: hash,
+    explorerUrl: `${HEDERA_TESTNET.explorer}/transaction/${hash}`,
+    assetReference: `hedera-testnet:ats-equity:${equityAddress}`,
+    assetName: name,
+  };
+}
+
 export class HederaAtsTestnetExecutor implements AssetTokenizationExecutor {
   readonly network = 'hedera-testnet';
   private readonly wallet: Wallet;
@@ -184,22 +216,6 @@ export class HederaAtsTestnetExecutor implements AssetTokenizationExecutor {
     const tx = await factory.deployEquity(equityData, regulationData, {
       gasLimit: DEPLOY_GAS_LIMIT,
     });
-    const receipt = await tx.wait(1, 180_000);
-    if (receipt === null || receipt.status !== 1) {
-      throw new Error(`deployEquity transaction ${tx.hash} did not succeed`);
-    }
-    const deployed = receipt.logs
-      .map((log) => factory.interface.parseLog(log))
-      .find((parsed) => parsed?.name === 'EquityDeployed');
-    const equityAddress = deployed?.args['equityAddress'] as string | undefined;
-    if (equityAddress === undefined) throw new Error(`no EquityDeployed event in ${tx.hash}`);
-    // Read-back (no transaction): the new ATS token carries the demo asset's metadata.
-    const name = await IAsset__factory.connect(equityAddress, asRunner(this.provider)).name();
-    return {
-      transactionId: tx.hash,
-      explorerUrl: `${HEDERA_TESTNET.explorer}/transaction/${tx.hash}`,
-      assetReference: `hedera-testnet:ats-equity:${equityAddress}`,
-      assetName: name,
-    };
+    return deployedEquityResult(tx.hash, await tx.wait(1, 180_000), this.provider);
   }
 }

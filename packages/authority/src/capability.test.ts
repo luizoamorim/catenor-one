@@ -12,7 +12,7 @@ import { OTHER_DID, happyScenario, newKey } from './scenario.test-fixtures.js';
 
 const s = happyScenario(); // the admitted Trust Anchor (issuer) with its assertion key
 const ORG_B = OTHER_DID;
-const RESOURCE = 'asset:catenor-one-demo:001';
+const RESOURCE = 'spv:catenor-demo-001';
 const NOW = new Date('2026-09-12T12:00:00Z');
 
 function grant(
@@ -110,7 +110,7 @@ describe('scoped capability grant — authorization [REF-IMPL demo vocabulary]',
           request: {
             requester: ORG_B,
             action: TOKENIZE_ASSET,
-            resource: 'asset:catenor-one-demo:002',
+            resource: 'spv:catenor-demo-002',
           },
         }),
       ['RESOURCE_MISMATCH'],

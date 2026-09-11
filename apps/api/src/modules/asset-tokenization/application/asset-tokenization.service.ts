@@ -1,5 +1,5 @@
 // Part B (hackathon, Catenor One [REF-IMPL]) — an ACTIVE Trust Anchor grants Org B one scoped capability
-// (TOKENIZE_ASSET on asset:catenor-one-demo:001); Org B's tokenization request is authorized against it, and ONLY an
+// (TOKENIZE_ASSET on spv:catenor-demo-001); Org B's tokenization request is authorized against it, and ONLY an
 // ALLOW reaches the asset executor (Hedera ATS testnet). Policy Decision ≠ Execution Authorization: Catenor decides;
 // the executor adapter executes. Relationship ≠ Capability: authority comes only from the explicit, signed grant.
 import { commit } from '@catenor-one/audit';

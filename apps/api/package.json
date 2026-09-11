@@ -2,7 +2,7 @@
   "name": "@catenor-one/api",
   "version": "0.0.0",
   "private": true,
-  "description": "Catenor One API (NestJS modular monolith, T4.1). T3.2: persistence — Prisma schema and migrations.",
+  "description": "Catenor One API (NestJS modular monolith, T4.1). T3.2: persistence \u2014 Prisma schema and migrations.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate:deploy": "prisma migrate deploy",
-    "demo:s001": "node --conditions=@catenor-one/source --import tsx scripts/demo/s001-demo.ts"
+    "demo:s001": "node --conditions=@catenor-one/source --import tsx scripts/demo/s001-demo.ts",
+    "preflight:spv": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-deploy-equity.ts"
   },
   "dependencies": {
     "@catenor-one/audit": "workspace:*",

@@ -15,7 +15,7 @@ describe.skipIf(executor === undefined)('LIVE Hedera ATS testnet executor', () =
   it('deploys the demo asset as an ATS equity in exactly one transaction', async () => {
     const before = await executor!.operatorNonce();
     const result = await executor!.tokenize({
-      resource: 'asset:catenor-one-demo:001',
+      resource: 'spv:catenor-demo-001',
       requester: 'did:catenor:live-test',
       grantId: 'capability-grant-live-test',
     });

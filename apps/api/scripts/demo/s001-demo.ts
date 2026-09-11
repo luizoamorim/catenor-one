@@ -6,11 +6,13 @@
 //   SIMULATION  Chainlink CRE confidential workflow via `cre workflow simulate` (deployment gated by B1)
 //   MOCK        company / KYB evidence (SYNTHETIC MOCK fixture — Sumsub company KYB is not entitled, B11)
 //
-// Part B (after an ALLOW, only when apps/api/.env has HEDERA_OPERATOR_EVM_PRIVATE_KEY): the ACTIVE Trust Anchor grants
-// Org B the [REF-IMPL] TOKENIZE_ASSET capability (REAL Privy signature); DENY requests leave the Hedera operator nonce
-// unchanged (no transaction); Org B's valid request → exactly ONE REAL Hedera ATS testnet `deployEquity` (≈ 9 HBAR).
+// Part B (after an ALLOW, only when apps/api/.env has the PRIVY_SPV_* values): the ACTIVE Trust Anchor grants Org B
+// the [REF-IMPL] TOKENIZE_ASSET capability on spv:catenor-demo-001 (REAL Privy signature); DENY requests leave the SPV
+// wallet nonce unchanged (no transaction); the exact deployEquity for Org B's grant is prepared READ-ONLY. Only with
+// --hedera-live (explicit maintainer authorization) does Org B's valid request → exactly ONE REAL Hedera ATS testnet
+// `deployEquity`, signed by the Privy-managed SPV wallet under its Privy policy (≈ 9 HBAR). No raw operator key.
 //
-// Run: pnpm demo:s001 [--representative GREEN|RED]
+// Run: pnpm demo:s001 [--representative GREEN|RED] [--hedera-live]
 // Needs: Docker (or DATABASE_URL), the CRE CLI + `bun install` in the workflow, apps/api/.env with the Privy values,
 // workflows/.env with SUMSUB_APP_TOKEN_VAR / SUMSUB_SECRET_KEY_VAR (sandbox) and CATENOR_INTERNAL_API_TOKEN_VAR.
 // Secret values are read by this process only and never printed. Output: artifacts/demo/s001-run-<time>.json
@@ -21,10 +23,12 @@ import { fileURLToPath } from 'node:url';
 import { verifyChain } from '@catenor-one/audit';
 import { bootstrapConfigurationHash, parseBootstrapConfiguration } from '@catenor-one/authority';
 import { policyHash } from '@catenor-one/policy';
+import { PrivyClient } from '@privy-io/node';
+import { formatEther, keccak256 } from 'ethers';
 import { startCallbackReceiver } from '../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
 import { deriveChannelKeys } from '../../src/infrastructure/confidential-compute/cre-channel.js';
 import { CreSimulationConfidentialVerifier } from '../../src/infrastructure/confidential-compute/cre-simulation-verifier.js';
-import { HederaAtsTestnetExecutor } from '../../src/infrastructure/execution/hedera-ats-executor.js';
+import { PrivySpvAtsExecutor } from '../../src/infrastructure/execution/privy-spv-ats-executor.js';
 import { SumsubSandboxOperator } from '../../src/infrastructure/identity-providers/sumsub-sandbox.js';
 import { selectSigners } from '../../src/infrastructure/key-management/signer-selection.js';
 import {
@@ -46,6 +50,7 @@ const API_ENV = `${ROOT}apps/api/.env`;
 const WORKFLOW_ENV = `${WORKFLOWS}.env`;
 const TD = 'trust-domain:catenor-one-demo';
 const representativeAnswer = process.argv.includes('RED') ? 'RED' : 'GREEN';
+const hederaLive = process.argv.includes('--hedera-live');
 
 const steps: { step: string; label: 'REAL' | 'SIMULATION' | 'MOCK' | 'LOCAL'; result: unknown }[] =
   [];
@@ -90,7 +95,13 @@ if (!sumsub.appToken || !sumsub.secretKey || !channelToken) {
   );
 }
 const operator = new SumsubSandboxOperator(sumsub); // refuses non-sandbox tokens
-const hedera = HederaAtsTestnetExecutor.fromEnv(); // Part B runs only when configured
+// Part B runs only when the Privy SPV wallet is configured; it broadcasts only with --hedera-live.
+const hedera = PrivySpvAtsExecutor.fromEnv(
+  new PrivyClient({
+    appId: process.env['PRIVY_APP_ID'] ?? '',
+    appSecret: process.env['PRIVY_APP_SECRET'] ?? '',
+  }),
+);
 
 // Database: DATABASE_URL, or a throwaway Testcontainers PostgreSQL with the migrations deployed.
 let databaseUrl = process.env['DATABASE_URL'] ?? '';
@@ -184,8 +195,8 @@ const service = new TrustAnchorAdmissionService({
 wiring.service = service;
 
 /** Part B: Trust Anchor → scoped capability → DENY (no transaction) → ALLOW (one Hedera ATS testnet transaction). */
-async function runPartB(trustAnchor: string, executor: HederaAtsTestnetExecutor) {
-  const RESOURCE = 'asset:catenor-one-demo:001';
+async function runPartB(trustAnchor: string, executor: PrivySpvAtsExecutor) {
+  const RESOURCE = 'spv:catenor-demo-001';
   const tokenization = new AssetTokenizationService({
     uow: new PrismaUnitOfWork(client),
     clock: systemClock,
@@ -217,27 +228,46 @@ async function runPartB(trustAnchor: string, executor: HederaAtsTestnetExecutor)
     await tokenization.requestTokenization({ requester: orgC.did, resource: RESOURCE, grant }),
     await tokenization.requestTokenization({
       requester: orgB.did,
-      resource: 'asset:catenor-one-demo:002',
+      resource: 'spv:catenor-demo-002',
       grant: {
         ...grant,
-        capability: { ...grant.capability, resource: 'asset:catenor-one-demo:002' },
+        capability: { ...grant.capability, resource: 'spv:catenor-demo-002' },
       },
     }),
   ];
   const nonceAfterDeny = await executor.operatorNonce();
-  say('Part B DENY (Org C with Org B grant; tampered resource) + Hedera nonce read', 'REAL', {
+  say('Part B DENY (Org C with Org B grant; tampered resource) + SPV wallet nonce read', 'REAL', {
     decisions: denials,
-    hederaOperatorNonce: { before: nonceBefore, after: nonceAfterDeny },
+    spvWalletNonce: { before: nonceBefore, after: nonceAfterDeny },
     hederaTransactions: nonceAfterDeny - nonceBefore,
   });
   if (nonceAfterDeny !== nonceBefore) throw new Error('a DENY reached Hedera');
+
+  const prepared = await executor.prepareDeployEquity({ resource: RESOURCE, grantId: grant.id });
+  say('Part B exact deployEquity for this grant (READ-ONLY eth_call + estimateGas)', 'REAL', {
+    from: `${prepared.from} (Privy SPV wallet)`,
+    to: `${prepared.transaction.to} (ATS Factory)`,
+    chainId: prepared.transaction.chain_id,
+    estimatedGas: String(prepared.estimatedGas),
+    gasLimit: prepared.transaction.gas_limit,
+    maxHbar: formatEther(prepared.maxCostWeibar),
+    calldataKeccak256: keccak256(prepared.transaction.data),
+  });
+  if (!hederaLive) {
+    say(
+      'Part B ALLOW → Hedera',
+      'LOCAL',
+      'NOT BROADCAST — requires --hedera-live (maintainer authorization)',
+    );
+    return;
+  }
 
   const allowed = await tokenization.requestTokenization({
     requester: orgB.did,
     resource: RESOURCE,
     grant,
   });
-  say('Part B ALLOW → Hedera ATS testnet deployEquity', 'REAL', {
+  say('Part B ALLOW → Hedera ATS testnet deployEquity (Privy SPV wallet)', 'REAL', {
     ...allowed,
     hederaTransactions: (await executor.operatorNonce()) - nonceAfterDeny,
   });
@@ -316,7 +346,7 @@ try {
     });
 
     if (hedera === undefined) {
-      say('Part B', 'LOCAL', 'skipped — HEDERA_OPERATOR_EVM_PRIVATE_KEY not configured');
+      say('Part B', 'LOCAL', 'skipped — the Privy SPV wallet (PRIVY_SPV_*) is not configured');
     } else {
       await runPartB(started.did, hedera);
     }
@@ -339,9 +369,11 @@ try {
         profile:
           'HYBRID_DEMO — Company evidence: SYNTHETIC MOCK · Representative verification: REAL SUMSUB SANDBOX',
         cre: 'SIMULATION (cre workflow simulate) — not a deployed Confidential Workflow',
-        hedera: hedera
-          ? 'Part B: REAL Hedera ATS testnet (chain 296), executed only after a Catenor ALLOW'
-          : 'Part B not run (no Hedera operator configured)',
+        hedera: !hedera
+          ? 'Part B not run (no Privy SPV wallet configured)'
+          : hederaLive
+            ? 'Part B: REAL Hedera ATS testnet (chain 296), signed by the Privy SPV wallet, executed only after a Catenor ALLOW'
+            : 'Part B: prepared READ-ONLY; not broadcast (no --hedera-live)',
         access:
           'maintainer/operator-initiated; the bootstrap access gate (AC-001–003) is not implemented',
         steps,

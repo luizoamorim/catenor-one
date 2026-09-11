@@ -33,7 +33,7 @@ import {
 } from './application/asset-tokenization.service.js';
 
 const TD = 'trust-domain:catenor-one-demo';
-const RESOURCE = 'asset:catenor-one-demo:001';
+const RESOURCE = 'spv:catenor-demo-001';
 
 let container: StartedPostgreSqlContainer;
 let client: PrismaClient;
@@ -167,7 +167,7 @@ describe('Part B — scoped tokenization capability [REF-IMPL demo profile]', ()
       [
         await tokenization.requestTokenization({
           requester: orgB.did,
-          resource: 'asset:catenor-one-demo:002',
+          resource: 'spv:catenor-demo-002',
           grant,
         }),
         'RESOURCE_MISMATCH',
@@ -175,10 +175,10 @@ describe('Part B — scoped tokenization capability [REF-IMPL demo profile]', ()
       [
         await tokenization.requestTokenization({
           requester: orgB.did,
-          resource: 'asset:catenor-one-demo:002',
+          resource: 'spv:catenor-demo-002',
           grant: {
             ...grant,
-            capability: { ...grant.capability, resource: 'asset:catenor-one-demo:002' },
+            capability: { ...grant.capability, resource: 'spv:catenor-demo-002' },
           },
         }),
         'SIGNATURE_INVALID',
