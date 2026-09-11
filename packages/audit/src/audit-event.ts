@@ -30,6 +30,12 @@ export const AUDIT_EVENT_TYPES = [
   'ASSET_ACTION_AUTHORIZED',
   'ASSET_ACTION_DENIED',
   'ASSET_ACTION_EXECUTED',
+  // Catenor One [REF-IMPL] final demo (Distribution Agent → eligibility-gated distribution plan)
+  'AGENT_EXECUTION_WALLET_PROVISIONED',
+  'ACCOUNT_BINDING_CREATED',
+  'DISTRIBUTION_REQUEST_DENIED',
+  'DISTRIBUTION_ELIGIBILITY_EVALUATED',
+  'DISTRIBUTION_PLAN_CREATED',
 ] as const;
 
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];

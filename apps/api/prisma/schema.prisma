@@ -217,6 +217,8 @@ enum SubjectType {
 enum ProviderBindingRole {
   COMPANY
   REPRESENTATIVE
+  /// Final demo [REF-IMPL]: an investor's individual identity-provider applicant.
+  INVESTOR
 
   @@schema("catenor_private")
 }
@@ -345,6 +347,12 @@ enum AuditEventType {
   ASSET_ACTION_AUTHORIZED
   ASSET_ACTION_DENIED
   ASSET_ACTION_EXECUTED
+  /// Final demo [REF-IMPL] event types.
+  AGENT_EXECUTION_WALLET_PROVISIONED
+  ACCOUNT_BINDING_CREATED
+  DISTRIBUTION_REQUEST_DENIED
+  DISTRIBUTION_ELIGIBILITY_EVALUATED
+  DISTRIBUTION_PLAN_CREATED
 
   @@schema("catenor_private")
 }
@@ -359,6 +367,7 @@ model Subject {
   providerBindings ProviderBinding[]
   keyReferences    KeyManagementReference[]
   sessions         AdmissionSession[]
+  accountBindings  AccountBinding[]
 
   @@schema("catenor_private")
 }
@@ -381,6 +390,35 @@ model ProviderBinding {
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 
   @@unique([subjectId, role])
+  @@schema("catenor_private")
+}
+
+/// Final demo [REF-IMPL]: purpose of a private Account Binding.
+enum AccountBindingPurpose {
+  /// An investor's receiving account for regulated distributions.
+  DISTRIBUTION_RECEIVING
+  /// A Distribution Agent's execution wallet.
+  AGENT_EXECUTION
+
+  @@schema("catenor_private")
+}
+
+/// Private Account Binding (Catenor invariant: financial Account Bindings are private by default; wallet/account ≠
+/// canonical Subject). Links a did:catenor Subject to one CAIP-10 account for one purpose. Never published.
+model AccountBinding {
+  id             String                @id
+  subjectId      String
+  purpose        AccountBindingPurpose
+  /// CAIP-10 account id, e.g. eip155:296:0x….
+  account        String
+  /// Wallet infrastructure (e.g. "privy"); walletRef is its opaque wallet id — private operational metadata.
+  walletProvider String
+  walletRef      String?
+  createdAt      DateTime              @default(now()) @db.Timestamptz(3)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([subjectId, purpose])
   @@schema("catenor_private")
 }
 

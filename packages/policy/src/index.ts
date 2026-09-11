@@ -26,3 +26,12 @@ export {
   type RequirementStatus,
 } from './evaluate.js';
 export { createDecision, type Decision } from './decision.js';
+export {
+  DISTRIBUTION_ELIGIBILITY_POLICY_ID,
+  DISTRIBUTION_EVIDENCE_FACTS,
+  DISTRIBUTION_REQUIREMENTS,
+  evaluateDistributionEligibility,
+  type DistributionEligibilityEvaluation,
+  type DistributionEvidenceFact,
+  type DistributionRequirement,
+} from './distribution-eligibility.js';

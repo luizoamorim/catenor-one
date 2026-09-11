@@ -25,7 +25,7 @@ import type {
 
 // ---- SubjectRegistry --------------------------------------------------------------------------------
 
-export type ProviderBindingRole = 'COMPANY' | 'REPRESENTATIVE';
+export type ProviderBindingRole = 'COMPANY' | 'REPRESENTATIVE' | 'INVESTOR';
 export type ProviderBindingStatus =
   'PENDING_ATTACHMENT' | 'ATTACHED_UNVERIFIED' | 'BINDING_VERIFIED' | 'BINDING_MISMATCH';
 
@@ -67,6 +67,30 @@ export interface SubjectRegistry {
     role: ProviderBindingRole,
     status: 'BINDING_VERIFIED' | 'BINDING_MISMATCH',
   ): Promise<void>;
+}
+
+// ---- AccountBindingRegistry (final demo [REF-IMPL]) ---------------------------------------------------
+
+export type AccountBindingPurpose = 'DISTRIBUTION_RECEIVING' | 'AGENT_EXECUTION';
+
+/** Private Account Binding: did:catenor Subject → one CAIP-10 account for one purpose. Never published. */
+export interface AccountBinding {
+  readonly id: string;
+  readonly subjectId: string;
+  readonly purpose: AccountBindingPurpose;
+  /** CAIP-10, e.g. eip155:296:0x…. */
+  readonly account: string;
+  readonly walletProvider: string;
+  /** Opaque wallet id (private operational metadata, not a secret). */
+  readonly walletRef?: string;
+}
+
+export interface AccountBindingRegistry {
+  createAccountBinding(binding: AccountBinding): Promise<void>;
+  findAccountBinding(
+    subjectId: string,
+    purpose: AccountBindingPurpose,
+  ): Promise<AccountBinding | undefined>;
 }
 
 // ---- DidStateRegistry -------------------------------------------------------------------------------
@@ -244,6 +268,7 @@ export interface AuditLog {
 
 export interface PersistencePorts {
   readonly subjects: SubjectRegistry;
+  readonly accountBindings: AccountBindingRegistry;
   readonly didState: DidStateRegistry;
   readonly admissions: AdmissionRepository;
   readonly trustAnchors: TrustAnchorRegistry;

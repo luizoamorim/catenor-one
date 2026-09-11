@@ -10,6 +10,7 @@ import type {
   ConfidentialEvidenceVerifier,
   PrivateVerificationContext,
 } from '../../modules/trust-anchor-admission/application/admission.ports.js';
+import type { InvestorVerificationContext } from '../../modules/distribution/application/distribution.service.js';
 import { sealContext, type ChannelKeys } from './cre-channel.js';
 
 export interface CreSimulationOptions {
@@ -49,11 +50,12 @@ export class CreSimulationConfidentialVerifier implements ConfidentialEvidenceVe
     mkdirSync(join(options.projectRoot, options.workflowFolder, this.dir), { recursive: true });
   }
 
-  async request(input: {
-    operation: 'TRUST_ANCHOR_ADMISSION';
-    runId: string;
-    context: PrivateVerificationContext;
-  }): Promise<{ executionId: string }> {
+  /** TRUST_ANCHOR_ADMISSION (S001) or INVESTOR_ELIGIBILITY (final demo): same sealing, same callback path. */
+  async request(
+    input:
+      | { operation: 'TRUST_ANCHOR_ADMISSION'; runId: string; context: PrivateVerificationContext }
+      | { operation: 'INVESTOR_ELIGIBILITY'; runId: string; context: InvestorVerificationContext },
+  ): Promise<{ executionId: string }> {
     const n = `${process.pid}-${++this.counter}`;
     const folder = join(this.options.projectRoot, this.options.workflowFolder, this.dir);
     const payloadFile = `${this.options.workflowFolder}/${this.dir}/${n}.payload.json`; // relative to cwd

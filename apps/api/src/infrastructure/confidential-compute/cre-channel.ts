@@ -17,6 +17,7 @@ import type {
   ConfidentialVerificationResult,
   PrivateVerificationContext,
 } from '../../modules/trust-anchor-admission/application/admission.ports.js';
+import type { InvestorVerificationContext } from '../../modules/distribution/application/distribution.service.js';
 
 export const CALLBACK_MAX_SKEW_SECONDS = 300;
 
@@ -54,7 +55,7 @@ export interface TriggerPayload {
 export function sealContext(
   keys: ChannelKeys,
   operation: string,
-  context: PrivateVerificationContext,
+  context: PrivateVerificationContext | InvestorVerificationContext,
 ): TriggerPayload {
   const nonce = randomBytes(12);
   const cipher = createCipheriv('aes-256-gcm', keys.ctx, nonce);

@@ -12,6 +12,8 @@ import {
  * vocabulary and Constraint grammar are open in Draft v0.1, specification/authority/02-CAPABILITIES.md §6).
  */
 export const TOKENIZE_ASSET = 'TOKENIZE_ASSET';
+/** Final demo: the Distribution Agent may execute the distribution of an SPV asset (Catenor One [REF-IMPL]). */
+export const EXECUTE_DISTRIBUTION = 'EXECUTE_DISTRIBUTION';
 
 /** Protocol Capability working shape exactly (`capability.schema.json`: these four fields, nothing else). */
 export interface Capability {

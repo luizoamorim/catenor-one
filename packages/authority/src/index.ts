@@ -66,6 +66,7 @@ export {
 } from './trust-anchor-verifier.js';
 export {
   TOKENIZE_ASSET,
+  EXECUTE_DISTRIBUTION,
   authorizeWithCapability,
   createCapabilityGrant,
   prepareCapabilityGrantProof,

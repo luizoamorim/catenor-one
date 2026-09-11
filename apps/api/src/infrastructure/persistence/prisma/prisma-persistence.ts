@@ -11,6 +11,9 @@ import type { DidDocument, KeyManagementReference } from '@catenor-one/identity'
 import type { Decision, FactInput } from '@catenor-one/policy';
 import { PrismaPg } from '@prisma/adapter-pg';
 import type {
+  AccountBinding,
+  AccountBindingPurpose,
+  AccountBindingRegistry,
   AdmissionRepository,
   AdmissionSession,
   AdmissionSessionUpdate,
@@ -52,6 +55,7 @@ export class PrismaUnitOfWork implements UnitOfWork {
 export function persistencePorts(db: Db): PersistencePorts {
   return {
     subjects: new PrismaSubjectRegistry(db),
+    accountBindings: new PrismaAccountBindingRegistry(db),
     didState: new PrismaDidStateRegistry(db),
     admissions: new PrismaAdmissionRepository(db),
     trustAnchors: new PrismaTrustAnchorRegistry(db),
@@ -126,6 +130,42 @@ class PrismaSubjectRegistry implements SubjectRegistry {
 }
 
 // ---- DidStateRegistry -------------------------------------------------------------------------------
+
+class PrismaAccountBindingRegistry implements AccountBindingRegistry {
+  constructor(private readonly db: Db) {}
+
+  async createAccountBinding(binding: AccountBinding): Promise<void> {
+    await this.db.accountBinding.create({
+      data: {
+        id: binding.id,
+        subjectId: binding.subjectId,
+        purpose: binding.purpose,
+        account: binding.account,
+        walletProvider: binding.walletProvider,
+        walletRef: binding.walletRef ?? null,
+      },
+    });
+  }
+
+  async findAccountBinding(
+    subjectId: string,
+    purpose: AccountBindingPurpose,
+  ): Promise<AccountBinding | undefined> {
+    const row = await this.db.accountBinding.findUnique({
+      where: { subjectId_purpose: { subjectId, purpose } },
+    });
+    return row
+      ? {
+          id: row.id,
+          subjectId: row.subjectId,
+          purpose: row.purpose,
+          account: row.account,
+          walletProvider: row.walletProvider,
+          ...(row.walletRef ? { walletRef: row.walletRef } : {}),
+        }
+      : undefined;
+  }
+}
 
 class PrismaDidStateRegistry implements DidStateRegistry {
   constructor(private readonly db: Db) {}

@@ -12,7 +12,11 @@
 // --hedera-live (explicit maintainer authorization) does Org B's valid request → exactly ONE REAL Hedera ATS testnet
 // `deployEquity`, signed by the Privy-managed SPV wallet under its Privy policy (≈ 9 HBAR). No raw operator key.
 //
-// Run: pnpm demo:s001 [--representative GREEN|RED] [--hedera-live]
+// Part C (final demo, --distribution; needs PRIVY_AGENT_OWNER_PUBLIC_KEY / PRIVY_AGENT_RUNTIME_QUORUM_ID): pre-seeded
+// investors (REAL Sumsub sandbox, A GREEN / B RED) → CREATE DISTRIBUTION AGENT (live Privy wallet + narrow policy,
+// EXECUTE_DISTRIBUTION grant) → blind DRY RUN vs controlled plan (CRE SIMULATION per holder). Nothing is paid.
+//
+// Run: pnpm demo:s001 [--representative GREEN|RED] [--hedera-live] [--distribution]
 // Needs: Docker (or DATABASE_URL), the CRE CLI + `bun install` in the workflow, apps/api/.env with the Privy values,
 // workflows/.env with SUMSUB_APP_TOKEN_VAR / SUMSUB_SECRET_KEY_VAR (sandbox) and CATENOR_INTERNAL_API_TOKEN_VAR.
 // Secret values are read by this process only and never printed. Output: artifacts/demo/s001-run-<time>.json
@@ -42,6 +46,13 @@ import {
   systemClock,
 } from '../../src/infrastructure/runtime/runtime-adapters.js';
 import { AssetTokenizationService } from '../../src/modules/asset-tokenization/application/asset-tokenization.service.js';
+import {
+  DistributionService,
+  type InvestorEligibilityResult,
+} from '../../src/modules/distribution/application/distribution.service.js';
+import { HederaAtsHoldingsReader } from '../../src/infrastructure/execution/hedera-ats-holdings.js';
+import { PrivyDistributionAgentProvisioner } from '../../src/infrastructure/key-management/privy-distribution-agent.js';
+import { DEMO_INVESTORS, REHEARSAL_EQUITY } from './final-demo-config.js';
 import { TrustAnchorAdmissionService } from '../../src/modules/trust-anchor-admission/application/trust-anchor-admission.service.js';
 
 const ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
@@ -51,6 +62,9 @@ const WORKFLOW_ENV = `${WORKFLOWS}.env`;
 const TD = 'trust-domain:catenor-one-demo';
 const representativeAnswer = process.argv.includes('RED') ? 'RED' : 'GREEN';
 const hederaLive = process.argv.includes('--hedera-live');
+const runDistribution = process.argv.includes('--distribution');
+const RESOURCE = 'spv:catenor-demo-001';
+const HBAR = 10n ** 18n; // Hedera JSON-RPC weibar
 
 const steps: { step: string; label: 'REAL' | 'SIMULATION' | 'MOCK' | 'LOCAL'; result: unknown }[] =
   [];
@@ -148,12 +162,18 @@ say('bootstrap configuration', 'LOCAL', { hash, evidenceProfile: 'HYBRID_DEMO' }
 
 const deliveries: { accepted: boolean; reason?: string; runId?: string }[] = [];
 // The receiver is created before the service it delivers to (the verifier needs the receiver URL).
-const wiring: { service?: TrustAnchorAdmissionService } = {};
+const wiring: { service?: TrustAnchorAdmissionService; distribution?: DistributionService } = {};
 const receiver = await startCallbackReceiver({
   port: 8787,
   keys,
   now: () => new Date(),
-  deliver: (result) => wiring.service!.recordConfidentialVerificationResult(result),
+  // One authenticated callback path for both identity-confidential operations; routed by the signed envelope.
+  deliver: (result) =>
+    (result as { operation: string }).operation === 'INVESTOR_ELIGIBILITY'
+      ? wiring.distribution!.recordInvestorEligibilityResult(
+          result as unknown as InvestorEligibilityResult,
+        )
+      : wiring.service!.recordConfidentialVerificationResult(result),
   onEvent: (e) => deliveries.push(e),
 });
 const verifier = new CreSimulationConfidentialVerifier({
@@ -176,6 +196,8 @@ const verifier = new CreSimulationConfidentialVerifier({
     },
     bootstrapConfigurationHash: hash,
     acceptedEvidence: configuration.load().config.acceptedEvidence,
+    // [REF-IMPL] final demo: individual-investor evidence rules for INVESTOR_ELIGIBILITY.
+    investorEvidence: { levelNames: ['id-only'], evidenceMaxAgeDays: 180 },
     authorizedTriggerAddress: '0x0000000000000000000000000000000000000000',
     authorizedKeys: [
       { type: 'KEY_TYPE_ECDSA_EVM', publicKey: '0x0000000000000000000000000000000000000000' },
@@ -196,7 +218,6 @@ wiring.service = service;
 
 /** Part B: Trust Anchor → scoped capability → DENY (no transaction) → ALLOW (one Hedera ATS testnet transaction). */
 async function runPartB(trustAnchor: string, executor: PrivySpvAtsExecutor) {
-  const RESOURCE = 'spv:catenor-demo-001';
   const tokenization = new AssetTokenizationService({
     uow: new PrismaUnitOfWork(client),
     clock: systemClock,
@@ -270,6 +291,134 @@ async function runPartB(trustAnchor: string, executor: PrivySpvAtsExecutor) {
   say('Part B ALLOW → Hedera ATS testnet deployEquity (Privy SPV wallet)', 'REAL', {
     ...allowed,
     hederaTransactions: (await executor.operatorNonce()) - nonceAfterDeny,
+  });
+}
+
+/**
+ * Part C (final demo, --distribution): pre-seeded investors (REAL Sumsub sandbox: A current review GREEN, B RED) →
+ * CREATE DISTRIBUTION AGENT (live: AGENT did, Privy wallet + narrow policy, EXECUTE_DISTRIBUTION grant) → a wrong
+ * requester is DENIED → SPV REVENUE RECEIVED → BLIND plan (DRY RUN) vs CONTROLLED plan (CRE SIMULATION per holder
+ * → policy:distribution-eligibility:v1). Nothing is paid: Hedera execution is a later, separately authorized step.
+ */
+async function runPartC(trustAnchor: string) {
+  const privy = new PrivyClient({
+    appId: process.env['PRIVY_APP_ID'] ?? '',
+    appSecret: process.env['PRIVY_APP_SECRET'] ?? '',
+  });
+  const provisioner = PrivyDistributionAgentProvisioner.fromEnv(privy);
+  if (!provisioner) {
+    say(
+      'Part C',
+      'LOCAL',
+      'skipped — PRIVY_AGENT_OWNER_PUBLIC_KEY / PRIVY_AGENT_RUNTIME_QUORUM_ID not configured',
+    );
+    return;
+  }
+  const distribution = new DistributionService({
+    uow: new PrismaUnitOfWork(client),
+    clock: systemClock,
+    ids: nodeIds,
+    trustDomain: TD,
+    assertionSigner: signers.assertionSigner,
+    verifyTrustAnchor: (did) => service.verifyTrustAnchor(did),
+    provisioner,
+    holdings: new HederaAtsHoldingsReader(),
+    verifier,
+    resultTimeoutMs: 300_000,
+  });
+  wiring.distribution = distribution;
+
+  // Pre-seeded state (not a live demo action): investor Subjects with PRIVATE bindings + current provider evidence.
+  const investors = [] as { label: 'A' | 'B'; did: string; answer: 'GREEN' | 'RED' }[];
+  for (const [label, answer] of [
+    ['A', 'GREEN'],
+    ['B', 'RED'],
+  ] as const) {
+    const wallet = DEMO_INVESTORS[label];
+    const { did, bindingRef } = await distribution.registerInvestor({ account: wallet.address });
+    const applicantId = await operator.createInvestorApplicant(bindingRef, label);
+    await operator.forceReview(applicantId, answer);
+    await distribution.attachInvestorApplicant(did, applicantId);
+    investors.push({ label, did, answer });
+  }
+  say('Part C pre-seeded investors', 'REAL', {
+    investors: investors.map((i) => ({
+      investor: `Investor ${i.label}`,
+      did: i.did,
+      receivingAccount: 'private Account Binding (not published)',
+      sumsubSandboxCurrentReview: i.answer,
+    })),
+  });
+
+  const agent = await distribution.createDistributionAgent({
+    issuer: trustAnchor,
+    resource: RESOURCE,
+    investors: investors.map((i) => i.did),
+    maxPayoutWeibar: 20n * HBAR,
+    validUntil: new Date(Date.now() + 24 * 3600_000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  });
+  say('CREATE DISTRIBUTION AGENT (live)', 'REAL', {
+    agentDid: agent.did,
+    privyAgentWallet: agent.wallet.address,
+    privyAgentPolicyControls: agent.wallet.controls,
+    capability: agent.grant.capability,
+    issuer: 'the ACTIVE Trust Anchor',
+    proof: `${agent.grant.proof.cryptosuite} via the Trust Anchor's Privy Credential Assertion Key`,
+  });
+
+  const wrongRequester = await distribution.planDistribution({
+    agent: investors[0]!.did,
+    grant: agent.grant,
+    resource: RESOURCE,
+    asset: REHEARSAL_EQUITY,
+    revenueWeibar: 10n * HBAR,
+    investors: investors.map((i) => i.did),
+  });
+  say('Part C DENY (Investor A presents the Agent grant)', 'LOCAL', wrongRequester);
+
+  const revenueWeibar = 10n * HBAR;
+  say('SPV REVENUE RECEIVED (simulated trigger)', 'LOCAL', {
+    resource: RESOURCE,
+    revenueHbar: formatEther(revenueWeibar),
+    source: 'demo trigger — in production a PMS, bank webhook, schedule or reconciliation event',
+  });
+  const plan = await distribution.planDistribution({
+    agent: agent.did,
+    grant: agent.grant,
+    resource: RESOURCE,
+    asset: REHEARSAL_EQUITY,
+    revenueWeibar,
+    investors: investors.map((i) => i.did),
+  });
+  if (plan.decision === 'DENY') {
+    say('CONTROLLED DISTRIBUTION', 'LOCAL', plan);
+    return;
+  }
+  const label = (did: string) => `Investor ${investors.find((i) => i.did === did)!.label}`;
+  say('BLIND DISTRIBUTION (DRY RUN — holdings only, nothing sent)', 'LOCAL', {
+    asset: `${REHEARSAL_EQUITY} (Hedera testnet, READ-ONLY balances)`,
+    proposed: plan.blind.map((b) => ({
+      investor: label(b.investor),
+      hbar: formatEther(b.proposedWeibar),
+    })),
+  });
+  say('CONTROLLED DISTRIBUTION (Catenor + CRE SIMULATION)', 'SIMULATION', {
+    planRef: plan.planRef,
+    holders: plan.holders.map((h) => ({
+      investor: label(h.investor),
+      units: String(h.units),
+      proposedHbar: formatEther(h.proposedWeibar),
+      confidentialRun: h.confidentialRun,
+      policy: h.eligibility.policy,
+      decision: h.eligibility.outcome,
+      trace: h.eligibility.trace.map((t) => `${t.requirement}=${t.status}`),
+      factReasons: h.factReasons ?? {},
+      decisionCommitment: h.decisionCommitment,
+      controlled: h.controlled,
+    })),
+    payHbar: formatEther(plan.payWeibar),
+    heldHbar: formatEther(plan.heldWeibar),
+    executed: false,
   });
 }
 
@@ -350,6 +499,7 @@ try {
     } else {
       await runPartB(started.did, hedera);
     }
+    if (runDistribution) await runPartC(started.did);
   }
 
   const timeline = await new PrismaUnitOfWork(client).run((p) => p.audit.timeline(TD));

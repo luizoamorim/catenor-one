@@ -2,11 +2,9 @@
 // (TOKENIZE_ASSET on spv:catenor-demo-001); Org B's tokenization request is authorized against it, and ONLY an
 // ALLOW reaches the asset executor (Hedera ATS testnet). Policy Decision ≠ Execution Authorization: Catenor decides;
 // the executor adapter executes. Relationship ≠ Capability: authority comes only from the explicit, signed grant.
-import { commit } from '@catenor-one/audit';
 import {
   TOKENIZE_ASSET,
   authorizeWithCapability,
-  createCapabilityGrant,
   type CapabilityDenialReason,
   type CapabilityGrant,
   type TrustAnchorVerificationResult,
@@ -17,6 +15,7 @@ import type {
   Clock,
   IdGenerator,
 } from '../../trust-anchor-admission/application/admission.ports.js';
+import { grantCapability } from '../../capability-grants/application/grant-capability.js';
 import type {
   PersistencePorts,
   UnitOfWork,
@@ -61,12 +60,7 @@ export type TokenizationOutcome =
     }
   | { readonly decision: 'DENY'; readonly reasons: readonly CapabilityDenialReason[] };
 
-export class CapabilityGrantRefused extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'CapabilityGrantRefused';
-  }
-}
+export { CapabilityGrantRefused } from '../../capability-grants/application/grant-capability.js';
 
 const rfc3339 = (d: Date) => d.toISOString().replace(/\.\d{3}Z$/, 'Z');
 
@@ -89,53 +83,13 @@ export class AssetTokenizationService {
   }
 
   /** The issuer must verify as an ACTIVE Trust Anchor; it signs with its Credential Assertion Key. */
-  async grantTokenizationCapability(input: {
+  grantTokenizationCapability(input: {
     readonly issuer: string;
     readonly subject: string;
     readonly resource: string;
     readonly validUntil: string;
   }): Promise<CapabilityGrant> {
-    const verification = await this.deps.verifyTrustAnchor(input.issuer);
-    if (!verification.TRUST_ANCHOR_VALID) {
-      throw new CapabilityGrantRefused('the issuer is not an ACTIVE Trust Anchor');
-    }
-    const key = await this.deps.uow.run(async (p) => {
-      const resolved = await p.didState.resolve(input.issuer);
-      const vmId = resolved?.document.assertionMethod[0];
-      const keyRef = vmId ? await p.didState.findKeyReference(vmId) : undefined;
-      if (!vmId || keyRef?.purpose !== 'CREDENTIAL_ASSERTION' || keyRef.status !== 'ACTIVE') {
-        throw new CapabilityGrantRefused('the issuer has no ACTIVE Credential Assertion Key');
-      }
-      const subject = await p.subjects.findSubjectByDid(input.subject);
-      if (subject === undefined) throw new CapabilityGrantRefused('unknown capability subject');
-      return { vmId, signerRef: keyRef.signerRef };
-    });
-    const now = rfc3339(this.deps.clock.now());
-    const payload = createCapabilityGrant({
-      id: this.deps.ids.id('capability-grant'),
-      issuer: input.issuer,
-      subject: input.subject,
-      action: TOKENIZE_ASSET,
-      resource: input.resource,
-      validUntil: input.validUntil,
-      issuedAt: now,
-    });
-    const grant = await this.deps.assertionSigner.signCapabilityGrant(key.signerRef, {
-      grant: payload,
-      verificationMethod: key.vmId,
-      created: now,
-    });
-    await this.deps.uow.run((p) =>
-      this.audit(p, 'CAPABILITY_GRANTED', input.subject, {
-        grantId: grant.id,
-        issuer: grant.issuer,
-        action: TOKENIZE_ASSET,
-        resource: input.resource,
-        validUntil: input.validUntil,
-        grantCommitment: commit(grant),
-      }),
-    );
-    return grant;
+    return grantCapability(this.deps, { ...input, action: TOKENIZE_ASSET });
   }
 
   /** Authorizes Org B's request against the grant; only ALLOW invokes the executor. */
