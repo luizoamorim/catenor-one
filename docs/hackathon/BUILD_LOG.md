@@ -939,6 +939,38 @@ Human review: pending.
 
 Commit: d8a3af0, plus the docs commit that contains this entry.
 
+## 2026-09-11 — Privy / Hedera official skills + specialist subagents
+
+Goal: prepare the final delivery sprint with sponsor-specific specialist agents. AI tooling only, no application code.
+
+Work completed:
+
+- Installed the official Privy skill (`privy`) and three official Hedera skills from `hedera-dev/hedera-skills`:
+  - `hedera-hackathon-submission-validator` and `hedera-hackathon-prd`, the hackathon-helper plugin;
+  - `hts-system-contract`.
+- Created the project subagents `privy-engineer` and `hedera-engineer` on the `cre-engineer` pattern:
+  - mechanics only;
+  - Catenor semantics stay with the main session;
+  - no live transaction without explicit maintainer authorization;
+  - no secrets read or printed;
+  - no silent raw-key fallback.
+
+Validation:
+
+- `claude agents` lists `cre-engineer`, `hedera-engineer` and `privy-engineer`.
+- Headless no-tool delegations confirmed that every preloaded skill body is in each agent's context; the quoted headings match the files.
+- The subagent `skills:` field resolved by skill directory name. The display names containing spaces ("Hedera Hackathon …") did not preload, so directory names are used.
+- `cre-engineer` still preloads `chainlink-cre-skill`.
+- No sponsor call or transaction was made.
+
+AI assistance: Claude Code main session.
+
+Human review: pending.
+
+Artifacts: `docs/hackathon/prompts/2026-09-11-008-privy-hedera-specialist-agents.md`.
+
+Commit: the `chore(ai)` commit that contains this entry.
+
 ## Entry template
 
 ```md

@@ -641,3 +641,29 @@ S001 demo tooling (2026-09-11, `apps/api` dev dependency): `tsx` 4.23.13 (MIT) r
   They were read to mirror the behavior; no Solidity was copied.
 - The research that selected this path was done by a general-purpose Claude Code subagent. It checked current npm packages, the ATS repository and the live testnet with read-only `eth_call`s; its throwaway scripts stayed in the session scratchpad and none were committed.
 - `@hashgraph/asset-tokenization-sdk` 8.0.0 was evaluated and not adopted. It has no server-side private-key wallet mode, and its ESM build does not import under Node.
+
+---
+
+## 25. 2026-09-11 — Official Privy / Hedera agent skills and project subagents
+
+Type: official sponsor skills (instructions and reference documents for AI coding agents; no application code) plus project-authored Claude Code subagent definitions.
+
+| Skill | Source | Installed with | Lock hash (`skills-lock.json`) | License |
+|---|---|---|---|---|
+| `privy` (`.claude/skills/privy/`) | `https://docs.privy.io` well-known skills endpoint (Mintlify-generated, frontmatter version 1.0) | `npx skills add https://docs.privy.io -a claude-code --project -y` | computed `078d8c23…`, well-known digest `sha256:a8bb782d…` | per Privy documentation terms |
+| `hedera-hackathon-submission-validator` | `hedera-dev/hedera-skills` `plugins/hackathon-helper/skills/validate-submission` (commit `8b1fccd`) | `npx skills@latest add hedera-dev/hedera-skills --skill … -a claude-code --project -y` | `1031b8d9…` | Apache-2.0 |
+| `hedera-hackathon-prd` | `hedera-dev/hedera-skills` `plugins/hackathon-helper/skills/hackathon-prd` (commit `8b1fccd`) | same | `04a27c0b…` | Apache-2.0 |
+| `hts-system-contract` | `hedera-dev/hedera-skills` `plugins/system-contracts/skills/hts-system-contract` (commit `8b1fccd`) | same | `b955e168…` | Apache-2.0 |
+
+- The skills CLI was 1.5.25.
+- The skill contents are unmodified.
+- Other `hedera-dev/hedera-skills` skills were deliberately not installed because they are not on the approved ATS + ethers path:
+  - agent-kit;
+  - native-services-js (HTS/HCS SDK);
+  - oracles;
+  - cross-chain;
+  - harness;
+  - dev-intelligence;
+  - hiero-cli.
+
+Project subagents `.claude/agents/privy-engineer.md` and `.claude/agents/hedera-engineer.md` were written for Catenor One by Claude Code under maintainer instruction (prompt `docs/hackathon/prompts/2026-09-11-008-privy-hedera-specialist-agents.md`), following `.claude/agents/cre-engineer.md`. No third-party text was copied into them.

@@ -231,6 +231,42 @@ changing S001 requirements
 
 The main Claude context and the human maintainer retain authority over protocol/application design.
 
+### Privy and Hedera official skills + `privy-engineer` / `hedera-engineer` subagents (2026-09-11)
+
+Official sponsor skills installed in project scope (skills CLI 1.5.25, copied into `.claude/skills/`, recorded in `skills-lock.json`):
+
+```text
+privy                                   ← https://docs.privy.io (well-known endpoint)
+hedera-hackathon-submission-validator   ← hedera-dev/hedera-skills, hackathon-helper plugin
+hedera-hackathon-prd                    ← hedera-dev/hedera-skills, hackathon-helper plugin
+hts-system-contract                     ← hedera-dev/hedera-skills, system-contracts plugin
+```
+
+Project subagents, built on the same pattern as `cre-engineer`:
+
+```text
+.claude/agents/privy-engineer.md   preloads: privy
+.claude/agents/hedera-engineer.md  preloads: hedera-hackathon-submission-validator, hedera-hackathon-prd, hts-system-contract
+```
+
+Allowed scope:
+
+- `privy-engineer`: Privy wallets, authorization keys, owners and additional signers, policies, EVM/Solana signing, server-wallet transactions, live Privy tests.
+- `hedera-engineer`: Hedera testnet, JSON-RPC relay, Mirror Node, ATS contracts through the typechain bindings with ethers v6, receipts, prize-requirement checks.
+
+Forbidden scope for both, the same as `cre-engineer`:
+
+- redefining Catenor identity, authority, capability, delegation or policy semantics;
+- broadcasting a live transaction without explicit maintainer authorization;
+- reading or printing secrets;
+- silently falling back to a raw private key.
+
+Rule:
+
+> Catenor decides authority. Privy constrains wallet execution. Hedera executes only after Catenor authorization.
+
+No Privy or Hedera MCP server is configured. The Hedera skills do not cover Asset Tokenization Studio, so the ATS contract types and the testnet stay the references for ATS work.
+
 ## 2026-09-10 S001 planning record
 
 Claude Code created and revised S001 `PLAN.md` / `TASKS.md` from the approved source-of-truth documents.

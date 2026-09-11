@@ -1,11 +1,36 @@
 {
   "version": 1,
   "skills": {
+    "Hedera Hackathon PRD": {
+      "source": "hedera-dev/hedera-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/hackathon-helper/skills/hackathon-prd/SKILL.md",
+      "computedHash": "04a27c0bc1abfc5f280d4a4924b78ee3a7ed1479b0748a320454a8a6f8ecdb28"
+    },
+    "Hedera Hackathon Submission Validator": {
+      "source": "hedera-dev/hedera-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/hackathon-helper/skills/validate-submission/SKILL.md",
+      "computedHash": "1031b8d9e3936fad93269855d35932c2d61e28a6c54bcbeb1aa126225da366ea"
+    },
     "chainlink-cre-skill": {
       "source": "smartcontractkit/chainlink-agent-skills",
       "sourceType": "github",
       "skillPath": "chainlink-cre-skill/SKILL.md",
       "computedHash": "1415af4c96e0ba18af13ec91a1765b09e50e6b3a957c92e3cbeaf385c0d2b2ff"
+    },
+    "hts-system-contract": {
+      "source": "hedera-dev/hedera-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/system-contracts/skills/hts-system-contract/SKILL.md",
+      "computedHash": "b955e168bdee09f911305a838a58642c2b7af3727e01920f0d9890abc9f2fc96"
+    },
+    "privy": {
+      "source": "docs.privy.io",
+      "sourceUrl": "https://docs.privy.io",
+      "sourceType": "well-known",
+      "computedHash": "078d8c234abad0bfe611e51571ec435175ab9b801c9f4bbac2aeb19d2f27820d",
+      "wellKnownDigest": "sha256:a8bb782d504d88c8926db7293d9e3178c9ead05c177d0b912c317669739dac05"
     }
   }
 }
