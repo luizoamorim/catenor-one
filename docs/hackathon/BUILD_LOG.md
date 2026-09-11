@@ -971,6 +971,35 @@ Artifacts: `docs/hackathon/prompts/2026-09-11-008-privy-hedera-specialist-agents
 
 Commit: the `chore(ai)` commit that contains this entry.
 
+## 2026-09-11 — Final ETHOnline demo story locked
+
+Goal: lock the final demo as a delivery plan, without redesigning S001 or the frozen Catenor semantics.
+
+Work completed:
+
+- Saved the maintainer prompt verbatim: `docs/hackathon/prompts/2026-09-11-009-final-ethonline-demo-story.md`.
+- Added `docs/hackathon/demo/FINAL-DEMO.md` with:
+  - cast and wallet separation;
+  - the pre-seeded state;
+  - seven live demo actions;
+  - the REAL / SIMULATION / MOCK / DRY RUN matrix;
+  - the Judge Inspector timeline;
+  - prize mapping;
+  - evidence to capture;
+  - reuse;
+  - delivery tasks FD-0…FD-9;
+  - deferred scope;
+  - open decisions.
+- S001 `TASKS.md` points to FD-0…FD-9. No S001 task was checked.
+
+Validation: documentation only; no code change.
+
+AI assistance: Claude Code main session.
+
+Human review: story provided by the maintainer; FINAL-DEMO.md pending review.
+
+Commit: the `docs(hackathon)` commit that contains this entry.
+
 ## Entry template
 
 ```md
