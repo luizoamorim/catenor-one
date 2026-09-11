@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:integration": "pnpm --filter @catenor-one/api db:generate && vitest run --config vitest.integration.config.ts",
     "test:privy-live": "vitest run --config vitest.live.config.ts",
+    "test:hedera-live": "CATENOR_HEDERA_LIVE=1 vitest run --config vitest.live.config.ts hedera-ats",
     "test:cre-sim": "pnpm --filter @catenor-one/api db:generate && vitest run --config vitest.live.config.ts cre-simulation",
     "boundaries": "depcruise packages test-vectors apps scripts --config .dependency-cruiser.cjs",
     "secret-scan": "node scripts/secret-scan.mjs",

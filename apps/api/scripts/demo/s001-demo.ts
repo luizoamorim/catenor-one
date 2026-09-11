@@ -6,6 +6,10 @@
 //   SIMULATION  Chainlink CRE confidential workflow via `cre workflow simulate` (deployment gated by B1)
 //   MOCK        company / KYB evidence (SYNTHETIC MOCK fixture — Sumsub company KYB is not entitled, B11)
 //
+// Part B (after an ALLOW, only when apps/api/.env has HEDERA_OPERATOR_EVM_PRIVATE_KEY): the ACTIVE Trust Anchor grants
+// Org B the [REF-IMPL] TOKENIZE_ASSET capability (REAL Privy signature); DENY requests leave the Hedera operator nonce
+// unchanged (no transaction); Org B's valid request → exactly ONE REAL Hedera ATS testnet `deployEquity` (≈ 9 HBAR).
+//
 // Run: pnpm demo:s001 [--representative GREEN|RED]
 // Needs: Docker (or DATABASE_URL), the CRE CLI + `bun install` in the workflow, apps/api/.env with the Privy values,
 // workflows/.env with SUMSUB_APP_TOKEN_VAR / SUMSUB_SECRET_KEY_VAR (sandbox) and CATENOR_INTERNAL_API_TOKEN_VAR.
@@ -20,6 +24,7 @@ import { policyHash } from '@catenor-one/policy';
 import { startCallbackReceiver } from '../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
 import { deriveChannelKeys } from '../../src/infrastructure/confidential-compute/cre-channel.js';
 import { CreSimulationConfidentialVerifier } from '../../src/infrastructure/confidential-compute/cre-simulation-verifier.js';
+import { HederaAtsTestnetExecutor } from '../../src/infrastructure/execution/hedera-ats-executor.js';
 import { SumsubSandboxOperator } from '../../src/infrastructure/identity-providers/sumsub-sandbox.js';
 import { selectSigners } from '../../src/infrastructure/key-management/signer-selection.js';
 import {
@@ -32,6 +37,7 @@ import {
   pinnedBootstrapConfiguration,
   systemClock,
 } from '../../src/infrastructure/runtime/runtime-adapters.js';
+import { AssetTokenizationService } from '../../src/modules/asset-tokenization/application/asset-tokenization.service.js';
 import { TrustAnchorAdmissionService } from '../../src/modules/trust-anchor-admission/application/trust-anchor-admission.service.js';
 
 const ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
@@ -84,6 +90,7 @@ if (!sumsub.appToken || !sumsub.secretKey || !channelToken) {
   );
 }
 const operator = new SumsubSandboxOperator(sumsub); // refuses non-sandbox tokens
+const hedera = HederaAtsTestnetExecutor.fromEnv(); // Part B runs only when configured
 
 // Database: DATABASE_URL, or a throwaway Testcontainers PostgreSQL with the migrations deployed.
 let databaseUrl = process.env['DATABASE_URL'] ?? '';
@@ -176,6 +183,66 @@ const service = new TrustAnchorAdmissionService({
 });
 wiring.service = service;
 
+/** Part B: Trust Anchor → scoped capability → DENY (no transaction) → ALLOW (one Hedera ATS testnet transaction). */
+async function runPartB(trustAnchor: string, executor: HederaAtsTestnetExecutor) {
+  const RESOURCE = 'asset:catenor-one-demo:001';
+  const tokenization = new AssetTokenizationService({
+    uow: new PrismaUnitOfWork(client),
+    clock: systemClock,
+    ids: nodeIds,
+    trustDomain: TD,
+    assertionSigner: signers.assertionSigner,
+    verifyTrustAnchor: (did) => service.verifyTrustAnchor(did),
+    executor,
+  });
+  await executor.assertTestnet();
+  const orgB = await tokenization.registerOrganization();
+  const orgC = await tokenization.registerOrganization();
+  say('Part B organizations', 'LOCAL', { orgB: orgB.did, orgC: orgC.did, trustAnchor: false });
+
+  const grant = await tokenization.grantTokenizationCapability({
+    issuer: trustAnchor,
+    subject: orgB.did,
+    resource: RESOURCE,
+    validUntil: new Date(Date.now() + 24 * 3600_000).toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  });
+  say('Part B capability grant [REF-IMPL]', 'REAL', {
+    issuer: 'the ACTIVE Trust Anchor',
+    capability: grant.capability,
+    proof: `${grant.proof.cryptosuite} via the Trust Anchor's Privy Credential Assertion Key`,
+  });
+
+  const nonceBefore = await executor.operatorNonce();
+  const denials = [
+    await tokenization.requestTokenization({ requester: orgC.did, resource: RESOURCE, grant }),
+    await tokenization.requestTokenization({
+      requester: orgB.did,
+      resource: 'asset:catenor-one-demo:002',
+      grant: {
+        ...grant,
+        capability: { ...grant.capability, resource: 'asset:catenor-one-demo:002' },
+      },
+    }),
+  ];
+  const nonceAfterDeny = await executor.operatorNonce();
+  say('Part B DENY (Org C with Org B grant; tampered resource) + Hedera nonce read', 'REAL', {
+    decisions: denials,
+    hederaOperatorNonce: { before: nonceBefore, after: nonceAfterDeny },
+    hederaTransactions: nonceAfterDeny - nonceBefore,
+  });
+  if (nonceAfterDeny !== nonceBefore) throw new Error('a DENY reached Hedera');
+
+  const allowed = await tokenization.requestTokenization({
+    requester: orgB.did,
+    resource: RESOURCE,
+    grant,
+  });
+  say('Part B ALLOW → Hedera ATS testnet deployEquity', 'REAL', {
+    ...allowed,
+    hederaTransactions: (await executor.operatorNonce()) - nonceAfterDeny,
+  });
+}
+
 try {
   const started = await service.startInitialAdmission({
     operatorRef: 'operator-ref:maintainer-demo',
@@ -247,6 +314,12 @@ try {
       TRUST_ANCHOR_VALID: verification.TRUST_ANCHOR_VALID,
       failedChecks: verification.checks.filter((c) => !c.passed).map((c) => c.id),
     });
+
+    if (hedera === undefined) {
+      say('Part B', 'LOCAL', 'skipped — HEDERA_OPERATOR_EVM_PRIVATE_KEY not configured');
+    } else {
+      await runPartB(started.did, hedera);
+    }
   }
 
   const timeline = await new PrismaUnitOfWork(client).run((p) => p.audit.timeline(TD));
@@ -266,6 +339,9 @@ try {
         profile:
           'HYBRID_DEMO — Company evidence: SYNTHETIC MOCK · Representative verification: REAL SUMSUB SANDBOX',
         cre: 'SIMULATION (cre workflow simulate) — not a deployed Confidential Workflow',
+        hedera: hedera
+          ? 'Part B: REAL Hedera ATS testnet (chain 296), executed only after a Catenor ALLOW'
+          : 'Part B not run (no Hedera operator configured)',
         access:
           'maintainer/operator-initiated; the bootstrap access gate (AC-001–003) is not implemented',
         steps,

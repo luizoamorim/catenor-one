@@ -19,11 +19,13 @@
     "@catenor-one/credentials": "workspace:*",
     "@catenor-one/identity": "workspace:*",
     "@catenor-one/policy": "workspace:*",
+    "@hashgraph/asset-tokenization-contracts": "8.0.0",
     "@noble/curves": "2.4.0",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
     "@privy-io/node": "0.34.0",
-    "@scure/base": "2.4.0"
+    "@scure/base": "2.4.0",
+    "ethers": "6.17.0"
   },
   "devDependencies": {
     "@catenor-one/test-vectors": "workspace:*",

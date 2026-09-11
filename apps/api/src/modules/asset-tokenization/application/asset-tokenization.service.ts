@@ -29,7 +29,13 @@ export interface AssetTokenizationExecutor {
     readonly resource: string;
     readonly requester: string;
     readonly grantId: string;
-  }): Promise<{ readonly transactionId: string; readonly explorerUrl?: string }>;
+  }): Promise<{
+    readonly transactionId: string;
+    readonly explorerUrl?: string;
+    /** What the action produced on the execution side (e.g. the ATS token address). */
+    readonly assetReference?: string;
+    readonly assetName?: string;
+  }>;
 }
 
 export interface AssetTokenizationDeps {
@@ -50,6 +56,8 @@ export type TokenizationOutcome =
       readonly transactionId: string;
       readonly network: string;
       readonly explorerUrl?: string;
+      readonly assetReference?: string;
+      readonly assetName?: string;
     }
   | { readonly decision: 'DENY'; readonly reasons: readonly CapabilityDenialReason[] };
 
@@ -177,6 +185,7 @@ export class AssetTokenizationService {
         ...details,
         network: this.deps.executor.network,
         transactionId: executed.transactionId,
+        assetReference: executed.assetReference ?? null,
       }),
     );
     return { decision: 'ALLOW', network: this.deps.executor.network, ...executed };
