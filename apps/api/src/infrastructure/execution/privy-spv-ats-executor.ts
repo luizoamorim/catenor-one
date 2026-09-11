@@ -7,13 +7,16 @@
 // policy; the management-owner key never enters the runtime) → signer boundary: the signed transaction must be
 // exactly the prepared one (from, chain, to, data, value, nonce, gas) → broadcast through the Hedera JSON-RPC relay →
 // receipt → EquityDeployed → read-back. Privy signs only; it never broadcasts. There is no raw-key fallback.
-import { Factory__factory } from '@hashgraph/asset-tokenization-contracts';
+// issueByPartition (FD-4) uses the same path; Catenor builds its calldata from structured input only.
+import { Factory__factory, IAsset__factory } from '@hashgraph/asset-tokenization-contracts';
 import type { PrivyClient } from '@privy-io/node';
-import { JsonRpcProvider, Transaction } from 'ethers';
+import { JsonRpcProvider, Transaction, ZeroAddress, isAddress } from 'ethers';
 import type { AssetTokenizationExecutor } from '../../modules/asset-tokenization/application/asset-tokenization.service.js';
 import {
+  ATS,
   DEPLOY_GAS_LIMIT,
   HEDERA_TESTNET,
+  asRunner,
   deployEquityArguments,
   deployedEquityResult,
 } from './hedera-ats-executor.js';
@@ -67,17 +70,53 @@ export interface PrivySpvExecutorConfig {
   readonly runtimeAuthorizationKey: string;
 }
 
-export interface DeployEquityPreflight {
+/** A transaction prepared and simulated READ-ONLY from the SPV address; nothing signed or sent. */
+export interface PreparedCall {
   readonly from: string;
   readonly transaction: PreparedTransaction;
-  readonly simulatedEquityAddress: string;
+  readonly returned: string;
   readonly estimatedGas: bigint;
   readonly balanceWeibar: bigint;
   readonly maxCostWeibar: bigint;
 }
 
+export interface DeployEquityPreflight extends PreparedCall {
+  readonly simulatedEquityAddress: string;
+}
+
+export interface IssuancePreflight extends PreparedCall {
+  readonly equity: string;
+  readonly tokenHolder: string;
+  readonly amount: bigint;
+}
+
+/** Gas limit for one issueByPartition (READ-ONLY estimate ≈ 0.2–0.5M); unused gas is refunded. */
+export const ISSUE_GAS_LIMIT = 1_000_000;
+
 const sameAddress = (a: string | null | undefined, b: string) =>
   typeof a === 'string' && a.toLowerCase() === b.toLowerCase();
+
+/**
+ * The exact issueByPartition calldata, built by Catenor from structured input only (never arbitrary bytes): the
+ * single default partition, one holder, a positive whole-unit amount, empty data.
+ */
+export function issueByPartitionCalldata(input: {
+  readonly tokenHolder: string;
+  readonly amount: bigint;
+}): string {
+  if (!isAddress(input.tokenHolder) || input.tokenHolder === ZeroAddress) {
+    throw new Error('issueByPartition: invalid token holder');
+  }
+  if (input.amount <= 0n) throw new Error('issueByPartition: amount must be positive');
+  return IAsset__factory.createInterface().encodeFunctionData('issueByPartition', [
+    {
+      partition: ATS.defaultPartition,
+      tokenHolder: input.tokenHolder,
+      value: input.amount,
+      data: '0x',
+    },
+  ]);
+}
 
 export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
   readonly network = 'hedera-testnet';
@@ -121,24 +160,20 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
     }
   }
 
-  /** READ-ONLY: the exact transaction, simulated from the SPV address. Nothing is signed or sent. */
-  async prepareDeployEquity(input: {
-    readonly resource: string;
-    readonly grantId: string;
-  }): Promise<DeployEquityPreflight> {
-    await this.assertTestnet();
+  /** READ-ONLY: the SPV wallet address as Privy reports it, checked against the configured one. */
+  private async spvAddress(): Promise<string> {
     const from = await this.api.walletAddress(this.config.walletId);
     if (!sameAddress(from, this.config.walletAddress)) {
       throw new Error('the Privy SPV wallet address does not match PRIVY_SPV_WALLET_ADDRESS');
     }
-    const { equityData, regulationData } = deployEquityArguments({
-      resource: input.resource,
-      grantId: input.grantId,
-      operator: from,
-    });
-    const iface = Factory__factory.createInterface();
-    const data = iface.encodeFunctionData('deployEquity', [equityData, regulationData]);
-    const call = { from, to: HEDERA_TESTNET.factory, data };
+    return from;
+  }
+
+  /** READ-ONLY: eth_call + eth_estimateGas from the SPV address; balance must cover gasLimit × gasPrice. */
+  private async prepareCall(to: string, data: string, gasLimit: number): Promise<PreparedCall> {
+    await this.assertTestnet();
+    const from = await this.spvAddress();
+    const call = { from, to, data };
     const [returned, estimatedGas, gasPrice, nonce, balanceWeibar] = await Promise.all([
       this.provider.call(call),
       this.provider.estimateGas(call),
@@ -146,37 +181,75 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
       this.provider.getTransactionCount(from, 'latest'),
       this.provider.getBalance(from),
     ]);
-    if (estimatedGas > BigInt(DEPLOY_GAS_LIMIT)) {
-      throw new Error(
-        `deployEquity needs ${estimatedGas} gas, above the ${DEPLOY_GAS_LIMIT} limit`,
-      );
+    if (estimatedGas > BigInt(gasLimit)) {
+      throw new Error(`the call needs ${estimatedGas} gas, above the ${gasLimit} limit`);
     }
-    const maxCostWeibar = BigInt(DEPLOY_GAS_LIMIT) * BigInt(gasPrice);
+    const maxCostWeibar = BigInt(gasLimit) * BigInt(gasPrice);
     if (balanceWeibar < maxCostWeibar) {
       throw new Error('the SPV wallet balance does not cover gasLimit × gasPrice');
     }
-    const [simulatedEquityAddress] = iface.decodeFunctionResult('deployEquity', returned);
     return {
       from,
       transaction: {
         chain_id: Number(HEDERA_TESTNET.chainId),
-        to: HEDERA_TESTNET.factory,
+        to,
         data,
         value: 0,
         nonce,
-        gas_limit: DEPLOY_GAS_LIMIT,
+        gas_limit: gasLimit,
         gas_price: gasPrice,
         type: 0,
       },
-      simulatedEquityAddress: simulatedEquityAddress as string,
+      returned,
       estimatedGas,
       balanceWeibar,
       maxCostWeibar,
     };
   }
 
-  /** Privy signs; the signed transaction must be exactly the prepared one. Returns the raw transaction (not sent). */
-  async signPrepared(prepared: DeployEquityPreflight): Promise<string> {
+  /** READ-ONLY: the exact deployEquity transaction, simulated from the SPV address. Nothing is signed or sent. */
+  async prepareDeployEquity(input: {
+    readonly resource: string;
+    readonly grantId: string;
+  }): Promise<DeployEquityPreflight> {
+    const operator = await this.spvAddress();
+    const { equityData, regulationData } = deployEquityArguments({
+      resource: input.resource,
+      grantId: input.grantId,
+      operator,
+    });
+    const iface = Factory__factory.createInterface();
+    const data = iface.encodeFunctionData('deployEquity', [equityData, regulationData]);
+    const prepared = await this.prepareCall(HEDERA_TESTNET.factory, data, DEPLOY_GAS_LIMIT);
+    const [simulatedEquityAddress] = iface.decodeFunctionResult('deployEquity', prepared.returned);
+    return { ...prepared, simulatedEquityAddress: simulatedEquityAddress as string };
+  }
+
+  /** READ-ONLY: the exact issueByPartition transaction (SPV = ROLE_ISSUER) simulated from the SPV address. */
+  async prepareIssueByPartition(input: {
+    readonly equity: string;
+    readonly tokenHolder: string;
+    readonly amount: bigint;
+  }): Promise<IssuancePreflight> {
+    if (!isAddress(input.equity)) throw new Error('issueByPartition: invalid equity address');
+    if (sameAddress(input.tokenHolder, this.config.walletAddress)) {
+      throw new Error('issueByPartition: the SPV wallet cannot be the token holder');
+    }
+    const data = issueByPartitionCalldata(input);
+    const prepared = await this.prepareCall(input.equity, data, ISSUE_GAS_LIMIT);
+    return {
+      ...prepared,
+      equity: input.equity,
+      tokenHolder: input.tokenHolder,
+      amount: input.amount,
+    };
+  }
+
+  /**
+   * Signer boundary: Privy signs; the signed transaction must be exactly the prepared one (sender, chain, target,
+   * calldata, value, nonce, gas). Returns the raw transaction (not sent).
+   */
+  async signPrepared(prepared: PreparedCall): Promise<string> {
     const raw = await this.api.signTransaction(
       this.config.walletId,
       prepared.transaction,
@@ -208,5 +281,29 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
     const raw = await this.signPrepared(prepared);
     const sent = await this.provider.broadcastTransaction(raw);
     return deployedEquityResult(sent.hash, await sent.wait(1, 180_000), this.provider);
+  }
+
+  /** One issueByPartition: prepare (READ-ONLY) → Privy signature → signer boundary → broadcast → receipt → balance. */
+  async issueByPartition(input: {
+    readonly equity: string;
+    readonly tokenHolder: string;
+    readonly amount: bigint;
+  }) {
+    const prepared = await this.prepareIssueByPartition(input);
+    const raw = await this.signPrepared(prepared);
+    const sent = await this.provider.broadcastTransaction(raw);
+    const receipt = await sent.wait(1, 180_000);
+    if (receipt === null || receipt.status !== 1) {
+      throw new Error(`issueByPartition transaction ${sent.hash} did not succeed`);
+    }
+    const holderBalance = await IAsset__factory.connect(
+      input.equity,
+      asRunner(this.provider),
+    ).balanceOf(input.tokenHolder);
+    return {
+      transactionId: sent.hash,
+      explorerUrl: `${HEDERA_TESTNET.explorer}/transaction/${sent.hash}`,
+      holderBalance,
+    };
   }
 }

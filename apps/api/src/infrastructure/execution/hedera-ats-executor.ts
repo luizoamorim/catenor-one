@@ -35,6 +35,8 @@ export const ATS = {
   issuerRole: '0x5eeaf5602c75bf26e73b5206d0bd6ee82f621166255e5fd73cc06bc7bd84a95f',
   regulationTypeRegS: 1,
   regulationSubTypeNone: 0,
+  /** _DEFAULT_PARTITION (contracts/constants/values.sol); the demo equity is single-partition. */
+  defaultPartition: `0x${'0'.repeat(63)}1`,
 } as const;
 
 /** Hedera's per-transaction maximum; unused gas is refunded, but the sender must hold gasLimit × gasPrice up front. */

@@ -13,7 +13,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "demo:s001": "node --conditions=@catenor-one/source --import tsx scripts/demo/s001-demo.ts",
     "preflight:spv": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-deploy-equity.ts",
-    "verify:ats": "node --conditions=@catenor-one/source --import tsx scripts/hedera/verify-ats-equity.ts"
+    "verify:ats": "node --conditions=@catenor-one/source --import tsx scripts/hedera/verify-ats-equity.ts",
+    "preflight:issuance": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-issuance.ts"
   },
   "dependencies": {
     "@catenor-one/audit": "workspace:*",

@@ -688,3 +688,13 @@ Live sponsor resources:
 - **Hedera Testnet:** ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418` (`0.0.10479921`), created by transaction `0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897` through the ATS v8 Factory `0.0.9213391`.
 - Evidence: `artifacts/hedera/final-demo/`.
 
+Added in CP4 (2026-09-11), also original Catenor One code without new dependencies:
+
+- `apps/api/scripts/privy/provision-investor-wallets.mjs` — two receiving-only Privy EVM wallets; owner keys outside the repository;
+- `apps/api/scripts/privy/add-spv-issuance-rule.mjs` — maintainer-run, owner-authorized rule creation;
+- `apps/api/scripts/hedera/preflight-spv-issuance.ts`;
+- `apps/api/scripts/demo/final-demo-config.ts` — public addresses only;
+- the issuance path in `privy-spv-ats-executor.ts`.
+
+The Privy calldata-condition shapes (`function_name`, the nested tuple field) come from the current Privy policy documentation and the live CP4 probe by `privy-engineer`. The `issueByPartition` ABI fragment matches `@hashgraph/asset-tokenization-contracts` 8.0.0 (the script checks the signature at run time).
+

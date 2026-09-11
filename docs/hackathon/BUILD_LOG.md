@@ -1079,6 +1079,46 @@ Artifacts:
 
 Commit: 6397df4, plus the `feat(hedera)` live-checkpoint commit that contains this entry.
 
+## 2026-09-11 — Final demo CP4: issuance policy, investor wallets, issuance prepared (no broadcast)
+
+Goal: prepare `issueByPartition` → Investor A / B on the rehearsal equity with the narrowest practical Privy rule; STOP before any issuance transaction.
+
+Work completed:
+
+- **`privy-engineer` live probe** (headless; throwaway resources; the real SPV policy untouched):
+  - `ethereum_calldata` `function_name eq issueByPartition` with the ATS ABI, combined with chain 296 and `to` = the equity: CONFIRMED, 7/7 — other functions, the wrong chain, the wrong target and undecodable calldata are denied.
+  - The nested tuple condition `issueByPartition._issueData.partition` is enforced.
+  - Owner-authorized rule creation works; the runtime key gets 401.
+  - The main session audited the scripts and re-ran the SDK `createRule` wrapper on a throwaway policy (OK; policy deleted).
+- **Investor wallets** (`provision-investor-wallets.mjs`, run once): two Privy EVM receiving wallets, each owned by its own maintainer-held key (0600, outside the repo), with no signer and no policy.
+  - A `0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78`, B `0x72f94a15A815853B488BCf225ec3cb67eC5ba444`.
+  - They are distinct from each other and from the SPV wallet.
+- **Maintainer script** `add-spv-issuance-rule.mjs` (dry run by default, `--apply` to change):
+  - checks that the policy is in the CP1 shape and that the key-file owner equals `PRIVY_SPV_OWNER_PUBLIC_KEY`;
+  - adds one rule: chain 296 ∧ to = the equity ∧ `issueByPartition` ∧ partition `0x…01`.
+  - Not run by Claude Code; the owner key is never read by the agent.
+- **Executor:**
+  - a shared prepare → simulate → Privy sign → signer-boundary path;
+  - `issueByPartitionCalldata` is built from structured input only (default partition, one holder, positive amount, empty data);
+  - `prepareIssueByPartition` / `issueByPartition` with gas limit 1M;
+  - the SPV wallet is refused as a holder.
+- **`preflight:issuance`:**
+  - READ-ONLY `eth_call` accepted for both investors; 485,034 gas ≈ 0.58 HBAR each (max 1.19);
+  - the current Privy policy DENIES both, as expected before the update;
+  - after the update it also checks that `grantRole` and partition `0x…02` stay denied.
+
+Validation: `pnpm check` green; `pnpm test:integration` green (see commit); `preflight:spv` 14/14.
+
+Not done: the maintainer policy update; the issuance broadcast (awaiting approval); the private Account Binding persistence; FD-2 (required for the final recorded demo).
+
+AI assistance: Claude Code main session; `privy-engineer` project subagent (live probe).
+
+Human review: maintainer decisions in prompt 2026-09-11-012.
+
+Artifacts: `artifacts/privy/final-demo/cp4-issuance-policy-probe.md`.
+
+Commit: the `feat(hedera)` commit that contains this entry.
+
 ## Entry template
 
 ```md

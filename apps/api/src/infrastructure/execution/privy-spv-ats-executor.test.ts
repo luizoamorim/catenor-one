@@ -1,11 +1,13 @@
 // Privy SPV ATS executor — offline checks. Privy is replaced by a throwaway random secp256k1 wallet; the provider is
 // a stub. No network, no real key material, nothing broadcast.
-import { Factory__factory } from '@hashgraph/asset-tokenization-contracts';
+import { Factory__factory, IAsset__factory } from '@hashgraph/asset-tokenization-contracts';
 import { AbiCoder, Transaction, Wallet, type JsonRpcProvider } from 'ethers';
 import { describe, expect, it, vi } from 'vitest';
-import { DEPLOY_GAS_LIMIT, HEDERA_TESTNET } from './hedera-ats-executor.js';
+import { ATS, DEPLOY_GAS_LIMIT, HEDERA_TESTNET } from './hedera-ats-executor.js';
 import {
+  ISSUE_GAS_LIMIT,
   PrivySpvAtsExecutor,
+  issueByPartitionCalldata,
   type PreparedTransaction,
   type PrivyEvmSigningApi,
 } from './privy-spv-ats-executor.js';
@@ -48,7 +50,8 @@ function fixture(opts: {
   const provider = {
     getNetwork: async () => ({ chainId: opts.chainId ?? HEDERA_TESTNET.chainId }),
     call: async () => AbiCoder.defaultAbiCoder().encode(['address'], [equity]),
-    estimateGas: async () => 7_405_139n,
+    estimateGas: async (call: { to: string }) =>
+      call.to === HEDERA_TESTNET.factory ? 7_405_139n : 250_000n,
     send: async (method: string) => {
       if (method !== 'eth_gasPrice') throw new Error(method);
       return `0x${GAS_PRICE.toString(16)}`;
@@ -156,5 +159,61 @@ describe('PrivySpvAtsExecutor.fromEnv', () => {
         PRIVY_SPV_WALLET_ADDRESS: '0x1',
       }),
     ).toBeUndefined();
+  });
+});
+
+describe('issueByPartition (FD-4) — Catenor-built calldata + signer boundary', () => {
+  const EQUITY = '0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418';
+  const holder = Wallet.createRandom().address;
+
+  it('builds exactly issueByPartition(default partition, holder, amount, empty data)', () => {
+    const data = issueByPartitionCalldata({ tokenHolder: holder, amount: 600n });
+    const iface = IAsset__factory.createInterface();
+    expect(data.slice(0, 10)).toBe(iface.getFunction('issueByPartition')!.selector);
+    const [issue] = iface.decodeFunctionData('issueByPartition', data);
+    expect(issue.partition).toBe(ATS.defaultPartition);
+    expect(issue.tokenHolder).toBe(holder);
+    expect(issue.value).toBe(600n);
+    expect(issue.data).toBe('0x');
+  });
+
+  it('refuses a zero amount, an invalid holder and the SPV wallet as holder', async () => {
+    expect(() => issueByPartitionCalldata({ tokenHolder: holder, amount: 0n })).toThrow(/positive/);
+    expect(() => issueByPartitionCalldata({ tokenHolder: '0x1234', amount: 1n })).toThrow(/holder/);
+    const { executor, spv } = fixture({});
+    await expect(
+      executor.prepareIssueByPartition({ equity: EQUITY, tokenHolder: spv.address, amount: 1n }),
+    ).rejects.toThrow(/SPV wallet cannot be the token holder/);
+  });
+
+  it('prepares the issuance to the equity with the issuance gas limit', async () => {
+    const { executor } = fixture({});
+    const prepared = await executor.prepareIssueByPartition({
+      equity: EQUITY,
+      tokenHolder: holder,
+      amount: 600n,
+    });
+    expect(prepared.transaction).toMatchObject({
+      to: EQUITY,
+      value: 0,
+      gas_limit: ISSUE_GAS_LIMIT,
+    });
+    expect(prepared.transaction.data).toBe(
+      issueByPartitionCalldata({ tokenHolder: holder, amount: 600n }),
+    );
+  });
+
+  it('never broadcasts when Privy returns a signature over another holder', async () => {
+    const other = Wallet.createRandom().address;
+    const { executor, broadcast } = fixture({
+      signedTamper: (t) => ({
+        ...t,
+        data: issueByPartitionCalldata({ tokenHolder: other, amount: 600n }),
+      }),
+    });
+    await expect(
+      executor.issueByPartition({ equity: EQUITY, tokenHolder: holder, amount: 600n }),
+    ).rejects.toThrow(/signer boundary/);
+    expect(broadcast).not.toHaveBeenCalled();
   });
 });

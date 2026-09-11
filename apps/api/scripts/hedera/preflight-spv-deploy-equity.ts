@@ -74,16 +74,19 @@ check(
 
 console.log('2. Privy SPV policy rules');
 const policy = await client.policies().get(policyId);
-const rules = policy.rules.map((r) => ({
-  method: r.method,
-  action: r.action,
-  conditions: r.conditions.map((c) => ({
-    field_source: c.field_source,
-    field: 'field' in c ? c.field : undefined,
-    operator: c.operator,
-    value: lower(String(c.value)),
-  })),
-}));
+// FD-4 adds one issuance rule (add-spv-issuance-rule.mjs); the deployEquity rules must stay exactly as approved.
+const rules = policy.rules
+  .filter((r) => r.name !== 'allow-issueByPartition-rehearsal-equity')
+  .map((r) => ({
+    method: r.method,
+    action: r.action,
+    conditions: r.conditions.map((c) => ({
+      field_source: c.field_source,
+      field: 'field' in c ? c.field : undefined,
+      operator: c.operator,
+      value: lower(String(c.value)),
+    })),
+  }));
 const expectedRules = [
   {
     method: 'eth_signTransaction',
@@ -104,7 +107,7 @@ const expectedRules = [
 check('chain_type ethereum', policy.chain_type === 'ethereum');
 check('owner = the wallet owner (management-owner key)', policy.owner_id === wallet.owner_id);
 check(
-  'rules exactly: ALLOW eth_signTransaction iff chain 296 ∧ to = ATS Factory; DENY exports; nothing else',
+  'deployEquity rules exactly: ALLOW eth_signTransaction iff chain 296 ∧ to = ATS Factory; DENY exports (+ only the FD-4 issuance rule)',
   JSON.stringify(rules) === JSON.stringify(expectedRules),
 );
 

@@ -326,3 +326,6 @@ The main session delegated sponsor mechanics to the `privy-engineer` and `hedera
 - `hedera-engineer` did read-only testnet estimation and a prize-requirement review.
 
 The main session audited both transcripts and re-ran the Hedera read-only check. Catenor semantics (the story, custody pattern, resource names and capability issuer) stayed with the main session and the maintainer. Prompt: `docs/hackathon/prompts/2026-09-11-009-final-ethonline-demo-story.md`.
+
+Checkpoint 4 (same day): `privy-engineer` ran a live policy-capability probe on throwaway Privy resources: a function-level `issueByPartition` restriction and owner-authorized policy updates. The main session audited the probe scripts and re-ran the SDK wrapper check before writing the maintainer-run policy-update script. The maintainer decided the issuance-policy rule, the investor-wallet model and the STOP before any issuance broadcast.
+
