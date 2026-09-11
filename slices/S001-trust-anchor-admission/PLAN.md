@@ -4,7 +4,7 @@
 **Project:** Catenor One
 **Protocol baseline:** Catenor Protocol Draft v0.1 @ `66ef712694acfc987663f5ffa9bcc9d12d1fe80e` (verified against local protocol checkout)
 **Slice:** `S001-trust-anchor-admission`
-**Status:** Rev 2.1 — APPROVED by the maintainer (2026-09-10) with the final decisions in §33; source-of-truth documents aligned in T0.9 (awaiting maintainer review). No implementation code exists.
+**Status:** Rev 2.6 — Rev 2.1–2.5 APPROVED (2026-09-10). Rev 2.6 clarifies key terminology (2 Catenor Ed25519 signing keys + 4 Privy P-256 authorization keys, §13.0), scopes Catenor-managed custody to the reference implementation, and keeps the base64 sealed-context transport as APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED — **APPROVED** (final Phase 0 documentation review, 2026-09-10). Phase 0 documentation complete; T0.9 committed (`2772744`). No implementation code exists.
 **Prepared by:** Claude Code (AI-assisted), from SPEC / ACCEPTANCE / TEST-VECTORS, the architecture baseline, the pinned protocol, maintainer amendments, and current official sponsor/provider documentation (Appendix A).
 
 > `SPEC.md` says what must be true. `ARCHITECTURE.md` says what structure must be obeyed. This `PLAN.md` says how S001 fits that structure. Anything that touches a frozen SPEC decision or protocol shape is listed in §33 and Appendix B; source-of-truth text that must be cleaned up because of Rev 2 is listed in Appendix E.
@@ -14,6 +14,11 @@
 | Rev | Date | Change |
 |---|---|---|
 | 1 | 2026-09-10 | initial proposal |
+| 2.6 | 2026-09-10 | Terminology/model clarification: §13.0 key inventory — **2 Catenor Ed25519 signing keys** (Credential Assertion Key, Bootstrap Endorsement Key; separate Privy Solana wallets) **+ 4 Privy P-256 authorization keys** (management-owner and runtime-signer per wallet), which are control keys and never the Catenor signing keys; Railway variables renamed `CATENOR_ASSERTION_RUNTIME_AUTHORIZATION_KEY` / `CATENOR_BOOTSTRAP_RUNTIME_AUTHORIZATION_KEY`; Catenor-managed custody is a reference-implementation choice, not a protocol requirement; Bootstrap Authority controlled by the maintainer; D37 base64 sealed-context transport marked APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED |
+| 2.5 | 2026-09-10 | **Q7 → D36**: Bootstrap Endorsement Key uses the same Privy owner/runtime-signer pattern with its own wallet, management owner key, runtime signer key and `P_BOOTSTRAP` policy; Credential Assertion Key ≠ Bootstrap Endorsement Key. **T0.7 approved (D37)**: official scaffold, `handlerInTee`/`TeeRuntime`, batched secrets, `HTTPClient` inside `handlerInTee`, `runtime.now()`, JCS + noble primitives, AES-256-GCM sealed context (HKDF-SHA256 key, 12-byte nonce), base64 HTTP request bodies, `deployment-registry: "private"`, production-like simulation limits file — all **SIMULATION-CONFIRMED**, never deployed-TEE confirmed; B3/B6/B8/B9 updated to the evidence; sealed-context base64 transport approved but not yet simulation-tested (T8.2) |
+| 2.4 | 2026-09-10 | **T0.5 PASSED WITH APPROVED DESIGN AMENDMENT**: dedicated Privy Solana Ed25519 wallet kept; raw-byte `signMessage` verifies as plain Ed25519; Privy `message.byte_length` is **not** a security primitive for binary messages → exact message format/length is enforced by the **Catenor signer boundary** (D33); owner/signer separation — management key = wallet owner (not in the runtime), runtime key = additional signer scoped by the policy (D34); send-transaction denial UNCONFIRMED LIVE, documentation-supported only (D35); non-blocking Privy question Q6; D1 resolved, D3 resolved only for the Ed25519 primitive (full `eddsa-jcs-2022` interoperability still to be tested) |
+| 2.3 | 2026-09-10 | Rev 2.2 approved. **Q4 → Hybrid Demo Profile** (D31): live path may use SYNTHETIC MOCK company evidence + REAL Sumsub sandbox representative verification + REAL deployed CRE workflow + REAL Catenor policy/endorsement/Admission, with `evidenceProfile` + `evidenceSources` hash-pinned in the Bootstrap Configuration and bound by the endorsement, exact visible labels, and forbidden claims (§20.7, §31.3). **Q5 → no universal AML deny-list** (D32): `ORGANIZATION_AML_CLEAR` from review state only; rejection labels kept as sanitized reason codes (§20.4, §20.8 N5). Evidence-source enum renamed to `SYNTHETIC_MOCK` / `REAL_SUMSUB_SANDBOX`; scenario `MOCK_COMPANY_RED_AML` → `MOCK_COMPANY_RED`. SPEC / ACCEPTANCE / TEST-VECTORS aligned (AC-019 amended, AC-077, TV-B04, TV-L04 added; Appendix F) |
+| 2.2 | 2026-09-10 | T0.8 individual Sumsub sandbox spike **PASSED** and approved (D25); approved normalization rules: absent rejection fields on completed GREEN = no labels, otherwise MISSING (D26); `review.reprocessing` ignored (D27); `reviewDate` is the freshness source (D28); Company/KYB **blocked by tenant entitlement** (B11) → clearly labeled **MOCK company-evidence fixture** behind the provider-normalization boundary, replaceable by a real Sumsub company adapter (D29, §20.7); REAL vs MOCK evidence labeling everywhere (D30); live evidence DENY via a real representative RED review (§20.6). No domain semantics or policy names changed. Source-of-truth impacts listed in Appendix F (not applied) |
 | 2.1 | 2026-09-10 | Rev 2 APPROVED with final decisions: Q1 refined → endorsement binds `verificationMethodCommitment` (full canonical VM); Q2 provider-binding mismatch AC/TV added (AC-075, TV-E11); Q3 bucket not provisioned in S001; evidence-commitment wording corrected (recomputable, not re-openable); T0.9 source-of-truth cleanup applied (AC-076, TV-G06/J07 added; LLM IDs retired) |
 | 2 | 2026-09-10 | maintainer amendments: `workflows/identity-confidential` (S001 = first capability); **LLM removed from S001**; 3 Vault secrets; custom ECIES rejected → COMMITMENT_ONLY; provider-binding sequence fixed (`AttachProviderReferences`); Privy signer + sealed context become STOP-gated spikes; CRE quota/timeout wording corrected; Trust Anchor status claims narrowed; `cre-engineer` subagent + official `cre init` scaffolding; P0 Fast Lane; decision register updated |
 
@@ -25,6 +30,8 @@
 [UNCONFIRMED]  official docs did not confirm; a spike/test resolves it
 [STOP-GATE]    if the spike fails: STOP and report to the maintainer; no silent substitute
 [HUMAN]        requires a maintainer action
+SIMULATION-CONFIRMED  observed only with `cre workflow simulate` (local simulator, not a TEE) — never
+               "deployed TEE confirmed", "production TEE confirmed" or "live Confidential Workflow execution"
 [P0]/[P1]/[P2] priority, aligned with ACCEPTANCE.md; P1/P2 never block the P0 Fast Lane
 ```
 
@@ -41,10 +48,10 @@ The shortest path to a **real, live** S001. Everything not on this path is P1/P2
 | 3 | private PostgreSQL state | T3.1–T3.4 | human schema review before migration |
 | 4 | Privy operator auth + email allowlist | T4.1–T4.3 | |
 | 5 | Organization `did:catenor` + provider bindingRefs | T4.4, T4.5 | bindingRefs issued before applicant IDs |
-| 6 | assertion key + Proof of Key Possession | T5.1–T5.4, T6.1–T6.3 | [STOP-GATE] T0.5 Privy spike |
+| 6 | assertion key + Proof of Key Possession | T5.1–T5.4, T6.1–T6.3 | T0.5 PASSED with approved design amendment (§13) |
 | 7 | Bootstrap Configuration | T7.1–T7.3 | human out-of-band acceptance |
 | 8 | `identity-confidential` CRE workflow | T0.6, T0.7, T8.1, T8.2 | official `cre init`; [STOP-GATE] sealed-context crypto |
-| 9 | Sumsub deterministic confidential verification | T0.8, T8.3, T8.4 | Sumsub **sandbox** |
+| 9 | Sumsub deterministic confidential verification | T0.8, T8.3, T8.3a, T8.4 | representative: REAL Sumsub **sandbox**; company: **MOCK fixture** until KYB entitlement (§20.7) |
 | 10 | minimized facts + evidenceCommitment | T8.5, T8.6, T9.1–T9.4 | COMMITMENT_ONLY |
 | 11 | Admission Policy ALLOW / DENY | T10.1, T10.2 | |
 | 12 | bootstrap endorsement | T11.1, T11.2 | human-initiated |
@@ -54,9 +61,9 @@ The shortest path to a **real, live** S001. Everything not on this path is P1/P2
 | 16 | Judge Inspector | T14.1–T14.3 | public read-only |
 | 17 | Railway deployment | T15.1–T15.3 | |
 | 18 | real CRE deploy | T16.1, T16.2 | private registry; [HUMAN] beta access |
-| 19 | real Sumsub sandbox happy path | T16.3 | |
+| 19 | real Sumsub sandbox happy path | T16.3 | preferred: Full Sumsub Sandbox Profile (after T0.8b); otherwise **Hybrid Demo Profile** (D31): company SYNTHETIC MOCK, representative REAL Sumsub sandbox |
 | 20 | live invalid-key DENY | T17.1 | |
-| 21 | live evidence/policy DENY if sandbox permits | T17.2 | labeled fixture fallback allowed by TV-L03 |
+| 21 | live evidence/policy DENY | T17.2 | REAL Sumsub sandbox representative RED (`SANCTIONS`, `FINAL`) — no fixture needed (§20.6) |
 | 22 | artifacts + provenance | T17.3, T18.1–T18.6 | |
 
 Explicitly **not** on the fast lane: DON-signed report (T8.7/T9.5), audit append-only DB trigger (T3.5), Railway IaC, any encrypted evidence retention, two-person bootstrap quorum, generic SDK work, verifiable status/revocation architecture.
@@ -74,7 +81,8 @@ authenticated + allowlisted bootstrap operator     (application gate, not eligib
 → out-of-band accepted Bootstrap Configuration     (hash-pinned)
 → did:catenor + private provider bindingRefs
 → operator attaches Sumsub applicant refs (externalUserId = bindingRef)
-→ public DID Document + assertion key (Privy secure signer, spike-gated)
+    (representative: REAL Sumsub sandbox; company: MOCK fixture reference until KYB entitlement — §20.7)
+→ public DID Document + assertion key (dedicated Privy Solana Ed25519 wallet; Catenor signer boundary, §13)
 → Proof of Key Possession                          (eddsa-jcs-2022 over a single-use challenge)
 → DEPLOYED CRE Confidential Workflow identity-confidential / handler trust-anchor-admission
     handlerInTee → Vault secrets → sealed context → HTTPS to Sumsub from inside the TEE
@@ -302,6 +310,8 @@ Location: `apps/api/src/modules/trust-anchor-admission/application/`. Plain clas
 7 only if the gate passes does provider verification continue (fact derivation, further calls)
 ```
 
+**While company KYB entitlement is missing (B11, §20.7):** step 4 creates only the REAL Sumsub sandbox *representative* applicant (`externalUserId` = representative bindingRef); no company applicant or linking exists at Sumsub. Step 5 attaches the real `representativeApplicantId` plus a **MOCK company reference** (`mock:company-fixture:<scenario>`) — the only company reference U3 accepts when the configured company evidence source is `SYNTHETIC_MOCK`. Step 6 runs the REAL binding gate for the representative; the company leg's binding check runs against the MOCK fixture and is recorded as `MOCK`, never as a verified provider binding. The domain still creates both bindingRefs `{COMPANY, REPRESENTATIVE}` (domain unchanged), so a real Sumsub company applicant can later be attached without domain or policy changes.
+
 Why step 6 runs inside the TEE: the Railway API deliberately holds no Sumsub credentials, so the only place Catenor can read `externalUserId` is the confidential handler. The gate is the **first deterministic guardrail** of the run and uses the responses of HTTP #1/#2 (no extra call); a mismatch ends the run with `status: ERROR, code: PROVIDER_BINDING_MISMATCH`, no facts, and an audit event. bindingRef format: 128-bit random, lowercase hex with a short prefix (exact allowed charset confirmed in T0.8). bindingRefs are not the DID and are not derived from any identity data.
 
 ## 4.3 Admission session state machine (`TrustAnchorAdmission`)
@@ -343,8 +353,8 @@ Defined inward; implemented in `apps/api/src/infrastructure/*`. Cross-slice port
 | `BootstrapOperatorAllowlist` | `isAllowed(email)` | env `ALLOWED_BOOTSTRAP_EMAILS` |
 | `BootstrapConfigurationSource` | `load(trustDomain) → {config, hash}` (fails if ≠ pin) | file + env pin |
 | `AdmissionPolicySource` | `load(policyId)` | packaged JSON |
-| `AssertionSigner` | `createKey({subject, purpose}) → {publicKeyMultibase, signerRef}`; `sign(signerRef, bytes64)` | Privy Ed25519 wallet (spike-gated) |
-| `BootstrapEndorsementSigner` | `publicKeyMultibase()`; `sign(bytes64)` | separate Privy Ed25519 wallet |
+| `AssertionSigner` | `createKey({subject, purpose}) → {publicKeyMultibase, signerRef}`; `signAssertion(signerRef, AssertionSigningInput)` — **structured** input (e.g. key-possession proof config + challenge); the signer builds the canonical message itself (§13.4); no arbitrary-bytes method | Privy Ed25519 wallet (T0.5 passed) |
+| `BootstrapEndorsementSigner` | `publicKeyMultibase()`; `signEndorsement(EndorsementSigningInput)` — structured input; message built and length-checked inside the signer (§13.4) | separate Privy Ed25519 bootstrap wallet (own owner + runtime signer keys, `P_BOOTSTRAP`; D36) |
 | `ConfidentialEvidenceVerifier` | `request({operation, runId, sealedContext}) → {creExecutionId}` | CRE HTTP-trigger gateway client |
 | `ConfidentialResultAuthenticator` | `authenticate(headers, rawBody) → envelope` | HMAC; [P1] DON report verifier |
 | `ContextSealer` | `seal(privateContext, aad) → {nonce, ciphertext}` | AES-256-GCM, HKDF from channel secret |
@@ -366,7 +376,7 @@ apps/api/src/infrastructure/
 ├── identity-providers/privy-operator-identity.adapter.ts   @privy-io/node access + identity tokens
 ├── access-control/env-bootstrap-allowlist.adapter.ts
 ├── config/file-bootstrap-configuration.adapter.ts
-├── key-management/privy-ed25519-signer.adapter.ts           only after T0.5 passes
+├── key-management/privy-ed25519-signer.adapter.ts           signer boundary (§13.4); runtime additional-signer key only
 ├── confidential-compute/cre-gateway-trigger.adapter.ts      workflows.execute JSON-RPC + EIP-191 JWT (own code)
 ├── confidential-compute/cre-result-authenticator.adapter.ts HMAC; [P1] DON report verification (viem)
 ├── confidential-compute/aes-gcm-context-sealer.adapter.ts
@@ -484,7 +494,7 @@ Route `/judge/s001`, backed by `GET /v1/judge/s001/*` (sanitized projection from
 | Runtime boundary | Railway vs Privy vs CRE TEE; what crossed each boundary; "HTTPS requests are executed from inside the confidential TEE boundary" (not "Confidential HTTP product") |
 | Public identity | DID, DID Document, VM, Multikey |
 | Key possession | challenge id, expiry, result, verifier checks |
-| Confidential verification | workflow `identity-confidential`, operation `trust-anchor-admission`, CRE workflow ID, execution ID (link to CRE UI), run status, provider environment **"Sumsub sandbox — synthetic organization, not production KYB"**, retention mode `COMMITMENT_ONLY`, fact names + true/false |
+| Confidential verification | workflow `identity-confidential`, operation `trust-anchor-admission`, CRE workflow ID, execution ID (link to CRE UI), run status, **evidence profile banner** (Hybrid Demo Profile, D31) with the exact labels **"Company evidence: SYNTHETIC MOCK"** and **"Representative verification: REAL SUMSUB SANDBOX"** (Full Sumsub Sandbox Profile after T0.8b: "Company evidence: REAL SUMSUB SANDBOX"), retention mode `COMMITMENT_ONLY`, fact names + true/false, each fact tagged with the evidence source(s) it was derived from |
 | Representative authority | which evidence classes established it and the documented limitation from T0.8 (e.g., role declared vs provider-verified under the KYB level used) |
 | Policy | id, canonical JSON, hash, requirement table SATISFIED / FALSE / MISSING |
 | Decision / endorsement / record | public projections, endorsement verification result |
@@ -527,7 +537,7 @@ Postgres schemas via Prisma `multiSchema` if supported without preview flags by 
 | private | `KeyManagementReference` | `verificationMethodId` PK, `subjectId`, `signerRef`, `adapter`, `purpose`, `status` | never key material |
 | private | `AdmissionSession` | `sessionRef` UNIQUE, `trustDomain`, `subjectId`, `operatorRef`, `state`, flags, timestamps | |
 | private | `KeyPossessionChallenge` | `challengeId` PK, bound fields, `nonce`, `issuedAt`, `expiresAt`, `status` | conditional-update consume |
-| private | `ConfidentialVerificationRun` | `runId`, `sessionRef`, `operation`, `creWorkflowId`, `creExecutionId`, `status`, `code`, `deadlineAt`, `facts` JSONB, `evidenceCommitment`, `commitmentInputs` JSONB (observedAt, response digests, provider-ref digests — no salt, no content), `providerEnvironment`, `retentionMode`="COMMITMENT_ONLY", `bootstrapConfigurationHashEcho`, `resultAuth` JSONB, `donReport` JSONB (P1) | one accepted result per run |
+| private | `ConfidentialVerificationRun` | `runId`, `sessionRef`, `operation`, `creWorkflowId`, `creExecutionId`, `status`, `code`, `deadlineAt`, `facts` JSONB, `evidenceCommitment`, `commitmentInputs` JSONB (observedAt, response digests, provider-ref digests — no salt, no content), `evidenceSources` JSONB (`{company: "SYNTHETIC_MOCK"|"REAL_SUMSUB_SANDBOX", representative: "REAL_SUMSUB_SANDBOX"}`, §20.7), `retentionMode`="COMMITMENT_ONLY", `bootstrapConfigurationHashEcho`, `resultAuth` JSONB, `donReport` JSONB (P1) | one accepted result per run |
 | private | `DecisionRecord` + `DecisionTrace` | every Decision (ALLOW/DENY/ERROR); requirement statuses FALSE vs MISSING; fact provenance | |
 | private | `AuditEvent` | `seq`, `id`, `type`, `subject`, `requestId`, `timestamp`, `details` (sanitized), `prevHash`, `eventHash` | [P1] append-only trigger |
 
@@ -577,40 +587,131 @@ Confirmed platform facts for later use: buckets are always private, encrypted at
 
 # 13. Credential / assertion-key strategy
 
-## 13.1 Decision: Privy-backed dedicated Ed25519 signer per Organization — APPROVED PROVISIONALLY (D1)
+## 13.0 Key inventory and terminology (Rev 2.6)
 
-Implementation is conditional on spike T0.5 [STOP-GATE]. Pattern from Privy's official docs skill, API reference and `@privy-io/node` source (Appendix A.2):
+The reference implementation has **two Catenor signing keys** and **four Privy authorization (control) keys**:
 
 ```text
-SDK            @privy-io/node (0.34.0 at review; @privy-io/server-auth deprecated)
-wallet         privy.wallets().create({ chain_type: "solana", owner_id: <assertion key quorum>, policy_ids: [P_ASSERT] })
-               Solana-type = Ed25519; base58 address = 32-byte public key
-public key     publicKeyMultibase = "z" + base58btc(0xed01 ‖ base58decode(address))
+Catenor signing keys (Ed25519) — the only keys that sign Catenor artifacts
+  A. Credential Assertion Key     dedicated Privy Solana wallet; associated with the candidate Organization /
+                                  future Trust Anchor; signs key-possession proofs (assertionMethod)
+  B. Bootstrap Endorsement Key    completely separate Privy Solana wallet; controlled by the Bootstrap
+                                  Authority; signs the bootstrap endorsement
+
+Privy authorization keys (P-256) — control who may operate each wallet; they never sign Catenor artifacts
+  assertion wallet   1 assertion management-owner authorization key    (wallet owner; administrative only)
+                     2 assertion runtime-signer authorization key      (additional signer under P_ASSERT)
+  bootstrap wallet   3 bootstrap management-owner authorization key    (wallet owner; administrative only)
+                     4 bootstrap runtime-signer authorization key      (additional signer under P_BOOTSTRAP)
+
+total: 2 Catenor Ed25519 signing keys/wallets + 4 Privy P-256 authorization keys
+```
+
+Terminology rule: a P-256 Privy authorization key is **never** called the Credential Assertion Key or the Bootstrap Endorsement Key. In this PLAN, "management-owner authorization key" and "runtime-signer authorization key" always mean the P-256 Privy control keys.
+
+Custody (reference implementation only):
+
+```text
+Bootstrap Authority   controlled by the Catenor One maintainer; the bootstrap management-owner authorization key
+                      stays outside the normal runtime; the bootstrap runtime-signer authorization key is available
+                      to the application, scoped by P_BOOTSTRAP
+assertion wallet      Catenor One managed signing infrastructure associated with the candidate Subject in the
+                      reference implementation; the assertion management-owner authorization key stays outside the
+                      normal runtime; the runtime-signer authorization key is available to the application under P_ASSERT
+```
+
+This custody arrangement is a **Catenor One reference-implementation choice**. It is **not** a Catenor Protocol requirement: the protocol does not require any Trust Anchor to use Privy or to place its key under Catenor-managed custody. Frozen semantics and fact names are unchanged.
+
+## 13.1 Decision: Privy-backed dedicated Ed25519 signer per Organization — APPROVED (D1; T0.5 passed with approved design amendment)
+
+The Credential Assertion Key is a **dedicated Privy Solana wallet (Ed25519)**, separate from any user EVM/account wallet, used only for credential/assertion signing and never as a financial execution wallet. This is a Catenor key-purpose-separation choice for the reference implementation, not a decision to make Solana part of the Catenor Protocol. Pattern from Privy's docs and `@privy-io/node` 0.34.0 (Appendix A.2), observed live in T0.5:
+
+```text
+SDK            @privy-io/node 0.34.0 (@privy-io/server-auth is deprecated)
+wallet         privy.wallets().create({ chain_type: "solana", owner_id: <assertion management-owner authorization key quorum>,
+                 policy_ids: [P_ASSERT],
+                 additional_signers: [{ signer_id: <assertion runtime-signer authorization key quorum>,
+                                        override_policy_ids: [P_ASSERT] }] })
+               Solana wallet = Ed25519; base58 address = the 32-byte public key (T0.5: no public_key field)
+public key     publicKeyMultibase = "z" + base58btc(0xed01 ‖ base58decode(address))   — no export needed
 signerRef      Privy wallet id (private operational metadata)
-sign           privy.wallets().solana().signMessage(walletId, { message: base64(64 bytes), authorization_context })
-policy P_ASSERT  ALLOW signMessage when message.byte_length eq 64
-                 DENY  exportPrivateKey
-                 (transaction methods denied by default: no matching ALLOW)
-owner          key quorum { CATENOR_ASSERTION_AUTHORIZATION_KEY (P-256) }, threshold 1
-custody        generated/used inside Privy's TEE per Privy security docs; Catenor never sees the key
+sign           privy.wallets().solana().signMessage(walletId, { message: <bytes built by the signer boundary>,
+                 authorization_context: { assertion runtime-signer authorization key } })   — pass bytes, never a string (SDK treats
+                 strings as base64)
+policy P_ASSERT  ALLOW signMessage                 (no byte_length condition — see D33)
+                 DENY  exportPrivateKey, exportSeedPhrase
+                 every other method: default DENY (signTransaction observed denied; signAndSendTransaction
+                 documentation-only, D35); raw_sign is not supported for Solana wallets (observed)
+custody        key generated/used inside Privy's TEE per Privy security docs; Catenor never sees the key
 ```
 
-Invariant (frozen): **Credential Assertion Key ≠ Financial Execution Key.** The policy permits only 64-byte message signing: no transaction signing, no send, no export (AC-013). The address can still *receive* funds; it can never spend them and is never bound as a financial Account Binding.
+Invariant (frozen): **Credential Assertion Key ≠ Financial Execution Key.** No transaction signing (observed denied), no export (observed denied), no send (default-deny, documentation-supported only). The address can still *receive* funds; it can never be used to spend them through Catenor and is never bound as a financial Account Binding.
 
-## 13.2 Spike T0.5 must prove, before any adapter code
+### 13.1.1 Authorization model — owner/signer separation (D34)
 
 ```text
-1 a Privy signMessage signature over 64 raw bytes verifies with plain Ed25519 (@noble/curves) against
-  the Multikey derived from the wallet address — i.e. no prefix/hash is applied by Privy
-2 policy denies: signTransaction, signAndSendTransaction, 32-byte and 65-byte messages, exportPrivateKey
-3 authorization-key / key-quorum flow works from a server context
+management-owner authorization key (P-256) → wallet OWNER (key quorum)
+                                          administrative operations only (create wallet, set/replace policy,
+                                          add/remove signers); NOT available to the normal assertion-signing
+                                          runtime; held outside Railway (maintainer custody, T0.4)
+runtime-signer authorization key (P-256)   → ADDITIONAL SIGNER (key quorum), scoped by P_ASSERT via
+                                          override_policy_ids; used only by the Catenor assertion signer
+                                          (Railway sealed variable)
 ```
 
-If any item fails: **STOP and report**. No other signer, curve, suite or crypto profile is introduced without maintainer approval (the local-key and Sui `raw_sign` options from Rev 1 are no longer pre-approved fallbacks).
+The runtime signer must not be able to change wallet ownership, change policies, add/remove signers, or export the private key. Privy documents that owners control policies/signers/export and that signers "cannot export the wallet's private key"; T0.5 observed that policy changes without the owner signature fail (401). The runtime-signer restrictions are **verified live in T5.2** (assertion) and **T5.3** (bootstrap) before the adapters are accepted.
+
+### 13.1.2 Bootstrap Endorsement Key — same pattern, separate keys (D36, Q7 approved)
+
+Key-purpose rule: **Credential Assertion Key ≠ Bootstrap Endorsement Key** — separate wallets and keys; only the authorization architecture is shared.
+
+| | Assertion wallet | Bootstrap endorsement wallet |
+|---|---|---|
+| Catenor signing key (Ed25519) | **Credential Assertion Key** — dedicated assertion Solana wallet | **Bootstrap Endorsement Key** — separate dedicated bootstrap Solana wallet |
+| management-owner authorization key (P-256) | assertion management-owner authorization key — administrative only, never in the runtime | separate bootstrap management-owner authorization key — administrative only, never in the runtime |
+| runtime-signer authorization key (P-256) | `CATENOR_ASSERTION_RUNTIME_AUTHORIZATION_KEY` (Railway sealed) | separate `CATENOR_BOOTSTRAP_RUNTIME_AUTHORIZATION_KEY` (Railway sealed) |
+| policy | `P_ASSERT` (assertion signing) | `P_BOOTSTRAP` (bootstrap-endorsement signing): ALLOW `signMessage`; DENY `exportPrivateKey`, `exportSeedPhrase`; default-deny rest |
+| signer boundary | structured assertion / PoP input (§13.4) | structured endorsement input (§13.4) |
+
+No signing key or authorization key of the assertion wallet is ever reused for the bootstrap wallet (and vice versa). Management-owner authorization keys are high-privilege administrative credentials held in maintainer custody (T0.4) and are not available to the normal application runtime.
+
+## 13.2 Spike T0.5 results (2026-09-10 — PASSED WITH APPROVED DESIGN AMENDMENT)
+
+Evidence: `slices/S001-trust-anchor-admission/spikes/T0.5-privy-assertion-key.md`.
+
+```text
+CONFIRMED  dedicated Solana wallet provisioned server-side with owner + policy; public key from the address (no export)
+CONFIRMED  signMessage signs the raw bytes with plain Ed25519 — no prefix, no hashing; 64-byte signatures verify
+           independently with @noble/curves against the address-derived key
+CONFIRMED  owner authorization enforced (sign / policy removal without owner signature → 401)
+CONFIRMED  denied: signTransaction, exportPrivateKey, exportSeedPhrase (policy_violation); raw_sign (unsupported
+           for Solana)
+FAILED     Privy message.byte_length as a length guard for binary messages (a 64-byte binary message is denied by
+           byte_length eq/lte 64; text messages behave as expected) → replaced by the signer boundary (D33)
+UNCONFIRMED LIVE  transaction sending denial (not tested: no funding/broadcast); default-deny documentation-supported (D35)
+```
+
+What T0.5 proves: Privy's Solana wallet is a usable **Ed25519 signing primitive** whose signatures verify independently. It does **not** by itself prove full W3C `eddsa-jcs-2022` Data Integrity interoperability; that is tested separately (T2.3 vectors + the T5.2 end-to-end proof check).
 
 ## 13.3 Evidence for judges
 
-`artifacts/privy/s001/`: policy JSON, Multikey, a 64-byte signature verified with `@noble/curves`, and a **denied** `signTransaction` attempt against the assertion wallet. Wallet ids redacted.
+`artifacts/privy/s001/`: policy JSON (P_ASSERT as above), owner/signer model (key quorum IDs redacted), Multikey, a signature over the signer-built message verified with `@noble/curves`, and **denied** `signTransaction` and export attempts against the assertion wallet. Wallet ids redacted. Claims follow §31.3 (external Privy controls vs Catenor signer-boundary controls).
+
+## 13.4 Catenor signer boundary (D33)
+
+```text
+1 accepts structured internal assertion / proof-of-possession inputs — never arbitrary caller-provided bytes
+2 constructs the canonical signing message deterministically inside the signer boundary
+  (current profile: eddsa-jcs-2022 hashData = SHA-256(JCS(proofConfig)) ‖ SHA-256(JCS(document)))
+3 validates the expected message format and exact byte length (current profile: 64 bytes)
+4 only then invokes Privy signMessage, authorized with the runtime-signer authorization key
+5 independently verifies the returned Ed25519 signature against the key's publicKeyMultibase where the design
+  requires verification (key-possession proof, bootstrap endorsement)
+```
+
+The 64-byte length is the **current Catenor One profile value**, not a Catenor Protocol requirement, unless and until the crypto profile explicitly freezes it. The same boundary applies to `BootstrapEndorsementSigner` (endorsement input is structured; message built and length-checked inside the signer).
+
+Control attribution (never overstated): signMessage-only / default-deny / export-deny are **external Privy controls**; exact binary assertion-message validation is enforced by the **Catenor signer boundary**; compromise of the privileged management-owner authorization key (or of the runtime-signer authorization key together with API code execution) remains a higher-privilege threat (§31.2).
 
 ---
 
@@ -634,7 +735,7 @@ If any item fails: **STOP and report**. No other signer, curve, suite or crypto 
 
 TTL 5 minutes; one challenge per session.
 
-## 14.2 Proof — W3C `eddsa-jcs-2022` (D3, [REF-IMPL], conditional on T0.5)
+## 14.2 Proof — W3C `eddsa-jcs-2022` (D3, [REF-IMPL]; Ed25519 primitive confirmed by T0.5, Data Integrity interoperability tested in T2.3/T5.2)
 
 ```text
 proofConfig = {type:"DataIntegrityProof", cryptosuite:"eddsa-jcs-2022", verificationMethod,
@@ -700,23 +801,26 @@ Guarantees: the gate result is never an input to `FactSet` (type-level; AC-003, 
     "profileNote": "[REF-IMPL] Catenor One reference/demo evidence-acceptance rules; not a Catenor Protocol rule",
     "provider": "sumsub",
     "environment": "sandbox",
-    "companyLevelNames": ["<confirmed in T0.8>"],
-    "representativeLevelNames": ["<confirmed in T0.8>"],
-    "authorityRoles": ["<confirmed in T0.8>"],
-    "amlRejectLabels": ["<confirmed in T0.8>"],
-    "activeRegistryStatuses": ["<confirmed in T0.8>"],
+    "evidenceProfile": "HYBRID_DEMO",
+    "evidenceSources": { "company": "SYNTHETIC_MOCK", "representative": "REAL_SUMSUB_SANDBOX" },
+    "companyLevelNames": ["MOCK_KYB_LEVEL"],
+    "representativeLevelNames": ["id-only"],
+    "authorityRoles": ["<MOCK fixture value; real value pending T0.8b>"],
+    "activeRegistryStatuses": ["<MOCK fixture value; real value pending T0.8b>"],
     "evidenceMaxAgeDays": 180
   }
 }
 ```
 
-`evidenceMaxAgeDays: 180` is the approved Catenor One reference/demo value (D5), **[REF-IMPL]**, not a Catenor Protocol rule. All Sumsub-specific values are filled only from spike T0.8 observations — no provider semantics are hardcoded before the spike.
+`evidenceMaxAgeDays: 180` is the approved Catenor One reference/demo value (D5), **[REF-IMPL]**, not a Catenor Protocol rule, applied to `review.reviewDate` (D28). All Sumsub-specific values are filled only from spike observations — no provider semantics are hardcoded before a spike. `representativeLevelNames: ["id-only"]` is the level confirmed live in T0.8 (maintainer confirms at T7.1). While company KYB is blocked (B11), `evidenceSources.company = "SYNTHETIC_MOCK"` and the company-side values are **MOCK fixture values**, so the hash-pinned configuration — and therefore every bootstrap endorsement that binds its hash — states explicitly that company evidence is MOCK (D30). When real Sumsub company KYB becomes available, a new configuration (new hash) sets `evidenceProfile: "FULL_SUMSUB_SANDBOX"` and `evidenceSources.company: "REAL_SUMSUB_SANDBOX"` with values from T0.8b. There is deliberately **no `amlRejectLabels` deny-list** (D32): `ORGANIZATION_AML_CLEAR` is derived from the review state (§20.4).
 
 Out-of-band acceptance (human, before any admission):
 
 ```text
-1 scripts/bootstrap/create-bootstrap-signer.ts → bootstrap Privy wallet (policy P_ASSERT) under a SEPARATE
-  authorization key → publicKeyMultibase
+1 scripts/bootstrap/create-bootstrap-signer.ts (admin, run with the bootstrap management-owner authorization key) → separate bootstrap Privy
+  wallet (policy P_BOOTSTRAP; owner = bootstrap management-owner authorization key; additional signer = bootstrap
+  runtime-signer authorization key; §13.0, §13.1.2)
+  → publicKeyMultibase
 2 human fills the config, runs scripts/bootstrap/hash-config.ts, reviews, commits
 3 human sets Railway BOOTSTRAP_CONFIGURATION_HASH
 4 API refuses admissions if file hash ≠ pin (AC-004/005, TV-B01/B02)
@@ -759,8 +863,8 @@ It makes replacement of the public key under the same Verification Method ID det
 ```text
 created only by U10, only when Decision == ALLOW and policy integrity re-verified
 human-initiated: an authenticated allowlisted operator clicks "Endorse and activate"
-separate bootstrap signing authority: own Privy wallet + own authorization key
-  (CATENOR_BOOTSTRAP_AUTHORIZATION_KEY); never the candidate's key
+separate bootstrap signing authority: own Privy wallet (Bootstrap Endorsement Key), own management-owner authorization
+  key (not in the runtime) and own runtime-signer authorization key (CATENOR_BOOTSTRAP_RUNTIME_AUTHORIZATION_KEY) — §13.1.2, D36; never the candidate's or the assertion keys
 no mandatory two-person rule in S001 (quorum/two-person model is a later enhancement)
 verified immediately after signing, in TrustAnchorVerifier, and by the offline verifier script
 DENY / ERROR → no endorsement object (AC-045, TV-G02)
@@ -778,7 +882,8 @@ SPEC §21's `trustDomain` and `bootstrapEndorsementRef` are implemented as **Cat
 
 ```text
 Confidential Workflows   PRIVATE BETA, invite-only, separate from normal deploy access          [HUMAN]
-SDK / CLI                @chainlink/cre-sdk (TS) ≥1.18 (1.19.1 at review); cre CLI ≥1.29 (1.32.0 at review)
+SDK / CLI                @chainlink/cre-sdk (TS) ≥1.18 (1.19.1 at review; the official template pins 1.18.0 —
+                         pin decided in T8.1); cre CLI v1.33.0 used in T0.7
 TEE                      AWS Nitro, us-west-2; one enclave executes each run (single observation)
 API                      handlerInTee(trigger, fn(teeRuntime, triggerOutput), tees, hooks?)
                          TeeRuntime: config, now(), log(), getSecrets(), reportFromDon(), usingTheDons()
@@ -791,8 +896,31 @@ HTTP trigger             one HTTP trigger per workflow; returns ACCEPTED asynchr
 logs from TEE            may be forwarded outside the enclave → treated as PUBLIC
 binary + config          uploaded to CRE storage → treated as PUBLIC
 randomness               no CSPRNG in the TEE (Math.random host-seeded; no crypto.getRandomValues)
-crypto libs              @noble/hashes recommended by docs; @noble/ciphers [UNCONFIRMED → T0.7]
+crypto libs              @noble/hashes 2.4.0 + @noble/ciphers 2.4.0 + canonicalize 5.0.0 (JCS) — SIMULATION-CONFIRMED (T0.7)
 network                  HTTPS only, no private addresses, no redirects
+```
+
+### T0.7 runtime observations (approved 2026-09-10, D37) — SIMULATION-CONFIRMED only
+
+Evidence: `slices/S001-trust-anchor-admission/spikes/T0.7-cre-runtime.md` (CLI v1.33.0, `@chainlink/cre-sdk` 1.18.0). The local simulator is **not a TEE**; none of this is deployed-TEE or production evidence (B1 still gates that).
+
+```text
+scaffold          cre init -t hello-confidential-workflows-ts works (non-interactive needs TERM=dumb)    CONFIRMED (CLI)
+handlerInTee      handler runs with a TeeRuntime                                                   SIMULATION-CONFIRMED
+secrets           runtime.getSecrets([{id}×3]).result() — one batched call, 3 values resolved       SIMULATION-CONFIRMED
+HTTP              HTTPClient.sendRequest(teeRuntime, …) from inside handlerInTee                    SIMULATION-CONFIRMED
+                  request body is a proto bytes field → base64 string in the request object        SIMULATION-CONFIRMED
+trigger payload   handler receives Payload{ input: Uint8Array, key? } → JSON.parse(TextDecoder)       SIMULATION-CONFIRMED
+time              runtime.now() returns a Date with correct UTC                                     SIMULATION-CONFIRMED
+crypto            @noble/hashes SHA-256 / HMAC / HKDF known-answer tests; canonicalize (RFC 8785)    SIMULATION-CONFIRMED
+                  AES-256-GCM open with @noble/ciphers; 5/5 tamper cases fail closed (§18)          SIMULATION-CONFIRMED
+globals           absent: crypto, atob, btoa, fetch, setTimeout, structuredClone, process           SIMULATION-CONFIRMED
+                  present: TextEncoder/TextDecoder, Buffer (polyfill), BigInt
+hooks             handlerInTee(…, hooks?.preHook → RestrictionsJson{secrets?, capabilities?})       SDK types only
+registry          cre init --deployment-registry private is accepted but NOT persisted →
+                  deployment-registry: "private" must be set explicitly per target in workflow.yaml CONFIRMED (CLI)
+logs from TEE     simulator banner says user logs "will not leave the TEE" in real execution; the
+                  skill says they do → PLAN keeps treating TEE logs as PUBLIC (no sensitive logging)
 ```
 
 ### Quotas and timeouts — exact official wording (docs.chain.link/cre/service-quotas, updated 2026-05-26)
@@ -811,7 +939,9 @@ PerWorkflow.HTTPTrigger.RateLimit         1 per 60 s, burst 1
 PerWorkflow.ConfidentialHTTP.TimeOut      10 s total — applies to the separate Confidential HTTP capability ONLY
 ```
 
-The TS SDK reference (`reference/sdk/http-client-ts`) additionally documents a per-request `timeout` field on `HTTPClient` requests: default 5 s, "default maximum" 10 s. Whether that field and cap behave identically for `HTTPClient` calls made with `TeeRuntime` is [UNCONFIRMED] and measured in T0.7. S001 sets an explicit per-request `timeout` within the documented range and does not claim any other total-time limit. The CRE CLI's local `limits.json` shows different values (e.g. 15 calls); S001 designs for the stricter documented 5 unless the real organization/runtime proves otherwise.
+The TS SDK reference (`reference/sdk/http-client-ts`) additionally documents a per-request `timeout` field on `HTTPClient` requests (`google.protobuf.Duration`, e.g. `"8s"`): default 5 s, "default maximum" 10 s. T0.7 (SIMULATION-CONFIRMED): `"2s"` against a 3 s delay times out; `"8s"` against 7 s succeeds; `"15s"` is accepted (whether values > 10 s take effect is UNCONFIRMED); without the field the simulator's default is ≥ 7 s. Deployed-TEE timeout behavior is UNCONFIRMED; S001 keeps an explicit `"8s"`.
+
+Simulator limits: the CLI's defaults (`cre workflow limits export`: 15 HTTP calls, 120 kb request, 250 kb response) are **not** production values, and `--limits default` also applied them in T0.7. S001 therefore requires a **production-like limits file** (`HTTPAction.CallLimit 5`, `RequestSizeLimit 10kb`, `ResponseSizeLimit 100kb`, `Consensus.CallLimit 20`) for every workflow simulation (§28). With that file the simulator rejected call #6 (`LimitExceeded … limit is 5`), an 11,264-byte request ("limit of 10000 bytes") and a 101,000-byte response ("limit of 100000 bytes") — SIMULATION-CONFIRMED; "kb" means 1,000 bytes. S001 designs for the documented production values.
 
 ### Terminology (D11a confirmed)
 
@@ -819,7 +949,7 @@ The approved statement is: **"HTTPS requests are executed from inside the confid
 
 ## 17.2 Official scaffolding (D20, maintainer amendment §20)
 
-When implementation begins (not before): the `cre-engineer` subagent runs `cre init` with the official TypeScript Confidential Workflow template `hello-confidential-workflows-ts` (exact template identifier/flags confirmed against the installed CLI's `cre init --help`), with explicit private-registry and target configuration, so that:
+When implementation begins (not before): the `cre-engineer` subagent runs `cre init` with the official TypeScript Confidential Workflow template `hello-confidential-workflows-ts` (exact template identifier/flags confirmed against the installed CLI's `cre init --help`), with explicit private-registry and target configuration (`TERM=dumb` for non-interactive runs; `deployment-registry: "private"` written explicitly under each target's `user-workflow` in `workflow.yaml`, because `cre init --deployment-registry` is not persisted — T0.7; never `onchain:ethereum-mainnet` without maintainer approval, D9), so that:
 
 ```text
 workflows/project.yaml, workflows/secrets.yaml          CRE project root
@@ -835,6 +965,7 @@ Because a workflow has a single HTTP trigger, `identity-confidential` exposes on
 
 ```text
 trigger payload   {v:1, operation:"TRUST_ANCHOR_ADMISSION", runId, sealedContext:{nonce, ciphertext}}
+                  delivered to the handler as Payload.input bytes → JSON.parse(new TextDecoder().decode(input))
 router            operation → capabilities/<operation>/handler.ts ; unknown operation → ERROR, no calls
 binding           operation and runId are bound as AES-GCM AAD, so a context sealed for one operation
                   cannot be replayed into another
@@ -852,28 +983,35 @@ Per-operation guardrails live in the capability (HTTP host allowlist, call budge
 3  context = AES-256-GCM open(keys.ctx, sealedContext, aad = operation ‖ runId)
              → {sessionRef, runId, trustDomain, subjectDid, companyApplicantId, representativeApplicantId,
                 companyBindingRef, representativeBindingRef, notAfter}; expired / mismatch → ERROR
-4  HTTP #1  Sumsub GET company applicant (review status + companyInfo/beneficiaries)
-   HTTP #2  Sumsub GET representative applicant (review status + membership)
+4  company    = CompanyEvidenceSource.fetch(context)            (port; adapter chosen by config.companyEvidence.source)
+                 SYNTHETIC_MOCK   → MockCompanyEvidenceFixture: no HTTP, returns the configured MOCK scenario (§20.7)
+                 REAL_SUMSUB_SANDBOX → SumsubCompanyEvidenceSource: HTTP #1 GET company applicant (+ #3 company check)
+   HTTP #2  Sumsub GET representative applicant (review status + membership)            REAL Sumsub sandbox
 5  PROVIDER-BINDING GATE: externalUserId == bindingRef for both; types company/individual
+   (company leg under SYNTHETIC_MOCK: checked against the fixture, recorded as binding "MOCK")
    → mismatch: callback {status:ERROR, code:PROVIDER_BINDING_MISMATCH}, no facts, stop
-6  HTTP #3  Sumsub company registry check — ONLY if T0.8 shows registry status is not available from #1
-7  normalize (allowlisted fields; unknown ignored; unparseable → null)
+6  HTTP #3  Sumsub company registry check — REAL_SUMSUB_SANDBOX company source only (docs: registry status lives
+            only on the checks endpoint; T0.8b confirms)
+7  normalize (allowlisted fields; unknown ignored; unparseable → null; §20.8 rules) → NormalizedCompanyEvidence
+   + NormalizedRepresentativeEvidence, each tagged with its evidence source
 8  facts      = deriveFacts(normalized, config.acceptedEvidence, teeRuntime.now())        (§20.4)
 9  commitment = evidenceCommitment(...)                                                     (§23)
 10 [P1] report = teeRuntime.reportFromDon(SHA-256(JCS(resultEnvelope)))   (hash only reaches DON nodes)
-11 HTTP #4  POST config.callbackUrl  resultEnvelope, HMAC(keys.cb)
+11 HTTP #4  POST config.callbackUrl  resultEnvelope, HMAC(keys.cb)   (request body passed base64-encoded, T0.7)
 12 return {status:"DELIVERED"|"FAILED", code}     (return value is DON-visible: no facts, no PII)
 ```
 
 ## 17.5 HTTP budget (documented limit: 5)
 
 ```text
-#1 Sumsub company applicant       required
-#2 Sumsub representative applicant required
-#3 Sumsub company registry check  only if needed (T0.8)
+#1 Sumsub company applicant       REAL_SUMSUB_SANDBOX company source only
+#2 Sumsub representative applicant required (REAL)
+#3 Sumsub company registry check  REAL_SUMSUB_SANDBOX company source only (likely required — T0.8 docs)
 #4 TEE → Catenor API callback     required
 headroom                           ≥ 1 request; no request is reserved for an LLM (none exists in S001)
 ```
+
+With `companyEvidence.source = SYNTHETIC_MOCK` the run uses 2 calls (#2, #4); with real company KYB it uses up to 4. The preHook call limit stays 4 in both modes.
 
 Errors at any step → callback `status: ERROR` with a code and **no facts** (fail closed). If the callback fails, the API run times out (U15) → non-ALLOW.
 
@@ -884,6 +1022,7 @@ Errors at any step → callback `status: ERROR` with a code and **no facts** (fa
   "callbackUrl": "https://<api-domain>/v1/internal/cre/identity-confidential/results",
   "sumsubBaseUrl": "https://api.sumsub.com",
   "httpRequestTimeout": "8s",
+  "companyEvidence": { "source": "SYNTHETIC_MOCK", "scenario": "MOCK_COMPANY_ACTIVE_GREEN", "label": "MOCK — not Sumsub KYB" },
   "bootstrapConfigurationHash": "0x…",
   "acceptedEvidence": { "...": "identical to the bootstrap configuration" },
   "authorizedTriggerAddress": "0x…"
@@ -912,7 +1051,7 @@ ownership    the main agent owns protocol/application architecture decisions; cr
 
 ---
 
-# 18. Private input transport into `handlerInTee` (D10 approved; D11 approved conditionally)
+# 18. Private input transport into `handlerInTee` (D10 approved; D11 approved — SIMULATION-CONFIRMED in T0.7)
 
 Requirement: the Workflow DON must not receive applicant IDs or PII in plaintext (SPEC §26). The HTTP trigger payload is visible to Workflow DON nodes, and CRE documents no encrypted-trigger mechanism.
 
@@ -926,9 +1065,21 @@ ct = AES-256-GCM(k_ctx, nonce, JCS(context), aad = operation ‖ runId)
 trigger {v, operation, runId, sealedContext:{nonce, ct}}  ────►  open; check runId, operation, notAfter (≤10 min)
 ```
 
-Private context contents: `sessionRef`, `trustDomain`, `subjectDid`, Sumsub applicant IDs, expected bindingRefs, `notAfter`. DON nodes and CRE logs see only `operation`, `runId` and ciphertext. Nonces are generated only on the API side (the TEE decrypts; it never encrypts with AES-GCM in S001). The API accepts one result per run.
+Private context contents: `sessionRef`, `trustDomain`, `subjectDid`, Sumsub applicant IDs (under `SYNTHETIC_MOCK`, the company field carries the MOCK company reference), expected bindingRefs, `notAfter`. DON nodes and CRE logs see only `operation`, `runId` and ciphertext. Nonces are generated only on the API side (the TEE decrypts; it never encrypts with AES-GCM in S001). The API accepts one result per run.
 
-[STOP-GATE] T0.7 must confirm that `@noble/ciphers` AES-256-GCM (and `@noble/hashes` HKDF/HMAC) run correctly in the CRE QuickJS/WASM runtime inside `handlerInTee`. If not: **STOP and report.** The TEE→API context-fetch fallback changes the HTTP budget and threat model and requires explicit maintainer review first.
+Sealed-context profile (Catenor One reference-implementation detail, not a protocol requirement; D37):
+
+```text
+key        k_ctx = HKDF-SHA256(ikm = CATENOR_INTERNAL_API_TOKEN, salt = empty, info = UTF-8
+           "catenor-one/identity-confidential/ctx/v1", L = 32)
+cipher     AES-256-GCM, 12-byte nonce generated by the API (CSPRNG), 16-byte tag
+aad        UTF-8(operation ‖ runId)
+payload    ciphertext ‖ tag (Node: Buffer.concat([ct, cipher.getAuthTag()])), opened with @noble/ciphers gcm
+transport  nonce and ciphertext‖tag as base64 strings in the trigger JSON — APPROVED DESIGN, NOT YET
+           SIMULATION-CONFIRMED (T8.2)
+```
+
+T0.7 status: HKDF (empty salt, UTF-8 info), 12-byte nonce, `ciphertext ‖ tag`, the AAD binding and the AES-256-GCM open inside `handlerInTee`, plus fail-closed on wrong AAD, wrong runId, flipped ciphertext bit, flipped tag bit and wrong key — **SIMULATION-CONFIRMED**. The spike carried nonce and ciphertext as **hex**; the approved **base64** transport is **not yet simulation-tested**. The runtime has no `atob`/`btoa`, so T8.2 must decode with a pure-JS base64 implementation and repeat the tamper suite in simulation. Real deployed-TEE behavior remains gated by B1 and is re-checked in T16.2 before any live claim.
 
 Trigger authentication: `workflows.execute` JSON-RPC with a JWT (`alg: ETH`, EIP-191, `digest` over the key-sorted body, `exp ≤ iat + 5 min`, unique `jti`) signed by `CRE_TRIGGER_PRIVATE_KEY` — a dedicated, **unfunded** EVM key used only for trigger authentication. Implemented in-house with `viem`; the official `cre-http-trigger` package (BUSL-1.1) is a behavioral reference only (PROVENANCE note).
 
@@ -958,7 +1109,8 @@ dynamic applicant IDs, bindingRefs              sealed per run, never long-lived
 ```text
 DATABASE_URL (reference)             ALLOWED_BOOTSTRAP_EMAILS         BOOTSTRAP_CONFIGURATION_HASH
 PRIVY_APP_ID / PRIVY_APP_SECRET*     PRIVY_JWT_VERIFICATION_KEY
-CATENOR_ASSERTION_AUTHORIZATION_KEY* CATENOR_BOOTSTRAP_AUTHORIZATION_KEY*
+CATENOR_ASSERTION_RUNTIME_AUTHORIZATION_KEY*        CATENOR_BOOTSTRAP_RUNTIME_AUTHORIZATION_KEY*   (P-256 runtime-signer authorization keys only; both
+                                     management-owner authorization keys are NOT Railway variables — §13.0, D34, D36)
 CATENOR_INTERNAL_API_TOKEN*          CRE_TRIGGER_PRIVATE_KEY*         CRE_WORKFLOW_ID   CRE_GATEWAY_URL
 OPERATOR_REF_KEY*                    ETHEREUM_MAINNET_RPC_URL (P1 report verification only, read-only)
 ```
@@ -967,7 +1119,7 @@ OPERATOR_REF_KEY*                    ETHEREUM_MAINNET_RPC_URL (P1 report verific
 
 # 20. Sumsub mapping (D6, D7 approved; exact fields confirmed by T0.8)
 
-Source: current Sumsub docs (Appendix A.3). All calls from the TEE. **Nothing below is hardcoded until T0.8 confirms it against real sandbox responses.**
+Source: current Sumsub docs (Appendix A.3). All calls from the TEE. **Nothing below is hardcoded until a spike confirms it against real sandbox responses** (T0.8: individual/representative — PASSED; T0.8b: company/KYB — blocked by entitlement).
 
 ## 20.1 Authentication (documented)
 
@@ -979,54 +1131,139 @@ clock      ±60 s → teeRuntime.now()
 errors     4001 / 4003 / 4004 / timeout / 5xx → status ERROR, no facts (AC-021, AC-022, TV-E04/E05)
 ```
 
-## 20.2 Candidate endpoints (to confirm in T0.8)
+## 20.2 Endpoints and T0.8 status
 
-| # | Endpoint (documented) | Intended fields |
-|---|---|---|
-| 1 | `GET /resources/applicants/{companyId}/one` | `type`, `externalUserId`, `review.{reviewStatus, levelName, reviewDate, reviewResult.{reviewAnswer, reviewRejectType, rejectLabels}}`, `info.companyInfo.beneficiaries[].{applicantId, types}` |
-| 2 | `GET /resources/applicants/{representativeId}/one` | `type`, `externalUserId`, `review.*`, `memberOf[].applicantId` |
-| 3 | `GET /resources/checks/latest?type=COMPANY&applicantId={companyId}` (only if needed) | `checks[].{answer, createdAt}`, `companyCheckInfo.status` |
+| # | Endpoint (documented) | Intended fields | Status (T0.8) |
+|---|---|---|---|
+| 1 | `GET /resources/applicants/{companyId}/one` | `type`, `externalUserId`, `review.{reviewStatus, levelName, reviewDate, reviewResult.{reviewAnswer, reviewRejectType, rejectLabels}}`, beneficiaries at `fixedInfo.companyInfo.beneficiaries[]` and/or `info.companyInfo.beneficiaries[]` `.{applicantId, types}` | documentation only — **blocked by KYB entitlement (B11, T0.8b)**; replaced by the MOCK fixture (§20.7) |
+| 2 | `GET /resources/applicants/{representativeId}/one` | `type`, `externalUserId`, `review.*`, `memberOf[].applicantId` (no roles) | **CONFIRMED live** for individual applicants (T0.8, level `id-only`); `memberOf` not observable without a company |
+| 3 | `GET /resources/checks/latest?type=COMPANY&applicantId={companyId}` | `checks[].{answer, createdAt}`, `companyCheckInfo.status` (free-form string) | documentation only — blocked (B11) |
 
-## 20.3 Spike T0.8 must confirm
+## 20.3 Spike T0.8 results (approved 2026-09-10, D25)
 
 ```text
-company applicant behavior (KYB 2.0 level, type "company", review lifecycle)
-representative linking (beneficiary types; memberOf back-reference)
-testCompleted support for company AND individual applicants; GREEN and RED (incl. AML labels) behavior
-actual field shapes/formats (dates, status strings, label values) and response sizes (< 100 KB)
-relevant company-check responses (registry status) and whether call #3 is needed
-externalUserId allowed charset for bindingRefs
-which representative-role evidence the sandbox/KYB mode actually provides
+PASSED (REAL Sumsub sandbox, synthetic individual applicants — slices/S001-trust-anchor-admission/spikes/T0.8-sumsub-sandbox.md §6)
+  authentication (signed GET/POST) · level list (id-only, individual) · externalUserId = bindingRef echoed exactly
+  and resolvable by lookup · bindingRef charset [a-z0-9-] accepted · testCompleted GREEN verified ·
+  testCompleted RED with SANCTIONS / FINAL verified · /one ≈ 1.0–1.3 KB · review completes immediately in sandbox
+OBSERVED   testCompleted works on individuals directly from init (no documents, no check request) → sandbox results
+           are entirely synthetic; GREEN omits rejectLabels / reviewRejectType; review.reprocessing = true after
+           simulated reviews; reviewDate present only once completed, format YYYY-MM-DD HH:MM:SS+0000
+BLOCKED    company applicant, linking, company checks, company testCompleted, role-verification strength —
+           the sandbox tenant has no company-type level (B11); tracked as T0.8b; no bypass is attempted
 ```
 
-## 20.4 Deterministic fact derivation (target rules; finalized after T0.8)
+## 20.4 Deterministic fact derivation (target rules; company-side rules finalized by T0.8b)
 
-| Fact | Target rule (any unparseable input → `null` = MISSING) |
-|---|---|
-| `ORGANIZATION_KYB_VERIFIED` | binding gate passed ∧ company completed ∧ GREEN ∧ `levelName ∈ companyLevelNames` |
-| `ORGANIZATION_STATUS_VALID` | registry status ∈ `activeRegistryStatuses` ∧ no inactive-entity reject label (source per T0.8) |
-| `ORGANIZATION_AML_CLEAR` | company completed + GREEN ∧ `rejectLabels ∩ amlRejectLabels = ∅` ∧ not on hold |
-| `AUTHORIZED_REPRESENTATIVE_VERIFIED` | binding gate passed ∧ representative completed ∧ GREEN ∧ `levelName ∈ representativeLevelNames` |
-| `REPRESENTATIVE_AUTHORITY_CONFIRMED` | company ↔ representative linkage (beneficiary with `applicantId` + accepted role ∈ `authorityRoles`) ∧ reverse membership where available ∧ `ORGANIZATION_KYB_VERIFIED` ∧ `AUTHORIZED_REPRESENTATIVE_VERIFIED` |
-| `EVIDENCE_FRESH` | `now − reviewDate ≤ evidenceMaxAgeDays` (180, [REF-IMPL]) for company AND representative |
+| Fact | Target rule (any unparseable input → `null` = MISSING) | Evidence source today |
+|---|---|---|
+| `ORGANIZATION_KYB_VERIFIED` | binding gate passed ∧ company completed ∧ GREEN ∧ `levelName ∈ companyLevelNames` | company → **MOCK** |
+| `ORGANIZATION_STATUS_VALID` | registry status ∈ `activeRegistryStatuses` ∧ no inactive-entity reject label (source per T0.8b) | company → **MOCK** |
+| `ORGANIZATION_AML_CLEAR` | (D32) company completed ∧ GREEN ∧ rejection labels absent or empty (§20.8 N1) → `true`; RED → `false`; completed GREEN **with** rejection labels present (inconsistent provider state) → `null` (MISSING) with private normalization reason `INCONSISTENT_PROVIDER_STATE` (§20.8 N6); pending / queued / on hold / awaiting → `false`; unavailable / unparseable → `null` (MISSING). No label list is consulted (§20.8 N5) | company → **MOCK** |
+| `AUTHORIZED_REPRESENTATIVE_VERIFIED` | binding gate passed ∧ representative completed ∧ GREEN ∧ `levelName ∈ representativeLevelNames` | representative → **REAL** Sumsub sandbox |
+| `REPRESENTATIVE_AUTHORITY_CONFIRMED` | company ↔ representative linkage (beneficiary with `applicantId` + accepted role ∈ `authorityRoles`) ∧ reverse membership where available ∧ `ORGANIZATION_KYB_VERIFIED` ∧ `AUTHORIZED_REPRESENTATIVE_VERIFIED` | **MOCK** linkage + **REAL** representative |
+| `EVIDENCE_FRESH` | `now − review.reviewDate ≤ evidenceMaxAgeDays` (180, [REF-IMPL]) for company AND representative (D28) | **MOCK** company date + **REAL** representative date |
 
-RED (RETRY or FINAL), pending, queued, on hold, awaiting user → `false` (a present, deterministic "not verified").
+RED (RETRY or FINAL), pending, queued, on hold, awaiting user → `false` (a present, deterministic "not verified"). The rules are identical for both company adapters: fact derivation never branches on the evidence source; the source is carried as a label (§20.7).
 
 ## 20.5 Representative-authority limitation (D7)
 
-Deterministic provider evidence only. Sumsub documents that roles such as `representative` / `director` are *verified by Sumsub* only under Expert-assisted (Full) KYB; otherwise they are declared data. If the sandbox/KYB mode used cannot provider-verifiably establish the role, S001 does **not** fake certainty: it uses the strongest evidence actually available (e.g., linkage + both applicants GREEN under the accepted level), states the exact evidence class in PLAN (updated after T0.8), and shows the limitation in the Judge Inspector and artifacts.
+Deterministic provider evidence only. Sumsub documents that roles such as `representative` / `director` are *verified by Sumsub* only under Expert-assisted (Full) KYB; otherwise they are declared data. If the sandbox/KYB mode used cannot provider-verifiably establish the role, S001 does **not** fake certainty: it uses the strongest evidence actually available (e.g., linkage + both applicants GREEN under the accepted level), states the exact evidence class in PLAN, and shows the limitation in the Judge Inspector and artifacts.
+
+**While company evidence is MOCK (§20.7):** the company ↔ representative linkage and role come from the MOCK fixture, so `REPRESENTATIVE_AUTHORITY_CONFIRMED` rests on **MOCK linkage + REAL Sumsub sandbox representative review**. The Judge Inspector and artifacts state exactly that evidence class; it is never described as provider-verified authority.
 
 ## 20.6 Demo onboarding and the live DENY case
 
 ```text
-environment        Sumsub SANDBOX token — real API calls, synthetic Organization / representative data
-                   (all docs + Judge Inspector say "Sumsub sandbox"; never implies production KYB)
-onboarding         operator creates applicants with externalUserId = Catenor bindingRef (§4.2), links the
-                   representative, forces reviews with testCompleted where T0.8 confirms support
-happy case         synthetic company + representative, both GREEN
-evidence DENY      a second synthetic company forced RED with an AML label, or an inactive-registry mock
-                   company — whichever T0.8 confirms (TV-L03 allows a labeled fixture if neither works)
+environment        REAL: Sumsub SANDBOX token — real API calls for the representative, synthetic applicant data
+                   ("Sumsub sandbox" everywhere; never implies production KYC/KYB)
+                   MOCK: company evidence from the labeled fixture (§20.7) until T0.8b unblocks
+onboarding         operator creates the representative applicant (level id-only) with externalUserId =
+                   representative bindingRef (§4.2); attaches it plus the MOCK company reference; forces the
+                   representative review with testCompleted (confirmed for individuals in T0.8)
+happy case         MOCK_COMPANY_ACTIVE_GREEN + REAL representative GREEN
+evidence DENY      REAL representative forced RED (SANCTIONS, FINAL) → AUTHORIZED_REPRESENTATIVE_VERIFIED = false
+                   (and REPRESENTATIVE_AUTHORITY_CONFIRMED = false) → DENY — the false fact comes from REAL Sumsub
+                   sandbox evidence, so TV-L03 does not need a fixture. MOCK company DENY scenarios (RED/AML,
+                   inactive, stale, not linked, binding mismatch) are used in unit tests and simulation only
 ```
+
+## 20.7 Company evidence source — MOCK fixture while KYB entitlement is missing (D29, D30)
+
+Company/KYB is **blocked by tenant entitlement** (B11): the sandbox exposes no company-type level. No attempt is made to bypass or fake the entitlement. For **development**, company evidence comes from a clearly labeled synthetic fixture **behind the provider-normalization boundary**; the REAL Sumsub sandbox representative/individual integration stays live.
+
+```text
+boundary (workflows/identity-confidential, capability trust-anchor-admission)
+  port      CompanyEvidenceSource.fetch(context)
+              → { source, normalized: NormalizedCompanyEvidence, responseDigest, providerRefDigest, bindingCheck }
+  adapters  MockCompanyEvidenceFixture    source "SYNTHETIC_MOCK"    no HTTP; scenario from public config
+            SumsubCompanyEvidenceSource   source "REAL_SUMSUB_SANDBOX"  HTTP #1 (+ #3); built when T0.8b unblocks (T8.3b)
+  select    public workflow config companyEvidence.source (+ scenario); must equal the hash-pinned Bootstrap
+            Configuration acceptedEvidence.evidenceSources.company — otherwise ERROR, no facts
+unchanged   NormalizedCompanyEvidence shape, normalization rules (§20.8), deriveFacts, the eight policy fact names,
+            policy:trust-anchor-admission:v1, packages/policy, packages/authority, the domain model
+```
+
+| MOCK scenario | Fixture content (all values synthetic, labeled MOCK) | Expected result |
+|---|---|---|
+| `MOCK_COMPANY_ACTIVE_GREEN` | `type: company`; `externalUserId` = expected company bindingRef; `levelName: MOCK_KYB_LEVEL`; completed / GREEN; registry status = the MOCK active value; beneficiary = the run's representative applicant ID with an accepted MOCK role; fixed `reviewDate` literal | company facts true (MOCK) |
+| `MOCK_COMPANY_RED` | completed / RED / FINAL; reason code `SANCTIONS` recorded as metadata only | `ORGANIZATION_KYB_VERIFIED`, `ORGANIZATION_AML_CLEAR` false (because RED, not because of the label) → DENY |
+| `MOCK_COMPANY_INACTIVE` | registry status = a non-active MOCK value | `ORGANIZATION_STATUS_VALID` false → DENY |
+| `MOCK_COMPANY_STALE` | `reviewDate` older than 180 days | `EVIDENCE_FRESH` false → DENY |
+| `MOCK_COMPANY_NOT_LINKED` | no beneficiary for the representative | `REPRESENTATIVE_AUTHORITY_CONFIRMED` false → DENY |
+| `MOCK_COMPANY_BINDING_MISMATCH` | `externalUserId` ≠ expected company bindingRef | ERROR `PROVIDER_BINDING_MISMATCH`, no facts |
+
+Rules:
+
+```text
+labeling (D30)   "MOCK" appears in: the hash-pinned Bootstrap Configuration (evidenceSources), public workflow config,
+                 the TEE result envelope (evidenceSources), the evidence-commitment preimage, the private run record,
+                 audit-event details, operator UI, Judge Inspector, artifacts and READMEs, and every submission claim
+never            presented as Sumsub KYB; never "Sumsub verified the organization"; never mixed into the REAL label
+honesty          the company leg's binding check under SYNTHETIC_MOCK is recorded as binding "MOCK", not as a verified
+                 provider binding; a fixed reviewDate literal is used (no runtime.now() to manufacture freshness)
+no hidden knob   the scenario is selected only by public config (no per-run override in the sealed context)
+consistency      API rejects a result whose evidenceSources differ from the Bootstrap Configuration
+environment      simulation + staging freely; the LIVE hackathon path only under the Hybrid Demo Profile (§20.7.1, D31)
+vs FAKE          the API-level FAKE ConfidentialEvidenceVerifier (§32) replaces the whole CRE run for local UI work and
+                 can never be selected in production; the MOCK company fixture runs inside the real workflow and
+                 replaces only the company leg
+replacement      T0.8b spike → T8.3b SumsubCompanyEvidenceSource → new Bootstrap Configuration (evidenceSources.company
+                 = "REAL_SUMSUB_SANDBOX", real company values) → operator creates + links a real company applicant →
+                 attaches its applicant ID. No domain, deriveFacts or policy change
+```
+
+### 20.7.1 Hybrid Demo Profile (Q4 → D31, approved 2026-09-10)
+
+If Sumsub Company/KYB entitlement is still unavailable when the live hackathon path is deployed, S001 may run the **Hybrid Demo Profile**:
+
+```text
+Company evidence                          SYNTHETIC MOCK fixture (§20.7)
+Representative verification               REAL Sumsub Sandbox API (from inside the TEE)
+Chainlink CRE Confidential Workflow       REAL deployed workflow (identity-confidential / trust-anchor-admission)
+Catenor policy / endorsement / Admission  REAL execution
+```
+
+| # | Requirement | Where enforced |
+|---|---|---|
+| H1 | The Bootstrap Configuration explicitly identifies the company evidence source as MOCK: `evidenceProfile: "HYBRID_DEMO"`, `evidenceSources.company: "SYNTHETIC_MOCK"`, `evidenceSources.representative: "REAL_SUMSUB_SANDBOX"` | §16.1; T7.1 |
+| H2 | That configuration stays hash-pinned and is bound by the bootstrap endorsement (via `bootstrapConfigurationHash`); workflow config and every result must echo the same sources, else ERROR / rejected | §16.1–§16.2, §20.7 consistency rule; T8.3a, T9.3; TV-B04 |
+| H3 | Judge Inspector, artifacts and README visibly state **"Company evidence: SYNTHETIC MOCK"** and **"Representative verification: REAL SUMSUB SANDBOX"** | §9, §30; T14.2, T18.1; TV-L04 |
+| H4 | Never claim "Sumsub verified the organization" or "real Sumsub KYB end-to-end" while this profile is used | §31.3; T18.1, T18.6; TV-L04 |
+| H5 | Real Sumsub Company/KYB (`FULL_SUMSUB_SANDBOX` profile) remains the preferred adapter and replaces the fixture without changing domain or policy semantics | §20.7 replacement path; T0.8b, T8.3b |
+
+Profile values (machine-readable): `HYBRID_DEMO` (company `SYNTHETIC_MOCK`, representative `REAL_SUMSUB_SANDBOX`) and `FULL_SUMSUB_SANDBOX` (both `REAL_SUMSUB_SANDBOX`, preferred). No other combination is valid; the representative leg is REAL in every profile.
+
+## 20.8 Normalization rules (approved 2026-09-10; apply to REAL and MOCK evidence alike)
+
+| # | Rule | Decision |
+|---|---|---|
+| N1 | `reviewStatus = completed ∧ reviewAnswer = GREEN` with `rejectLabels` / `reviewRejectType` **absent** → normalized as **no rejection labels** (`rejectLabels = []`, no reject type) | D26 |
+| N2 | In any other state (not completed, RED, or `reviewAnswer` absent), absent rejection fields stay **MISSING** (`null`) — never coerced to empty | D26 |
+| N3 | `review.reprocessing` is **ignored entirely**: not normalized, not a policy fact input, not part of the commitment preimage | D27 |
+| N4 | `review.reviewDate` (`YYYY-MM-DD HH:MM:SS+0000`, present only once completed) is the **only** source for the 180-day freshness rule; absent or unparseable → `EVIDENCE_FRESH` input MISSING; `createDate` is never used | D28 |
+| N5 | Rejection labels (`SANCTIONS`, `PEP`, `ADVERSE_MEDIA`, `CRIMINAL`, …) are retained only as **sanitized reason codes** (allowlisted `[A-Z_]{1,64}` strings) in the private run record / decision trace and the normalized commitment preimage. They are **not** independent Catenor policy rules and no label is treated as universally disqualifying; they never appear in public projections (synthetic sandbox DENY artifacts may show them, labeled) | D32 |
+| N6 | `reviewStatus = completed ∧ reviewAnswer = GREEN` **with** rejection labels present is an internally inconsistent provider response: neither `ORGANIZATION_AML_CLEAR = true` nor `false` can be truthfully derived → the fact is `null` (MISSING) and the deterministic private normalization reason `INCONSISTENT_PROVIDER_STATE` is recorded in the private run record and decision trace (never in public projections). The labels stay reason codes only (N5); the existing policy fails closed on MISSING (D4) | D32 (correction) |
 
 ---
 
@@ -1083,12 +1320,18 @@ commitmentInput = {
   salt,                                   // HMAC-SHA256(HKDF(K,"salt"), runId) — TEE has no CSPRNG
   operation, runId, sessionRef, trustDomain, subject, bootstrapConfigurationHash,
   providerEnvironment: "sandbox", observedAt,
-  providerRefDigests: { company: SHA-256(applicantId), representative: SHA-256(applicantId) },
-  responseDigests:    { companyApplicant, representativeApplicant, companyCheck? },   // SHA-256 of raw bytes
+  evidenceProfile:    "HYBRID_DEMO" | "FULL_SUMSUB_SANDBOX",                   // §20.7.1
+  evidenceSources:    { company: "SYNTHETIC_MOCK" | "REAL_SUMSUB_SANDBOX", representative: "REAL_SUMSUB_SANDBOX" },   // §20.7
+  providerRefDigests: { company: SHA-256(applicantId | MOCK company reference), representative: SHA-256(applicantId) },
+  responseDigests:    { companyApplicant, representativeApplicant, companyCheck? },   // SHA-256 of raw bytes;
+                                                                                    // MOCK: SHA-256(JCS(fixture))
+  reasonCodes:        { company: [...], representative: [...] },                // sanitized rejection labels (§20.8 N5)
   facts:              { …6 evidence facts… }
 }
 evidenceCommitment = 0x + hex(SHA-256(JCS(commitmentInput)))
 ```
+
+`review.reprocessing` never enters the preimage (§20.8 N3); normalization follows §20.8 before facts are derived.
 
 ```text
 binding    ties Decision / endorsement / record to this exact confidential run, its facts and the exact
@@ -1211,6 +1454,7 @@ Golden inputs live in `test-vectors/s001/*.json`, shared by packages, api and wo
 |---|---|---|---|
 | B01 | U + A + M | config parse/hash; API boot check with correct pin; manual review of committed config vs Railway pin | T7.1, T7.2, T15.3 |
 | B02 | U + A | policy altered / pin mismatch → evaluation ERROR, U10 refuses, no ACTIVE | T7.2, T10.2, T11.2 |
+| B04 | U + A + S | evidence-source mismatch: workflow `companyEvidence.source` ≠ Bootstrap Configuration `evidenceSources.company` → TEE ERROR, no facts (`tta-source-mismatch`); callback `evidenceProfile`/`evidenceSources` ≠ pinned configuration → result rejected, no facts, never ALLOW | T8.3a, T8.6, T9.3 |
 | B03 | U + A | valid self-signed "I am a Trust Anchor" + no Decision/endorsement → activation rejected; no API accepts self-assertions | T2.6, T11.2 |
 
 ## C. Canonical Identity
@@ -1238,7 +1482,7 @@ Golden inputs live in `test-vectors/s001/*.json`, shared by packages, api and wo
 |---|---|---|---|
 | E01 | S + U | `cre workflow simulate identity-confidential … --http-payload fixtures/tta-happy.sealed.json` with MOCK Sumsub → 6 facts true + commitment; `derive-facts` unit tests on the same fixture | T8.4, T8.6 |
 | E02 | S + U | AML RED fixture → AML false → DENY at API | T8.4, T8.6 |
-| E03 | L | deployed workflow, Sumsub sandbox, Vault secrets → execution ID, sanitized events, minimized result; MOCK rejected by run metadata | T16.2, T16.3 |
+| E03 | L | deployed workflow, REAL Sumsub sandbox representative call, Vault secrets → execution ID, sanitized events, minimized result; the MOCK Sumsub server is rejected by run metadata; under the Hybrid Demo Profile the company leg is the SYNTHETIC MOCK fixture and the artifact states the profile labels (D31) | T16.2, T16.3 |
 | E04 | U + S + I | bad token / secret / signature → ERROR, no facts; simulation with wrong `.env` secret; API never reaches ALLOW | T8.3, T8.6, T9.3 |
 | E05 | U + S + A | timeout / 5xx / unparseable → ERROR or null facts; API run TIMED_OUT → never ALLOW | T8.3, T8.6, T9.4 |
 | E06 | U + S + I | synthetic response with `PRIVATE_FIXTURE_123` → absent from callback, return value, logs, DB, artifacts | T8.5, T8.6, T17.3 |
@@ -1261,7 +1505,7 @@ Golden inputs live in `test-vectors/s001/*.json`, shared by packages, api and wo
 | F07 | U: possession false → DENY; A/E/L via D02/L02 | T2.5, T6.2, T17.1 |
 | F08 | U: purpose false → DENY; via D06 | T2.5, T2.7 |
 | F09 | U: stale → DENY; U: reviewDate > 180 days fixture | T2.5, T8.4 |
-| F10 | U: missing AML → DENY; trace status MISSING (≠ FALSE) | T2.5 |
+| F10 | U: missing AML → DENY; trace status MISSING (≠ FALSE); U (derivation): completed GREEN + rejection labels present → `ORGANIZATION_AML_CLEAR` MISSING with private reason `INCONSISTENT_PROVIDER_STATE` → policy DENY, trace MISSING | T2.5, T8.4 |
 | F11 | U: unknown `SUPER_TRUSTED_BY_UI=true` dropped; AML false → DENY | T2.5 |
 | F12 | **RETIRED** (T0.9). Its generic intent is covered by F11 plus the callback strict-schema test (unknown fields rejected) in T9.3 | — |
 
@@ -1318,9 +1562,10 @@ Golden inputs live in `test-vectors/s001/*.json`, shared by packages, api and wo
 
 | TV | Verification | Where / how | Task |
 |---|---|---|---|
-| L01 | L + E + J | full live run (18 steps incl. bindingRefs + attach): Railway + deployed `identity-confidential` + Privy + Sumsub sandbox | T16.3, T18.1 |
+| L01 | L + E + J | full live run (18 steps incl. bindingRefs + attach): Railway + deployed `identity-confidential` + Privy + REAL Sumsub sandbox representative; company leg per evidence profile (Hybrid Demo Profile: SYNTHETIC MOCK, labeled) | T16.3, T18.1 |
 | L02 | L + J | live wrong-key proof → DENY, no endorsement/record/ACTIVE, verification false | T17.1 |
-| L03 | L + J (or labeled fixture) | sandbox company forced RED/AML or inactive registry → DENY | T17.2 |
+| L03 | L + J | REAL Sumsub sandbox representative forced RED (`SANCTIONS`, `FINAL`) → `AUTHORIZED_REPRESENTATIVE_VERIFIED` false → DENY (§20.6); MOCK company DENY scenarios only in simulation | T17.2 |
+| L04 | L + J + M | Hybrid Demo Profile labeling: pinned Bootstrap Configuration shows `HYBRID_DEMO` / `SYNTHETIC_MOCK`; Judge Inspector, artifacts and README show "Company evidence: SYNTHETIC MOCK" and "Representative verification: REAL SUMSUB SANDBOX"; claims scan finds no "Sumsub verified the organization" / "real Sumsub KYB end-to-end" | T7.1, T14.2, T18.1, T18.6 |
 
 ## Coverage of TEST-VECTORS §12–15
 
@@ -1330,7 +1575,7 @@ Golden inputs live in `test-vectors/s001/*.json`, shared by packages, api and wo
 §15 live set        → T16.3 (L01 + E03 + J01), T17.1 (L02); L03 strongly preferred (T17.2)
 ```
 
-All 65 vector IDs appear above (A3, B3, C3, D6, E11, F12, G6, H3, I6, J7, K2, L3): 60 active, 4 RETIRED (E08, E09, E10, F12) and 1 not applicable to S001 (I05).
+All 67 vector IDs appear above (A3, B4, C3, D6, E11, F12, G6, H3, I6, J7, K2, L4): 62 active, 4 RETIRED (E08, E09, E10, F12) and 1 not applicable to S001 (I05). TV-S001-B04 and TV-S001-L04 were added in Rev 2.3.
 
 ---
 
@@ -1341,6 +1586,7 @@ Run from the CRE project root `workflows/`, always non-interactive:
 ```bash
 cre workflow simulate identity-confidential \
   --target staging-settings --non-interactive --trigger-index 0 \
+  --limits test/limits.production-like.json \
   --http-payload fixtures/<case>.sealed.json
 ```
 
@@ -1353,9 +1599,13 @@ cre workflow simulate identity-confidential \
 | tta-unavailable | MOCK timeout / 5xx | ERROR, no facts | E05 |
 | tta-leak | MOCK payload with `PRIVATE_FIXTURE_123`, `RAW_SECRET_DOCUMENT_VALUE_001` | absent from callback / return / logs | E06, I03 |
 | tta-unknown-operation | sealed payload with unknown `operation` | ERROR, zero provider calls | router guard |
-| tta-sandbox | REAL Sumsub sandbox from the developer machine | real facts; labeled "simulation against Sumsub sandbox" — not deployment evidence | pre-deploy confidence |
+| tta-sandbox | REAL Sumsub sandbox (representative) from the developer machine + MOCK company fixture | real representative facts; company facts labeled MOCK; "simulation against Sumsub sandbox" — not deployment evidence | pre-deploy confidence |
+| tta-mock-company-* | MOCK company fixture scenarios of §20.7 (RED_AML, INACTIVE, STALE, NOT_LINKED, BINDING_MISMATCH) + MOCK representative server | expected results per §20.7 table; `evidenceSources.company = SYNTHETIC_MOCK` in the result | F02–F06, F09, E11 |
+| tta-source-mismatch | workflow config `companyEvidence.source` ≠ Bootstrap Configuration `evidenceSources.company` | ERROR, no facts | D30 guard |
 
-`handlerInTee` runs in the local simulator, **not** a real TEE; artifacts say so. `fixtures/seal-context.ts` builds sealed payloads from the local `.env` channel secret. Outputs pass the sanitizer (T18.2) before being saved.
+Two different mocks exist in simulation and are never confused: the **MOCK Sumsub server** (local HTTP mock of Sumsub responses, simulation only) and the **MOCK company-evidence fixture** (the §20.7 adapter, no HTTP). Both are labeled MOCK in every output.
+
+`handlerInTee` runs in the local simulator, **not** a real TEE; artifacts say so and label results **SIMULATION-CONFIRMED** only. Every simulation uses the production-like limits file (§17.1). `fixtures/seal-context.ts` builds sealed payloads from the local `.env` channel secret. Outputs pass the sanitizer (T18.2) before being saved.
 
 ---
 
@@ -1425,9 +1675,12 @@ artifacts/judges/s001/
   decision-allow.json, decision-deny-*.json, bootstrap-endorsement.json, admission-record.json
   verification-true.json, verification-false-tampered.json   (crypto vs operational basis shown)
   audit-timeline-happy.json, audit-timeline-deny.json
-  integrations/sumsub-evidence.md   "Sumsub sandbox — synthetic organization"; endpoints used; no IDs/PII;
-                                    representative-authority evidence class + limitation
+  integrations/sumsub-evidence.md   evidence profile + the exact labels "Company evidence: SYNTHETIC MOCK" /
+                                    "Representative verification: REAL SUMSUB SANDBOX" (Hybrid Demo Profile); endpoints used;
+                                    no IDs/PII; representative-authority evidence class + limitation
 ```
+
+Every artifact that contains facts, decisions or run results carries the `evidenceProfile` + `evidenceSources` labels, and `artifacts/chainlink/s001/README.md`, `artifacts/judges/s001/README.md` and the root/slice README show the two exact labels while the Hybrid Demo Profile is used; file names of runs that used the company fixture include `mock-company` (e.g. `live-happy.mock-company.json`).
 
 No LLM artifacts exist. Everything passes the sanitizer + secret scanner (T18.2) before commit (TEST-VECTORS §11).
 
@@ -1453,8 +1706,10 @@ No LLM artifacts exist. Everything passes the sanitizer + secret scanner (T18.2)
 | Operational DB tampering | endorsement signature binds record fields + `verificationMethodCommitment`; pinned config; verifier fails | lifecycle status is an operational projection (§26.1) |
 | Forged TEE result | HMAC with Vault-derived key, single-use runId, schema + echo checks, commitment recomputation; [P1] DON-signed report | channel secret also on Railway → a compromised API could forge results until the P1 report is in place |
 | Applicant substitution | Catenor-issued bindingRef as `externalUserId`, verified inside the TEE before any fact derivation; company ↔ representative cross-link | — |
-| Backend signs a bogus endorsement | separate bootstrap authorization key; human-initiated endpoint; audit | fully compromised API holding both keys can endorse — documented hackathon limitation; quorum later |
-| Assertion key used as execution key | Privy policy: 64-byte `signMessage` only (artifact: denied transaction) | address can receive funds |
+| Backend signs a bogus endorsement | separate bootstrap wallet with its own runtime-signer authorization key (D36); human-initiated endpoint; audit | a fully compromised API holding both runtime-signer authorization keys can endorse — documented hackathon limitation; quorum later. Management-owner authorization keys are not in the runtime, so a runtime compromise cannot change policies or export |
+| Assertion key used as execution key | Privy P_ASSERT: `signMessage` only, default-deny (observed: `signTransaction` denied; export denied) | address can receive funds; send-denial documentation-supported only (D35) |
+| Arbitrary message signed with the assertion key | Catenor signer boundary builds and length-checks the message from structured input (D33); runtime-signer authorization key used by no other code path | Privy does not restrict message content/length for binary messages (T0.5): runtime-signer authorization key + API code execution can sign arbitrary messages |
+| Assertion-wallet policy weakened or key exported | owner = management-owner authorization key outside the runtime; the runtime-signer authorization key is an additional signer that cannot change policy/signers/owner or export (D34, verified in T5.2) | compromise of the management-owner authorization key allows policy change and export — higher-privilege threat, documented |
 | TEE log leakage | no dynamic logging; `safeLog` enum codes; lint rule | — |
 | Public workflow config / DON-visible return | no secrets in config; return `{status, code}`; report carries a hash only | — |
 | Challenge replay | single-use conditional update, TTL, DID/VM/operation binding | — |
@@ -1463,10 +1718,33 @@ No LLM artifacts exist. Everything passes the sanitizer + secret scanner (T18.2)
 | SSRF from TEE | hosts fixed per capability; preHook call limit | — |
 | Public DB exposure | no TCP proxy; internal `DATABASE_URL` | — |
 | Secrets in Railway build logs | sealed variables; no echo in build scripts | Railway documents no log redaction |
+| MOCK company evidence mistaken for real KYB | `evidenceSources` hash-pinned in the Bootstrap Configuration and bound by the endorsement; carried in result, commitment, audit, UI, Judge Inspector, artifacts; API rejects source mismatch; claims rule §31.3 | a MOCK-based ALLOW is only as meaningful as its label — never a real KYB result |
 
 ## 31.3 Claims the demo may make
 
 Only artifact-backed claims: "Sumsub **sandbox** was called over HTTPS from inside a deployed CRE Confidential Workflow (TEE)", "only minimized facts and a commitment left the TEE", "Catenor never stored raw provider data", "admission provenance and bootstrap endorsement are cryptographically verifiable; current lifecycle status comes from the operational projection". Not claimed: production KYB of a real company; downloadable TEE attestation documents; use of the Confidential HTTP product; any LLM involvement.
+
+REAL vs MOCK evidence (D30) — every claim names its evidence class:
+
+```text
+REAL   "Representative/individual evidence came from real Sumsub sandbox API calls (synthetic applicant):
+        bindingRef ↔ externalUserId verified, GREEN and RED/SANCTIONS/FINAL reviews observed"
+MOCK   "Company/KYB evidence came from a clearly labeled synthetic MOCK fixture behind the provider-normalization
+        boundary; Sumsub company KYB was not available to the sandbox tenant"
+never  "Sumsub verified the organization", "real Sumsub KYB end-to-end", "KYB passed", or any wording that merges
+       MOCK company evidence into the REAL Sumsub claim (H4)
+labels "Company evidence: SYNTHETIC MOCK" · "Representative verification: REAL SUMSUB SANDBOX" (H3)
+```
+
+Privy assertion key (T0.5, D33–D35):
+
+```text
+may    "the assertion key is a dedicated Privy Solana Ed25519 wallet; its raw-byte signatures verify independently"
+       "Privy policy allows only message signing (default-deny); transaction signing and key export were denied"
+       "the exact assertion message format and length are enforced by the Catenor signer boundary"
+never  "Privy enforces the assertion message length/format"; "transaction sending was shown to be denied";
+       "T0.5 proves eddsa-jcs-2022 interoperability" (only after T2.3 / T5.2 test it)
+```
 
 ---
 
@@ -1499,7 +1777,7 @@ Phase 17 live negative paths + privacy scans
 Phase 18 artifacts, provenance, docs, ADRs
 ```
 
-Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7 and 10–14 proceed in parallel. Local development uses a FAKE `ConfidentialEvidenceVerifier` (labeled FAKE in state and UI) that cannot be selected in production configuration.
+Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7 and 10–14 proceed in parallel. Local development uses a FAKE `ConfidentialEvidenceVerifier` (labeled FAKE in state and UI) that cannot be selected in production configuration. Separately, the workflow's company leg uses the MOCK company-evidence fixture (§20.7) until T0.8b; it does not block the fast lane.
 
 ---
 
@@ -1510,23 +1788,26 @@ Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7
 | ID | Item | Impact | Handling |
 |---|---|---|---|
 | B1 | CRE Confidential Workflows private beta + deploy access + **private registry** availability [HUMAN] | AC-029/030, TV-E03/L01 impossible without it | **Status 2026-09-10 (maintainer, from Chainlink Labs contact):** deploy access enabled and private registry available; Confidential Workflows enrollment form submitted, org in Chainlink's queue ("todo", typical turnaround ≈24 h). Still open until enrollment is confirmed. Never substitute simulation; mainnet registry only with maintainer approval |
-| B2 | Privy Ed25519 signing semantics [STOP-GATE T0.5] | assertion + bootstrap signers, crypto profile D3 | if the spike fails → STOP and report; no silent fallback |
-| B3 | `@noble/ciphers` AES-GCM + `@noble/hashes` in CRE QuickJS inside `handlerInTee` [STOP-GATE T0.7] | sealed private context (D11) | if it fails → STOP and report; context-fetch fallback only after maintainer review |
-| B4 | Sumsub sandbox semantics (company `testCompleted`, linkage fields, role-verification strength, registry status source) [T0.8] | fact rules §20.4, live DENY case, representative-authority strength | no provider semantics hardcoded before the spike; limitation documented if role is not provider-verified |
-| B5 | Source-of-truth documents required the LLM (`LLM_API_KEY`, AC-031–034/041/072, TV-E08–E10/F12, SPEC §16/§36) | implementation would have contradicted the SPEC | **RESOLVED in T0.9** (2026-09-10): Appendix E applied; pending maintainer review of the edits |
-| B6 | HTTP budget: documented `HTTPAction.CallLimit` = 5 | design headroom | design uses ≤ 4 (§17.5); per-request `timeout` behavior in TeeRuntime measured in T0.7 |
-| B7 | Local `chainlink-cre-skill` outdated in places (HTTP trigger shape, cacheSettings, getSecrets batching, deploy/registry notes) | wrong code if followed blindly | cre-engineer instructed to prefer live docs where they differ; third-party skill not edited |
-| B8 | `cre init` template identifier `hello-confidential-workflows-ts` + flags [UNCONFIRMED until CLI installed] | scaffolding step | confirm via `cre init --help` in T0.7/T8.1; report if the template is unavailable instead of hand-writing boilerplate |
-| B9 | Claude Code subagent skill preloading [UNCONFIRMED] | cre-engineer setup | T0.6 verifies; fallback = explicit "read SKILL.md first" instruction |
+| B2 | Privy Ed25519 signing semantics [STOP-GATE T0.5] | assertion + bootstrap signers, crypto profile D3 | **RESOLVED — T0.5 PASSED WITH APPROVED DESIGN AMENDMENT** (2026-09-10; §13.2, D33–D35) |
+| B3 | `@noble/ciphers` AES-GCM + `@noble/hashes` in CRE QuickJS inside `handlerInTee` [STOP-GATE T0.7] | sealed private context (D11) | **SIMULATION-CONFIRMED** (T0.7, D37): HKDF/AES-256-GCM open and 5/5 tamper cases inside `handlerInTee` in the simulator. Open: base64 transport test (T8.2) and deployed-TEE re-check (T16.2, gated by B1) |
+| B4 | Sumsub sandbox semantics (company `testCompleted`, linkage fields, role-verification strength, registry status source) [T0.8] | fact rules §20.4, live DENY case, representative-authority strength | **Individual/representative: RESOLVED** (T0.8 PASSED, D25; §20.3). Company side → B11 |
+| B11 | **Sumsub company/KYB blocked by tenant entitlement** (sandbox exposes no company-type level) [HUMAN] | company facts cannot come from real Sumsub; `REPRESENTATIVE_AUTHORITY_CONFIRMED` rests on MOCK linkage | **OPEN.** No bypass attempted. MOCK company-evidence fixture behind the normalization boundary (D29, §20.7); T0.8b runs when entitlement exists |
+| B5 | Source-of-truth documents required the LLM (`LLM_API_KEY`, AC-031–034/041/072, TV-E08–E10/F12, SPEC §16/§36) | implementation would have contradicted the SPEC | **RESOLVED in T0.9** (2026-09-10): Appendix E applied; approved by the maintainer; committed in `f6b571e` and `2772744` |
+| B6 | HTTP budget: documented `HTTPAction.CallLimit` = 5 | design headroom | **SIMULATION-CONFIRMED** with a production-like limits file: 5 calls pass, call #6 rejected; request/response size limits enforced (10,000 / 100,000 bytes); design ≤ 4 (§17.5). Per-request timeout > 10 s and deployed-TEE limits UNCONFIRMED |
+| B7 | Local `chainlink-cre-skill` outdated in places (HTTP trigger shape, cacheSettings, getSecrets batching, deploy/registry notes) | wrong code if followed blindly | cre-engineer instructed to prefer live docs where they differ; third-party skill not edited — T0.7 observed two stale points (TS `getSecrets` batching exists; trigger payload is `Payload{input: Uint8Array}`) |
+| B8 | `cre init` template identifier `hello-confidential-workflows-ts` + flags | scaffolding step | **RESOLVED** (T0.7, CLI v1.33.0): template listed and `cre init` succeeds (`TERM=dumb` for non-interactive); `--deployment-registry private` accepted but not persisted → set in `workflow.yaml` |
+| B9 | Claude Code subagent skill preloading | cre-engineer setup | **RESOLVED** (T0.6): `skills:` frontmatter preloads `chainlink-cre-skill`; validated by a delegated no-tools check |
 | B10 | Provider-binding errors are detectable only inside a CRE run (API has no Sumsub credentials) | a setup mistake costs one run (rate limit 1/60 s) | acceptable; UI tells the operator to double-check External User IDs before verifying |
 
 ## 33.2 Decision register (maintainer amendments of 2026-09-10)
 
 | ID | Decision | Status |
 |---|---|---|
-| D1 | Privy Ed25519 assertion signer (dedicated per Organization, strict no-transaction policy) | **APPROVED PROVISIONALLY**, pending T0.5 [STOP-GATE]; Credential Assertion Key ≠ Financial Execution Key remains frozen |
+| D1 | Privy Ed25519 assertion signer (dedicated Solana wallet per Organization, strict no-transaction policy) | **APPROVED** — T0.5 passed with approved design amendment (D33 signer boundary, D34 owner/signer separation); Credential Assertion Key ≠ Financial Execution Key remains frozen |
 | D2 | Separate bootstrap signer; human-initiated endorsement | **APPROVED**; no mandatory two-person rule in S001 |
-| D3 | Crypto profile (Ed25519 Multikey, `eddsa-jcs-2022`, RFC 8785 JCS + SHA-256, `0x` commitments, 128-bit hex DID id) | **APPROVED as Catenor One [REF-IMPL]**, conditional on T0.5; not a Catenor Protocol profile |
+| D36 | Bootstrap Endorsement Key authorization (Q7) | **APPROVED**: separate bootstrap wallet (Bootstrap Endorsement Key), separate bootstrap management-owner authorization key, separate bootstrap runtime-signer authorization key, `P_BOOTSTRAP` policy; Credential Assertion Key ≠ Bootstrap Endorsement Key; no signing or authorization key reused across the two wallets; Bootstrap Authority controlled by the maintainer (§13.0, §13.1.2) |
+| D37 | T0.7 CRE runtime findings | **APPROVED as Catenor One reference-implementation details (not protocol requirements)**: official TS Confidential Workflow scaffold; `handlerInTee`/`TeeRuntime`; batched Vault secrets (3 names); `HTTPClient` inside `handlerInTee`; `runtime.now()`; JCS + noble primitives; AES-256-GCM sealed context with HKDF-SHA256 key and 12-byte nonce; base64 HTTP request bodies; `deployment-registry: "private"` in `workflow.yaml`; production-like simulation limits file — **SIMULATION-CONFIRMED** only (§17.1, §18). Exception: nonce and ciphertext‖tag **base64 transport = APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED** (the spike used hex; T8.2 tests base64 in the CRE QuickJS/WASM runtime; T16.2 re-checks the whole sealed path deployed) |
+| D3 | Crypto profile (Ed25519 Multikey, `eddsa-jcs-2022`, RFC 8785 JCS + SHA-256, `0x` commitments, 128-bit hex DID id) | **APPROVED as Catenor One [REF-IMPL]**; T0.5 resolves only the **Ed25519 primitive** (raw-byte signing, independent verification). Full W3C `eddsa-jcs-2022` Data Integrity interoperability is **not** claimed until T2.3 / T5.2 test it. Not a Catenor Protocol profile |
 | D4 | Missing required fact | **APPROVED: DENY**; private trace records MISSING distinctly from FALSE |
 | D5 | Freshness + provider acceptance rules in the hash-pinned Bootstrap Configuration | **APPROVED**; `evidenceMaxAgeDays = 180` [REF-IMPL] |
 | D6 | Sumsub sandbox as the real integration for the hackathon | **APPROVED** with explicit "Sumsub sandbox" labeling everywhere |
@@ -1534,7 +1815,7 @@ Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7
 | D8 | LLM | **REMOVED FROM S001**; no Anthropic integration in this slice |
 | D9 | CRE deployment registry | **APPROVED: private registry** |
 | D10 | `CATENOR_INTERNAL_API_TOKEN` as channel/root secret | **APPROVED** |
-| D11 | Sealed trigger context | **APPROVED CONDITIONALLY**, pending T0.7 [STOP-GATE] |
+| D11 | Sealed trigger context | **APPROVED** — SIMULATION-CONFIRMED in T0.7 (D37); base64 transport to be simulation-tested in T8.2; deployed-TEE behavior gated by B1 (re-check T16.2) |
 | D11a | HTTPS via `HTTPClient` inside `handlerInTee` (not the Confidential HTTP product) | **CONFIRMED** |
 | D12 | DON-signed result report (`reportFromDon`) | **APPROVED P1**; must not block first real deployment |
 | D13 | Custom ECIES evidence retention | **REJECTED**; S001 uses COMMITMENT_ONLY |
@@ -1549,6 +1830,17 @@ Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7
 | D22 | Public read-only Judge Inspector | **APPROVED** for the hackathon |
 | D23 | Failed key proof → immediate DENY, no CRE provider calls | **APPROVED** |
 | D24 | ADRs (signer custody; CRE workflow boundary + result transport) | **APPROVED**; written near the end of the slice once proven by implementation |
+| D25 | T0.8 individual Sumsub integration | **PASSED / APPROVED** (2026-09-10): real Sumsub sandbox API, synthetic applicants, bindingRef ↔ externalUserId verified, GREEN verified, RED/SANCTIONS/FINAL verified |
+| D26 | Absent rejection fields | **APPROVED**: completed GREEN → absent `rejectLabels` / `reviewRejectType` = no rejection labels; any other state → MISSING, never empty (§20.8 N1–N2) |
+| D27 | `review.reprocessing` | **APPROVED**: ignored entirely in S001 — not a policy fact, not in the commitment preimage (§20.8 N3) |
+| D28 | Freshness source | **APPROVED**: `review.reviewDate` is the source for the 180-day rule (§20.8 N4) |
+| D29 | Company evidence while KYB entitlement is missing | **APPROVED for development**: clearly labeled MOCK company-evidence fixture behind the provider-normalization boundary; replaceable `CompanyEvidenceSource` adapter; real Sumsub representative integration stays live; no domain/policy change (§20.7) |
+| D30 | REAL vs MOCK labeling | **APPROVED**: MOCK labeled everywhere, never presented as Sumsub KYB; final hackathon claims distinguish REAL Sumsub sandbox evidence from MOCK company evidence (§20.7, §31.3) |
+| D31 | Live path without company KYB entitlement (Q4) | **APPROVED WITH A STRICT DEMO PROFILE**: Hybrid Demo Profile — company SYNTHETIC MOCK, representative REAL Sumsub sandbox, REAL deployed CRE workflow, REAL Catenor policy/endorsement/Admission; requirements H1–H5 (§20.7.1); AC-019 amended, AC-077 added |
+| D32 | AML labels (Q5) | **APPROVED**: no universal Catenor AML deny-list; `ORGANIZATION_AML_CLEAR` = completed + GREEN + no labels → true, RED → false, pending/incomplete → false, unavailable/unparseable → MISSING; **correction (approved with Rev 2.3):** completed GREEN + rejection labels present → MISSING with private reason `INCONSISTENT_PROVIDER_STATE` (§20.8 N6); labels kept as sanitized reason codes only (§20.4, §20.8 N5) |
+| D33 | Assertion-message control (T0.5) | **APPROVED**: Privy `message.byte_length` is not a security primitive for binary assertion messages; the Catenor signer boundary accepts structured input, builds the canonical message, validates format and exact length, then calls Privy `signMessage` and verifies (§13.4). The assertion payload is **not** changed to text to suit Privy. 64 bytes is a profile value, not a protocol requirement |
+| D34 | Privy authorization model (T0.5) | **APPROVED**: assertion management-owner authorization key = wallet owner (administrative only, not in the runtime); assertion runtime-signer authorization key = additional signer scoped by P_ASSERT; the runtime signer cannot change ownership/policies/signers or export (§13.0, §13.1.1; verified in T5.2). P-256 authorization keys are control keys, not the Credential Assertion Key |
+| D35 | Transaction-sending denial (T0.5) | **RECORDED**: transaction signing denial CONFIRMED; sending denial UNCONFIRMED LIVE — no wallet funding or broadcast to test it; default-deny documentation-supported only; not a Phase 0 blocker |
 
 ## 33.3 Final decisions on Rev 2 questions (maintainer, 2026-09-10)
 
@@ -1558,6 +1850,20 @@ Critical path: **CRE beta access + T0.7 → Phase 8 → Phase 16**. Phases 1–7
 | Q2 | Provider-binding mismatch negative path | **APPROVED**: AC-S001-075, TV-S001-E11 — mismatch → no required facts established, no ALLOW |
 | Q3 | Railway bucket in S001 | **APPROVED: do not provision or use** in S001 (COMMITMENT_ONLY); bucket stays in the wider architecture |
 | — | Evidence-commitment wording | **CORRECTED**: recomputable against the retained normalized preimage and provider-response digests; binds what was observed; does not preserve or reconstruct raw provider evidence (§23) |
+
+## 33.4 Questions raised by Rev 2.2 — DECIDED 2026-09-10
+
+| ID | Question | Decision |
+|---|---|---|
+| Q4 | Live hackathon run with MOCK company evidence if KYB entitlement is still missing | **APPROVED WITH A STRICT DEMO PROFILE** → D31, §20.7.1 |
+| Q5 | AML rejection-label deny-list | **No universal deny-list** → D32; labels are sanitized reason codes only |
+
+## 33.5 Questions raised by T0.5
+
+| ID | Question | Status |
+|---|---|---|
+| Q6 | **To Privy (non-blocking):** does policy `byte_length` intentionally operate on the decoded/textual message representation for Solana `signMessage`, and is there any supported policy predicate over the raw message byte length? | open; asked asynchronously; nothing waits on it (D33 does not depend on the answer) |
+| Q7 | Apply the D34 owner/signer separation also to the **bootstrap** endorsement wallet | **APPROVED** → D36, §13.1.2 |
 
 ---
 
@@ -1596,6 +1902,9 @@ https://docs.privy.io/api-reference/wallets/create ; .../wallets/solana/sign-mes
 https://docs.privy.io/controls/policies/overview ; https://docs.privy.io/api-reference/policies/create
 https://docs.privy.io/controls/policies/example-policies/solana
 https://docs.privy.io/controls/authorization-keys/owners/types ; https://docs.privy.io/api-reference/key-quorums/create
+https://docs.privy.io/controls/policies/overview ; https://docs.privy.io/controls/authorization-keys/owners/overview
+https://docs.privy.io/security/implementation-guide/security-checklist ; https://docs.privy.io/api-reference/authorization-signatures
+https://docs.privy.io/basics/troubleshooting/error-handling/api-errors   (T0.5, 2026-09-10)
 https://docs.privy.io/security/security-faqs ; https://docs.privy.io/wallets/wallets/export
 https://docs.privy.io/authentication/user-authentication/access-tokens ; https://docs.privy.io/user-management/users/identity-tokens
 https://docs.privy.io/authentication/user-authentication/login-methods/email
@@ -1764,3 +2073,27 @@ N/A to S001       AC-057, AC-059, TV-I05
 | `slices/S001-trust-anchor-admission/README.md` L20 | "Real Sumsub evidence + auxiliary LLM" → remove LLM |
 | `artifacts/judges/s001/README.md` L20 and `trust-anchor-flow.html` (9 LLM mentions) | remove LLM; add "visualization only" banner (T14.3) |
 | `docs/architecture/ARCHITECTURE.md` §12, `README.md` repository tree | add `workflows/identity-confidential` and the workflow-boundary rule; mark the empty `subject-continuity` placeholder as superseded (directory itself untouched; reconciled when S002 starts) — ADR to follow (D24) |
+
+---
+
+# Appendix F — Source-of-truth alignment for Rev 2.2–2.6 (APPLIED and approved 2026-09-10; committed in `2772744`)
+
+Rev 2.2/2.3 change no domain semantics, fact names or policy. Q4 (D31) required the source-of-truth wording that assumed a REAL company leg to name the evidence profile explicitly; the requirement is **amended, not weakened**: the representative leg must be REAL in every profile, the company leg must be REAL under the preferred Full Sumsub Sandbox Profile, and a SYNTHETIC MOCK company leg is allowed only under the Hybrid Demo Profile with H1–H5 enforced and tested. Q5 (D32) required no source-of-truth change (no AML label list exists there).
+
+| File / location | Edit applied |
+|---|---|
+| `SPEC.md` header | Rev 2.3 note (evidence profiles, AC-077, TV-B04/L04) |
+| `SPEC.md` §12 | new §12.3 "Evidence profiles" (Full Sumsub Sandbox Profile preferred; Hybrid Demo Profile with H1–H5); live-path paragraph and applicant-reference list point to it |
+| `SPEC.md` §12.1 step 4 | Hybrid: representative applicant only; company reference = SYNTHETIC MOCK fixture reference |
+| `SPEC.md` §12.2 | Hybrid: company ↔ representative linkage comes from SYNTHETIC MOCK evidence and is labeled so |
+| `SPEC.md` §18 | evidence-source note under the fact-provenance table |
+| `SPEC.md` private-state list | "Sumsub company applicant reference (Hybrid Demo Profile: SYNTHETIC MOCK company reference)" |
+| `SPEC.md` §32 steps 3, 8 | representative REAL; company per evidence profile, labeled |
+| `SPEC.md` §33 artifacts | evidence-profile labels |
+| `SPEC.md` §36 frozen decisions | "Identity evidence provider" + "Evidence profile" lines |
+| `ACCEPTANCE.md` header | Rev 2.3 note |
+| `ACCEPTANCE.md` AC-S001-019 (P0) | THEN split per leg: representative REAL always; company REAL (Full profile) or SYNTHETIC MOCK only under the Hybrid Demo Profile satisfying AC-077; mocks never satisfy the representative leg; reporting rule "met under the Hybrid Demo Profile (company evidence SYNTHETIC MOCK)" — never "fully met" |
+| `ACCEPTANCE.md` AC-S001-066, 068, 071, 072, §30 DoD | profile-aware wording + the two exact labels + forbidden claims |
+| `ACCEPTANCE.md` new **AC-S001-077 (P0)** | Hybrid Demo Profile is explicit, hash-pinned, endorsement-bound and truthfully labeled; source mismatch fails closed |
+| `TEST-VECTORS.md` header, §5, E03, L01, L03, §15, §16 | profile-aware wording; L03 adds the REAL representative-RED example |
+| `TEST-VECTORS.md` new **TV-S001-B04**, **TV-S001-L04** | evidence-source mismatch; live Hybrid Demo Profile labeling + claims |
