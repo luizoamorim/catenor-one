@@ -197,7 +197,7 @@ Current live Chainlink documentation must be consulted where it differs from the
 
 ### Project-specific `cre-engineer` subagent
 
-Planned project subagent:
+Created 2026-09-10 (TASKS T0.6); preloads `chainlink-cre-skill` through the Claude Code subagent `skills:` frontmatter field. Project subagent:
 
 ```text
 .claude/agents/cre-engineer.md
@@ -249,3 +249,31 @@ narrower verification claims
 Claude Code then aligned S001 SPEC / ACCEPTANCE / TEST-VECTORS with those approved decisions.
 
 No production code had been written at the completion of this planning/source-of-truth phase.
+
+## 2026-09-10 S001 Phase 0 technical-validation record
+
+New usage category: **AI-executed technical spikes through a scoped sponsor-skill subagent.**
+
+```text
+Claude Code main session
+→ created .claude/agents/cre-engineer.md (loads the official chainlink-cre-skill)
+→ delegated the CRE runtime spike (two runs, simulation only) to cre-engineer
+   (headless Claude Code sessions; deploy/secrets/key-link/login/git-write commands blocked)
+→ delegated Sumsub documentation research to a general-purpose subagent
+→ audited both spike transcripts against raw simulator output and corrected overstated conclusions
+→ wrote sanitized findings under slices/S001-trust-anchor-admission/spikes/
+```
+
+Human direction: the maintainer defined the scope (Phase 0 items independent of the pending Privy decision), the STOP conditions and the no-fallback rule. The maintainer has not yet reviewed the results.
+
+The subagent and the sponsor skill executed and reported; they did not change PLAN, TASKS, SPEC, protocol semantics or the crypto profile.
+
+Prompt/plan: `docs/hackathon/prompts/2026-09-10-006-s001-phase0-cre-sumsub-spikes.md`, `docs/hackathon/plans/2026-09-10-005-s001-phase0-cre-sumsub-spikes.md`.
+
+## 2026-09-10 S001 Phase 0 final review round
+
+Claude Code applied the maintainer's final Phase 0 decisions to PLAN/TASKS and the S001 source of truth, then ran the documentation/traceability cross-check. The decisions were Q7 (bootstrap owner/runtime-signer separation), T0.6 approval, T0.7 approval with SIMULATION-CONFIRMED wording, and the key terminology clarification (2 Catenor Ed25519 signing keys + 4 Privy P-256 authorization keys).
+
+While recording T0.7, Claude Code found that the spike had carried the sealed context as hex. The approved base64 transport is therefore recorded as APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED rather than confirmed.
+
+The T0.5 Privy spike earlier the same day was executed by the Claude Code main session with a documentation-only research subagent; no sponsor agent was involved. The human maintainer made every decision (T0.5 amendment, Q4–Q7, D31–D37); AI tools executed, measured and reported.

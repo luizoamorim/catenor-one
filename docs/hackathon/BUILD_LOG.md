@@ -669,6 +669,99 @@ Reference implementation direction:
 
 S002 remains unimplemented while S001 is completed first.
 
+---
+
+## 2026-09-10 — S001 Phase 0: cre-engineer, CRE access check, CRE runtime spike, Sumsub spike
+
+**Goal:** Validate the CRE and Sumsub assumptions S001 depends on, independently of the pending Privy decision.
+
+Work completed:
+
+- Created `.claude/agents/cre-engineer.md` (Catenor One project subagent; preloads the official `chainlink-cre-skill`; CRE-mechanics scope only; must not redefine protocol, identity, authority, delegation, policy, Subject Continuity or S001 semantics). Claude Code recognized it (`claude agents`) and a delegated validation confirmed the skill content is preloaded.
+- CRE access (CLI v1.33.0, outputs redacted): logged in; **Deploy Access: Enabled**; registries `private` (Chainlink-hosted) and `onchain:ethereum-mainnet`; no linked owner keys. **Confidential Workflows private-beta enrollment is not visible through any CLI command or documented API** — it still requires written confirmation from Chainlink.
+- CRE runtime spike (T0.7), simulation only, run by `cre-engineer` in git-ignored `scratch/`: official `hello-confidential-workflows-ts` scaffold via `cre init`; batched `getSecrets` (3 names), `@noble/hashes` known-answer tests, **AES-256-GCM sealed-context open inside `handlerInTee` with 5/5 tamper cases failing closed**, RFC 8785 JCS, deterministic salt, `runtime.now()`, QuickJS globals, HTTP limits with a production-like limits file (6th call rejected; 10,000-byte request and 100,000-byte response limits enforced), per-request timeout behavior, trigger payload shape.
+- Sumsub spike (T0.8): documentation verification completed; a sanitizing sandbox harness was prepared. After the maintainer placed sandbox credentials in a git-ignored local `.env` (never read by the agent), the **live individual-applicant run passed**: auth, level list (`id-only` present; no company level), bindingRef as `externalUserId` echoed and looked up, `testCompleted` GREEN and RED (`SANCTIONS`, `FINAL`) verified. Company/KYB not attempted (entitlement blocker).
+
+Validation:
+
+- Sealed input feasibility **CONFIRMED in simulation**; deployed-TEE behavior remains unconfirmed until a real Confidential Workflows deployment.
+- Main session audited both spike transcripts (no forbidden commands; verdicts re-checked against raw simulator output) and corrected two overstated conclusions (timeout cap, registry failure cause).
+
+AI assistance:
+
+- Claude Code main session (orchestration, review, documentation); `cre-engineer` subagent with the official Chainlink skill (spike execution); general-purpose Claude Code subagent (Sumsub documentation research).
+
+Human review:
+
+- Pending at the time: `cre-engineer` file, both findings files, proposed PLAN corrections. *(Update: all reviewed and approved on 2026-09-10 — see "S001 Phase 0 final documentation decisions" below.)*
+
+Artifacts:
+
+```text
+.claude/agents/cre-engineer.md
+slices/S001-trust-anchor-admission/spikes/T0.7-cre-runtime.md
+slices/S001-trust-anchor-admission/spikes/T0.8-sumsub-sandbox.md
+docs/hackathon/prompts/2026-09-10-006-s001-phase0-cre-sumsub-spikes.md
+docs/hackathon/plans/2026-09-10-005-s001-phase0-cre-sumsub-spikes.md
+```
+
+Commit:
+
+```text
+f8657a9 (cre-engineer), 60ba490 (spike findings, PLAN/TASKS), this Phase 0 records commit (build log/provenance)
+```
+
+Notes:
+
+- Privy spike not run; crypto profile, D1/D3 and the assertion-signer design untouched (Privy decision pending).
+- No production S001 code, no repo dependencies, no migrations, no `workflows/identity-confidential`, no deployment.
+
+
+---
+
+## 2026-09-10 — S001 T0.5 Privy Credential Assertion Key spike (STOP-GATE: partial pass)
+
+Goal: validate a dedicated Privy Solana (Ed25519) wallet as the Credential Assertion Key, with a strict signing-only policy (maintainer decision for this spike; not a protocol decision).
+
+Work completed (Privy development app, synthetic data, `@privy-io/node` 0.34.0, scratch only):
+
+- wallet provisioned server-side with an ephemeral P-256 owner key and a policy; public key taken from the address (no export);
+- `signMessage` signatures verified locally as **plain Ed25519 over the raw bytes** (no prefix, no hash);
+- denied as expected: signing without an owner signature (401), `signTransaction` (policy_violation), `rawSign` (unsupported for Solana), `exportPrivateKey` and `exportSeedPhrase` (policy_violation), policy removal without an owner signature (401);
+- **STOP-GATE:** the policy condition `message.byte_length eq "64"` denied the authorized 64-byte *binary* message; a diagnostic showed the condition works for text messages but not binary input;
+- documented limitations: the owner can lift the export DENY; send-transaction denial cannot be shown without funds (simulation runs before policy).
+
+Validation: sanitized outputs leak-checked; no secrets, keys or full IDs recorded.
+
+AI assistance: Claude Code (harness, docs/SDK review, analysis); general-purpose Claude Code subagent (Privy documentation research).
+
+Human review: the maintainer chose option A (Catenor signer boundary) and pursues option C with Privy non-blocking — T0.5 PASSED WITH APPROVED DESIGN AMENDMENT (PLAN D33–D35).
+
+Artifacts: `slices/S001-trust-anchor-admission/spikes/T0.5-privy-assertion-key.md`.
+
+Commit: 60ba490 (findings, PLAN/TASKS); provenance in the Phase 0 records commit.
+
+---
+
+## 2026-09-10 — S001 Phase 0 final documentation decisions
+
+Goal: close the Phase 0 documentation decisions before the first S001 implementation commit.
+
+Decisions recorded (maintainer):
+
+- **Q7 → D36:** the Bootstrap Endorsement Key uses the same Privy owner/runtime-signer pattern as the assertion key, but as a completely separate wallet with its own management-owner and runtime-signer authorization keys and its own `P_BOOTSTRAP` policy. Credential Assertion Key ≠ Bootstrap Endorsement Key; no key reuse.
+- **Key terminology (PLAN §13.0):** 2 Catenor Ed25519 signing keys (Credential Assertion Key, Bootstrap Endorsement Key) + 4 Privy P-256 authorization (control) keys. Management-owner authorization keys stay outside the runtime. Catenor-managed custody is a reference-implementation choice, not a protocol requirement. T0.4 renamed "Privy signing-wallet and authorization-key provisioning".
+- **T0.6 complete:** `cre-engineer` approved after three corrections.
+- **T0.7 complete (D37):** CRE runtime findings approved as reference-implementation details, all **SIMULATION-CONFIRMED** only; B3/B6 simulation-confirmed, B8/B9 resolved; nothing about deployed or production TEE behavior is marked confirmed.
+- **Evidence gap recorded:** the T0.7 spike carried the sealed context as hex; the approved base64 transport is APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED — T8.2 tests it in the CRE QuickJS/WASM runtime (no `atob`/`btoa` there) and T16.2 re-checks the whole sealed path in the deployed workflow.
+
+Validation: documentation/traceability cross-check re-run across SPEC, ACCEPTANCE, TEST-VECTORS, PLAN and TASKS (77 acceptance criteria, 67 test vectors, all task/decision references resolved).
+
+AI assistance: Claude Code main session (edits, cross-check).
+
+Human review: approved in the final Phase 0 documentation review (2026-09-10).
+
+Commit: 2772744 (source of truth, T0.9), 60ba490 (PLAN/TASKS + spike findings), f8657a9 (cre-engineer subagent), plus the Phase 0 records commit that contains this entry.
 
 ## Entry template
 

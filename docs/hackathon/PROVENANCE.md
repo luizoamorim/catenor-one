@@ -486,3 +486,71 @@ S008 Audit & Explainability
 The renumbering affects not-yet-implemented slices only.
 
 S001 remains the first implementation slice.
+
+---
+
+## 18. 2026-09-10 — `cre-engineer` project subagent
+
+Type:
+
+```text
+Project-authored Claude Code subagent definition (not a Chainlink-provided agent)
+```
+
+File:
+
+```text
+.claude/agents/cre-engineer.md
+```
+
+Source: written for Catenor One by Claude Code under maintainer instruction (PLAN §17.7, TASKS T0.6). It preloads the official `chainlink-cre-skill` (§12) through the Claude Code subagent `skills:` frontmatter field. No third-party text was copied into it.
+
+---
+
+## 19. 2026-09-10 — S001 Phase 0 CRE runtime spike tooling (scratch only, not committed)
+
+Type:
+
+```text
+Official sponsor CLI / template / SDK + open-source libraries, used in a git-ignored spike
+```
+
+Used only under `scratch/` (git-ignored via `scratch/.gitignore`); **no file from the spike is committed and no spike code is imported by Catenor One**. Sanitized findings are committed in `slices/S001-trust-anchor-admission/spikes/T0.7-cre-runtime.md`.
+
+| Item | Source | Version | License |
+|---|---|---|---|
+| CRE CLI | Chainlink (`~/.cre/bin/cre`) | v1.33.0 | Chainlink terms |
+| `hello-confidential-workflows-ts` template | `smartcontractkit/cre-templates` (`starter-templates/hello-confidential-workflows`), fetched by `cre init` | branch `main`, fetched 2026-09-10 | per upstream repository |
+| `@chainlink/cre-sdk` | npm (pinned by the template) | 1.18.0 | **BUSL-1.1** — official SDK required to build CRE workflows; license note to be carried into production use review (T8.1) |
+| `@noble/hashes` | npm | 2.4.0 | MIT |
+| `@noble/ciphers` | npm | 2.4.0 | MIT |
+| `canonicalize` (RFC 8785 JCS) | npm | 5.0.0 | Apache-2.0 |
+| `viem`, `zod`, `typescript` | npm (template dependencies) | 2.34.0, 3.25.76, 5.9.3 | MIT, MIT, Apache-2.0 |
+
+Official documentation consulted: the pages listed in `slices/S001-trust-anchor-admission/PLAN.md` Appendix A.1 (service quotas, HTTP client TS reference, Confidential Workflows concepts/guide/client reference, TypeScript WASM runtime).
+
+---
+
+## 20. 2026-09-10 — Sumsub sandbox spike references (scratch only, not committed)
+
+Type:
+
+```text
+Official provider documentation + locally written spike harness
+```
+
+Documentation: docs.sumsub.com (authentication, create-applicant, link-beneficiary-to-company-kyb-20, get-applicant-data, get-applicant-review-status, request-applicant-check, simulate-review-response-in-sandbox, get-additional-company-check-data, mock-company-data, rejection-labels, rate-limits, verify-businesses, how-business-verification-works, test-in-sandbox, app-tokens) and the official signing examples repository `github.com/SumSubstance/AppTokenUsageExamples` (now `github.com/sumsub/AppTokenUsageExamples`) — read only, no code copied.
+
+Harness: `scratch/sumsub-spike/` (git-ignored), written from the documented request format using only Node built-ins. Findings (documentation evidence plus the live individual-applicant sandbox run of 2026-09-10) are committed in `slices/S001-trust-anchor-admission/spikes/T0.8-sumsub-sandbox.md`.
+
+---
+
+## 21. 2026-09-10 — S001 T0.5 Privy assertion-key spike tooling (scratch only, not committed)
+
+| Item | Source | Version | License |
+|---|---|---|---|
+| `@privy-io/node` | npm (official Privy server SDK; `@privy-io/server-auth` is deprecated) | 0.34.0 | Apache-2.0 |
+| `@noble/curves` | npm | 2.4.0 | MIT |
+| `@scure/base` | npm | 2.4.0 | MIT |
+
+Used only under `scratch/privy-spike/` (git-ignored) against a Privy development app with synthetic data; no spike code is imported by Catenor One. Official documentation consulted: docs.privy.io (list in `slices/S001-trust-anchor-admission/spikes/T0.5-privy-assertion-key.md` §1). Sanitized findings are committed in that file.
