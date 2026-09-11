@@ -1,0 +1,578 @@
+// Catenor One — S001 Trust Anchor Admission persistence model (TASKS T3.1; PLAN §10, §10.1, §25.3).
+//
+// APPROVED by the maintainer on 2026-09-11 (T3.1 final review). The initial migration (T3.2) is
+// prisma/migrations/*_init: Prisma-generated DDL + the reviewed raw SQL CHECKs and immutability triggers.
+//
+// Rules applied throughout:
+//   * Two Postgres schemas: catenor_public (rows the Resolver/API may serialize) and catenor_private
+//     (never serialized by public controllers). Native `schemas` + @@schema — generally available in the
+//     pinned Prisma 7.10.0 (validated without a preview flag), so the pub_/prv_ prefix fallback is not used.
+//   * No cross-schema Prisma relations prevent accidental relational traversal. Public/private
+//     authorization remains enforced by the application and/or database permissions — neither the
+//     separate schemas nor the absence of relations is by itself an access-control boundary.
+//   * A value that sits inside a signed or hashed object (Decision, key-possession challenge, bootstrap
+//     endorsement, audit event) is stored as the exact string that was signed/hashed. DateTime is used only
+//     for operational timestamps that nothing signs. JSON columns hold objects that are always verified by
+//     re-canonicalization (RFC 8785), so JSONB key reordering is harmless.
+//   * Never stored: private keys, Privy authorization keys, Privy/CRE/Sumsub secrets, raw provider
+//     responses, raw PII, provider evidence snapshots, operator email (PLAN §10.1). No evidence-object model
+//     (COMMITMENT_ONLY; no EvidenceVault in S001).
+//   * Every relation declares onDelete: Restrict and onUpdate: Restrict: no identifier cascade, delete or
+//     SET NULL may silently rewrite historical identity or root-of-trust relationships.
+//   * Constraints Prisma cannot express (CHECKs, immutability triggers) live in the raw SQL section of the
+//     initial migration and are summarized at the end of this file.
+//
+// The datasource URL lives in prisma.config.ts (Prisma 7).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/infrastructure/persistence/prisma/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["catenor_public", "catenor_private"]
+}
+
+// ============================================================================
+// catenor_public — rows the Resolver / public API / Judge Inspector may serialize (through DTO allowlists)
+// ============================================================================
+
+enum SubjectLifecycle {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+
+  @@schema("catenor_public")
+}
+
+enum VerificationMethodStatus {
+  ACTIVE
+  REVOKED
+
+  @@schema("catenor_public")
+}
+
+enum TrustAnchorStatus {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+  DEACTIVATED
+
+  @@schema("catenor_public")
+}
+
+/// Only ALLOW Decisions are public (PLAN §10.1, §11); the type makes any other value unstorable here.
+enum PublishedDecisionOutcome {
+  ALLOW
+
+  @@schema("catenor_public")
+}
+
+/// Public DID state. Built only from the DidDocument value object; regenerated, never edited in place.
+model DidDocumentProjection {
+  did       String           @id
+  document  Json
+  lifecycle SubjectLifecycle
+  updatedAt DateTime         @updatedAt @db.Timestamptz(3)
+
+  verificationMethods VerificationMethodProjection[]
+
+  @@schema("catenor_public")
+}
+
+model VerificationMethodProjection {
+  id                 String                   @id
+  did                String
+  type               String
+  /// Immutable after insertion (trigger): a new key means a new Verification Method.
+  publicKeyMultibase String
+  /// DID Document verification relationships, e.g. {assertionMethod}.
+  relationships      String[]
+  status             VerificationMethodStatus
+  /// Projection metadata only — never part of the resolved or signed DID Document.
+  createdAt          DateTime                 @default(now()) @db.Timestamptz(3)
+
+  didDocument DidDocumentProjection @relation(fields: [did], references: [did], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([did])
+  @@schema("catenor_public")
+}
+
+/// Immutable (PLAN §10.1): rows are inserted once, never updated.
+model PolicyPublication {
+  policyId      String @id
+  /// RFC 8785 canonical text exactly as hashed.
+  canonicalJson String
+  policyHash    String
+
+  @@schema("catenor_public")
+}
+
+/// The 7 protocol Decision fields (decision.schema.json) plus their commitment. ALLOW only.
+model DecisionProjection {
+  decisionRef        String                   @id
+  policy             String
+  subject            String
+  action             String
+  resource           String
+  decision           PublishedDecisionOutcome
+  /// Exact RFC 3339 value covered by decisionCommitment.
+  evaluatedAt        String
+  evidenceCommitment String
+  decisionCommitment String                   @unique
+
+  endorsement     BootstrapEndorsementProjection?
+  admissionRecord TrustAnchorAdmissionRecord?
+
+  @@schema("catenor_public")
+}
+
+/// Full endorsement including its eddsa-jcs-2022 proof. The FK to DecisionProjection means an
+/// endorsement row can exist only for a published (ALLOW) Decision.
+model BootstrapEndorsementProjection {
+  id          String @id
+  decisionRef String @unique
+  payload     Json
+
+  decisionProjection DecisionProjection          @relation(fields: [decisionRef], references: [decisionRef], onDelete: Restrict, onUpdate: Restrict)
+  admissionRecord    TrustAnchorAdmissionRecord?
+
+  @@schema("catenor_public")
+}
+
+/// SPEC §21 fields exactly (+ the [REF-IMPL] trustDomain / bootstrapEndorsementRef extensions, D14).
+model TrustAnchorAdmissionRecord {
+  id                      String @id
+  trustDomain             String
+  trustAnchor             String
+  admissionPolicy         String
+  policyHash              String
+  /// Always "ADMIT_TRUST_ANCHOR" (SPEC §21).
+  decision                String
+  verificationMethod      String
+  evidenceCommitment      String
+  /// Exact RFC 3339 value of the record.
+  createdAt               String
+  decisionRef             String @unique
+  bootstrapEndorsementRef String @unique
+
+  trustDomainProjection TrustDomainProjection          @relation("TrustDomainAdmissionRecords", fields: [trustDomain], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  decisionProjection    DecisionProjection             @relation(fields: [decisionRef], references: [decisionRef], onDelete: Restrict, onUpdate: Restrict)
+  endorsement           BootstrapEndorsementProjection @relation(fields: [bootstrapEndorsementRef], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status                TrustAnchorStatusProjection?
+  initialRootOf         TrustDomainProjection?         @relation("TrustDomainInitialRoot")
+
+  @@unique([trustDomain, trustAnchor])
+  @@schema("catenor_public")
+}
+
+/// Operational status projection (PLAN §26, checks 11–12) — not cryptographic proof. The FK means no
+/// status row (and so no ACTIVE) can exist without an Admission Record (AC-S001-051).
+model TrustAnchorStatusProjection {
+  trustDomain String
+  did         String
+  status      TrustAnchorStatus
+  changedAt   DateTime          @db.Timestamptz(3)
+
+  admissionRecord TrustAnchorAdmissionRecord @relation(fields: [trustDomain, did], references: [trustDomain, trustAnchor], onDelete: Restrict, onUpdate: Restrict)
+
+  @@id([trustDomain, did])
+  @@schema("catenor_public")
+}
+
+/// One initial root per Trust Domain:
+///   * one nullable column per domain row → at most one root per Trust Domain;
+///   * UNIQUE initialTrustAnchorDid → a DID is the initial root of at most one Trust Domain;
+///   * composite FK (id, initialTrustAnchorDid) → an Admission Record of that DID in that same domain;
+///     NULL until admission (MATCH SIMPLE skips the FK while the column is NULL);
+///   * set once in the U10 transaction by conditional update
+///     (… SET initialTrustAnchorDid = $2 WHERE id = $1 AND initialTrustAnchorDid IS NULL; 0 rows →
+///     INITIAL_TRUST_ANCHOR_EXISTS), after inserting the record;
+///   * immutability trigger: once non-NULL it can neither change nor return to NULL.
+model TrustDomainProjection {
+  id                         String  @id
+  bootstrapConfigurationHash String
+  initialTrustAnchorDid      String? @unique
+
+  admissionRecords       TrustAnchorAdmissionRecord[] @relation("TrustDomainAdmissionRecords")
+  initialAdmissionRecord TrustAnchorAdmissionRecord?  @relation("TrustDomainInitialRoot", fields: [id, initialTrustAnchorDid], references: [trustDomain, trustAnchor], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([id, initialTrustAnchorDid])
+  @@schema("catenor_public")
+}
+
+// ============================================================================
+// catenor_private — never serialized by public controllers (AC-S001-054, 055)
+// ============================================================================
+
+enum SubjectType {
+  HUMAN
+  ORGANIZATION
+  AGENT
+
+  @@schema("catenor_private")
+}
+
+enum ProviderBindingRole {
+  COMPANY
+  REPRESENTATIVE
+
+  @@schema("catenor_private")
+}
+
+enum ProviderBindingStatus {
+  PENDING_ATTACHMENT
+  ATTACHED_UNVERIFIED
+  BINDING_VERIFIED
+  BINDING_MISMATCH
+
+  @@schema("catenor_private")
+}
+
+enum KeyPurpose {
+  CREDENTIAL_ASSERTION
+  AUTHENTICATION
+  DELEGATION
+  RECOVERY
+  FINANCIAL_EXECUTION
+
+  @@schema("catenor_private")
+}
+
+enum KeyReferenceStatus {
+  ACTIVE
+  REVOKED
+
+  @@schema("catenor_private")
+}
+
+/// Mirrors TrustAnchorAdmission phases (PLAN §4.3).
+enum AdmissionPhase {
+  STARTED
+  KEY_PROVISIONED
+  KEY_PROOF_VALID
+  KEY_PROOF_INVALID
+  VERIFICATION_REQUESTED
+  EVIDENCE_RECEIVED
+  VERIFICATION_FAILED
+  DECIDED
+  ENDORSED
+  ADMITTED
+
+  @@schema("catenor_private")
+}
+
+enum ChallengeStatus {
+  ISSUED
+  CONSUMED
+
+  @@schema("catenor_private")
+}
+
+enum VerificationRunStatus {
+  PENDING
+  EVIDENCE_RECEIVED
+  ERROR
+  TIMED_OUT
+  BINDING_MISMATCH
+
+  @@schema("catenor_private")
+}
+
+enum RetentionMode {
+  COMMITMENT_ONLY
+
+  @@schema("catenor_private")
+}
+
+enum PolicyOutcome {
+  ALLOW
+  DENY
+  ERROR
+
+  @@schema("catenor_private")
+}
+
+enum RequirementStatus {
+  SATISFIED
+  FALSE
+  MISSING
+
+  @@schema("catenor_private")
+}
+
+/// The 8 frozen fact names of policy:trust-anchor-admission:v1.
+enum FactName {
+  ORGANIZATION_KYB_VERIFIED
+  ORGANIZATION_STATUS_VALID
+  ORGANIZATION_AML_CLEAR
+  AUTHORIZED_REPRESENTATIVE_VERIFIED
+  REPRESENTATIVE_AUTHORITY_CONFIRMED
+  ASSERTION_KEY_POSSESSION_VALID
+  ASSERTION_KEY_PURPOSE_VALID
+  EVIDENCE_FRESH
+
+  @@schema("catenor_private")
+}
+
+enum FactSource {
+  KEY_POSSESSION_VERIFIER
+  CONFIDENTIAL_VERIFICATION
+
+  @@schema("catenor_private")
+}
+
+/// Mirrors AUDIT_EVENT_TYPES in @catenor-one/audit (protocol types + Catenor One [REF-IMPL] extensions).
+enum AuditEventType {
+  SUBJECT_CREATED
+  KEY_ADDED
+  DID_DOCUMENT_CREATED
+  ADMISSION_REQUESTED
+  KEY_POSSESSION_VERIFIED
+  CONFIDENTIAL_EVIDENCE_VERIFIED
+  POLICY_EVALUATED
+  BOOTSTRAP_ENDORSEMENT_CREATED
+  TRUST_ANCHOR_ADMITTED
+  TRUST_ANCHOR_ADMISSION_DENIED
+  BOOTSTRAP_ACCESS_DENIED
+  PROVIDER_REFERENCES_ATTACHED
+  KEY_POSSESSION_FAILED
+  CONFIDENTIAL_VERIFICATION_REQUESTED
+  CONFIDENTIAL_VERIFICATION_FAILED
+  ADMISSION_ALREADY_ADMITTED
+
+  @@schema("catenor_private")
+}
+
+model Subject {
+  id        String           @id
+  did       String           @unique
+  type      SubjectType
+  lifecycle SubjectLifecycle
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+
+  providerBindings ProviderBinding[]
+  keyReferences    KeyManagementReference[]
+  sessions         AdmissionSession[]
+
+  @@schema("catenor_private")
+}
+
+/// Private provider binding (PLAN §4.2). bindingRef is created before any applicant ID exists and is
+/// never derived from identity data. Provider-generic model: `provider` carries no database default or
+/// CHECK; S001 writes "sumsub" from application configuration (later slices may add other providers).
+model ProviderBinding {
+  id                String                @id
+  subjectId         String
+  provider          String
+  role              ProviderBindingRole
+  bindingRef        String                @unique
+  /// Sumsub applicantId, or "mock:company-fixture:<scenario>" while the company source is SYNTHETIC_MOCK.
+  externalSubjectId String?
+  status            ProviderBindingStatus @default(PENDING_ATTACHMENT)
+  createdAt         DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime              @updatedAt @db.Timestamptz(3)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([subjectId, role])
+  @@schema("catenor_private")
+}
+
+/// Reference to a key held by a secure signer — never key material (AC-S001-012).
+/// Invariant: one signer mapping per Verification Method — PK verificationMethodId (one mapping per VM)
+/// and UNIQUE signerRef (one VM per signer). Key rotation creates a new Verification Method and a new
+/// mapping; the signing key behind an existing VM identity is never changed (the repository exposes no
+/// signerRef update; TV-S001-J07 detects a replaced key cryptographically).
+model KeyManagementReference {
+  verificationMethodId String             @id
+  subjectId            String
+  /// Opaque signer reference (e.g. Privy wallet id); private operational metadata, not a secret.
+  /// Immutable after insertion (trigger).
+  signerRef            String             @unique
+  /// Signer adapter name (e.g. "privy"; a FAKE adapter only outside production).
+  adapter              String
+  purpose              KeyPurpose
+  status               KeyReferenceStatus
+  createdAt            DateTime           @default(now()) @db.Timestamptz(3)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([subjectId])
+  @@schema("catenor_private")
+}
+
+/// Persisted TrustAnchorAdmission aggregate state (PLAN §4.3). Key facts are nullable: NULL = not
+/// established, so FALSE and MISSING stay distinct when the Decision is evaluated. keyPurposeValid stays
+/// NULL when verification stopped before purpose was evaluated (maintainer decision 2026-09-11).
+model AdmissionSession {
+  id                          String         @id
+  sessionRef                  String         @unique
+  trustDomain                 String
+  subjectId                   String
+  /// HMAC-SHA256(OPERATOR_REF_KEY, privyUserId); never the operator email.
+  operatorRef                 String
+  state                       AdmissionPhase @default(STARTED)
+  providerRefsAttached        Boolean        @default(false)
+  assertionVerificationMethod String?
+  keyPossessionValid          Boolean?
+  keyPurposeValid             Boolean?
+  /// Sanitized KeyPossessionVerifier reason codes (e.g. CHALLENGE_EXPIRED).
+  keyPossessionReasons        String[]
+  createdAt                   DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt                   DateTime       @updatedAt @db.Timestamptz(3)
+
+  subject   Subject                       @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  challenge KeyPossessionChallenge?
+  runs      ConfidentialVerificationRun[]
+  decision  DecisionRecord?
+
+  @@index([subjectId])
+  @@index([trustDomain])
+  @@schema("catenor_private")
+}
+
+/// Server-side challenge record (PLAN §14.1). Consumed by conditional update
+/// (… SET status = 'CONSUMED' WHERE challengeId = $1 AND status = 'ISSUED'); losing the race → CHALLENGE_CONSUMED.
+model KeyPossessionChallenge {
+  challengeId        String          @id
+  /// One challenge per session (PLAN §14.1).
+  sessionId          String          @unique
+  subject            String
+  verificationMethod String
+  /// "ADMIT_TRUST_ANCHOR" in S001 (CHECK).
+  operation          String
+  trustDomain        String
+  nonce              String          @unique
+  /// Exact signed RFC 3339 values.
+  issuedAt           String
+  expiresAt          String
+  status             ChallengeStatus @default(ISSUED)
+  consumedAt         DateTime?       @db.Timestamptz(3)
+
+  session AdmissionSession @relation(fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@schema("catenor_private")
+}
+
+/// One confidential verification run (PLAN §4.3, §19–§21). One accepted result per run: the result is
+/// recorded by conditional update from PENDING. commitmentInputs holds observedAt, response digests and
+/// provider-reference digests only — no salt, no content.
+model ConfidentialVerificationRun {
+  runId                          String                @id
+  sessionId                      String
+  /// 1..MAX_VERIFICATION_RUNS (3); bound enforced by CHECK in the T3.2 migration.
+  attempt                        Int
+  operation                      String
+  creWorkflowId                  String
+  creExecutionId                 String?
+  status                         VerificationRunStatus @default(PENDING)
+  code                           String?
+  deadlineAt                     DateTime              @db.Timestamptz(3)
+  facts                          Json?
+  evidenceCommitment             String?
+  commitmentInputs               Json?
+  /// {company: "SYNTHETIC_MOCK" | "REAL_SUMSUB_SANDBOX", representative: "REAL_SUMSUB_SANDBOX"} (§20.7).
+  evidenceSources                Json
+  retentionMode                  RetentionMode         @default(COMMITMENT_ONLY)
+  bootstrapConfigurationHashEcho String?
+  resultAuth                     Json?
+  /// [P1] DON-signed report.
+  donReport                      Json?
+  createdAt                      DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt                      DateTime              @updatedAt @db.Timestamptz(3)
+
+  session AdmissionSession @relation(fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([sessionId, attempt])
+  @@index([status, deadlineAt])
+  @@schema("catenor_private")
+}
+
+/// Every Decision (ALLOW / DENY / ERROR) with the 7 protocol fields; one per session (terminal).
+model DecisionRecord {
+  decisionRef        String        @id
+  sessionId          String        @unique
+  policy             String
+  subject            String
+  action             String
+  resource           String
+  decision           PolicyOutcome
+  /// Exact RFC 3339 value covered by decisionCommitment.
+  evaluatedAt        String
+  evidenceCommitment String
+  decisionCommitment String        @unique
+  /// Hash of the evaluated policy (the pinned admissionPolicyHash).
+  policyHash         String
+  /// ERROR outcomes only (e.g. POLICY_INTEGRITY_FAILURE).
+  errorReason        String?
+  createdAt          DateTime      @default(now()) @db.Timestamptz(3)
+
+  session AdmissionSession @relation(fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  trace   DecisionTrace[]
+
+  @@schema("catenor_private")
+}
+
+/// Private per-requirement trace: FALSE and MISSING are never collapsed (D4).
+model DecisionTrace {
+  decisionRef      String
+  claim            FactName
+  status           RequirementStatus
+  /// NULL when MISSING.
+  factValue        Boolean?
+  provenanceSource FactSource?
+  provenanceRef    String?
+  /// Sanitized reason codes (e.g. INCONSISTENT_PROVIDER_STATE, CHALLENGE_EXPIRED).
+  reasons          String[]
+
+  decisionRecord DecisionRecord @relation(fields: [decisionRef], references: [decisionRef], onDelete: Restrict, onUpdate: Restrict)
+
+  @@id([decisionRef, claim])
+  @@schema("catenor_private")
+}
+
+/// Append-only audit log with a per-trust-domain hash chain computed in the application (PLAN §25.3,
+/// D16). [REF-IMPL] eventHash = SHA-256(JCS(event ∪ {trustDomain}) ‖ prevHash as 32 raw bytes), genesis
+/// prevHash = 0x00…00: trustDomain is inside the hashed body, so moving an event to another Trust Domain
+/// changes its eventHash. UNIQUE (trustDomain, prevHash) gives each link at most one successor, so
+/// concurrent appends cannot fork the chain.
+model AuditEvent {
+  id          String         @id
+  seq         BigInt         @unique @default(autoincrement())
+  trustDomain String
+  type        AuditEventType
+  subject     String?
+  issuer      String?
+  requestId   String?
+  /// Exact hashed RFC 3339 value.
+  timestamp   String
+  /// Sanitized, allowlisted details only (PLAN §25.1).
+  details     Json?
+  prevHash    String
+  eventHash   String         @unique
+
+  @@unique([trustDomain, prevHash])
+  @@index([subject])
+  @@schema("catenor_private")
+}
+
+// ----------------------------------------------------------------------------------------------------
+// Raw SQL in the initial migration (not expressible in Prisma schema):
+//   CHECKs
+//   C1 commitment format ^0x[0-9a-f]{64}$     on every commitment/hash column (13 columns)
+//   C2 did:catenor format ^did:catenor:[0-9a-f]{32}$  on every DID column (9 columns)
+//   C3 trust-domain format ^trust-domain:[a-z0-9][a-z0-9-]*$  on every trust-domain column (6 columns)
+//   C4 TrustAnchorAdmissionRecord.decision = 'ADMIT_TRUST_ANCHOR'; KeyPossessionChallenge.operation =
+//      'ADMIT_TRUST_ANCHOR'; ConfidentialVerificationRun.attempt BETWEEN 1 AND 3; KeyPossessionChallenge.nonce
+//      ^[A-Za-z0-9_-]{43}$; VM id starts with did || '#'
+//   C5 DecisionTrace status ⇔ factValue and ⇔ provenance (SATISFIED/FALSE: value + source + ref present;
+//      MISSING: all NULL); DecisionRecord errorReason ⇔ ERROR; challenge consumedAt ⇔ CONSUMED;
+//      ProviderBinding externalSubjectId ⇔ attached; run facts + evidenceCommitment ⇔ EVIDENCE_RECEIVED
+//   Immutability triggers
+//   TrustDomainProjection.initialTrustAnchorDid (set once from NULL); KeyManagementReference.signerRef;
+//   VerificationMethodProjection.publicKeyMultibase
+// Not added: ProviderBinding.provider = 'sumsub' (provider-generic model).
+// [P1, T3.5] trigger rejecting UPDATE/DELETE on catenor_private."AuditEvent".
+// ----------------------------------------------------------------------------------------------------

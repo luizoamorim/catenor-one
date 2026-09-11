@@ -1,0 +1,26 @@
+{
+  "name": "@catenor-one/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Catenor One API (NestJS modular monolith, T4.1). T3.2: persistence — Prisma schema and migrations.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src prisma.config.ts",
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
+    "db:migrate:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "12.1.0",
+    "@types/pg": "8.23.1",
+    "pg": "8.23.0",
+    "prisma": "7.10.0",
+    "testcontainers": "12.1.0"
+  }
+}

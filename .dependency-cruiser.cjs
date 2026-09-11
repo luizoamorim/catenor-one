@@ -86,7 +86,13 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: 'node_modules' },
-    exclude: { path: '^(packages/[^/]+|test-vectors|apps/[^/]+)/(dist|coverage)/' },
+    exclude: {
+      path: [
+        '^(packages/[^/]+|test-vectors|apps/[^/]+)/(dist|coverage)/',
+        // Prisma-generated client (git-ignored, vendor-generated; contains internal import cycles)
+        '^apps/api/src/infrastructure/persistence/prisma/generated/',
+      ],
+    },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.base.json' },
     enhancedResolveOptions: {

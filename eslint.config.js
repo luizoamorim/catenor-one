@@ -13,6 +13,7 @@ export default tseslint.config(
       '.claude/**',
       'workflows/**',
       'artifacts/**',
+      'apps/api/src/infrastructure/persistence/prisma/generated/**',
     ],
   },
   js.configs.recommended,

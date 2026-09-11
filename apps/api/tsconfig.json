@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "customConditions": ["@catenor-one/source"]
+  },
+  "include": ["src", "prisma.config.ts"],
+  "exclude": ["src/infrastructure/persistence/prisma/generated"]
+}

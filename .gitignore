@@ -15,3 +15,5 @@ scratch/
 # OS / editor
 .DS_Store
 
+# Prisma generated client (apps/api, prisma generate)
+apps/api/src/infrastructure/persistence/prisma/generated/

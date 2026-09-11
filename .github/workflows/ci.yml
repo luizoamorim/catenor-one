@@ -27,6 +27,8 @@ jobs:
         run: pnpm build
       - name: Unit tests
         run: pnpm test
+      - name: Integration tests (PostgreSQL via Testcontainers)
+        run: pnpm test:integration
       - name: Package boundaries (dependency-cruiser)
         run: pnpm boundaries
       - name: Secret scan (stub)
