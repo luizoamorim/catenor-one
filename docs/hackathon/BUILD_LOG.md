@@ -1147,6 +1147,35 @@ Artifacts: `artifacts/hedera/final-demo/issue-investor-a.md`, `issue-investor-a.
 
 Commit: the `feat(hedera)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP6: LIVE issuance to Investor B (rehearsal asset complete)
+
+Goal: the maintainer-authorized single live `issueByPartition` → Investor B (400 units); STOP before any lifecycle/dividend operation.
+
+Work completed:
+
+- **`issue:investor B`** preflight matched the authorization: token, holder, 400, partition `0x…01`, chain 296, SPV sender, gas limit 1,000,000. The Privy dry signature passed.
+- **`issue:investor B --broadcast`**, one attempt, no retry, Privy SPV signer path only:
+  - tx `0x5ea23774ef08a9046ae2135bfeb243e1bd385d153b8d1d8a703c883d4c8c58f7`, receipt SUCCESS, Mirror Node SUCCESS;
+  - Investor B 0 → 400; SPV nonce 2 → 3;
+  - 405,329 gas = 0.45802177 HBAR.
+- **Read-only afterwards:** Investor A 600 (unchanged), Investor B 400 (both on the default partition), total supply 1,000, 2 security holders.
+
+Validation: `pnpm check` green (see commit).
+
+OPEN (preserved):
+
+- FD-2 dynamic SPV wallet and policy provisioning after the Sponsor's ALLOW;
+- issuance authorization and binding through Catenor rather than maintainer-authorized rehearsal scripts.
+- Lifecycle/dividend not started.
+
+AI assistance: Claude Code main session.
+
+Human review: maintainer authorized the transaction explicitly (prompt 2026-09-11-014).
+
+Artifacts: `artifacts/hedera/final-demo/issue-investor-b.md`, `issue-investor-b.json`.
+
+Commit: the `feat(hedera)` commit that contains this entry.
+
 ## Entry template
 
 ```md

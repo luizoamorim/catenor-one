@@ -1,0 +1,50 @@
+{
+  "label": "LIVE \u2014 one issueByPartition broadcast (Hedera Testnet)",
+  "operation": "IAsset.issueByPartition({partition: 0x\u202601, tokenHolder, value, data: 0x})",
+  "investor": "Investor B",
+  "token": "0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418",
+  "holder": "0x72f94a15A815853B488BCf225ec3cb67eC5ba444",
+  "amount": "400",
+  "chainId": 296,
+  "sender": "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93 (Privy SPV wallet)",
+  "gasLimit": 1000000,
+  "estimatedGas": "433834",
+  "before": {
+    "spvNonce": 2,
+    "spvBalanceHbar": "91.82632458",
+    "totalSupply": "600",
+    "holderBalance": "0"
+  },
+  "transaction": "0x5ea23774ef08a9046ae2135bfeb243e1bd385d153b8d1d8a703c883d4c8c58f7",
+  "hashscan": "https://hashscan.io/testnet/transaction/0x5ea23774ef08a9046ae2135bfeb243e1bd385d153b8d1d8a703c883d4c8c58f7",
+  "gasUsed": "405329",
+  "gasPriceWeibar": "1130000000000",
+  "actualCostHbar": "0.45802177",
+  "after": {
+    "spvNonce": 3,
+    "spvBalanceHbar": "91.36830281",
+    "totalSupply": "1000",
+    "holderBalance": "400"
+  },
+  "mirrorNode": {
+    "result": "SUCCESS",
+    "gasUsed": 405329,
+    "timestamp": "1789148914.260632325"
+  },
+  "checks": {
+    "receiptSuccess": true,
+    "holderBalanceIncreasedByAmount": true,
+    "totalSupplyIncreasedByAmount": true,
+    "spvNonceIncrementedByOne": true,
+    "mirrorNodeSuccess": true
+  },
+  "readBackAfter": {
+    "label": "READ-ONLY",
+    "investorA": "600",
+    "investorA_defaultPartition": "600",
+    "investorB": "400",
+    "investorB_defaultPartition": "400",
+    "totalSupply": "1000",
+    "totalSecurityHolders": "2"
+  }
+}

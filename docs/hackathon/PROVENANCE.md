@@ -700,3 +700,5 @@ The Privy calldata-condition shapes (`function_name`, the nested tuple field) co
 
 CP5 (2026-09-11): `apps/api/scripts/hedera/issue-to-investor.ts` is original Catenor One code. It runs one issuance through the Privy SPV executor; preflight is the default and broadcast requires an explicit flag. Live result: `issueByPartition` → Investor A, tx `0x9e6c86c4e8d2674f3d49142b14f7c9d194cb025dfa604ee684ad362e034a04bf` (`artifacts/hedera/final-demo/`).
 
+CP6 (2026-09-11): the same script issued to Investor B, tx `0x5ea23774ef08a9046ae2135bfeb243e1bd385d153b8d1d8a703c883d4c8c58f7`. The rehearsal equity now has total supply 1,000 (A 600, B 400).
+

@@ -117,7 +117,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 - [x] FD-0 Lock story: this file and the prompt artifact.
 - [x] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast. Evidence: `artifacts/privy/final-demo/cp1-spv-hedera-compat.md`.
 - [ ] FD-2 `feat(privy)`: runtime SPV wallet + policy provisioning after ALLOW, with refs persisted.
-  - **Required for the final recorded demo** (maintainer, 2026-09-11): after the Sponsor's TOKENIZE_ASSET ALLOW, Catenor provisions the SPV Privy wallet and policy dynamically. The pre-provisioned CP1 wallet and the rehearsal equity are a real rehearsal/checkpoint only.
+  - **OPEN — required for the final recorded demo** (maintainer, 2026-09-11): after the Sponsor's TOKENIZE_ASSET ALLOW, Catenor provisions the SPV Privy wallet and policy dynamically. The pre-provisioned CP1 wallet and the rehearsal equity are a real rehearsal/checkpoint only.
 - [x] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
   - LIVE 2026-09-11: tx `0x8265479f…5897`; ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418`; 7.66 HBAR.
   - Evidence: `artifacts/hedera/final-demo/deploy-equity.md`.
@@ -125,7 +125,9 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - **Prepared 2026-09-11:** investor wallets provisioned; READ-ONLY simulation accepted; function-level Privy issuance rule CONFIRMED (`artifacts/privy/final-demo/cp4-issuance-policy-probe.md`).
   - The maintainer applied the SPV issuance rule; `preflight:issuance` PASS.
   - **LIVE 2026-09-11, Investor A:** 600 units, tx `0x9e6c86c4…04bf`, 0.516 HBAR; A balance 600, total supply 600. Evidence: `artifacts/hedera/final-demo/issue-investor-a.md`.
-  - Pending: Investor B (awaiting authorization); Catenor runtime authorization of issuance and the private Account Binding persistence.
+  - **LIVE 2026-09-11, Investor B:** 400 units, tx `0x5ea23774…58f7`, 0.458 HBAR; B 400, A 600, total supply 1,000. Evidence: `artifacts/hedera/final-demo/issue-investor-b.md`.
+  - Rehearsal-asset issuance is complete. The FD-4 checkbox stays open because of the gap below.
+  - **OPEN:** issuance authorization and binding through Catenor. Both issuances were maintainer-authorized rehearsal scripts; the Catenor runtime authorization and the private `did:catenor` ↔ wallet Account Binding are not implemented.
 - [ ] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
 - [ ] FD-6 `feat(cre)`: real Sumsub sandbox representative in the final path (A GREEN, B RED).
 - [ ] FD-7 `feat(distribution)`: revenue trigger, blind dry run, controlled distribution, A executed / B held.
