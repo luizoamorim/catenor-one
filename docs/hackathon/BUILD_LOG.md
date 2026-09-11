@@ -852,6 +852,24 @@ Human review: pending (next checkpoint report).
 
 Commit: 6dd8278 (append-only audit), e6df1c0 (repositories), plus the docs commit that contains this entry.
 
+## 2026-09-11 — S001 vertical path executable (FAKE adapters) + Privy signer adapters
+
+Goal: make the S001 admission executable end to end and connect the first sponsor adapter (Hackathon Delivery Mode).
+
+Work completed:
+
+- **Orchestration (commit 056d5fd):** application service for U2–U10 and U13; the domain aggregate is rebuilt from persisted state for every command; ports for signers (structured input only), confidential verification (result envelope with facts / null = MISSING, echoes, explanatory reconciliation), configuration, policy, clock, ids. Labeled FAKE adapters (noble signers, scripted confidential verifier) — no sponsor call. [REF-IMPL, flagged] a Decision reached without an accepted confidential run commits to the key-possession outcome and run statuses.
+- **Privy (commit d37a6d3):** `PrivyAssertionSigner` / `PrivyBootstrapEndorsementSigner` with the D33 signer boundary; maintainer provisioning script (4 P-256 authorization keys, 2 quorums, P_ASSERT / P_BOOTSTRAP, bootstrap wallet; secrets to a 0600 file outside the repo); unit tests; opt-in live test.
+- **Part B scope note (proposal):** `docs/hackathon/plans/2026-09-11-007-part-b-authority-hedera-scope-note.md` — awaiting maintainer approval.
+
+Validation: `pnpm check` green (256 unit tests); `pnpm test:integration` 98/98 — happy path to an ACTIVE initial Trust Anchor with TRUST_ANCHOR_VALID (12/12 checks) and a valid audit chain; wrong-key, representative-RED, stale-evidence, binding-mismatch and evidence-source-mismatch paths never ALLOW. Live Privy not run (T0.4 provisioning pending).
+
+AI assistance: Claude Code main session.
+
+Human review: pending (checkpoint report).
+
+Commit: 056d5fd, d37a6d3, plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md

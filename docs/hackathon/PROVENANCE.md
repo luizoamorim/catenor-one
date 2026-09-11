@@ -597,4 +597,6 @@ T3.2 persistence dependencies (2026-09-11, `apps/api`):
 
 pnpm build scripts of `prisma`, `@prisma/engines`, `cpu-features`, `ssh2`, `protobufjs` were left unapproved; the Prisma CLI fetches its schema engine on first use.
 
+S001 vertical path dependencies (2026-09-11, `apps/api`): `@privy-io/node` 0.34.0 (Apache-2.0; official Privy server SDK, the version validated in the T0.5 spike, now a runtime dependency of the Privy signer adapters), `@noble/curves` 2.4.0 and `@scure/base` 2.4.0 (MIT; signer-boundary verification and address decoding). The Privy provisioning script is original code written for Catenor One; no SDK example code was copied.
+
 Scratch-only review tooling for T3.1 (2026-09-11; not repository dependencies, not committed): Prisma CLI / `@prisma/client` 7.10.0 (Apache-2.0) for `validate`, `format` and offline `migrate diff`; PGlite 0.4.3 (`@electric-sql/pglite`, Apache-2.0) as a throwaway in-memory Postgres to syntax-check the draft CHECK constraints.
