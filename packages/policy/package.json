@@ -10,7 +10,8 @@
       "@catenor-one/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./policies/*.json": "./policies/*.json"
   },
   "files": [
     "dist",

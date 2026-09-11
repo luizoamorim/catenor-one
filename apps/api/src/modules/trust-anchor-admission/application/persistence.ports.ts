@@ -50,6 +50,7 @@ export interface ProviderBinding {
 export interface SubjectRegistry {
   createSubject(subject: StoredSubject): Promise<void>;
   findSubjectByDid(did: string): Promise<StoredSubject | undefined>;
+  findSubjectById(id: string): Promise<StoredSubject | undefined>;
   createProviderBindings(
     bindings: readonly Omit<ProviderBinding, 'externalSubjectId' | 'status'>[],
   ): Promise<void>;
@@ -151,6 +152,7 @@ export interface StoredVerificationRun extends VerificationRun {
   readonly code?: string;
   readonly facts?: readonly FactInput[];
   readonly evidenceCommitment?: string;
+  readonly commitmentInputs?: unknown;
 }
 
 export interface DecisionTraceEntry {
@@ -174,6 +176,8 @@ export interface AdmissionRepository {
 
   createVerificationRun(run: VerificationRun): Promise<void>;
   loadVerificationRun(runId: string): Promise<StoredVerificationRun | undefined>;
+  /** Runs of one session in attempt order. */
+  listVerificationRuns(sessionId: string): Promise<StoredVerificationRun[]>;
   /** Accepts exactly one result per run (PENDING → result); false for late/duplicate results. */
   recordVerificationResult(runId: string, result: VerificationRunResult): Promise<boolean>;
 
@@ -187,8 +191,26 @@ export interface AdmissionRepository {
     readonly errorReason?: string;
     readonly trace: readonly DecisionTraceEntry[];
   }): Promise<void>;
+  /** The session's Decision (private record), if any. */
+  loadDecision(sessionId: string): Promise<StoredDecision | undefined>;
+  /** A published (ALLOW) Decision — the public projection used by Trust Anchor verification. */
+  loadPublishedDecision(decisionRef: string): Promise<Decision | undefined>;
   saveEndorsement(endorsement: BootstrapEndorsement): Promise<void>;
+  loadEndorsement(id: string): Promise<BootstrapEndorsement | undefined>;
   saveAdmissionRecord(id: string, record: TrustAnchorAdmissionRecord): Promise<void>;
+  loadAdmissionRecord(
+    trustDomain: string,
+    trustAnchor: string,
+  ): Promise<TrustAnchorAdmissionRecord | undefined>;
+}
+
+export interface StoredDecision {
+  readonly decisionRef: string;
+  readonly decision: Decision;
+  readonly decisionCommitment: string;
+  readonly policyHash: string;
+  readonly errorReason?: string;
+  readonly trace: readonly DecisionTraceEntry[];
 }
 
 // ---- TrustAnchorRegistry ----------------------------------------------------------------------------
@@ -202,6 +224,8 @@ export interface TrustAnchorRegistry {
     did: string,
     at: Date,
   ): Promise<'ESTABLISHED' | 'INITIAL_TRUST_ANCHOR_EXISTS'>;
+  /** The Trust Domain's initial root, if established. */
+  initialTrustAnchor(trustDomain: string): Promise<string | undefined>;
   status(
     trustDomain: string,
     did: string,

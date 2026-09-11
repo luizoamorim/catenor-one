@@ -8,7 +8,7 @@ import type {
   TrustAnchorAdmissionRecord,
 } from '@catenor-one/authority';
 import type { DidDocument, KeyManagementReference } from '@catenor-one/identity';
-import type { FactInput } from '@catenor-one/policy';
+import type { Decision, FactInput } from '@catenor-one/policy';
 import { PrismaPg } from '@prisma/adapter-pg';
 import type {
   AdmissionRepository,
@@ -20,6 +20,7 @@ import type {
   PersistencePorts,
   ProviderBinding,
   ProviderBindingRole,
+  StoredDecision,
   StoredSubject,
   StoredVerificationRun,
   SubjectRegistry,
@@ -69,6 +70,11 @@ class PrismaSubjectRegistry implements SubjectRegistry {
 
   async findSubjectByDid(did: string): Promise<StoredSubject | undefined> {
     const row = await this.db.subject.findUnique({ where: { did } });
+    return row ? { id: row.id, did: row.did, type: row.type, lifecycle: row.lifecycle } : undefined;
+  }
+
+  async findSubjectById(id: string): Promise<StoredSubject | undefined> {
+    const row = await this.db.subject.findUnique({ where: { id } });
     return row ? { id: row.id, did: row.did, type: row.type, lifecycle: row.lifecycle } : undefined;
   }
 
@@ -291,22 +297,16 @@ class PrismaAdmissionRepository implements AdmissionRepository {
   }
 
   async loadVerificationRun(runId: string): Promise<StoredVerificationRun | undefined> {
-    const r = await this.db.confidentialVerificationRun.findUnique({ where: { runId } });
-    return r
-      ? {
-          runId: r.runId,
-          sessionId: r.sessionId,
-          attempt: r.attempt,
-          operation: r.operation,
-          creWorkflowId: r.creWorkflowId,
-          deadlineAt: r.deadlineAt,
-          evidenceSources: r.evidenceSources as unknown as VerificationRun['evidenceSources'],
-          status: r.status,
-          code: orUndefined(r.code),
-          facts: orUndefined(r.facts) as readonly FactInput[] | undefined,
-          evidenceCommitment: orUndefined(r.evidenceCommitment),
-        }
-      : undefined;
+    const row = await this.db.confidentialVerificationRun.findUnique({ where: { runId } });
+    return row ? toStoredRun(row) : undefined;
+  }
+
+  async listVerificationRuns(sessionId: string): Promise<StoredVerificationRun[]> {
+    const rows = await this.db.confidentialVerificationRun.findMany({
+      where: { sessionId },
+      orderBy: { attempt: 'asc' },
+    });
+    return rows.map(toStoredRun);
   }
 
   async recordVerificationResult(runId: string, result: VerificationRunResult): Promise<boolean> {
@@ -351,6 +351,83 @@ class PrismaAdmissionRepository implements AdmissionRepository {
     }
   }
 
+  async loadDecision(sessionId: string): Promise<StoredDecision | undefined> {
+    const r = await this.db.decisionRecord.findUnique({
+      where: { sessionId },
+      include: { trace: true },
+    });
+    if (r === null) return undefined;
+    return {
+      decisionRef: r.decisionRef,
+      decision: {
+        policy: r.policy,
+        subject: r.subject,
+        action: r.action,
+        resource: r.resource,
+        decision: r.decision,
+        evaluatedAt: r.evaluatedAt,
+        evidenceCommitment: r.evidenceCommitment as Decision['evidenceCommitment'],
+      },
+      decisionCommitment: r.decisionCommitment,
+      policyHash: r.policyHash,
+      errorReason: orUndefined(r.errorReason),
+      trace: r.trace.map((t) => ({
+        claim: t.claim,
+        status: t.status,
+        factValue: orUndefined(t.factValue),
+        provenance:
+          t.provenanceSource === null || t.provenanceRef === null
+            ? undefined
+            : { source: t.provenanceSource, ref: t.provenanceRef },
+        reasons: t.reasons,
+      })),
+    };
+  }
+
+  async loadPublishedDecision(decisionRef: string): Promise<Decision | undefined> {
+    const r = await this.db.decisionProjection.findUnique({ where: { decisionRef } });
+    return r
+      ? {
+          policy: r.policy,
+          subject: r.subject,
+          action: r.action,
+          resource: r.resource,
+          decision: r.decision,
+          evaluatedAt: r.evaluatedAt,
+          evidenceCommitment: r.evidenceCommitment as Decision['evidenceCommitment'],
+        }
+      : undefined;
+  }
+
+  async loadEndorsement(id: string): Promise<BootstrapEndorsement | undefined> {
+    const r = await this.db.bootstrapEndorsementProjection.findUnique({ where: { id } });
+    return r ? (r.payload as unknown as BootstrapEndorsement) : undefined;
+  }
+
+  async loadAdmissionRecord(
+    trustDomain: string,
+    trustAnchor: string,
+  ): Promise<TrustAnchorAdmissionRecord | undefined> {
+    const r = await this.db.trustAnchorAdmissionRecord.findUnique({
+      where: { trustDomain_trustAnchor: { trustDomain, trustAnchor } },
+    });
+    return r
+      ? ({
+          type: 'CatenorTrustAnchorAdmissionRecord',
+          trustDomain: r.trustDomain,
+          trustAnchor: r.trustAnchor,
+          admissionPolicy: r.admissionPolicy,
+          policyHash: r.policyHash,
+          decision: 'ADMIT_TRUST_ANCHOR',
+          verificationMethod: r.verificationMethod,
+          evidenceCommitment: r.evidenceCommitment,
+          createdAt: r.createdAt,
+          decisionRef: r.decisionRef,
+          bootstrapEndorsementRef: r.bootstrapEndorsementRef,
+        } as TrustAnchorAdmissionRecord)
+      : undefined;
+  }
+
   async saveEndorsement(endorsement: BootstrapEndorsement): Promise<void> {
     await this.db.bootstrapEndorsementProjection.create({
       data: {
@@ -378,6 +455,25 @@ class PrismaAdmissionRepository implements AdmissionRepository {
       },
     });
   }
+}
+
+type RunRow = Awaited<ReturnType<Db['confidentialVerificationRun']['findUniqueOrThrow']>>;
+
+function toStoredRun(r: RunRow): StoredVerificationRun {
+  return {
+    runId: r.runId,
+    sessionId: r.sessionId,
+    attempt: r.attempt,
+    operation: r.operation,
+    creWorkflowId: r.creWorkflowId,
+    deadlineAt: r.deadlineAt,
+    evidenceSources: r.evidenceSources as unknown as VerificationRun['evidenceSources'],
+    status: r.status,
+    code: orUndefined(r.code),
+    facts: orUndefined(r.facts) as readonly FactInput[] | undefined,
+    evidenceCommitment: orUndefined(r.evidenceCommitment),
+    commitmentInputs: orUndefined(r.commitmentInputs),
+  };
 }
 
 function traceRow(entry: DecisionTraceEntry) {
@@ -415,6 +511,11 @@ class PrismaTrustAnchorRegistry implements TrustAnchorRegistry {
       data: { trustDomain, did, status: 'ACTIVE', changedAt: at },
     });
     return 'ESTABLISHED' as const;
+  }
+
+  async initialTrustAnchor(trustDomain: string): Promise<string | undefined> {
+    const row = await this.db.trustDomainProjection.findUnique({ where: { id: trustDomain } });
+    return orUndefined(row?.initialTrustAnchorDid ?? null);
   }
 
   async status(trustDomain: string, did: string) {

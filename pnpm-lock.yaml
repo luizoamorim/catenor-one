@@ -71,12 +71,18 @@ importers:
       '@catenor-one/authority':
         specifier: workspace:*
         version: link:../../packages/authority
+      '@catenor-one/credentials':
+        specifier: workspace:*
+        version: link:../../packages/credentials
       '@catenor-one/identity':
         specifier: workspace:*
         version: link:../../packages/identity
       '@catenor-one/policy':
         specifier: workspace:*
         version: link:../../packages/policy
+      '@noble/curves':
+        specifier: 2.4.0
+        version: 2.4.0
       '@prisma/adapter-pg':
         specifier: 7.10.0
         version: 7.10.0

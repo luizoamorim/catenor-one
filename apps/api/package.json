@@ -15,8 +15,10 @@
   "dependencies": {
     "@catenor-one/audit": "workspace:*",
     "@catenor-one/authority": "workspace:*",
+    "@catenor-one/credentials": "workspace:*",
     "@catenor-one/identity": "workspace:*",
     "@catenor-one/policy": "workspace:*",
+    "@noble/curves": "2.4.0",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0"
   },
