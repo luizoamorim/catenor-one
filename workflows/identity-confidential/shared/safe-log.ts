@@ -23,6 +23,7 @@ type SafeEvent =
   | 'callback_sent'
   | 'callback_failed'
   | 'tta_evaluated'
+  | 'investor_evaluated'
 
 /** Safe field values — only primitives, never context-derived. */
 type SafeFields = Record<string, string | number | boolean>

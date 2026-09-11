@@ -30,7 +30,7 @@ export function bindingGatePasses(
 }
 
 /** completed ∧ GREEN ∧ accepted level → true; RED / not completed / other level → false; unparseable → null. */
-function verifiedAtLevel(a: NormalizedApplicant, acceptedLevels: readonly string[]): Tri {
+export function verifiedAtLevel(a: NormalizedApplicant, acceptedLevels: readonly string[]): Tri {
   if (a.reviewStatus === null) return null;
   if (a.reviewStatus !== 'completed') return false; // pending, queued, onHold, awaitingUser, init …
   if (a.reviewAnswer === null || a.levelName === null) return null;
@@ -38,7 +38,7 @@ function verifiedAtLevel(a: NormalizedApplicant, acceptedLevels: readonly string
 }
 
 /** D32 (+ N6 correction): the AML rule consults no label list. */
-function amlClear(company: NormalizedApplicant): { value: Tri; reason?: string } {
+export function amlClear(company: NormalizedApplicant): { value: Tri; reason?: string } {
   if (company.reviewStatus === null) return { value: null };
   if (company.reviewStatus !== 'completed') return { value: false };
   if (company.reviewAnswer === 'RED') return { value: false };
@@ -48,7 +48,7 @@ function amlClear(company: NormalizedApplicant): { value: Tri; reason?: string }
     : { value: null, reason: 'INCONSISTENT_PROVIDER_STATE' };
 }
 
-function fresh(a: NormalizedApplicant, now: Date, maxAgeDays: number): Tri {
+export function fresh(a: NormalizedApplicant, now: Date, maxAgeDays: number): Tri {
   if (a.reviewDate === null) return null; // N4: absent / unparseable → MISSING
   return now.getTime() - a.reviewDate.getTime() <= maxAgeDays * DAY_MS;
 }

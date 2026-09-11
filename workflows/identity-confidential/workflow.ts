@@ -5,6 +5,7 @@
  *
  * Operations:
  *   TRUST_ANCHOR_ADMISSION → src/trust-anchor-admission/index.ts
+ *   INVESTOR_ELIGIBILITY   → src/investor-eligibility/index.ts (final demo [REF-IMPL])
  *   (future S002: SUBJECT_CONTINUITY)
  *
  * The handler's return value is DON-visible: only {status, code}.
@@ -19,6 +20,7 @@ import { openSealedContext, type TriggerPayload } from './shared/sealed-context.
 import { safeLog } from './shared/safe-log.js'
 import { base64Encode } from './shared/base64.js'
 import { runTrustAnchorAdmission, type TtaRuntime } from './src/trust-anchor-admission/index.js'
+import { runInvestorEligibility } from './src/investor-eligibility/index.js'
 
 // ── Config Schema (validated by the SDK at startup) ──────────────────
 
@@ -48,6 +50,12 @@ export const configSchema = z.object({
     activeRegistryStatuses: z.array(z.string()),
     evidenceMaxAgeDays: z.number(),
   }),
+  // [REF-IMPL] individual-investor evidence rules for INVESTOR_ELIGIBILITY (final demo); absent → that operation
+  // fails closed with CONFIG_INVALID.
+  investorEvidence: z.object({
+    levelNames: z.array(z.string()),
+    evidenceMaxAgeDays: z.number(),
+  }).optional(),
   authorizedTriggerAddress: z.string(),
   // T0.7: use z.enum for KeyType so type checks stay on
   authorizedKeys: z.array(z.object({
@@ -105,7 +113,7 @@ const onHttpTrigger = (
 
   let result: WorkflowResult
 
-  if (operation === 'TRUST_ANCHOR_ADMISSION') {
+  if (operation === 'TRUST_ANCHOR_ADMISSION' || operation === 'INVESTOR_ELIGIBILITY') {
     // Build the TtaRuntime adapter wrapping CRE SDK calls
     const config = runtime.config
     const httpClient = new cre.capabilities.HTTPClient()
@@ -146,7 +154,8 @@ const onHttpTrigger = (
     // (.result()) resolve synchronously in QuickJS, so the handler runs to
     // completion in a single turn.
     try {
-      result = runTrustAnchorAdmission({
+      const run = operation === 'TRUST_ANCHOR_ADMISSION' ? runTrustAnchorAdmission : runInvestorEligibility
+      result = run({
         runId: payload.runId,
         context,
         config: runtime.config as unknown as Record<string, unknown>,

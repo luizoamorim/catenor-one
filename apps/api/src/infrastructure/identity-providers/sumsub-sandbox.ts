@@ -49,12 +49,29 @@ export class SumsubSandboxOperator {
 
   /** Creates a synthetic individual applicant bound to `bindingRef`; returns its applicant ID (private). */
   async createRepresentative(bindingRef: string, levelName = 'id-only'): Promise<string> {
+    return this.createIndividual(bindingRef, 'DemoRepresentative', levelName);
+  }
+
+  /** Final demo: a synthetic individual INVESTOR applicant bound to `bindingRef` (e.g. lastName DemoInvestorA). */
+  async createInvestorApplicant(
+    bindingRef: string,
+    label: 'A' | 'B',
+    levelName = 'id-only',
+  ): Promise<string> {
+    return this.createIndividual(bindingRef, `DemoInvestor${label}`, levelName);
+  }
+
+  private async createIndividual(
+    bindingRef: string,
+    lastName: string,
+    levelName: string,
+  ): Promise<string> {
     const applicant = await this.call(
       'POST',
       `/resources/applicants?levelName=${encodeURIComponent(levelName)}`,
       {
         externalUserId: bindingRef,
-        fixedInfo: { firstName: 'Catenor', lastName: 'DemoRepresentative', country: 'GBR' },
+        fixedInfo: { firstName: 'Catenor', lastName, country: 'GBR' },
       },
     );
     if (typeof applicant.id !== 'string') {
