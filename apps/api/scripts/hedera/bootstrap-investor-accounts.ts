@@ -165,12 +165,17 @@ if (agentBalance < p.maxCost) {
 const { raw } = await sign(p);
 const sent = await provider.broadcastTransaction(raw);
 const receipt = await sent.wait(1, 180_000);
-const [agentAfter, nonceAfter, toAfter, exists] = await Promise.all([
+const [agentAfter, toAfter, exists] = await Promise.all([
   provider.getBalance(wallet.address),
-  provider.getTransactionCount(wallet.address, 'latest'),
   provider.getBalance(p.to),
   isAccount(p.to),
 ]);
+// The relay can serve a stale nonce right after a receipt (observed for Investor B): poll READ-ONLY, bounded.
+let nonceAfter = await provider.getTransactionCount(wallet.address, 'latest');
+for (let i = 0; nonceAfter === agentNonce && i < 10; i++) {
+  await new Promise((r) => setTimeout(r, 1500));
+  nonceAfter = await provider.getTransactionCount(wallet.address, 'latest');
+}
 const mirror = (await (
   await fetch(`https://testnet.mirrornode.hedera.com/api/v1/contracts/results/${sent.hash}`)
 ).json()) as Record<string, unknown>;

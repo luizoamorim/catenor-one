@@ -1,0 +1,32 @@
+{
+  "label": "LIVE TESTNET BOOTSTRAP — account activation, not a distribution",
+  "investor": "Investor A",
+  "to": "0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78",
+  "transaction": "0x40c48ff31c758a566da6a7554c6d593b937bb989aa56a1fc730811c989896e07",
+  "hashscan": "https://hashscan.io/testnet/transaction/0x40c48ff31c758a566da6a7554c6d593b937bb989aa56a1fc730811c989896e07",
+  "gasUsed": "607856",
+  "gasFeeHbar": "0.69295584",
+  "agentHbar": {
+    "before": "100.0",
+    "after": "98.30704416"
+  },
+  "investorHbar": {
+    "before": "0.0",
+    "after": "1.0"
+  },
+  "agentNonce": {
+    "before": 0,
+    "after": 1
+  },
+  "mirrorNode": {
+    "result": "SUCCESS",
+    "timestamp": "1789163523.441237104"
+  },
+  "checks": {
+    "receiptSuccess": true,
+    "mirrorNodeSuccess": true,
+    "agentNonceIncrementedByOne": true,
+    "investorReceivedExactly1Hbar": true,
+    "investorIsNowHederaAccount": true
+  }
+}

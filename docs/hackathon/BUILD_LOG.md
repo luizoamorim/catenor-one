@@ -1370,6 +1370,31 @@ AI assistance: Claude Code main session.
 
 Commit: the `fix(distribution)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP13: pre-demo TESTNET BOOTSTRAP of the investor receiving accounts (not a distribution)
+
+Goal: activate the two investor receiving accounts on Hedera testnet so the demo payout is a normal ≈ 23K-gas transfer (prompts 2026-09-11-020 and -021). This is not a distribution, a payout or an eligibility decision.
+
+Work completed:
+
+- `bootstrap:investors` (standalone; fixed destination, 1 HBAR, empty calldata, gas limit 700,000; Privy Agent runtime signer; signer boundary; no Catenor audit event):
+  - **A:** tx `0x40c48ff31c758a566da6a7554c6d593b937bb989aa56a1fc730811c989896e07`, SUCCESS, account created, 0 → 1 HBAR, nonce 0 → 1, 607,856 gas = 0.69295584 HBAR.
+  - **B:** tx `0x0260e56f8331571aeb3e2649541439b85ce69b7ec2c8e1eba8b366ac02c4548d`, SUCCESS, account created, 0 → 1 HBAR, 607,856 gas = 0.69295584 HBAR.
+- The immediate post-receipt nonce read for B was stale (1). A READ-ONLY re-read showed the relay at 2 and the Mirror Node `ethereum_nonce` at 2 (txs at nonces 0 and 1), so each transfer incremented the nonce exactly once and nothing was retried. The bootstrap script and the demo live-payout verification now poll the nonce (bounded, read-only).
+- Baseline: A 1 HBAR, B 1 HBAR, Agent 96.61408832 HBAR, Agent nonce 2.
+- `preflight:payout` all PASS; payout gas estimate 22,828 ≤ 30,000.
+
+Validation: `pnpm check` green (see commit).
+
+Not done: the live A-only 6 HBAR payout (awaiting authorization).
+
+AI assistance: Claude Code main session.
+
+Human review: the maintainer authorized both transfers explicitly (prompt 2026-09-11-021).
+
+Artifacts: `artifacts/hedera/pre-demo-bootstrap/` (kept separate from the distribution evidence).
+
+Commit: the `chore(hedera)` commit that contains this entry.
+
 ## Entry template
 
 ```md

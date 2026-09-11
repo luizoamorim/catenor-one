@@ -163,7 +163,12 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - the pre-seeded Agent wallet is verified at CREATE DISTRIBUTION AGENT;
     - preflight: A's exact 6 HBAR payout is dry-signed by Privy and recovers to the Agent wallet; B gets no transaction and no signature request; the negative cases are refused before Privy or denied by the policy.
     - Evidence: `artifacts/privy/final-demo/cp10-agent-payout-preflight.md`.
-  - **Pending:** fund the Agent wallet `0x5037…FC51` (it reads 0 HBAR and Mirror Node finds no account), then the maintainer-authorized live payout of 6 HBAR to A (`--agent-payout-live`).
+  - **Pre-demo setup done (CP13, NOT a distribution):**
+    - the Agent wallet was funded (100 HBAR) by the maintainer;
+    - the investor receiving accounts were activated by 1 HBAR testnet bootstrap transfers from the Agent wallet (`artifacts/hedera/pre-demo-bootstrap/`, no Catenor audit events).
+    - Baseline: A 1 HBAR, B 1 HBAR, Agent nonce 2.
+    - `preflight:payout` PASS; payout gas estimate 22,828 ≤ 30,000.
+  - **Pending:** the maintainer-authorized live payout, 6 HBAR to A only (`--agent-payout-live`). Expected A 1 → 7, B 1 → 1.
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 

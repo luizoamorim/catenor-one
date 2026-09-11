@@ -546,7 +546,12 @@ async function runPartC(trustAnchor: string) {
     executed = await payout.execute(only); // exactly one broadcast, no retry
   }
   const after = await balances();
-  const nonceAfter = await payout.nonce();
+  // The relay can serve a stale nonce right after a receipt (observed in CP13): poll READ-ONLY, bounded.
+  let nonceAfter = await payout.nonce();
+  for (let i = 0; executed && nonceAfter === nonceBefore && i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 1500));
+    nonceAfter = await payout.nonce();
+  }
   if (executed) {
     const mirror = (await (
       await fetch(
