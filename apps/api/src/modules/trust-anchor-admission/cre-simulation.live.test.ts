@@ -23,10 +23,7 @@ import {
   startMockSumsubServer,
   type MockSumsubServer,
 } from '../../infrastructure/identity-providers/sumsub-sandbox.js';
-import {
-  FakeAssertionSigner,
-  FakeBootstrapEndorsementSigner,
-} from '../../infrastructure/key-management/fake-signers.js';
+import { selectSigners } from '../../infrastructure/key-management/signer-selection.js';
 import type { PrismaClient } from '../../infrastructure/persistence/prisma/generated/client.js';
 import {
   prisma,
@@ -45,6 +42,9 @@ import {
 import { TrustAnchorAdmissionService } from './application/trust-anchor-admission.service.js';
 
 const WORKFLOWS = fileURLToPath(new URL('../../../../../workflows/', import.meta.url));
+const API_ENV = fileURLToPath(new URL('../../../.env', import.meta.url));
+if (existsSync(API_ENV)) process.loadEnvFile(API_ENV); // Privy values, if provisioned (never printed)
+const signers = selectSigners();
 const ENV_FILE = `${WORKFLOWS}.env.simulation-synthetic`;
 const CRE = process.env.CRE_BIN ?? `${homedir()}/.cre/bin/cre`;
 const ready =
@@ -66,7 +66,7 @@ let mockSumsub: MockSumsubServer;
 let receiver: CallbackReceiver;
 
 describe.skipIf(!ready)(
-  'STEP A — S001 through cre workflow simulate (SIMULATION, MOCK Sumsub server)',
+  `STEP A — S001 through cre workflow simulate (SIMULATION, MOCK Sumsub server, ${signers.kind} signers)`,
   () => {
     const keys = deriveChannelKeys(
       ready ? synthetic('CATENOR_INTERNAL_API_TOKEN_VAR') : 'a1'.repeat(32),
@@ -85,7 +85,7 @@ describe.skipIf(!ready)(
         secretKey: synthetic('SUMSUB_SECRET_KEY_VAR'),
       });
 
-      const bootstrapSigner = new FakeBootstrapEndorsementSigner();
+      const bootstrapSigner = signers.bootstrapSigner;
       const raw = {
         type: 'CatenorTrustDomainBootstrapConfiguration',
         profile: 'catenor-one/bootstrap-configuration/v1',
@@ -150,7 +150,7 @@ describe.skipIf(!ready)(
         ids: nodeIds,
         configuration,
         policy: packagedAdmissionPolicy,
-        assertionSigner: new FakeAssertionSigner(),
+        assertionSigner: signers.assertionSigner,
         bootstrapSigner,
         verifier,
       });
@@ -221,6 +221,9 @@ describe.skipIf(!ready)(
       await service.endorseAndActivate(started.sessionRef);
       const verification = await service.verifyTrustAnchor(started.did);
       expect(verification.TRUST_ANCHOR_VALID).toBe(true);
+      expect(
+        await client.keyManagementReference.findFirst({ where: { subject: { did: started.did } } }),
+      ).toMatchObject({ adapter: signers.kind === 'PRIVY' ? 'privy' : 'fake' });
       const timeline = await new PrismaUnitOfWork(client).run((p) =>
         p.audit.timeline('trust-domain:catenor-one-demo'),
       );
