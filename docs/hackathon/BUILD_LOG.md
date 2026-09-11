@@ -821,6 +821,20 @@ Human review: T3.1 final review approved 2026-09-11 (maintainer); T3.2 results p
 
 Commit: 0c5cb18 (persistence schema, migration, integration tests), plus the docs commit that contains this entry.
 
+## 2026-09-11 — Hackathon Delivery Mode adopted
+
+Goal: optimize the remaining time until the Sunday ETHOnline deadline for the smallest credible end-to-end demo path.
+
+Decision (maintainer): delivery/execution strategy change only — not an architecture redesign. Protocol semantics, S001 facts, `policy:trust-anchor-admission:v1`, key-purpose separation, evidence rules/profiles and security claims are unchanged. TASKS.md stays the backlog; tasks may be implemented as far as the demo needs and stay unchecked until complete; deferred work is marked `[POST-DEMO]`, never deleted.
+
+Artifacts: `docs/hackathon/plans/2026-09-11-006-ethonline-delivery-fast-lane.md`, `docs/hackathon/prompts/2026-09-11-007-ethonline-delivery-fast-lane.md`, TASKS.md status note.
+
+AI assistance: Claude Code main session (plan and prompt artifacts).
+
+Human review: decision made by the maintainer.
+
+Commit: this docs commit.
+
 ## Entry template
 
 ```md

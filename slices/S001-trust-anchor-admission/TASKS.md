@@ -3,6 +3,7 @@
 
 **Status:** Rev 2.6 — Rev 2.1–2.5 approved 2026-09-10. Rev 2.6 clarifies key terminology (T0.4, PLAN §13.0) and keeps the base64 sealed-context transport as APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED (T8.2) — **APPROVED** (final Phase 0 documentation review, 2026-09-10). T0.9 complete. No implementation task is started.
 **Rule:** a task is checked only when its code **and** listed tests exist and pass (CLAUDE.md). Live/manual tasks are checked only when the named artifact exists.
+**Hackathon Delivery Mode (2026-09-11, until the ETHOnline submission):** execution follows `docs/hackathon/plans/2026-09-11-006-ethonline-delivery-fast-lane.md` — the smallest credible end-to-end demo path first, no longer phase by phase. Requirements, facts, policy, evidence profiles and security claims are unchanged. A task may be implemented only as far as the demo needs; it stays unchecked until its full listed scope and tests exist. `[POST-DEMO]` marks work deliberately deferred until after the submission (kept for traceability, never deleted).
 
 Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 
@@ -55,7 +56,7 @@ Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 - [x] **T3.1 [FAST] — Prisma schema** · deps: T2.6 · models PLAN §10.1 (incl. `ProviderBinding`; no evidence-object model); multiSchema vs prefixes decided from installed Prisma docs; **maintainer schema review** · AC-012, 053–055. · **Status 2026-09-11:** proposal `apps/api/prisma/schema.prisma` drafted; native `schemas` (`catenor_public` / `catenor_private`) validated without a preview flag on Prisma 7.10.0; awaiting maintainer schema review — no migration. **Revision 2 (2026-09-11):** review decisions applied (security wording, Trust-Domain-bound audit chain, initial-root composite FK, signer-mapping invariant, no DB-level `provider = 'sumsub'`); CHECK draft (37 constraints) prepared for T3.2; awaiting final schema review. **COMPLETE (2026-09-11):** final review approved — option-B key purpose kept; C1–C5 CHECKs plus DecisionTrace provenance and challenge `operation = 'ADMIT_TRUST_ANCHOR'`; field-level immutability triggers (initial root set once; `signerRef`; `publicKeyMultibase`); explicit `onDelete: Restrict` / `onUpdate: Restrict` on all 14 relations; `VerificationMethodProjection.createdAt` (projection metadata only); `ProviderBinding` stays provider-generic.
 - [x] **T3.2 [FAST] — Initial migration** · deps: T3.1 + approval · unique `initialTrustAnchorDid` · done-when: `prisma migrate deploy` on Testcontainers Postgres. · **COMPLETE (2026-09-11):** `apps/api/prisma/migrations/20260911034806_init` (Prisma-generated DDL + reviewed raw SQL: 39 CHECKs, 3 immutability triggers); Prisma / `@prisma/client` / `@prisma/adapter-pg` 7.10.0; `apps/api/prisma.config.ts`; `pnpm test:integration` deploys it with the real `prisma migrate deploy` on `postgres:17.11-alpine` (Testcontainers) and tests every CHECK, trigger, referential action, no-drift and the single-root / audit-fork / challenge-consume / run-attempt races — 78 tests green locally; CI step added (first GitHub run pending push, see T1.4). Railway not touched.
 - [ ] **T3.3 [FAST] — Repositories** · deps: T3.2 · `SubjectRegistry` (incl. bindings), `DidStateRegistry`, `AdmissionRepository` (conditional challenge consume), `TrustAnchorRegistry`, `AuditLog` (app-computed hash chain), `UnitOfWork` · integration tests incl. concurrency (TV-D04, K01).
-- [ ] **T3.4 [FAST] — Public read model** · deps: T3.3 · public-only reads + explicit DTO allowlists · AC-054.
+- [ ] **T3.4 [FAST] — Public read model** · `[POST-DEMO beyond the reads the demo/judge path uses]` · deps: T3.3 · public-only reads + explicit DTO allowlists · AC-054.
 - [ ] **T3.5 [P1] — Audit append-only DB trigger** · deps: T3.2 · raw SQL trigger rejecting UPDATE/DELETE + test (D16).
 
 ## Phase 4 — API skeleton, access gate, provider bindings
@@ -95,15 +96,15 @@ Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 - [ ] **T8.4 [FAST] — Provider-binding gate + fact derivation** · deps: T8.3 · `binding-gate.ts` (externalUserId == bindingRef, types) runs before any derivation; `derive-facts.ts` per PLAN §20.4 as finalized by T0.8; freshness via `runtime.now()` (180 days); null = MISSING · unit tests: happy, AML RED, inactive registry, on hold, stale, missing linkage, non-accepted role, **binding mismatch**, **N1/N2** (GREEN without labels → no labels; non-GREEN absent labels → MISSING), **N3** (`reprocessing` has no effect on facts or commitment), **N4** (freshness from `reviewDate` only), **D32 AML rule** (completed GREEN + no/empty labels → true; RED → false regardless of labels; **completed GREEN + labels present → MISSING with private normalization reason `INCONSISTENT_PROVIDER_STATE`** (N6; recorded in the private run record/trace, absent from public projections; policy then DENY with trace MISSING — TV-F10); pending → false; unparseable → MISSING; a `PEP`- or `SANCTIONS`-labelled input changes only the reason codes, never the rule), **N5** (labels kept as sanitized reason codes, absent from public projections); facts carry evidence-source tags · TV-E01, E02, E11, F02–F06, F09, F10 · AC-040, 042, 043, 075.
 - [ ] **T8.5 [FAST] — Evidence commitment** · deps: T8.4, T2.9 · `commitmentInput` per PLAN §23 (salt via HMAC(HKDF(K), runId); response + provider-ref digests; `evidenceSources`; no `reprocessing`); identical bytes to `test-vectors/s001` goldens · TV-E06, I04 · AC-026, 027, 056, 058.
 - [ ] **T8.6 [FAST] — Callback + handler wiring + simulation suite** · deps: T8.2–T8.5, T8.3a · HMAC callback (≤ 10,000-byte body, passed base64-encoded to `HTTPClient`), return `{status, code}` only, preHook (4 calls, 3 secrets, CLOSED); MOCK Sumsub server + MOCK company fixture (both labeled, never confused); run all PLAN §28 cases incl. `tta-mock-company-*` and `tta-source-mismatch` non-interactively with `--limits test/limits.production-like.json`; outputs labeled SIMULATION-CONFIRMED and sanitized · TV-E01, E02, E04–E06, E11, I03 + unknown operation · AC-028, 075.
-- [ ] **T8.7 [P1] — DON-signed result report** · deps: T8.6, first live run (T16.3) · `reportFromDon` over SHA-256 of the result envelope; included in callback; must not block T16.
+- [ ] **T8.7 [P1][POST-DEMO] — DON-signed result report** · deps: T8.6, first live run (T16.3) · `reportFromDon` over SHA-256 of the result envelope; included in callback; must not block T16.
 
 ## Phase 9 — API ↔ CRE integration
 
 - [ ] **T9.1 [FAST] — CRE gateway trigger + context sealer** · deps: T8.6, T4.1 · `workflows.execute` JSON-RPC; EIP-191 JWT (own code, BUSL reference noted in PROVENANCE); AES-256-GCM sealing (Node `crypto`) · unit tests on JWT digest/claims + seal/open golden.
 - [ ] **T9.2 [FAST] — U7 RequestConfidentialVerification** · deps: T9.1, T6.2, T4.5 · preconditions: key facts true ∧ refs attached; run + deadline; audit · tests: refuses after failed key proof or without refs · AC-023.
 - [ ] **T9.3 [FAST] — Callback endpoint + U8** · deps: T9.2 · HMAC/timestamp/single-use; strict schema (unknown fields rejected — TV-F11 intent); echo checks (operation, runId, config hash, freshness, **`evidenceProfile` + `evidenceSources` = Bootstrap Configuration**, TV-B04); **commitment recomputation** against the normalized preimage + digests (store only those; never raw content); OK → facts + `BINDING_VERIFIED`; `PROVIDER_BINDING_MISMATCH`/ERROR → no facts · tests: forged/replayed/late/duplicate/mismatched callbacks rejected; SQL scan for sentinels · TV-E04, E11, I03, I04 · AC-021, 026, 027, 056, 058, 075.
-- [ ] **T9.4 [FAST] — U15 run expiry** · deps: T9.2 · deadline sweep → TIMED_OUT → non-ALLOW · TV-E05 · AC-022.
-- [ ] **T9.5 [P1] — DON report verifier** · deps: T8.7, T9.3 · offchain verification per CRE docs (viem).
+- [ ] **T9.4 [FAST][POST-DEMO] — U15 run expiry** · deps: T9.2 · deadline sweep → TIMED_OUT → non-ALLOW · TV-E05 · AC-022.
+- [ ] **T9.5 [P1][POST-DEMO] — DON report verifier** · deps: T8.7, T9.3 · offchain verification per CRE docs (viem).
 
 ## Phase 10 — Policy evaluation
 
@@ -115,13 +116,13 @@ Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 - [ ] **T11.1 [FAST] — Endorsement builder** · deps: T2.6, T5.3 · payload incl. `decisionCommitment` and `verificationMethodCommitment` (Q1) · AC-044, 076.
 - [ ] **T11.2 [FAST] — U10 EndorseAndActivateInitialTrustAnchor** · deps: T11.1, T10.2 · ALLOW-only; human-initiated; sign → verify → record → ACTIVE in one transaction; no mandatory two-person rule · tests TV-B02, B03, G01, G02, G06, H01–H03 · AC-044–051, 076.
 - [ ] **T11.3 [FAST] — Public admission projection** · deps: T11.2 · `GET /v1/trust-domains/{td}/trust-anchors/{did}` · snapshot test · TV-H01 · AC-049.
-- [ ] **T11.4 [FAST] — Idempotency + retries** · deps: T11.2 · `ALREADY_ADMITTED`; concurrent activation → one root; new session after DENY · TV-K01, K02 · AC-052.
+- [ ] **T11.4 [FAST][POST-DEMO] — Idempotency + retries** · deps: T11.2 · `ALREADY_ADMITTED`; concurrent activation → one root; new session after DENY · TV-K01, K02 · AC-052.
 
 ## Phase 12 — Trust Anchor verification
 
 - [ ] **T12.1 [FAST] — U13 VerifyTrustAnchor** · deps: T2.8, T11.3 · endpoint with per-check `basis`; wording per PLAN §26.1.
-- [ ] **T12.2 [FAST] — Tamper/lifecycle integration tests** · deps: T12.1 · DB mutations (evidenceCommitment, policyHash, endorsement, VM key replaced under the same ID) and status via test harness only (D21) · TV-J02, J03, J05, J06, J07 · AC-064, 065, 076.
-- [ ] **T12.3 [FAST] — Offline verifier script** · deps: T12.1 · `scripts/verify-trust-anchor.ts` (public API + committed config + pin only) · TV-J01, I01 · AC-063.
+- [ ] **T12.2 [FAST][POST-DEMO] — Tamper/lifecycle integration tests** · deps: T12.1 · DB mutations (evidenceCommitment, policyHash, endorsement, VM key replaced under the same ID) and status via test harness only (D21) · TV-J02, J03, J05, J06, J07 · AC-064, 065, 076.
+- [ ] **T12.3 [FAST][POST-DEMO] — Offline verifier script** · deps: T12.1 · `scripts/verify-trust-anchor.ts` (public API + committed config + pin only) · TV-J01, I01 · AC-063.
 
 ## Phase 13 — Product UI (`apps/web`)
 
@@ -153,14 +154,14 @@ Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 - [ ] **T17.1 [FAST] — Live invalid-key DENY** · deps: T15.3, T5.4 (can run before T16.3 on a separate session) · wrong-key control → DENY, no endorsement/record/ACTIVE, verification false · TV-L02, D02 · AC-015, 067.
 - [ ] **T17.2 [FAST] — Live evidence DENY** · deps: T16.2, T0.8 · REAL Sumsub sandbox representative forced RED (`SANCTIONS`, `FINAL`) → `AUTHORIZED_REPRESENTATIVE_VERIFIED` false → DENY (PLAN §20.6; confirmed feasible in T0.8) · artifact `live-deny-evidence.json` · TV-L03, F04 · AC-036, 067.
 - [ ] **T17.3 [FAST] — Privacy/secret scans** · deps: T16.3 · sentinel crawl (applicant IDs, bindingRefs, raw fixtures, emails) of public/judge routes; SQL text scan (staging); secret scanner over repo + `artifacts/` + captured logs (values from env, never committed); private-key pattern scan · TV-E06, E07, I01, I03, I06 · AC-010, 020, 025, 062; ACCEPTANCE §28 list.
-- [ ] **T17.4 [P1] — Live provider-binding mismatch** · deps: T16.2 · attach an applicant with a wrong `externalUserId` → run ERROR, no facts, non-ALLOW (recorded) · TV-E11 · AC-075.
+- [ ] **T17.4 [P1][POST-DEMO] — Live provider-binding mismatch** · deps: T16.2 · attach an applicant with a wrong `externalUserId` → run ERROR, no facts, non-ALLOW (recorded) · TV-E11 · AC-075.
 
 ## Phase 18 — Artifacts, provenance, documentation
 
 - [ ] **T18.1 [FAST] — Assemble artifacts** · deps: T16.3, T17.1, T17.2 · layout PLAN §30; READMEs distinguish MOCK / simulation / live and say "Sumsub sandbox"; REAL vs MOCK evidence claims per PLAN §31.3 (D30, D31): exact labels "Company evidence: SYNTHETIC MOCK" / "Representative verification: REAL SUMSUB SANDBOX", never "Sumsub verified the organization" or "real Sumsub KYB end-to-end"; runs using the company fixture named `*.mock-company.*` · TV-L04 · AC-077 · AC-070–072.
 - [ ] **T18.2 [FAST] — Sanitizer** · deps: — (used from T8.6 on) · `scripts/artifacts/sanitize.ts` (applicant IDs, bindingRefs, wallet IDs, emails, tokens) + CI check on `artifacts/`.
 - [ ] **T18.3 [FAST] — Integration docs** · deps: T16.3 · `docs/integrations/CHAINLINK-CRE.md` (identity-confidential boundary rule, quotas as documented), `PRIVY.md`, Sumsub section (sandbox) — spike results included.
-- [ ] **T18.4 [P1] — ADRs + protocol amendment note** · deps: T16.3 · ADR-0007 signer custody; ADR-0008 CRE workflow boundary (`identity-confidential`) + result transport/provenance; ARCHITECTURE §12 / README tree reconciliation (Appendix E.2); Admission Record amendment draft for the protocol repo (D14) · AC-073.
+- [ ] **T18.4 [P1][POST-DEMO] — ADRs + protocol amendment note** · deps: T16.3 · ADR-0007 signer custody; ADR-0008 CRE workflow boundary (`identity-confidential`) + result transport/provenance; ARCHITECTURE §12 / README tree reconciliation (Appendix E.2); Admission Record amendment draft for the protocol repo (D14) · AC-073.
 - [ ] **T18.5 [FAST] — Provenance + AI logs** · deps: each phase · BUILD_LOG per phase; AI_USAGE (Claude Code, cre-engineer subagent, official CRE skill, Privy docs skill); PROVENANCE (SDK versions, `cre init` template, BUSL note); prompt artifact for the planning sessions · AC-073, 074.
 - [ ] **T18.6 [FAST] — Definition-of-Done audit** · deps: all [FAST] · ACCEPTANCE §29 matrix + §30 DoD; every P0 AC → evidence link; failures reported, not hidden. Includes the Hybrid Demo Profile claims scan over README / artifacts / submission text (TV-L04, AC-077).
 
