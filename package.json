@@ -1,7 +1,7 @@
 {
   "name": "catenor-one",
   "private": true,
-  "description": "Catenor One \u2014 first reference implementation of Catenor Protocol (ETHOnline 2026)",
+  "description": "Catenor One — first reference implementation of Catenor Protocol (ETHOnline 2026)",
   "license": "Apache-2.0",
   "type": "module",
   "packageManager": "pnpm@10.11.0",
@@ -14,7 +14,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration": "pnpm --filter @catenor-one/api db:generate && vitest run --config vitest.integration.config.ts",
     "boundaries": "depcruise packages test-vectors apps scripts --config .dependency-cruiser.cjs",
     "secret-scan": "node scripts/secret-scan.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm boundaries && pnpm secret-scan",

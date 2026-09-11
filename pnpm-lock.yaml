@@ -65,6 +65,18 @@ importers:
 
   apps/api:
     dependencies:
+      '@catenor-one/audit':
+        specifier: workspace:*
+        version: link:../../packages/audit
+      '@catenor-one/authority':
+        specifier: workspace:*
+        version: link:../../packages/authority
+      '@catenor-one/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
+      '@catenor-one/policy':
+        specifier: workspace:*
+        version: link:../../packages/policy
       '@prisma/adapter-pg':
         specifier: 7.10.0
         version: 7.10.0
@@ -72,6 +84,9 @@ importers:
         specifier: 7.10.0
         version: 7.10.0(prisma@7.10.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3))(typescript@6.0.3)
     devDependencies:
+      '@catenor-one/test-vectors':
+        specifier: workspace:*
+        version: link:../../test-vectors
       '@testcontainers/postgresql':
         specifier: 12.1.0
         version: 12.1.0
