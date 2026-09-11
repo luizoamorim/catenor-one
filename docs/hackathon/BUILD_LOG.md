@@ -835,6 +835,23 @@ Human review: decision made by the maintainer.
 
 Commit: this docs commit.
 
+## 2026-09-11 — S001 persistence checkpoint: append-only audit + minimum repositories
+
+Goal: close the persistence gap and provide the minimum adapters the S001 vertical path needs (Hackathon Delivery Mode).
+
+Work completed:
+
+- **T3.5:** migration `20260911041606_audit_event_append_only` — `catenor_private.AuditEvent` accepts INSERT only; UPDATE/DELETE rejected by a row trigger, TRUNCATE by a statement trigger (it bypasses row triggers).
+- **T3.3 (minimum set):** application-layer persistence ports and Prisma adapters (`@prisma/adapter-pg`) for SubjectRegistry, DidStateRegistry, AdmissionRepository, TrustAnchorRegistry, AuditLog and UnitOfWork; conditional updates for challenge consumption, run results and the initial root; per-Trust-Domain advisory transaction lock for audit appends so the hash chain stays linear.
+
+Validation: `pnpm test:integration` 92/92 on Testcontainers PostgreSQL (84 migration/constraint tests + 8 repository tests incl. K01, D04 and audit-chain concurrency); `pnpm check` green (251 unit tests).
+
+AI assistance: Claude Code main session.
+
+Human review: pending (next checkpoint report).
+
+Commit: 6dd8278 (append-only audit), e6df1c0 (repositories), plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md
