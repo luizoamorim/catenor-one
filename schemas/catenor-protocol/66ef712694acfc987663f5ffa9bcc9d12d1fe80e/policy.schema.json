@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://catenor.example/schemas/policy.schema.json",
+  "title": "Catenor Policy \u2014 Minimal Draft",
+  "type": "object",
+  "required": [
+    "id",
+    "action",
+    "requirements"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claim"
+        ],
+        "properties": {
+          "claim": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

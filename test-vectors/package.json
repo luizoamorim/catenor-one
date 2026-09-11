@@ -1,0 +1,34 @@
+{
+  "name": "@catenor-one/test-vectors",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Machine-readable golden vectors shared by packages, api and workflow tests.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@catenor-one/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./test-keys": {
+      "@catenor-one/source": "./src/test-keys.ts",
+      "types": "./dist/test-keys.d.ts",
+      "default": "./dist/test-keys.js"
+    }
+  },
+  "files": [
+    "dist",
+    "s001"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  }
+}

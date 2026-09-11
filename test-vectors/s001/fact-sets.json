@@ -1,0 +1,1161 @@
+{
+  "generatedBy": "scripts/vectors/generate-s001.mjs (T2.9)",
+  "policyHash": "0xb2d0783063808e7f93be27179cec2910ef7f88630979b3ff5a246695c48ecec4",
+  "cases": {
+    "TV-S001-F01": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "ALLOW",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F02": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "FALSE"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F03": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "FALSE"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F04": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "FALSE"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F05": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "FALSE"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F06": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "FALSE"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F07": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": false,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "FALSE"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F08": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": false,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "FALSE"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F09": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "FALSE"
+          }
+        ]
+      }
+    },
+    "TV-S001-F10": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "MISSING"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    },
+    "TV-S001-F11": {
+      "facts": [
+        {
+          "name": "ORGANIZATION_KYB_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_STATUS_VALID",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ORGANIZATION_AML_CLEAR",
+          "value": false,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_POSSESSION_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "ASSERTION_KEY_PURPOSE_VALID",
+          "value": true,
+          "provenance": {
+            "source": "KEY_POSSESSION_VERIFIER",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "EVIDENCE_FRESH",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        },
+        {
+          "name": "SUPER_TRUSTED_BY_UI",
+          "value": true,
+          "provenance": {
+            "source": "CONFIDENTIAL_VERIFICATION",
+            "ref": "fixture"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "DENY",
+        "requirementResults": [
+          {
+            "claim": "ORGANIZATION_KYB_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_STATUS_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ORGANIZATION_AML_CLEAR",
+            "status": "FALSE"
+          },
+          {
+            "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_POSSESSION_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "ASSERTION_KEY_PURPOSE_VALID",
+            "status": "SATISFIED"
+          },
+          {
+            "claim": "EVIDENCE_FRESH",
+            "status": "SATISFIED"
+          }
+        ]
+      }
+    }
+  }
+}

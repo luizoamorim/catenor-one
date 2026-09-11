@@ -1,0 +1,17 @@
+# dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# local secrets — never committed (names only in .env.example)
+.env
+.env.*
+!.env.example
+
+# local spikes/experiments (also ignored by scratch/.gitignore)
+scratch/
+
+# OS / editor
+.DS_Store
+

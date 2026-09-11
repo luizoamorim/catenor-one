@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+scratch
+.agents
+.claude
+docs
+slices
+artifacts
+schemas/catenor-protocol
+*.md
+test-vectors/s001/*.json

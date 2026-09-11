@@ -1,0 +1,28 @@
+{
+  "generatedBy": "scripts/vectors/generate-s001.mjs (T2.9)",
+  "note": "didDocument uses the TEST-ONLY, NON-SECRET assertion key derived from testKeyLabel (seed = SHA-256(UTF-8(label))); fixtureVerificationMethod uses the TEST-VECTORS §6 placeholder key",
+  "testKeyLabel": "catenor-one/test-vectors/s001/assertion-key-1/NOT-A-SECRET",
+  "didDocument": {
+    "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "verificationMethod": [
+      {
+        "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+        "controller": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+        "type": "Multikey",
+        "publicKeyMultibase": "z6MkkcRFVK6Tqt6hNnLomtumKBd1proD5z37t54hqBQHnZa3"
+      }
+    ],
+    "assertionMethod": [
+      "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1"
+    ]
+  },
+  "verificationMethodCommitment": "0x8aec411825be8807d717b9f4625f1ede8d3d5fcde438bf5a9e4e3a74fc4957e2",
+  "fixtureVerificationMethod": {
+    "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "controller": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "type": "Multikey",
+    "publicKeyMultibase": "z6MkFixtureAssertionPublicKey001"
+  },
+  "fixtureVerificationMethodCommitment": "0x131927a2ca054b75dec03c6fecd7cf57be2d18af6a45efcc571d00eacd96ffb5",
+  "fixtureReplacementCommitment": "0xf50ce7b27b0e86c03e7bf7ce4854953552c593de4b518518a4647f00bb8fa6b5"
+}

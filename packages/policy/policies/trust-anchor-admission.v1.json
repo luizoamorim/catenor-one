@@ -1,0 +1,15 @@
+{
+  "id": "policy:trust-anchor-admission:v1",
+  "action": "ADMIT_TRUST_ANCHOR",
+  "requirements": [
+    { "claim": "ORGANIZATION_KYB_VERIFIED", "equals": true },
+    { "claim": "ORGANIZATION_STATUS_VALID", "equals": true },
+    { "claim": "ORGANIZATION_AML_CLEAR", "equals": true },
+    { "claim": "AUTHORIZED_REPRESENTATIVE_VERIFIED", "equals": true },
+    { "claim": "REPRESENTATIVE_AUTHORITY_CONFIRMED", "equals": true },
+    { "claim": "ASSERTION_KEY_POSSESSION_VALID", "equals": true },
+    { "claim": "ASSERTION_KEY_PURPOSE_VALID", "equals": true },
+    { "claim": "EVIDENCE_FRESH", "equals": true }
+  ],
+  "decision": { "allRequirementsSatisfied": "ALLOW", "otherwise": "DENY" }
+}

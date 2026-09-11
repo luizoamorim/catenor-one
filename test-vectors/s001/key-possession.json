@@ -1,0 +1,32 @@
+{
+  "generatedBy": "scripts/vectors/generate-s001.mjs (T2.9)",
+  "challenge": {
+    "type": "CatenorOneKeyPossessionChallenge",
+    "challengeId": "challenge:admission:001",
+    "subject": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "verificationMethod": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "operation": "ADMIT_TRUST_ANCHOR",
+    "trustDomain": "trust-domain:catenor-one-demo",
+    "nonce": "opaque-random-nonce-001",
+    "issuedAt": "2026-09-09T22:00:00Z",
+    "expiresAt": "2026-09-09T22:05:00Z"
+  },
+  "verifiedAt": "2026-09-09T22:01:00Z",
+  "testKeyLabel": "catenor-one/test-vectors/s001/assertion-key-1/NOT-A-SECRET",
+  "publicKeyMultibase": "z6MkkcRFVK6Tqt6hNnLomtumKBd1proD5z37t54hqBQHnZa3",
+  "hashDataHex": "f25d39d3ad45470b9450e1e59c5f4f8aafd5174a56cbe3a75386dd041c8f443d0561478bbc750b0d02551ff3bca2c5bc7f1abad37eec44acece02f530e51ae27",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-jcs-2022",
+    "verificationMethod": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "proofPurpose": "assertionMethod",
+    "created": "2026-09-09T22:01:00Z",
+    "challenge": "opaque-random-nonce-001",
+    "domain": "trust-domain:catenor-one-demo",
+    "proofValue": "z5abZV7Cm8mNYsxPZwnKDWia6KuPrg7yvxcBfNM9MKPjy3PsM7x8Yy4puX4yhckoqFrnLo1nwYiRacRszy4vqbK2J"
+  },
+  "expected": {
+    "ASSERTION_KEY_POSSESSION_VALID": true,
+    "ASSERTION_KEY_PURPOSE_VALID": true
+  }
+}

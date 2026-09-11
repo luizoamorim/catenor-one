@@ -1,0 +1,33 @@
+{
+  "name": "@catenor-one/authority",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Trust Domain bootstrap, key possession, bootstrap endorsement, Trust Anchor Admission and verification (framework- and vendor-independent domain package).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@catenor-one/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@catenor-one/identity": "workspace:*",
+    "@catenor-one/credentials": "workspace:*",
+    "@catenor-one/policy": "workspace:*",
+    "@catenor-one/audit": "workspace:*"
+  },
+  "devDependencies": {
+    "@catenor-one/test-vectors": "workspace:*",
+    "@noble/curves": "2.4.0"
+  }
+}

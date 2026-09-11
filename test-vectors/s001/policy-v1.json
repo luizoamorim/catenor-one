@@ -1,0 +1,6 @@
+{
+  "generatedBy": "scripts/vectors/generate-s001.mjs (T2.9)",
+  "policyId": "policy:trust-anchor-admission:v1",
+  "canonicalPolicy": "{\"action\":\"ADMIT_TRUST_ANCHOR\",\"decision\":{\"allRequirementsSatisfied\":\"ALLOW\",\"otherwise\":\"DENY\"},\"id\":\"policy:trust-anchor-admission:v1\",\"requirements\":[{\"claim\":\"ORGANIZATION_KYB_VERIFIED\",\"equals\":true},{\"claim\":\"ORGANIZATION_STATUS_VALID\",\"equals\":true},{\"claim\":\"ORGANIZATION_AML_CLEAR\",\"equals\":true},{\"claim\":\"AUTHORIZED_REPRESENTATIVE_VERIFIED\",\"equals\":true},{\"claim\":\"REPRESENTATIVE_AUTHORITY_CONFIRMED\",\"equals\":true},{\"claim\":\"ASSERTION_KEY_POSSESSION_VALID\",\"equals\":true},{\"claim\":\"ASSERTION_KEY_PURPOSE_VALID\",\"equals\":true},{\"claim\":\"EVIDENCE_FRESH\",\"equals\":true}]}",
+  "policyHash": "0xb2d0783063808e7f93be27179cec2910ef7f88630979b3ff5a246695c48ecec4"
+}

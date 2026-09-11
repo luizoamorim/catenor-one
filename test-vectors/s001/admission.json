@@ -1,0 +1,107 @@
+{
+  "generatedBy": "scripts/vectors/generate-s001.mjs (T2.9)",
+  "note": "bootstrap and assertion keys are TEST-ONLY, NON-SECRET keys derived from the labels below (seed = SHA-256(UTF-8(label))); evidenceCommitment is a placeholder commitment until the T8.5 evidence-commitment golden exists",
+  "testKeyLabels": {
+    "assertion": "catenor-one/test-vectors/s001/assertion-key-1/NOT-A-SECRET",
+    "bootstrap": "catenor-one/test-vectors/s001/bootstrap-key-1/NOT-A-SECRET"
+  },
+  "bootstrapConfiguration": {
+    "type": "CatenorTrustDomainBootstrapConfiguration",
+    "profile": "catenor-one/bootstrap-configuration/v1",
+    "trustDomain": "trust-domain:catenor-one-demo",
+    "admissionPolicy": "policy:trust-anchor-admission:v1",
+    "admissionPolicyHash": "0xb2d0783063808e7f93be27179cec2910ef7f88630979b3ff5a246695c48ecec4",
+    "bootstrapVerificationMethod": "bootstrap-verification-method:1",
+    "bootstrapPublicKeyMultibase": "z6MkfM7eV7kEsoURGG4ZEx732W12sPWKSAAsJ2Ah3yS1S5Ne",
+    "commitmentProfile": {
+      "canonicalization": "RFC8785",
+      "hash": "SHA-256",
+      "encoding": "0x-hex"
+    },
+    "acceptedEvidence": {
+      "profileNote": "[REF-IMPL] Catenor One reference/demo evidence-acceptance rules; not a Catenor Protocol rule",
+      "provider": "sumsub",
+      "environment": "sandbox",
+      "evidenceProfile": "HYBRID_DEMO",
+      "evidenceSources": {
+        "company": "SYNTHETIC_MOCK",
+        "representative": "REAL_SUMSUB_SANDBOX"
+      },
+      "companyLevelNames": [
+        "MOCK_KYB_LEVEL"
+      ],
+      "representativeLevelNames": [
+        "id-only"
+      ],
+      "authorityRoles": [
+        "MOCK_AUTHORIZED_SIGNATORY"
+      ],
+      "activeRegistryStatuses": [
+        "MOCK_ACTIVE"
+      ],
+      "evidenceMaxAgeDays": 180
+    }
+  },
+  "bootstrapConfigurationHash": "0x81e26c28385d6372f91d9bf00c9d1337836dd77f53a2690c86f68855a1dfe391",
+  "didDocument": {
+    "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "verificationMethod": [
+      {
+        "id": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+        "controller": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+        "type": "Multikey",
+        "publicKeyMultibase": "z6MkkcRFVK6Tqt6hNnLomtumKBd1proD5z37t54hqBQHnZa3"
+      }
+    ],
+    "assertionMethod": [
+      "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1"
+    ]
+  },
+  "decision": {
+    "policy": "policy:trust-anchor-admission:v1",
+    "subject": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "action": "ADMIT_TRUST_ANCHOR",
+    "resource": "trust-domain:catenor-one-demo",
+    "decision": "ALLOW",
+    "evaluatedAt": "2026-09-09T22:10:00Z",
+    "evidenceCommitment": "0xc694b70abf2887efe675c51aab4836e6d108d8dab9e68603308fb056b5c5bc09"
+  },
+  "decisionRef": "decision:admission:001",
+  "decisionCommitment": "0xe56fb5f134d7aff383701674c3199a7990c3557d2960aed27014c8aa10d5020d",
+  "endorsement": {
+    "type": "CatenorOneBootstrapEndorsement",
+    "id": "endorsement:bootstrap:001",
+    "trustDomain": "trust-domain:catenor-one-demo",
+    "bootstrapConfigurationHash": "0x81e26c28385d6372f91d9bf00c9d1337836dd77f53a2690c86f68855a1dfe391",
+    "candidate": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "verificationMethod": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "verificationMethodCommitment": "0x8aec411825be8807d717b9f4625f1ede8d3d5fcde438bf5a9e4e3a74fc4957e2",
+    "admissionPolicy": "policy:trust-anchor-admission:v1",
+    "policyHash": "0xb2d0783063808e7f93be27179cec2910ef7f88630979b3ff5a246695c48ecec4",
+    "decisionRef": "decision:admission:001",
+    "decisionCommitment": "0xe56fb5f134d7aff383701674c3199a7990c3557d2960aed27014c8aa10d5020d",
+    "evidenceCommitment": "0xc694b70abf2887efe675c51aab4836e6d108d8dab9e68603308fb056b5c5bc09",
+    "endorsedAt": "2026-09-10T00:00:00Z",
+    "proof": {
+      "type": "DataIntegrityProof",
+      "cryptosuite": "eddsa-jcs-2022",
+      "verificationMethod": "bootstrap-verification-method:1",
+      "proofPurpose": "assertionMethod",
+      "created": "2026-09-10T00:00:01Z",
+      "proofValue": "z5oS2s6L8PJB49fEjbEXoX2od1YYs5iYJku9DaTzHDeR33P1t1NJTB1rSgoGzAEWLAbXUn4msY6srLHSLPyL7AJqP"
+    }
+  },
+  "admissionRecord": {
+    "type": "CatenorTrustAnchorAdmissionRecord",
+    "trustDomain": "trust-domain:catenor-one-demo",
+    "trustAnchor": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b",
+    "admissionPolicy": "policy:trust-anchor-admission:v1",
+    "policyHash": "0xb2d0783063808e7f93be27179cec2910ef7f88630979b3ff5a246695c48ecec4",
+    "decision": "ADMIT_TRUST_ANCHOR",
+    "verificationMethod": "did:catenor:8f0c92d7e5f04e40a41faee32e5e180b#assertion-key-1",
+    "evidenceCommitment": "0xc694b70abf2887efe675c51aab4836e6d108d8dab9e68603308fb056b5c5bc09",
+    "createdAt": "2026-09-10T00:00:02Z",
+    "decisionRef": "decision:admission:001",
+    "bootstrapEndorsementRef": "endorsement:bootstrap:001"
+  }
+}

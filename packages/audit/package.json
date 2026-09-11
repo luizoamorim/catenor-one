@@ -1,0 +1,30 @@
+{
+  "name": "@catenor-one/audit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "RFC 8785 JCS, SHA-256 commitments, audit event model and hash chain (framework- and vendor-independent domain package).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@catenor-one/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "canonicalize": "5.0.0"
+  },
+  "devDependencies": {
+    "@catenor-one/test-vectors": "workspace:*"
+  }
+}

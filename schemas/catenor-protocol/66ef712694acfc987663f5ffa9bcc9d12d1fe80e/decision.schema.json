@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://catenor.example/schemas/decision.schema.json",
+  "title": "Catenor Decision \u2014 Draft",
+  "type": "object",
+  "required": [
+    "policy",
+    "subject",
+    "action",
+    "decision",
+    "evaluatedAt"
+  ],
+  "properties": {
+    "policy": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string",
+      "pattern": "^did:catenor:"
+    },
+    "action": {
+      "type": "string"
+    },
+    "resource": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "DENY",
+        "INDETERMINATE",
+        "REQUIRES_REVIEW",
+        "ERROR"
+      ]
+    },
+    "evaluatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenceCommitment": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@catenor-one/policy",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Policy document + hash, verified facts, evaluator and protocol Decision (framework- and vendor-independent domain package).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@catenor-one/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "policies"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@catenor-one/audit": "workspace:*"
+  },
+  "devDependencies": {
+    "@catenor-one/test-vectors": "workspace:*"
+  }
+}
