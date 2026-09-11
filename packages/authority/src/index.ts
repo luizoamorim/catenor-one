@@ -64,3 +64,14 @@ export {
   type TrustAnchorVerificationResult,
   type VerificationCheck,
 } from './trust-anchor-verifier.js';
+export {
+  TOKENIZE_ASSET,
+  authorizeWithCapability,
+  createCapabilityGrant,
+  prepareCapabilityGrantProof,
+  type Capability,
+  type CapabilityAuthorization,
+  type CapabilityDenialReason,
+  type CapabilityGrant,
+  type CapabilityGrantPayload,
+} from './capability.js';

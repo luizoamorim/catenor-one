@@ -15,7 +15,11 @@ import {
   startPostgres,
 } from './postgres.test-fixtures.js';
 
-const MIGRATIONS = ['20260911034806_init', '20260911041606_audit_event_append_only'];
+const MIGRATIONS = [
+  '20260911034806_init',
+  '20260911041606_audit_event_append_only',
+  '20260911053426_part_b_audit_event_types',
+];
 const D = did('1');
 
 let container: StartedPostgreSqlContainer;

@@ -5,7 +5,10 @@
 import { randomBytes } from 'node:crypto';
 import {
   assembleEndorsement,
+  prepareCapabilityGrantProof,
   prepareEndorsementProof,
+  type CapabilityGrant,
+  type CapabilityGrantPayload,
   type BootstrapConfiguration,
   type BootstrapEndorsement,
   type BootstrapEndorsementPayload,
@@ -67,6 +70,23 @@ export class FakeAssertionSigner implements AssertionSigner {
       { type: 'DataIntegrityProof', cryptosuite: 'eddsa-jcs-2022', ...input.proofOptions },
     );
     return attachProofValue(proofOptions, signBoundary(hashData, secretKey));
+  }
+
+  async signCapabilityGrant(
+    signerRef: string,
+    input: { grant: CapabilityGrantPayload; verificationMethod: string; created: string },
+  ): Promise<CapabilityGrant> {
+    const secretKey = this.keys.get(signerRef);
+    if (secretKey === undefined) throw new Error('unknown signerRef');
+    const { proofOptions, hashData } = prepareCapabilityGrantProof(
+      input.grant,
+      input.verificationMethod,
+      input.created,
+    );
+    return {
+      ...input.grant,
+      proof: attachProofValue(proofOptions, signBoundary(hashData, secretKey)),
+    };
   }
 }
 

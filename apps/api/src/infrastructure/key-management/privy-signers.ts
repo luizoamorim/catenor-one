@@ -11,7 +11,10 @@
 // verification before anything is returned. There is no arbitrary-bytes signing method.
 import {
   assembleEndorsement,
+  prepareCapabilityGrantProof,
   prepareEndorsementProof,
+  type CapabilityGrant,
+  type CapabilityGrantPayload,
   type BootstrapConfiguration,
   type BootstrapEndorsement,
   type BootstrapEndorsementPayload,
@@ -150,6 +153,26 @@ export class PrivyAssertionSigner implements AssertionSigner {
       publicKey,
     );
     return attachProofValue(proofOptions, signature);
+  }
+
+  async signCapabilityGrant(
+    signerRef: string,
+    input: { grant: CapabilityGrantPayload; verificationMethod: string; created: string },
+  ): Promise<CapabilityGrant> {
+    const { proofOptions, hashData } = prepareCapabilityGrantProof(
+      input.grant,
+      input.verificationMethod,
+      input.created,
+    );
+    const publicKey = publicKeyOf(await this.api.walletAddress(signerRef));
+    const signature = await boundarySign(
+      this.api,
+      signerRef,
+      this.config.runtimeAuthorizationKey,
+      hashData,
+      publicKey,
+    );
+    return { ...input.grant, proof: attachProofValue(proofOptions, signature) };
   }
 }
 

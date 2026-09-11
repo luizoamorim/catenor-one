@@ -4,6 +4,8 @@ import type {
   BootstrapConfiguration,
   BootstrapEndorsement,
   BootstrapEndorsementPayload,
+  CapabilityGrant,
+  CapabilityGrantPayload,
   KeyPossessionChallenge,
 } from '@catenor-one/authority';
 import type { DataIntegrityProof, ProofOptions } from '@catenor-one/credentials';
@@ -29,6 +31,18 @@ export interface AssertionSigner {
       readonly proofOptions: Omit<ProofOptions, 'type' | 'cryptosuite'>;
     },
   ): Promise<DataIntegrityProof>;
+  /**
+   * Signs a scoped capability grant issued by this key's Subject (Part B, [REF-IMPL]) — an assertion under
+   * `assertionMethod`, never a financial action. The eddsa-jcs-2022 hashData is built inside the signer.
+   */
+  signCapabilityGrant(
+    signerRef: string,
+    input: {
+      readonly grant: CapabilityGrantPayload;
+      readonly verificationMethod: string;
+      readonly created: string;
+    },
+  ): Promise<CapabilityGrant>;
 }
 
 export interface BootstrapEndorsementSigner {

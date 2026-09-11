@@ -25,6 +25,11 @@ export const AUDIT_EVENT_TYPES = [
   'CONFIDENTIAL_VERIFICATION_REQUESTED',
   'CONFIDENTIAL_VERIFICATION_FAILED',
   'ADMISSION_ALREADY_ADMITTED',
+  // Catenor One [REF-IMPL] hackathon Part B (scoped capability → authorized asset action)
+  'CAPABILITY_GRANTED',
+  'ASSET_ACTION_AUTHORIZED',
+  'ASSET_ACTION_DENIED',
+  'ASSET_ACTION_EXECUTED',
 ] as const;
 
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
