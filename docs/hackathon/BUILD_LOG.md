@@ -870,6 +870,25 @@ Human review: pending (checkpoint report).
 
 Commit: 056d5fd, d37a6d3, plus the docs commit that contains this entry.
 
+## 2026-09-11 — S001 confidential workflow (CRE SIMULATION) + live Privy signing
+
+Goal: replace the FAKE sponsor adapters with the strongest truthful sponsor-backed path (maintainer checkpoint decisions of 2026-09-11).
+
+Work completed:
+
+- **D38 / D39 (commit dd2b9e5):** early-DENY Decisions commit to `catenor-one/local-decision-evidence/v1` [REF-IMPL]; U4 reuses an existing ACTIVE assertion key before creating a wallet (orphan-wallet residual risk documented).
+- **CRE (commit 2f886b1):** `workflows/identity-confidential` from the official template via the `cre-engineer` subagent (headless, simulation only, forbidden commands blocked); base64 sealed context SIMULATION-CONFIRMED; the handler is synchronous; Catenor semantics written in the main session and run inside the TEE: MOCK company fixture, signed Sumsub GET, binding gate, N1–N6, §20.4 facts, minimal reconciliation, §23 commitment, HMAC callback. API: sealer, callback authenticator (HMAC, timestamp, commitment recomputation), receiver, simulation verifier, execution-mode label guard.
+- **Step A (SIMULATION):** full S001 through a real `cre workflow simulate` run with a local MOCK Sumsub server — ALLOW → ACTIVE → TRUST_ANCHOR_VALID; representative RED → DENY.
+- **Privy LIVE (commit 399b606):** T5.2/T5.3 pass on the Privy development app; runtime-signer denials HTTP 401; step A now uses the real Privy signers.
+
+Validation: `pnpm check` green (295 unit tests); `pnpm test:integration` 100/100; `pnpm test:cre-sim` 2/2 (SIMULATION); `pnpm test:privy-live` 2/2 (LIVE, development app).
+
+AI assistance: Claude Code main session; `cre-engineer` project subagent (headless Claude Code session, official `chainlink-cre-skill`) for the scaffold and sealed-context transport.
+
+Human review: pending (checkpoint report).
+
+Commit: dd2b9e5, 2f886b1, 399b606, plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md

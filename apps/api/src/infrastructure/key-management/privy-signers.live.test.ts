@@ -119,6 +119,17 @@ describe.skipIf(!configured)('LIVE Privy Credential Assertion Key (T5.2)', () =>
     await denied('assertion runtime key → wallet update (remove policy)', () =>
       client.wallets().update(key.signerRef, { authorization_context, policy_ids: [] } as never),
     );
+    await denied('assertion runtime key → change owner', () =>
+      client.wallets().update(key.signerRef, {
+        authorization_context,
+        owner: { public_key: env('PRIVY_ASSERTION_OWNER_PUBLIC_KEY') },
+      } as never),
+    );
+    await denied('assertion runtime key → remove additional signers', () =>
+      client
+        .wallets()
+        .update(key.signerRef, { authorization_context, additional_signers: [] } as never),
+    );
     await denied('assertion runtime key → policy update', () =>
       client
         .policies()

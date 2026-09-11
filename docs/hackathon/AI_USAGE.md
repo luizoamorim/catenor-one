@@ -277,3 +277,7 @@ Claude Code applied the maintainer's final Phase 0 decisions to PLAN/TASKS and t
 While recording T0.7, Claude Code found that the spike had carried the sealed context as hex. The approved base64 transport is therefore recorded as APPROVED DESIGN, NOT YET SIMULATION-CONFIRMED rather than confirmed.
 
 The T0.5 Privy spike earlier the same day was executed by the Claude Code main session with a documentation-only research subagent; no sponsor agent was involved. The human maintainer made every decision (T0.5 amendment, Q4–Q7, D31–D37); AI tools executed, measured and reported.
+
+## 2026-09-11 — Hackathon Delivery Mode implementation
+
+Claude Code main session implemented the S001 vertical path in small checkpoints (persistence, orchestration, Privy adapters, the confidential workflow's Catenor semantics, API channel, tests). The `cre-engineer` project subagent was used again in a headless Claude Code session (same pattern as Phase 0: official `chainlink-cre-skill` preloaded; deploy/activate/update/pause/delete, `cre secrets`, key linking, login/logout, git writes and `.env` reads blocked at the tool-permission layer) for the official scaffold, the CRE runtime wiring and the base64 sealed-context simulation suite. The main session reviewed its output against the transcript and the simulator logs before integrating. The maintainer made every scope and semantic decision (D38, D39, Part B scope).

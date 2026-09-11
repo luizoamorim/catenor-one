@@ -12,6 +12,7 @@ recorded here.
 | P3 | Runtime-signer authorization key → `exportPrivateKey` | DENIED — HTTP 401 |
 | P4 | Runtime-signer authorization key → wallet update (remove policy) | DENIED — HTTP 401 (`invalid_data`) |
 | P5 | Runtime-signer authorization key → policy update | DENIED — HTTP 401 (`invalid_data`) |
+| P5b | Runtime-signer authorization key → change owner; remove additional signers | DENIED — HTTP 401 (`invalid_data`) each |
 | P6 | Bootstrap Endorsement Key (separate wallet): endorsement signed through the signer boundary; `verifyEndorsement` → `{valid: true, failures: []}` (TV-S001-G01) | PASS |
 | P7 | D36 key separation: bootstrap runtime key cannot sign with the assertion wallet, and the assertion runtime key cannot sign with the bootstrap wallet | DENIED both ways (HTTP 401/403) |
 | P8 | S001 path (step A, `pnpm test:cre-sim`) with the Privy signers: Privy-signed key-possession proof → CRE SIMULATION evidence → ALLOW → Privy-signed bootstrap endorsement → ACTIVE → `TRUST_ANCHOR_VALID = true` | PASS (CRE part is SIMULATION; representative data from a MOCK Sumsub server in step A) |

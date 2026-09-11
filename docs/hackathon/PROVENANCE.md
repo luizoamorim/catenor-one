@@ -600,3 +600,25 @@ pnpm build scripts of `prisma`, `@prisma/engines`, `cpu-features`, `ssh2`, `prot
 S001 vertical path dependencies (2026-09-11, `apps/api`): `@privy-io/node` 0.34.0 (Apache-2.0; official Privy server SDK, the version validated in the T0.5 spike, now a runtime dependency of the Privy signer adapters), `@noble/curves` 2.4.0 and `@scure/base` 2.4.0 (MIT; signer-boundary verification and address decoding). The Privy provisioning script is original code written for Catenor One; no SDK example code was copied.
 
 Scratch-only review tooling for T3.1 (2026-09-11; not repository dependencies, not committed): Prisma CLI / `@prisma/client` 7.10.0 (Apache-2.0) for `validate`, `format` and offline `migrate diff`; PGlite 0.4.3 (`@electric-sql/pglite`, Apache-2.0) as a throwaway in-memory Postgres to syntax-check the draft CHECK constraints.
+
+---
+
+## 23. 2026-09-11 — `workflows/identity-confidential` (Chainlink CRE Confidential Workflow)
+
+Type: official sponsor template + SDK, plus original Catenor One code.
+
+| Item | Source | Version | License |
+|---|---|---|---|
+| `hello-confidential-workflows-ts` template | `smartcontractkit/cre-templates` (`starter-templates/hello-confidential-workflows`), fetched by `cre init` | branch `main`, fetched 2026-09-11 | per upstream repository |
+| CRE CLI | Chainlink | v1.33.0 | Chainlink terms |
+| `@chainlink/cre-sdk` | npm | 1.18.0 | **BUSL-1.1** — the official SDK required to build CRE workflows; production-use license review still to be done (T8.1 note) |
+| `viem`, `zod` (template dependencies) | npm | 2.34.0, 3.25.76 | MIT, MIT |
+| `@noble/ciphers`, `@noble/hashes` | npm | 2.4.0 | MIT |
+| `canonicalize` (RFC 8785) | npm | 5.0.0 | Apache-2.0 |
+| TypeScript (workflow) | npm | 5.9.3 (template pin) | Apache-2.0 |
+| Bun (workflow package manager, used by the template) | bun.sh | 1.4.0 | MIT |
+| `oven-sh/setup-bun` GitHub Action | GitHub | v2 | MIT |
+
+Template-derived files: `main.ts`, `package.json`, `tsconfig.json`, `workflow.yaml`, `project.yaml`, `secrets.yaml` (all adapted). Written for Catenor One: `workflow.ts` router and `shared/*` (`cre-engineer` subagent), `src/trust-anchor-admission/*` semantics (main session), `fixtures/seal-context.mjs`, `test/*`. No other template or example code was copied.
+
+Workflow package license set to Apache-2.0 (the template scaffold said `UNLICENSED`). The scaffold's unused `ethereum-mainnet` RPC entry was removed.
