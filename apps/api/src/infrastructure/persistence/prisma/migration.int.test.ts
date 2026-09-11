@@ -15,7 +15,7 @@ import {
   startPostgres,
 } from './postgres.test-fixtures.js';
 
-const MIGRATION = '20260911034806_init';
+const MIGRATIONS = ['20260911034806_init', '20260911041606_audit_event_append_only'];
 const D = did('1');
 
 let container: StartedPostgreSqlContainer;
@@ -40,14 +40,16 @@ const rejectsWith = async (client: pg.Client, sql: string, expected: Record<stri
   expect(client.query(sql)).rejects.toMatchObject(expected);
 
 describe('migration deploy (T3.2)', () => {
-  it('`prisma migrate deploy` applies the initial migration to an empty database', async () => {
+  it('`prisma migrate deploy` applies every migration to an empty database', async () => {
     expect(firstDeploy.code, firstDeploy.output).toBe(0);
-    expect(firstDeploy.output).toContain(MIGRATION);
+    for (const name of MIGRATIONS) expect(firstDeploy.output).toContain(name);
     const { rows } = await db.query(
       `SELECT migration_name, finished_at IS NOT NULL AS finished, rolled_back_at IS NULL AS kept
-         FROM public._prisma_migrations`,
+         FROM public._prisma_migrations ORDER BY migration_name`,
     );
-    expect(rows).toEqual([{ migration_name: MIGRATION, finished: true, kept: true }]);
+    expect(rows).toEqual(
+      MIGRATIONS.map((migration_name) => ({ migration_name, finished: true, kept: true })),
+    );
   });
 
   it('a second deploy has nothing to apply and `migrate status` reports the schema up to date', async () => {
@@ -92,12 +94,15 @@ describe('catalog', () => {
     expect(rows.map((r: { conname: string }) => r.conname)).toEqual(EXPECTED_CHECKS);
   });
 
-  it('exactly the 3 immutability triggers exist', async () => {
+  it('exactly the 3 immutability triggers and the 2 audit append-only triggers exist', async () => {
     const { rows } = await db.query(
-      `SELECT event_object_schema || '.' || event_object_table || ':' || trigger_name AS t
-         FROM information_schema.triggers WHERE trigger_schema LIKE 'catenor_%' ORDER BY 1`,
+      `SELECT n.nspname || '.' || c.relname || ':' || t.tgname AS t
+         FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname LIKE 'catenor_%' AND NOT t.tgisinternal ORDER BY 1`,
     );
     expect(rows.map((r: { t: string }) => r.t)).toEqual([
+      'catenor_private.AuditEvent:AuditEvent_append_only',
+      'catenor_private.AuditEvent:AuditEvent_no_truncate',
       'catenor_private.KeyManagementReference:KeyManagementReference_signerRef_immutable',
       'catenor_public.TrustDomainProjection:TrustDomainProjection_initialTrustAnchorDid_set_once',
       'catenor_public.VerificationMethodProjection:VerificationMethodProjection_publicKeyMultibase_immutable',
@@ -175,8 +180,16 @@ describe('CHECK constraints reject violations (C1–C5)', () => {
       'ConfidentialVerificationRun_bootstrapConfigHashEcho_format',
       `UPDATE catenor_private."ConfidentialVerificationRun" SET "bootstrapConfigurationHashEcho" = 'x'`,
     ],
-    ['AuditEvent_prevHash_format', `UPDATE catenor_private."AuditEvent" SET "prevHash" = 'x'`],
-    ['AuditEvent_eventHash_format', `UPDATE catenor_private."AuditEvent" SET "eventHash" = 'x'`],
+    [
+      'AuditEvent_prevHash_format',
+      `INSERT INTO catenor_private."AuditEvent" (id, "trustDomain", type, timestamp, "prevHash", "eventHash")
+         VALUES ('event:x', '${TD}', 'SUBJECT_CREATED', 't', 'x', '${hash('4')}')`,
+    ],
+    [
+      'AuditEvent_eventHash_format',
+      `INSERT INTO catenor_private."AuditEvent" (id, "trustDomain", type, timestamp, "prevHash", "eventHash")
+         VALUES ('event:x', '${TD}', 'SUBJECT_CREATED', 't', '${hash('f')}', 'x')`,
+    ],
     // C2 did:catenor formats
     [
       'DidDocumentProjection_did_format',
@@ -244,7 +257,8 @@ describe('CHECK constraints reject violations (C1–C5)', () => {
     ],
     [
       'AuditEvent_trustDomain_format',
-      `UPDATE catenor_private."AuditEvent" SET "trustDomain" = 'x'`,
+      `INSERT INTO catenor_private."AuditEvent" (id, "trustDomain", type, timestamp, "prevHash", "eventHash")
+         VALUES ('event:x', 'x', 'SUBJECT_CREATED', 't', '${hash('f')}', '${hash('4')}')`,
     ],
     // C4 fixed values and bounds
     [
@@ -472,6 +486,39 @@ describe('immutability triggers', () => {
         { code: '23505', constraint: 'KeyManagementReference_signerRef_key' },
       );
     });
+  });
+});
+
+describe('audit events are append-only (T3.5, D16)', () => {
+  it('INSERT is allowed', async () => {
+    await inRollback(db, async (c) => {
+      const r = await c.query(
+        `INSERT INTO catenor_private."AuditEvent" (id, "trustDomain", type, timestamp, "prevHash", "eventHash")
+           VALUES ('event:append', '${TD}', 'ADMISSION_REQUESTED', '2026-09-09T22:00:01Z', '${hash('f')}', '${hash('4')}')`,
+      );
+      expect(r.rowCount).toBe(1);
+    });
+  });
+
+  it.each([
+    ['UPDATE', `UPDATE catenor_private."AuditEvent" SET "requestId" = 'rewritten'`],
+    ['UPDATE', `UPDATE catenor_private."AuditEvent" SET type = type`],
+    ['DELETE', `DELETE FROM catenor_private."AuditEvent"`],
+    ['TRUNCATE', `TRUNCATE catenor_private."AuditEvent"`],
+  ])('%s is rejected (%s)', async (op, sql) => {
+    await inRollback(db, (c) =>
+      rejectsWith(c, sql, {
+        code: '23000',
+        message: expect.stringContaining(`AuditEvent is append-only: ${op} is not allowed`),
+      }),
+    );
+  });
+
+  it('the stored event is unchanged after the rejected attempts', async () => {
+    const { rows } = await db.query(
+      `SELECT id, "requestId", "eventHash" FROM catenor_private."AuditEvent" WHERE id = 'event:1'`,
+    );
+    expect(rows).toEqual([{ id: 'event:1', requestId: null, eventHash: hash('f') }]);
   });
 });
 

@@ -574,5 +574,6 @@ model AuditEvent {
 //   TrustDomainProjection.initialTrustAnchorDid (set once from NULL); KeyManagementReference.signerRef;
 //   VerificationMethodProjection.publicKeyMultibase
 // Not added: ProviderBinding.provider = 'sumsub' (provider-generic model).
-// [P1, T3.5] trigger rejecting UPDATE/DELETE on catenor_private."AuditEvent".
+// Append-only AuditEvent (T3.5, D16): migration 20260911041606_audit_event_append_only rejects UPDATE,
+// DELETE and TRUNCATE on catenor_private."AuditEvent".
 // ----------------------------------------------------------------------------------------------------
