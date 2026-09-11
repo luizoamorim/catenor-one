@@ -109,7 +109,9 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 - [x] FD-0 Lock story: this file and the prompt artifact.
 - [x] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast. Evidence: `artifacts/privy/final-demo/cp1-spv-hedera-compat.md`.
 - [ ] FD-2 `feat(privy)`: runtime SPV wallet + policy provisioning after ALLOW, with refs persisted.
-- [ ] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
+- [x] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
+  - LIVE 2026-09-11: tx `0x8265479f…5897`; ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418`; 7.66 HBAR.
+  - Evidence: `artifacts/hedera/final-demo/deploy-equity.md`.
 - [ ] FD-4 `feat(hedera)`: issueByPartition to Investor A and B.
 - [ ] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
 - [ ] FD-6 `feat(cre)`: real Sumsub sandbox representative in the final path (A GREEN, B RED).
@@ -132,10 +134,9 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 ## 11. Open decisions (maintainer)
 
 1. **Gas for a live-created wallet.** A Privy EVM wallet created after ALLOW holds 0 HBAR.
-   - `deployEquity` needs about 8.6 HBAR, and its gas limit must be covered up front: 11.6 HBAR at a 10M limit.
-   - Unused gas is fully refunded (current Hedera docs).
-   - Proposed: a pre-funded, Privy-managed **gas-sponsor** EVM wallet. Its policy allows only chain-296 value transfers up to a cap. After ALLOW it funds the new SPV and Agent wallets, and the first signed transaction completes the hollow account (HIP-583).
-   - The alternative, funding each new wallet by hand, does not fit a live flow.
+   - **Current state (2026-09-11):** the maintainer funded the CP1 SPV wallet directly (100 HBAR). The live `deployEquity` used that pre-provisioned wallet.
+   - Runtime creation of the SPV wallet and policy after ALLOW (FD-2) and how such a wallet would be funded (e.g. a Privy gas-sponsor wallet) stay open.
+   - Measured: `deployEquity` used 6.90M gas = 7.66 HBAR. Unused gas was refunded; the up-front requirement is gasLimit × gasPrice.
 2. **`issueByPartition` under the SPV policy.** The equity address is unknown when the policy is created. Options:
    - an `ethereum_calldata` ABI rule restricting the function (supported in the SDK types; to be tested live next);
    - a post-deploy policy update. This needs the management-owner key and is not allowed in the runtime.

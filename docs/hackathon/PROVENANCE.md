@@ -667,3 +667,24 @@ Type: official sponsor skills (instructions and reference documents for AI codin
   - hiero-cli.
 
 Project subagents `.claude/agents/privy-engineer.md` and `.claude/agents/hedera-engineer.md` were written for Catenor One by Claude Code under maintainer instruction (prompt `docs/hackathon/prompts/2026-09-11-008-privy-hedera-specialist-agents.md`), following `.claude/agents/cre-engineer.md`. No third-party text was copied into them.
+
+---
+
+## 26. 2026-09-11 — Final demo: Privy SPV wallet → Hedera ATS execution (live testnet)
+
+No new dependencies. It uses `@privy-io/node` 0.34.0 (Apache-2.0), `@hashgraph/asset-tokenization-contracts` 8.0.0 (Apache-2.0) and `ethers` 6.17.0 (MIT), all recorded in §21–§24.
+
+Original Catenor One code, written by Claude Code in the main session:
+
+- `apps/api/src/infrastructure/execution/privy-spv-ats-executor.ts`;
+- `apps/api/scripts/hedera/preflight-spv-deploy-equity.ts`;
+- `apps/api/scripts/hedera/verify-ats-equity.ts`.
+
+The Privy calls (`wallets().ethereum().signTransaction`, `wallets().get`, `policies().get`) follow the installed SDK types and the CP1 findings of the `privy-engineer` subagent. No SDK example code was copied.
+
+Live sponsor resources:
+
+- **Privy development app:** the SPV EVM wallet, the `catenor-one-SPV-execution` policy and the runtime-signer key quorum, provisioned in CP1. The authorization keys are outside the repository (maintainer custody for the owner key; the runtime-signer key only in the git-ignored `apps/api/.env`).
+- **Hedera Testnet:** ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418` (`0.0.10479921`), created by transaction `0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897` through the ATS v8 Factory `0.0.9213391`.
+- Evidence: `artifacts/hedera/final-demo/`.
+

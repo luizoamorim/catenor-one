@@ -1039,6 +1039,46 @@ Human review: pending (CP1 report).
 
 Commit: the `docs(hackathon)` commit that contains this entry.
 
+## 2026-09-11 — Final demo FD-3: first LIVE Hedera ATS transaction, signed by the Privy SPV wallet after a Catenor ALLOW
+
+Goal: the maintainer-authorized single live `Factory.deployEquity` on Hedera Testnet through the full Catenor path, with no raw operator key.
+
+Work completed:
+
+- **Executor and preflight (commit 6397df4):**
+  - `PrivySpvAtsExecutor` prepares the exact transaction read-only (eth_call + estimateGas from the SPV address; balance ≥ gasLimit × gasPrice) → Privy `eth_signTransaction` with the SPV runtime-signer key → signer boundary (the signed transaction must equal the prepared one) → hashio broadcast → receipt / EquityDeployed / read-back.
+  - `pnpm demo:s001` Part B uses this executor and broadcasts only with `--hedera-live`. The raw-key executor stays dev/test only.
+  - Demo resource renamed `spv:catenor-demo-001` [REF-IMPL].
+  - `preflight:spv`: 14/14 checks (wallet, exact policy rules, read-only simulation, Privy dry signatures, three policy denials).
+- **Dry run** (`pnpm demo:s001`, real Sumsub sandbox representative):
+  - S001 ALLOW → ACTIVE → `TRUST_ANCHOR_VALID`;
+  - grant, then DENY `SUBJECT_MISMATCH` / `SIGNATURE_INVALID` with the SPV nonce 0 → 0;
+  - the exact deployEquity for the real grant is identical to the preflight in from, to, chain, gas estimate, gas limit and max HBAR; only the grant id differs;
+  - audit chain valid.
+- **Live run** (`pnpm demo:s001 --hedera-live`, the one authorized transaction):
+  - tx `0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897`: SUCCESS, from the SPV wallet at nonce 0, to the ATS Factory, value 0, gas limit 15M;
+  - ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418` (`0.0.10479921`), "Catenor One Demo Asset 001 (SYNTHETIC)" / `C1DA001` / ISIN `XXCATENOR019`, supply 0 / max 1,000,000, the SPV holds admin + issuer, KYC off;
+  - the on-chain regulation `info` carries the real grant id;
+  - audit chain `… ASSET_ACTION_AUTHORIZED, ASSET_ACTION_EXECUTED` valid.
+- **Verification** (`pnpm --filter @catenor-one/api verify:ats <hash>`, public data only): receipt, decoded on-chain input, token state and roles, and the Mirror Node result agree.
+  - Gas used 6,898,815 at 1.11e12 weibar = **7.65768465 HBAR**, which equals the balance change (100 → 92.34231535).
+  - Unused gas was refunded.
+
+Validation: `pnpm check` green (329 unit tests); `pnpm test:integration` 102/102.
+
+Not done (next): `issueByPartition` to Investor A / B (the SPV policy does not allow it yet — FINAL-DEMO §11.2); FD-2 runtime creation of the SPV wallet and policy.
+
+AI assistance: Claude Code main session.
+
+Human review: maintainer authorized the live transaction explicitly (prompt 2026-09-11-011); report pending.
+
+Artifacts:
+
+- `artifacts/hedera/final-demo/deploy-equity.md`, `deploy-equity.verify.json`;
+- prompts `2026-09-11-010`, `2026-09-11-011`.
+
+Commit: 6397df4, plus the `feat(hedera)` live-checkpoint commit that contains this entry.
+
 ## Entry template
 
 ```md

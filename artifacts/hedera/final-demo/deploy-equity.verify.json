@@ -1,0 +1,56 @@
+{
+  "label": "READ-ONLY verification (public Hedera Testnet data)",
+  "transaction": "0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897",
+  "hashscan": "https://hashscan.io/testnet/transaction/0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897",
+  "chainId": "296",
+  "status": "SUCCESS",
+  "from": "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93",
+  "to": "0xd1F118A40f3b02883D35909eF2517e7EDd78379d",
+  "toIsAtsFactory": true,
+  "function": "deployEquity",
+  "value": "0",
+  "nonce": 0,
+  "gasLimit": "15000000",
+  "gasUsed": "6898815",
+  "gasPriceWeibar": "1110000000000",
+  "feeAtGasUsedHbar": "7.65768465",
+  "onChainInput": {
+    "regulationInfo": "catenor-one:TOKENIZE_ASSET:spv:catenor-demo-001:grant:capability-grant:5282690f-eb8a-4d18-bcbe-3a75a98d3be1",
+    "rbacs": [
+      {
+        "role": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "members": [
+          "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93"
+        ]
+      },
+      {
+        "role": "0x5eeaf5602c75bf26e73b5206d0bd6ee82f621166255e5fd73cc06bc7bd84a95f",
+        "members": [
+          "0x6c6AD33BA7FB4DA58A1b7412706f8ECB10Ba9C93"
+        ]
+      }
+    ]
+  },
+  "equity": {
+    "address": "0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418",
+    "hashscan": "https://hashscan.io/testnet/contract/0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418",
+    "name": "Catenor One Demo Asset 001 (SYNTHETIC)",
+    "symbol": "C1DA001",
+    "decimals": 0,
+    "isin": "XXCATENOR019",
+    "totalSupply": "0",
+    "maxSupply": "1000000",
+    "spvHasDefaultAdminRole": true,
+    "spvHasIssuerRole": true,
+    "internalKycActivated": false
+  },
+  "mirrorNode": {
+    "result": "SUCCESS",
+    "gasUsed": 6898815,
+    "contractId": "0.0.9213391",
+    "createdContractIds": [
+      "0.0.10479921"
+    ],
+    "timestamp": "1789145624.531106104"
+  }
+}
