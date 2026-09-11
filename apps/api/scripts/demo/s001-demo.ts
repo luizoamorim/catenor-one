@@ -28,7 +28,7 @@ import { verifyChain } from '@catenor-one/audit';
 import { bootstrapConfigurationHash, parseBootstrapConfiguration } from '@catenor-one/authority';
 import { policyHash } from '@catenor-one/policy';
 import { PrivyClient } from '@privy-io/node';
-import { formatEther, getAddress, keccak256 } from 'ethers';
+import { JsonRpcProvider, formatEther, getAddress, keccak256 } from 'ethers';
 import { startCallbackReceiver } from '../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
 import { deriveChannelKeys } from '../../src/infrastructure/confidential-compute/cre-channel.js';
 import { CreSimulationConfidentialVerifier } from '../../src/infrastructure/confidential-compute/cre-simulation-verifier.js';
@@ -50,6 +50,7 @@ import {
   DistributionService,
   type InvestorEligibilityResult,
 } from '../../src/modules/distribution/application/distribution.service.js';
+import { HEDERA_TESTNET } from '../../src/infrastructure/execution/hedera-ats-executor.js';
 import { HederaAtsHoldingsReader } from '../../src/infrastructure/execution/hedera-ats-holdings.js';
 import {
   PayoutRefused,
@@ -73,6 +74,10 @@ const hederaLive = process.argv.includes('--hedera-live');
 const runDistribution = process.argv.includes('--distribution');
 // Broadcasts the Agent payouts of PAY holders (maintainer-authorized only); without it the payout is dry-signed.
 const agentPayoutLive = process.argv.includes('--agent-payout-live');
+// Explicit, maintainer-authorized payout gas limit (default 30,000); e.g. --payout-gas-limit=700000.
+const payoutGasLimit = Number(
+  (process.argv.find((arg) => arg.startsWith('--payout-gas-limit=')) ?? '=30000').split('=')[1],
+);
 const RESOURCE = 'spv:catenor-demo-001';
 const HBAR = 10n ** 18n; // Hedera JSON-RPC weibar
 
@@ -450,13 +455,26 @@ async function runPartC(trustAnchor: string) {
       return privyApi.signTransaction(id, tx, key);
     },
   };
-  const payout = new PrivyAgentPayoutExecutor(recordingApi, {
-    walletId: agent.wallet.walletRef,
-    walletAddress: agent.wallet.address,
-    runtimeAuthorizationKey: runtimeKey,
+  const payout = new PrivyAgentPayoutExecutor(
+    recordingApi,
+    {
+      walletId: agent.wallet.walletRef,
+      walletAddress: agent.wallet.address,
+      runtimeAuthorizationKey: runtimeKey,
+    },
+    undefined,
+    payoutGasLimit,
+  );
+  const reader = new HederaAtsHoldingsReader();
+  const balances = async () => ({
+    agent: await reader.nativeBalance(agent.wallet.address),
+    investorA: await reader.nativeBalance(DEMO_INVESTORS.A.address),
+    investorB: await reader.nativeBalance(DEMO_INVESTORS.B.address),
   });
+  const before = await balances();
   const nonceBefore = await payout.nonce();
   const payouts = [];
+  const readyToExecute: Awaited<ReturnType<typeof payout.prepare>>[] = [];
   for (const h of plan.holders) {
     const approval = await distribution.approvedPayout(plan, h.investor);
     if (approval.controlled !== 'PAY') {
@@ -497,12 +515,8 @@ async function runPartC(trustAnchor: string) {
       maxCostHbar: formatEther(prepared.maxCostWeibar),
     };
     if (agentPayoutLive) {
-      const executed = await payout.execute(prepared);
-      payouts.push({
-        ...common,
-        transaction: executed.transactionId,
-        hashscan: executed.explorerUrl,
-      });
+      readyToExecute.push(prepared);
+      payouts.push({ ...common, status: 'PREPARED FOR THE AUTHORIZED BROADCAST' });
     } else {
       const { recoveredFrom } = await payout.sign(prepared); // dry signature, discarded
       payouts.push({
@@ -512,7 +526,61 @@ async function runPartC(trustAnchor: string) {
       });
     }
   }
+  let executed: Awaited<ReturnType<typeof payout.execute>> | undefined;
+  if (agentPayoutLive) {
+    // The maintainer authorized exactly ONE payout: 6 HBAR to Investor A's bound account, empty calldata.
+    const only = readyToExecute[0];
+    if (
+      readyToExecute.length !== 1 ||
+      !only ||
+      only.transaction.to !== getAddress(DEMO_INVESTORS.A.address) ||
+      only.approval.approvedWeibar !== 6n * HBAR ||
+      only.transaction.data !== '0x'
+    ) {
+      say('AGENT PAYOUT (LIVE)', 'LOCAL', {
+        refused: 'the live plan does not yield exactly the authorized payout — nothing broadcast',
+        payouts,
+      });
+      return;
+    }
+    executed = await payout.execute(only); // exactly one broadcast, no retry
+  }
+  const after = await balances();
   const nonceAfter = await payout.nonce();
+  if (executed) {
+    const mirror = (await (
+      await fetch(
+        `https://testnet.mirrornode.hedera.com/api/v1/contracts/results/${executed.transactionId}`,
+      )
+    ).json()) as Record<string, unknown>;
+    const receipt = await new JsonRpcProvider(HEDERA_TESTNET.rpcUrl).getTransactionReceipt(
+      executed.transactionId,
+    );
+    const gasPrice = receipt?.gasPrice ?? 0n;
+    say('AGENT PAYOUT (LIVE) — verification', 'REAL', {
+      transaction: executed.transactionId,
+      hashscan: executed.explorerUrl,
+      receiptStatus: receipt?.status === 1 ? 'SUCCESS' : String(receipt?.status),
+      gasUsed: String(executed.gasUsed),
+      gasFeeHbar: formatEther(executed.gasUsed * gasPrice),
+      mirrorNode: { result: mirror['result'], timestamp: mirror['timestamp'] },
+      agentHbar: { before: formatEther(before.agent), after: formatEther(after.agent) },
+      investorAHbar: { before: formatEther(before.investorA), after: formatEther(after.investorA) },
+      investorBHbar: { before: formatEther(before.investorB), after: formatEther(after.investorB) },
+      agentNonce: { before: nonceBefore, after: nonceAfter },
+      checks: {
+        agentNonceIncrementedByOne: nonceAfter === nonceBefore + 1,
+        investorAReceivedExactly6Hbar: after.investorA - before.investorA === 6n * HBAR,
+        investorBUnchanged: after.investorB === before.investorB,
+        agentPaid6HbarPlusGas:
+          before.agent - after.agent === 6n * HBAR + executed.gasUsed * gasPrice,
+        zeroSignatureRequestsForInvestorB: !signatureRequests.includes(
+          getAddress(DEMO_INVESTORS.B.address),
+        ),
+        mirrorNodeSuccess: mirror['result'] === 'SUCCESS',
+      },
+    });
+  }
   say(
     agentPayoutLive
       ? 'AGENT PAYOUT (LIVE)'

@@ -29,6 +29,10 @@ import { DEMO_INVESTORS } from '../demo/final-demo-config.js';
 process.loadEnvFile(new URL('../../.env', import.meta.url));
 const env = (name: string) => process.env[name] ?? '';
 const HBAR = 10n ** 18n;
+// Same explicit option as the demo (default 30,000): --payout-gas-limit=N
+const gasLimit = Number(
+  (process.argv.find((x) => x.startsWith('--payout-gas-limit=')) ?? '=30000').split('=')[1],
+);
 const CAP = 20n * HBAR;
 const A = DEMO_INVESTORS.A.address;
 const B = DEMO_INVESTORS.B.address;
@@ -167,7 +171,11 @@ line((await sign(raw({ chain_id: 1 }))) === 'DENIED', 'chain 1 → DENIED');
 console.log(
   '4. Exact approved payout (Investor A, 6 HBAR) — Catenor boundary + Privy dry signature (discarded)',
 );
-const exact = buildPayoutTransaction(approvedA, { recipient: A, amountWeibar: 6n * HBAR }, chain);
+const exact = buildPayoutTransaction(
+  approvedA,
+  { recipient: A, amountWeibar: 6n * HBAR },
+  { ...chain, gasLimit },
+);
 line(
   exact.to === getAddress(A) && exact.data === '0x' && exact.chain_id === 296,
   'boundary PASS: plain transfer to A, empty calldata, chain 296',
@@ -186,7 +194,7 @@ const executor = new PrivyAgentPayoutExecutor(
     runtimeAuthorizationKey: env('CATENOR_AGENT_RUNTIME_AUTHORIZATION_KEY'),
   },
 );
-const maxCost = BigInt(exact.value) + BigInt(PAYOUT_GAS_LIMIT) * BigInt(gasPrice);
+const maxCost = BigInt(exact.value) + BigInt(gasLimit) * BigInt(gasPrice);
 const { recoveredFrom } = await executor.sign({
   approval: approvedA,
   from: wallet.address,
@@ -198,6 +206,27 @@ const { recoveredFrom } = await executor.sign({
 line(
   getAddress(recoveredFrom) === wallet.address,
   `Privy dry signature SIGNED; recovers to the Agent wallet ${recoveredFrom}`,
+);
+// Gas for the exact payout (READ-ONLY). A first transfer to an EVM address that is not yet a Hedera account creates
+// the account (HIP-583 lazy create) and costs far more than a plain transfer.
+let payoutGas: bigint | undefined;
+try {
+  payoutGas = await provider.estimateGas({
+    from: wallet.address,
+    to: exact.to,
+    value: BigInt(exact.value),
+  });
+} catch {
+  payoutGas = undefined;
+}
+const recipientIsAccount =
+  (await fetch(`https://testnet.mirrornode.hedera.com/api/v1/accounts/${exact.to}`)).status === 200;
+const gasOk = payoutGas !== undefined && payoutGas <= BigInt(gasLimit);
+console.log(
+  `  ${gasOk ? 'PASS' : 'BLOCK'}  payout gas estimate ${payoutGas ?? 'unavailable'} ${gasOk ? '≤' : '>'} gas limit ${gasLimit}` +
+    (recipientIsAccount
+      ? ''
+      : ' (Investor A is not yet a Hedera account: the first transfer lazily creates it)'),
 );
 const funded = balance >= maxCost;
 console.log(

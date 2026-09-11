@@ -1343,6 +1343,33 @@ Artifacts: `artifacts/privy/final-demo/cp10-agent-payout-preflight.md`.
 
 Commit: the `feat(distribution)` and `docs(hackathon)` commits of this checkpoint.
 
+## 2026-09-11 — Final demo CP11: live Agent payout STOPPED before broadcast (gas limit)
+
+Goal: the maintainer-authorized single live payout (6 HBAR to Investor A, gas limit 30,000; prompt 2026-09-11-019).
+
+Findings (READ-ONLY):
+
+- Agent wallet funded: 100 HBAR, nonce 0.
+- Investor A and B balances 0; Investor A `0x8D72…7F78` is **not yet a Hedera account** (Mirror Node: not found).
+- `eth_estimateGas` for the 6 HBAR transfer = **655,519 gas**. The first transfer to a new EVM address lazily creates the account (HIP-583), far above the authorized 30,000 limit.
+
+Nothing was broadcast. The executor would have refused (`GAS_ABOVE_LIMIT`) before signing, and the authorized parameters cannot succeed on-chain.
+
+Work completed (safety):
+
+- `preflight:payout` now estimates the payout gas and reports BLOCK when it exceeds the limit (the CP10 preflight did not estimate gas for A).
+- The payout gas limit is an explicit option (`--payout-gas-limit=N`, bounded [21,000, 1,000,000], default 30,000).
+- Demo live mode broadcasts only when the live plan yields exactly one PAY payout: 6 HBAR to Investor A's bound account with empty calldata.
+- It captures Agent / A / B balances, the nonce, the receipt, Mirror Node and the B-signature check.
+
+Awaiting maintainer decision: activate Investor A's account first (a small transfer, then the payout is about 23K gas), or authorize a higher payout gas limit.
+
+Validation: `pnpm check` green (364 unit tests).
+
+AI assistance: Claude Code main session.
+
+Commit: the `fix(distribution)` commit that contains this entry.
+
 ## Entry template
 
 ```md

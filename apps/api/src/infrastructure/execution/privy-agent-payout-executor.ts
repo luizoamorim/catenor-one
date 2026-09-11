@@ -43,7 +43,7 @@ export class PayoutRefused extends Error {
 export function buildPayoutTransaction(
   approval: ApprovedPayout,
   request: PayoutRequest,
-  chain: { nonce: number; gasPrice: string },
+  chain: { nonce: number; gasPrice: string; gasLimit?: number },
 ): NativeTransferTransaction {
   if (approval.controlled !== 'PAY') throw new PayoutRefused('PLAN_RESULT_NOT_PAY');
   if (approval.approvedWeibar <= 0n) throw new PayoutRefused('NOTHING_TO_PAY');
@@ -63,7 +63,7 @@ export function buildPayoutTransaction(
     data: '0x',
     value: `0x${approval.approvedWeibar.toString(16)}`,
     nonce: chain.nonce,
-    gas_limit: PAYOUT_GAS_LIMIT,
+    gas_limit: chain.gasLimit ?? PAYOUT_GAS_LIMIT,
     gas_price: chain.gasPrice,
     type: 0,
   };
@@ -93,7 +93,13 @@ export class PrivyAgentPayoutExecutor {
     private readonly api: PrivyEvmSigningApi,
     private readonly config: PrivyAgentPayoutConfig,
     private readonly provider: JsonRpcProvider = new JsonRpcProvider(HEDERA_TESTNET.rpcUrl),
-  ) {}
+    /** Explicit, maintainer-authorized gas limit (default 30,000 — a plain transfer to an existing account). */
+    private readonly gasLimit: number = PAYOUT_GAS_LIMIT,
+  ) {
+    if (!Number.isInteger(gasLimit) || gasLimit < 21_000 || gasLimit > 1_000_000) {
+      throw new Error('payout gas limit must be an integer in [21000, 1000000]');
+    }
+  }
 
   /** The Agent wallet id comes from the (verified) pre-seeded wallet resolution; the key from the environment. */
   static fromEnv(
@@ -129,16 +135,20 @@ export class PrivyAgentPayoutExecutor {
       this.provider.send('eth_gasPrice', []) as Promise<string>,
       this.provider.getBalance(from),
     ]);
-    const transaction = buildPayoutTransaction(approval, request, { nonce, gasPrice });
+    const transaction = buildPayoutTransaction(approval, request, {
+      nonce,
+      gasPrice,
+      gasLimit: this.gasLimit,
+    });
     // Fail closed before any gas estimation or signature: the wallet must cover value + gasLimit × gasPrice.
-    const maxCostWeibar = BigInt(transaction.value) + BigInt(PAYOUT_GAS_LIMIT) * BigInt(gasPrice);
+    const maxCostWeibar = BigInt(transaction.value) + BigInt(this.gasLimit) * BigInt(gasPrice);
     if (balanceWeibar < maxCostWeibar) throw new PayoutRefused('INSUFFICIENT_AGENT_BALANCE');
     const estimatedGas = await this.provider.estimateGas({
       from,
       to: transaction.to,
       value: BigInt(transaction.value),
     });
-    if (estimatedGas > BigInt(PAYOUT_GAS_LIMIT)) throw new PayoutRefused('GAS_ABOVE_LIMIT');
+    if (estimatedGas > BigInt(this.gasLimit)) throw new PayoutRefused('GAS_ABOVE_LIMIT');
     return { approval, from, transaction, estimatedGas, balanceWeibar, maxCostWeibar };
   }
 

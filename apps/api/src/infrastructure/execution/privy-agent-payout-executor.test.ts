@@ -128,6 +128,13 @@ describe('PrivyAgentPayoutExecutor', () => {
     expect(Transaction.from(raw).data).toBe('0x');
   });
 
+  it('refuses a gas limit outside [21000, 1000000]', () => {
+    const api = {} as PrivyEvmSigningApi;
+    const config = { walletId: 'w', walletAddress: A, runtimeAuthorizationKey: 'k' };
+    expect(() => new PrivyAgentPayoutExecutor(api, config, undefined, 20_000)).toThrow();
+    expect(() => new PrivyAgentPayoutExecutor(api, config, undefined, 2_000_000)).toThrow();
+  });
+
   it('an underfunded Agent wallet is refused before any Privy signature request', async () => {
     const { executor, signRequests } = fixture({ balance: 6n * HBAR });
     await expect(executor.prepare(pay, { recipient: A, amountWeibar: 6n * HBAR })).rejects.toThrow(
