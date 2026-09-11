@@ -622,3 +622,5 @@ Type: official sponsor template + SDK, plus original Catenor One code.
 Template-derived files: `main.ts`, `package.json`, `tsconfig.json`, `workflow.yaml`, `project.yaml`, `secrets.yaml` (all adapted). Written for Catenor One: `workflow.ts` router and `shared/*` (`cre-engineer` subagent), `src/trust-anchor-admission/*` semantics (main session), `fixtures/seal-context.mjs`, `test/*`. No other template or example code was copied.
 
 Workflow package license set to Apache-2.0 (the template scaffold said `UNLICENSED`). The scaffold's unused `ethereum-mainnet` RPC entry was removed.
+
+S001 demo tooling (2026-09-11, `apps/api` dev dependency): `tsx` 4.23.13 (MIT) runs the TypeScript demo command `pnpm demo:s001`.

@@ -889,6 +889,25 @@ Human review: pending (checkpoint report).
 
 Commit: dd2b9e5, 2f886b1, 399b606, plus the docs commit that contains this entry.
 
+## 2026-09-11 — Part B scoped capability + labeled demo command
+
+Goal: implement the approved narrow Part B authority path and one command that runs the S001 demo truthfully.
+
+Work completed:
+
+- **Part B (commit c0b3342):** `packages/authority` capability grant (`CatenorOneCapabilityGrant` wrapping one protocol-shaped Capability; [REF-IMPL] `TOKENIZE_ASSET` / `asset:catenor-one-demo:001`), `authorizeWithCapability` (signature, ACTIVE Trust Anchor issuer, subject, action, resource, expiry — fail closed); structured `signCapabilityGrant` on the Privy and FAKE signers; `AssetTokenizationService` (register Org B, grant, request → executor only on ALLOW); four [REF-IMPL] audit event types (migration `20260911053426_part_b_audit_event_types`).
+- **Demo command (commit 6a24714):** `pnpm demo:s001` — REAL Privy + REAL Sumsub sandbox representative + CRE SIMULATION + SYNTHETIC MOCK company, labeled per step; refuses FAKE signers or missing Sumsub values; sanitized run record.
+
+Validation: `pnpm check` green (307 unit tests); `pnpm test:integration` 102/102 (Part B: ALLOW executes once; seven DENY paths never invoke the executor; audit chain valid).
+
+Blocked (maintainer actions): Sumsub sandbox values in `workflows/.env` (step B / demo run); Hedera testnet account + ATS asset for the real executor; B1 for CRE deployment.
+
+AI assistance: Claude Code main session; a general-purpose research subagent for current Hedera ATS SDK/testnet facts (in progress at the time of this entry).
+
+Human review: pending (checkpoint report).
+
+Commit: c0b3342, 6a24714, plus the docs commit that contains this entry.
+
 ## Entry template
 
 ```md

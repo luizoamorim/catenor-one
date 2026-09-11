@@ -2,7 +2,7 @@
 
 **Project:** Catenor One  
 **Parent plan:** `docs/hackathon/plans/2026-09-11-006-ethonline-delivery-fast-lane.md` (demo definition of done, part B)  
-**Status:** **PROPOSAL — awaiting maintainer approval.** No part-B code is written before approval.  
+**Status:** **APPROVED with narrowed scope (maintainer, 2026-09-11)** — see "Approved scope" below; the original proposal is kept for history.  
 **Protocol basis (pinned 66ef712):** `specification/authority/02-CAPABILITIES.md`, `04-AUTHORITY-CHAINS.md`, `05-TRUST-ANCHORS.md`; `schemas/capability.schema.json`
 
 ## Goal
@@ -73,3 +73,17 @@ Hedera ATS testnet: issue/mint 100 tokens (transaction id recorded as artifact)
 
 - A Hedera testnet account (operator ID + key) placed in the git-ignored `apps/api/.env`; values are never shared in chat.
 - One security token created through ATS on testnet (or confirmation that the adapter should create it), and its token/contract ID.
+
+## Approved scope (maintainer, 2026-09-11) — as implemented (commit c0b3342)
+
+- ACTIVE Trust Anchor → issues ONE signed scoped Capability to Org B: issuer = the active Trust Anchor `did:catenor`;
+  subject = Org B `did:catenor`; action `TOKENIZE_ASSET`; resource `asset:catenor-one-demo:001`; explicit `validUntil`.
+  All names are Catenor One **[REF-IMPL]**, never presented as frozen Catenor Protocol vocabulary.
+- The grant wraps one protocol-shaped Capability `{subject, action, resource, constraints}` inside a signed
+  `CatenorOneCapabilityGrant` envelope, signed with the Trust Anchor's existing Credential Assertion Key
+  (`eddsa-jcs-2022`, `assertionMethod`) — no key-purpose conflict found.
+- Catenor verifies at minimum: signature (issuer assertionMethod key), issuer currently an ACTIVE Trust Anchor (S001 verifier),
+  subject = requesting Org B, action, resource, not expired. ALLOW → exactly one Hedera ATS testnet action; any DENY → the
+  executor is never invoked.
+- Not implemented (out of the approved scope): Sponsor Authorization / Agent Delegation / full Hedera lifecycle; request
+  authentication of Org B beyond the subject match (Org B's request is operator-initiated in the demo).
