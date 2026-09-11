@@ -123,7 +123,9 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - Evidence: `artifacts/hedera/final-demo/deploy-equity.md`.
 - [ ] FD-4 `feat(hedera)`: issueByPartition to Investor A and B.
   - **Prepared 2026-09-11:** investor wallets provisioned; READ-ONLY simulation accepted; function-level Privy issuance rule CONFIRMED (`artifacts/privy/final-demo/cp4-issuance-policy-probe.md`).
-  - Pending: the maintainer policy update, the approved broadcast, and the private Account Binding persistence.
+  - The maintainer applied the SPV issuance rule; `preflight:issuance` PASS.
+  - **LIVE 2026-09-11, Investor A:** 600 units, tx `0x9e6c86c4…04bf`, 0.516 HBAR; A balance 600, total supply 600. Evidence: `artifacts/hedera/final-demo/issue-investor-a.md`.
+  - Pending: Investor B (awaiting authorization); Catenor runtime authorization of issuance and the private Account Binding persistence.
 - [ ] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
 - [ ] FD-6 `feat(cre)`: real Sumsub sandbox representative in the final path (A GREEN, B RED).
 - [ ] FD-7 `feat(distribution)`: revenue trigger, blind dry run, controlled distribution, A executed / B held.

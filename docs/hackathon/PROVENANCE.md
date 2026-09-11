@@ -698,3 +698,5 @@ Added in CP4 (2026-09-11), also original Catenor One code without new dependenci
 
 The Privy calldata-condition shapes (`function_name`, the nested tuple field) come from the current Privy policy documentation and the live CP4 probe by `privy-engineer`. The `issueByPartition` ABI fragment matches `@hashgraph/asset-tokenization-contracts` 8.0.0 (the script checks the signature at run time).
 
+CP5 (2026-09-11): `apps/api/scripts/hedera/issue-to-investor.ts` is original Catenor One code. It runs one issuance through the Privy SPV executor; preflight is the default and broadcast requires an explicit flag. Live result: `issueByPartition` → Investor A, tx `0x9e6c86c4e8d2674f3d49142b14f7c9d194cb025dfa604ee684ad362e034a04bf` (`artifacts/hedera/final-demo/`).
+

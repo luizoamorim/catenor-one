@@ -1119,6 +1119,34 @@ Artifacts: `artifacts/privy/final-demo/cp4-issuance-policy-probe.md`.
 
 Commit: the `feat(hedera)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP5: LIVE issuance to Investor A (Privy SPV signer path)
+
+Goal: the maintainer-authorized single live `issueByPartition` → Investor A (600 units) on the rehearsal equity; STOP before Investor B.
+
+Work completed:
+
+- **Maintainer steps:**
+  - `add-spv-issuance-rule.mjs --apply` added the SPV issuance rule: chain 296 ∧ equity ∧ `issueByPartition` ∧ partition `0x…01`;
+  - `preflight:issuance` PASS.
+- **`issue:investor A`** preflight matched the authorization: token, holder, 600, partition `0x…01`, chain 296, SPV sender, gas limit 1,000,000. The Privy dry signature passed under the new rule.
+- **`issue:investor A --broadcast`**, one attempt, no retry, no raw key:
+  - tx `0x9e6c86c4e8d2674f3d49142b14f7c9d194cb025dfa604ee684ad362e034a04bf`, receipt SUCCESS, Mirror Node SUCCESS;
+  - Investor A 0 → 600 (default partition 600); total supply 0 → 600; SPV nonce 1 → 2;
+  - 456,629 gas = 0.51599077 HBAR.
+- **Read-only afterwards:** Investor B balance 0; 1 security holder.
+
+Validation: `pnpm check` green (see commit).
+
+Not done: Investor B (awaiting authorization); Catenor runtime authorization of issuance plus the private Account Binding (FD-4 remainder); FD-2.
+
+AI assistance: Claude Code main session.
+
+Human review: maintainer authorized the transaction explicitly (prompt 2026-09-11-013).
+
+Artifacts: `artifacts/hedera/final-demo/issue-investor-a.md`, `issue-investor-a.json`.
+
+Commit: the `feat(hedera)` commit that contains this entry.
+
 ## Entry template
 
 ```md
