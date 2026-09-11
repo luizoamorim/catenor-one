@@ -336,3 +336,5 @@ Checkpoint 7 (same day):
 - The main session wrote the Catenor semantics: investor facts, the distribution-eligibility policy, the Agent capability and the plan. It also audited both subagents' outputs.
 - The maintainer decided the FD-2 clarification, the issuance-integration requirement and the STOP before the Hedera lifecycle operation.
 
+Checkpoint 8 (same day): `hedera-engineer` researched the ATS dividend lifecycle read-only against the deployed token and the package sources; `privy-engineer` probed the lifecycle policy rules live on throwaway resources. The main session wrote the signer-boundary checks, the preflight and the maintainer script, and audited both reports; one preflight expectation was corrected against the known CP1 Factory rule.
+

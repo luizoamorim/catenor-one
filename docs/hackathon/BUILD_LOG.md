@@ -1229,6 +1229,43 @@ Artifacts:
 
 Commit: the `feat(cre)`, `feat(distribution)` and `docs(hackathon)` commits of this checkpoint.
 
+## 2026-09-11 — Final demo CP8: ATS dividend lifecycle prepared (READ-ONLY) + SPV lifecycle rules + Agent funding plan
+
+Goal: READ-ONLY research and preflight of the ATS dividend on the rehearsal equity, plus the narrowest Privy lifecycle rules; STOP before grantRole / dividend / payout (prompt 2026-09-11-016).
+
+Work completed:
+
+- **`hedera-engineer` (READ-ONLY + sources):**
+  - `setDividend` needs `ROLE_CORPORATE_ACTION`: the SPV has DEFAULT_ADMIN but not that role; the call reverts `AccountHasNoRole`;
+  - `initializeDividend` was already done by the Factory; `dividendRight = 0` is metadata only;
+  - dividends count 0;
+  - `grantRole(ROLE_CORPORATE_ACTION, SPV)` eth_call accepted, 194,421 gas;
+  - amount semantics: rate `amount / 10^amountDecimals` per unit, so `1 / 2` gives A 6 and B 4;
+  - the snapshot is read lazily after the recordDate;
+  - ATS moves no funds.
+- **`privy-engineer` live probe (throwaway):**
+  - `grantRole` pinned to `_role = ROLE_CORPORATE_ACTION` ∧ `_account = SPV`: CONFIRMED (the wrong role, wrong account and wrong chain were denied);
+  - `setDividend` by function: CONFIRMED;
+  - a `uint8` tuple field (`amountDecimals`) is accepted at creation but mis-enforced (PARTIAL), so the Catenor signer boundary enforces it;
+  - zero-argument functions can be pinned; revoke/renounce/issuance stay denied.
+- **Code:**
+  - SPV executor: `prepareCorporateActionRoleGrant` (fixed role and account), `prepareSetDividend` (validated terms; `amountDecimals` pinned by Catenor) and `executePrepared` (signer boundary before any broadcast);
+  - `DEMO_DIVIDEND` config; `preflight:lifecycle`;
+  - the maintainer script `add-spv-lifecycle-rules.mjs` (dry run by default; strict CP4-shape precondition; owner key matched against `PRIVY_SPV_OWNER_PUBLIC_KEY`, never printed; adds exactly 2 rules; read-back).
+- **`preflight:lifecycle` before the update:** 16/16 PASS. Lifecycle calls are DENIED by the current policy; unrelated roles and accounts, `revokeRole`, `renounceRole`, `initializeDividend`, another contract, another chain and another partition are DENIED; `amountDecimals 3` is refused by the signer boundary.
+- **Finding:** the CP1 `deployEquity` rule restricts chain and Factory target but not the function (known since CP1). A Factory-targeted call of another function would be signed by Privy, and the Factory would reject it. Tightening it to `function_name = deployEquity` is an optional maintainer decision; it was not changed here.
+- **Agent funding:** recommended the pre-seeded, funded Agent wallet `0x5037…FC51` (created live in CP7; its read-back matches the narrow policy exactly), with live identity, binding, control verification and Capability. There is no gas sponsorship.
+
+Validation: `pnpm check` green (see commit).
+
+Not done: the maintainer policy update and the grantRole / setDividend / payout broadcasts (awaiting authorization).
+
+AI assistance: Claude Code main session; `hedera-engineer` (read-only research); `privy-engineer` (live policy probe).
+
+Human review: maintainer decisions in prompt 2026-09-11-016.
+
+Commit: the `feat(hedera)` and `docs(hackathon)` commits of this checkpoint.
+
 ## Entry template
 
 ```md

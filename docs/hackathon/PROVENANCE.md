@@ -726,3 +726,12 @@ Live sponsor resources:
 - **Privy development app:** the Agent runtime-signer key quorum (pre-seeded), plus one Agent policy and one Agent EVM wallet created by the demo run. The keys are outside the repository.
 - **Sumsub sandbox:** synthetic investor applicants, created per run.
 
+CP8 (2026-09-11), original Catenor One code without new dependencies:
+
+- the dividend-lifecycle preparation in `privy-spv-ats-executor.ts`;
+- `apps/api/scripts/hedera/preflight-spv-lifecycle.ts`;
+- `apps/api/scripts/privy/add-spv-lifecycle-rules.mjs`;
+- `DEMO_DIVIDEND`.
+
+The ATS role and function facts come from the `@hashgraph/asset-tokenization-contracts` 8.0.0 sources and types (`contracts/constants/roles.sol`, `contracts/facets/dividend/`), found by `hedera-engineer`. The Privy calldata-rule shapes come from the live CP8 probe by `privy-engineer`.
+

@@ -120,7 +120,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 - [x] FD-0 Lock story: this file and the prompt artifact.
 - [x] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast. Evidence: `artifacts/privy/final-demo/cp1-spv-hedera-compat.md`.
 - [ ] FD-2 `feat(privy)`: the SPV execution policy is created after ALLOW, for the pre-seeded SPV wallet, with refs persisted.
-  - **OPEN — required for the final recorded demo.**
+  - **DESIRED, NOT SUBMISSION-BLOCKING** (maintainer, CP8 2026-09-11). Live Privy wallet and policy provisioning is shown by CREATE DISTRIBUTION AGENT. If the SPV execution policy stays pre-provisioned in the recording, the demo and docs say so. Management-owner custody is not redesigned for FD-2.
   - **Clarified by the maintainer (2026-09-11):** the SPV EVM wallet MAY be pre-created and pre-funded. What must happen after the Sponsor's TOKENIZE_ASSET ALLOW is:
     1. Catenor creates the SPV EXECUTION POLICY through the Privy API;
     2. Catenor attaches and activates the execution controls for the pre-seeded SPV wallet;
@@ -183,6 +183,19 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
    - It is added by the maintainer-run `add-spv-issuance-rule.mjs` (owner key outside the runtime).
    - A chain-only rule is never used.
    - **Open for FD-2:** a runtime-created SPV policy needs the equity-specific issuance rule after `deployEquity` (the equity address is unknown before). The owner key never enters the runtime, so how that rule is added is decided at FD-2 and not assumed here.
-3. **Lifecycle / distribution operation.** `hedera-engineer` recommends the ATS dividend corporate action (`setDividend` plus its role/initialization) as the on-chain lifecycle step. The payout to Investor A only is a native HBAR transfer from the Agent wallet, and B is held. The prize requires issuance, configuration and ≥1 lifecycle operation on testnet.
+3. **Lifecycle / distribution operation.** DECIDED: the ATS dividend corporate action on the rehearsal equity (CP8, prepared, not broadcast).
+   - Minimum sequence (READ-ONLY verified; `initializeDividend` was already done by the Factory):
+     1. `grantRole(ROLE_CORPORATE_ACTION, SPV)`, about 194K gas, about 0.23 HBAR;
+     2. `setDividend({recordDate: now+120 s, executionDate: now+300 s, amount 1, amountDecimals 2})`, gas limit 1M, up to 1.18 HBAR up front;
+     3. read-backs `getDividend` / `getDividendFor` / `getDividendAmountFor`, expected after the recordDate: A 600 × 0.01 = 6, B 400 × 0.01 = 4.
+   - ATS records ownership-based entitlements and moves no funds. **Catenor alone decides the actual payout**: A PAY, B HOLD, since current eligibility ≠ ownership.
+   - SPV Privy rules for it (maintainer-run `add-spv-lifecycle-rules.mjs`): `grantRole` pinned to exactly ROLE_CORPORATE_ACTION → the SPV wallet; `setDividend` pinned by function and target.
+   - The `setDividend` terms (incl. `amountDecimals`, which Privy cannot enforce) are built and checked by the Catenor signer boundary.
+   - The Agent payout to A only (6 HBAR) follows, after separate authorization.
 4. **Resource vocabulary.** DONE: `spv:catenor-demo-001` [REF-IMPL] is used in code, tests and the on-chain grant `info`.
 5. **Issuer of the Agent's `EXECUTE_DISTRIBUTION` Capability.** Implemented with the default: the ACTIVE Trust Anchor, same grant mechanism as `TOKENIZE_ASSET` (CP7). A delegation chain (Sponsor → Agent) is deferred.
+6. **Agent funding for the recording** (maintainer, CP8): no gas-sponsor subsystem.
+   - Recommended: the **pre-seeded, funded Agent wallet** `0x5037705014596A9050A51Bc131c9B55Cf98fFC51`. It was created live by the CP7 run, and its read-back shows exactly the narrow Agent policy with the runtime signer scoped by it.
+   - Live in the recording: the AGENT subject and `did:catenor`, a private binding to that wallet, Catenor verifying the Privy controls, and the `EXECUTE_DISTRIBUTION` Capability.
+   - Attaching a *new* policy to an existing owned wallet needs the wallet owner's authorization, which never enters the runtime. So with a pre-seeded wallet the Agent policy is pre-provisioned and verified live, and it is labeled that way.
+   - The live-creation path (CP7 evidence) stays in the code.
