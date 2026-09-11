@@ -1000,6 +1000,45 @@ Human review: story provided by the maintainer; FINAL-DEMO.md pending review.
 
 Commit: the `docs(hackathon)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP1: Privy SPV EVM wallet → Hedera Testnet compatibility (no broadcast)
+
+Goal: FD-1. Confirm that a Privy-managed EVM wallet under a narrow policy can sign the ATS `deployEquity` transaction for Hedera Testnet (eip155:296) before any HBAR is spent.
+
+Work completed:
+
+- **`privy-engineer`** (headless, git writes and `.env` / key-file reads blocked), LIVE on the Privy development app:
+  - two new dedicated P-256 authorization keys (SPV management owner, SPV runtime signer), written once to a 0600 file outside the repo;
+  - one key quorum;
+  - policy `catenor-one-SPV-execution`: ALLOW `eth_signTransaction` only when chain_id 296 AND `to` is the ATS v8 Factory; DENY export; default-deny;
+  - one SPV EVM wallet with that policy and the runtime quorum as an override-scoped additional signer.
+  - The `deployEquity` calldata, with the SPV address as ATS admin and issuer, was signed; the recovered sender equals the wallet and the chain is 296.
+  - Wrong chain, wrong target and plain transfer were denied (400 `policy_violation`); export and policy update with the runtime key were denied (401).
+  - Nothing was broadcast.
+- **`hedera-engineer`** (READ-ONLY):
+  - `deployEquity` estimate 7.40M gas at a 1,160 Gwei-equivalent gas price ≈ 8.6 HBAR;
+  - current Hedera docs: unused gas fully refunded;
+  - hollow-account (HIP-583) funding and completion flow;
+  - `issueByPartition` signature, default partition `0x…01` and `ROLE_ISSUER`;
+  - lifecycle options, recommending the ATS dividend corporate action;
+  - "Tokenization of Anything" requirements from the ETHGlobal prize page: ATS; issuance + configuration + ≥1 lifecycle operation; Hedera testnet; video ≤5 min; public repo.
+- **Main session:**
+  - audited both transcripts (one provisioning run created resources; the earlier runs failed on module resolution before generating any key);
+  - re-ran a READ-ONLY `eth_call` / `eth_estimateGas` of `deployEquity` with the SPV address as operator: accepted.
+
+Validation: evidence in `artifacts/privy/final-demo/cp1-spv-hedera-compat.md` (Privy ids and keys omitted). `pnpm check` green.
+
+Open, for maintainer decisions (FINAL-DEMO §11):
+
+- gas funding of live-created wallets (proposed: a Privy gas-sponsor wallet);
+- how the SPV policy allows `issueByPartition`;
+- the lifecycle operation choice.
+
+AI assistance: Claude Code main session; `privy-engineer` and `hedera-engineer` project subagents (first live use).
+
+Human review: pending (CP1 report).
+
+Commit: the `docs(hackathon)` commit that contains this entry.
+
 ## Entry template
 
 ```md

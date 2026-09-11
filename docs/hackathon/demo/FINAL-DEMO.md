@@ -107,7 +107,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 ## 9. Delivery tasks (checked only when code + tests / artifacts exist)
 
 - [x] FD-0 Lock story: this file and the prompt artifact.
-- [ ] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast.
+- [x] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast. Evidence: `artifacts/privy/final-demo/cp1-spv-hedera-compat.md`.
 - [ ] FD-2 `feat(privy)`: runtime SPV wallet + policy provisioning after ALLOW, with refs persisted.
 - [ ] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
 - [ ] FD-4 `feat(hedera)`: issueByPartition to Investor A and B.
@@ -131,6 +131,15 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 
 ## 11. Open decisions (maintainer)
 
-1. **Gas for a live-created wallet.** A Privy EVM wallet created after ALLOW holds 0 HBAR, but `deployEquity` costs HBAR. The FD-1 report proposes how to fund it without a raw key.
-2. **Resource vocabulary.** `spv:catenor-demo-001` [REF-IMPL] replaces `asset:catenor-one-demo:001` in code, tests and the grant `info` field when FD-2/FD-3 land.
-3. **Issuer of the Agent's `EXECUTE_DISTRIBUTION` Capability.** Default: the ACTIVE Trust Anchor, with the same grant mechanism as `TOKENIZE_ASSET`. A delegation chain (Sponsor → Agent) is deferred.
+1. **Gas for a live-created wallet.** A Privy EVM wallet created after ALLOW holds 0 HBAR.
+   - `deployEquity` needs about 8.6 HBAR, and its gas limit must be covered up front: 11.6 HBAR at a 10M limit.
+   - Unused gas is fully refunded (current Hedera docs).
+   - Proposed: a pre-funded, Privy-managed **gas-sponsor** EVM wallet. Its policy allows only chain-296 value transfers up to a cap. After ALLOW it funds the new SPV and Agent wallets, and the first signed transaction completes the hollow account (HIP-583).
+   - The alternative, funding each new wallet by hand, does not fit a live flow.
+2. **`issueByPartition` under the SPV policy.** The equity address is unknown when the policy is created. Options:
+   - an `ethereum_calldata` ABI rule restricting the function (supported in the SDK types; to be tested live next);
+   - a post-deploy policy update. This needs the management-owner key and is not allowed in the runtime.
+   - A chain-only rule is too weak, and is a fallback only with explicit approval.
+3. **Lifecycle / distribution operation.** `hedera-engineer` recommends the ATS dividend corporate action (`setDividend` plus its role/initialization) as the on-chain lifecycle step. The payout to Investor A only is a native HBAR transfer from the Agent wallet, and B is held. The prize requires issuance, configuration and ≥1 lifecycle operation on testnet.
+4. **Resource vocabulary.** `spv:catenor-demo-001` [REF-IMPL] replaces `asset:catenor-one-demo:001` in code, tests and the grant `info` field when FD-2/FD-3 land.
+5. **Issuer of the Agent's `EXECUTE_DISTRIBUTION` Capability.** Default: the ACTIVE Trust Anchor, with the same grant mechanism as `TOKENIZE_ASSET`. A delegation chain (Sponsor → Agent) is deferred.

@@ -317,3 +317,12 @@ The T0.5 Privy spike earlier the same day was executed by the Claude Code main s
 ## 2026-09-11 — Hackathon Delivery Mode implementation
 
 Claude Code main session implemented the S001 vertical path in small checkpoints (persistence, orchestration, Privy adapters, the confidential workflow's Catenor semantics, API channel, tests). The `cre-engineer` project subagent was used again in a headless Claude Code session (same pattern as Phase 0: official `chainlink-cre-skill` preloaded; deploy/activate/update/pause/delete, `cre secrets`, key linking, login/logout, git writes and `.env` reads blocked at the tool-permission layer) for the official scaffold, the CRE runtime wiring and the base64 sealed-context simulation suite. The main session reviewed its output against the transcript and the simulator logs before integrating. The maintainer made every scope and semantic decision (D38, D39, Part B scope).
+
+## 2026-09-11 — Final demo, checkpoint 1 (Privy → Hedera compatibility)
+
+The main session delegated sponsor mechanics to the `privy-engineer` and `hedera-engineer` project subagents, each in a headless Claude Code session. Git writes and reads of `.env` and the key directory were blocked at the tool-permission layer.
+
+- `privy-engineer` provisioned a live SPV EVM wallet, policy and key quorum on the Privy development app and tested policy-constrained signing for chain 296. It sent no transaction.
+- `hedera-engineer` did read-only testnet estimation and a prize-requirement review.
+
+The main session audited both transcripts and re-ran the Hedera read-only check. Catenor semantics (the story, custody pattern, resource names and capability issuer) stayed with the main session and the maintainer. Prompt: `docs/hackathon/prompts/2026-09-11-009-final-ethonline-demo-story.md`.
