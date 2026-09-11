@@ -4,6 +4,6 @@
     "noEmit": true,
     "customConditions": ["@catenor-one/source"]
   },
-  "include": ["src", "prisma.config.ts"],
+  "include": ["src", "scripts/**/*.ts", "prisma.config.ts"],
   "exclude": ["src/infrastructure/persistence/prisma/generated", "src/**/*.contract.test.ts"]
 }

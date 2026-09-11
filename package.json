@@ -21,7 +21,8 @@
     "secret-scan": "node scripts/secret-scan.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm boundaries && pnpm secret-scan",
     "vectors:s001": "pnpm -r build && node scripts/vectors/generate-s001.mjs",
-    "vectors:s001:check": "pnpm vectors:s001 && git diff --exit-code -- test-vectors/s001"
+    "vectors:s001:check": "pnpm vectors:s001 && git diff --exit-code -- test-vectors/s001",
+    "demo:s001": "pnpm --filter @catenor-one/api db:generate && pnpm --filter @catenor-one/api demo:s001 --"
   },
   "devDependencies": {
     "@catenor-one/audit": "workspace:*",

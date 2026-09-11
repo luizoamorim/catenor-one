@@ -17,3 +17,6 @@ scratch/
 
 # Prisma generated client (apps/api, prisma generate)
 apps/api/src/infrastructure/persistence/prisma/generated/
+
+# Demo run records are regenerated per run (commit only curated ones under artifacts/)
+artifacts/demo/

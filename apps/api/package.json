@@ -10,7 +10,8 @@
     "lint": "eslint src prisma.config.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
-    "db:migrate:deploy": "prisma migrate deploy"
+    "db:migrate:deploy": "prisma migrate deploy",
+    "demo:s001": "node --conditions=@catenor-one/source --import tsx scripts/demo/s001-demo.ts"
   },
   "dependencies": {
     "@catenor-one/audit": "workspace:*",
@@ -30,6 +31,7 @@
     "@types/pg": "8.23.1",
     "pg": "8.23.0",
     "prisma": "7.10.0",
-    "testcontainers": "12.1.0"
+    "testcontainers": "12.1.0",
+    "tsx": "4.23.13"
   }
 }
