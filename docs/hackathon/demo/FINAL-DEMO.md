@@ -17,8 +17,8 @@ Chainlink CRE evaluates private evidence (SIMULATION until B1).
 |---|---|---|---|
 | Root Trust Anchor | `did:catenor` ORGANIZATION, S001 ACTIVE | Solana Credential Assertion Key (existing S001 wallet) | pre-seeded |
 | Sponsor | `did:catenor` ORGANIZATION | own assertion key | pre-seeded |
-| SPV `spv:catenor-demo-001` | `did:catenor` ORGANIZATION | **SPV EVM execution wallet + SPV policy** | **live, after ALLOW** |
-| Distribution Agent | `did:catenor` AGENT | **Agent EVM wallet + Agent policy (narrower)** | **live** |
+| SPV `spv:catenor-demo-001` | `did:catenor` ORGANIZATION | SPV EVM execution wallet (pre-seeded, funded) + **SPV execution policy** | wallet pre-seeded; **policy created live, after ALLOW** |
+| Distribution Agent | `did:catenor` AGENT | **Agent EVM wallet + Agent policy (narrower)** | **live** (CREATE DISTRIBUTION AGENT) |
 | Investor A | `did:catenor` HUMAN | EVM receiving wallet `0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78` | pre-seeded (2026-09-11) |
 | Investor B | `did:catenor` HUMAN | EVM receiving wallet `0x72f94a15A815853B488BCf225ec3cb67eC5ba444` | pre-seeded (2026-09-11) |
 
@@ -30,7 +30,7 @@ Investor wallets are receiving-only:
 - there is no runtime signer and no policy, so the Catenor runtime cannot sign with them;
 - the `did:catenor` ↔ wallet Account Binding is private and created in the Catenor database at demo time; only the addresses are public.
 
- Credential Assertion Key ≠ Financial Execution Key. Each execution wallet follows the S001 custody pattern (D34/D36):
+Credential Assertion Key ≠ Financial Execution Key. Each execution wallet follows the S001 custody pattern (D34/D36):
 
 - the owner is a management-owner P-256 authorization key in maintainer custody, never in the runtime;
 - the runtime acts only as an additional signer, scoped by that wallet's policy;
@@ -41,14 +41,17 @@ Investor wallets are receiving-only:
 - Root Trust Anchor ACTIVE, with a valid S001 Admission (auditable in the Judge Inspector).
 - Sponsor `did:catenor` holding a signed Capability from the Trust Anchor: `TOKENIZE_ASSET` on `spv:catenor-demo-001` [REF-IMPL]. It is only mentioned before tokenization.
 - Investor A and Investor B: `did:catenor`, a Privy EVM wallet each, and prepared evidence.
-- **Not** pre-created: the SPV execution policy and the Distribution Agent policy.
+- The SPV EVM execution wallet: pre-created and pre-funded. It is infrastructure, **not Catenor authority** (FD-2 clarification, maintainer 2026-09-11).
+- **Not** pre-created: the SPV execution policy for this tokenization and the Distribution Agent policy.
+
+Story: BEFORE, the SPV wallet exists and is funded, but no execution policy for this tokenization exists, so it cannot execute. AFTER the Sponsor's ALLOW, Catenor creates the SPV execution policy through the Privy API (visible in the Privy dashboard) and the Hedera action becomes executable. Catenor authority is what makes the policy-controlled execution capability available.
 
 ## 3. Live demo actions
 
 | # | Button / trigger | What happens | Sponsor |
 |---|---|---|---|
-| 1 | **TOKENIZE ASSET** | Catenor verifies the Sponsor Capability (ACTIVE Trust Anchor issuer, signature, subject, action, resource, expiry/revocation) → ALLOW → SPV subject → Privy SPV EVM wallet + SPV policy → `Factory.deployEquity` signed by the SPV wallet → receipt → asset TOKENIZED | Privy + Hedera |
-| 2 | (same flow) | `issueByPartition` → Investor A, → Investor B (P0 if stable) | Hedera |
+| 1 | **TOKENIZE ASSET** | Catenor verifies the Sponsor Capability (ACTIVE Trust Anchor issuer, signature, subject, action, resource, expiry/revocation) → ALLOW → SPV subject → **SPV execution policy created via the Privy API and activated for the pre-seeded SPV wallet** → `Factory.deployEquity` signed by the SPV wallet → receipt → asset TOKENIZED | Privy + Hedera |
+| 2 | (same flow) | the configured allocations are issued inside the authorized tokenization plan: `issueByPartition` → Investor A, → Investor B | Hedera |
 | 3 | **CREATE DISTRIBUTION AGENT** | AGENT subject → Privy Agent EVM wallet + narrower policy → Capability `EXECUTE_DISTRIBUTION` [REF-IMPL] on `spv:catenor-demo-001` | Privy |
 | 4 | **SPV REVENUE RECEIVED** (HTTP trigger) | revenue event recorded (in production: PMS, bank webhook, cron, reconciliation) | — |
 | 5 | **BLIND DISTRIBUTION (dry run)** | holdings-only plan proposes a payout to A and B. **Nothing is sent.** | — |
@@ -116,8 +119,15 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
 
 - [x] FD-0 Lock story: this file and the prompt artifact.
 - [x] FD-1 Privy → Hedera compatibility checkpoint: SPV EVM wallet + policy, eip155:296 signing, deployEquity calldata, no broadcast. Evidence: `artifacts/privy/final-demo/cp1-spv-hedera-compat.md`.
-- [ ] FD-2 `feat(privy)`: runtime SPV wallet + policy provisioning after ALLOW, with refs persisted.
-  - **OPEN — required for the final recorded demo** (maintainer, 2026-09-11): after the Sponsor's TOKENIZE_ASSET ALLOW, Catenor provisions the SPV Privy wallet and policy dynamically. The pre-provisioned CP1 wallet and the rehearsal equity are a real rehearsal/checkpoint only.
+- [ ] FD-2 `feat(privy)`: the SPV execution policy is created after ALLOW, for the pre-seeded SPV wallet, with refs persisted.
+  - **OPEN — required for the final recorded demo.**
+  - **Clarified by the maintainer (2026-09-11):** the SPV EVM wallet MAY be pre-created and pre-funded. What must happen after the Sponsor's TOKENIZE_ASSET ALLOW is:
+    1. Catenor creates the SPV EXECUTION POLICY through the Privy API;
+    2. Catenor attaches and activates the execution controls for the pre-seeded SPV wallet;
+    3. Hedera executes.
+  - Pre-seeding and funding the wallet is not Catenor authority.
+  - The CP1 wallet with its standing policy and the rehearsal equity are a real rehearsal/checkpoint only.
+  - The mechanism for attaching the new policy to the pre-seeded wallet is decided and probed at FD-2. Attaching a policy to an owned wallet needs the wallet owner's authorization, and the owner key is outside the runtime.
 - [x] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
   - LIVE 2026-09-11: tx `0x8265479f…5897`; ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418`; 7.66 HBAR.
   - Evidence: `artifacts/hedera/final-demo/deploy-equity.md`.
@@ -127,10 +137,26 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - **LIVE 2026-09-11, Investor A:** 600 units, tx `0x9e6c86c4…04bf`, 0.516 HBAR; A balance 600, total supply 600. Evidence: `artifacts/hedera/final-demo/issue-investor-a.md`.
   - **LIVE 2026-09-11, Investor B:** 400 units, tx `0x5ea23774…58f7`, 0.458 HBAR; B 400, A 600, total supply 1,000. Evidence: `artifacts/hedera/final-demo/issue-investor-b.md`.
   - Rehearsal-asset issuance is complete. The FD-4 checkbox stays open because of the gap below.
-  - **OPEN:** issuance authorization and binding through Catenor. Both issuances were maintainer-authorized rehearsal scripts; the Catenor runtime authorization and the private `did:catenor` ↔ wallet Account Binding are not implemented.
-- [ ] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
-- [ ] FD-6 `feat(cre)`: real Sumsub sandbox representative in the final path (A GREEN, B RED).
+  - **OPEN:** issuance authorization and binding through Catenor.
+    - **Final design (maintainer, 2026-09-11):** issuance is integrated into the authorized tokenization orchestration: Sponsor TOKENIZE_ASSET Capability → authorized tokenization plan → deploy equity → issue the configured allocations to Investor A/B.
+    - The signer boundary validates the exact token created by this flow, the exact investor addresses from the demo allocation, the exact amounts and partition `0x…01`.
+    - No generic mint/issuance API.
+    - The rehearsal scripts stay as evidence/tests only.
+    - The private Account Binding store now exists (CP7); investor receiving accounts are resolved from it.
+- [x] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
+  - LIVE 2026-09-11: Agent `did:catenor:bb5870b9…20f3`, Privy wallet `0x5037…FC51`, policy `to ∈ {A, B} ∧ value ≤ 20 HBAR ∧ chain 296`.
+  - The grant is issued by the ACTIVE Trust Anchor.
+  - Evidence: `artifacts/privy/final-demo/cp7-distribution-agent.md`.
+- [x] FD-6 `feat(cre)`: real Sumsub sandbox evidence through CRE `handlerInTee` (SIMULATION) in the final path (A GREEN, B RED).
+  - The new `INVESTOR_ELIGIBILITY` operation of `identity-confidential` gives A CONSISTENT and B MISMATCH (SANCTIONS, FINAL).
+  - The S001 representative already used the real sandbox; the mock Sumsub server is not used in the demo.
+  - Evidence: `artifacts/chainlink/final-demo/investor-eligibility-simulation.md`.
 - [ ] FD-7 `feat(distribution)`: revenue trigger, blind dry run, controlled distribution, A executed / B held.
+  - **Done 2026-09-11:**
+    - the revenue event (in-script trigger; HTTP button pending, FD-8);
+    - the blind DRY RUN (A 6 / B 4 HBAR, nothing sent);
+    - the controlled plan: `policy:distribution-eligibility:v1`, A ALLOW → PAY, B DENY → HOLD, with protocol Decisions and the audit chain.
+  - **Pending:** the live payout/lifecycle action for A only (Hedera, after the lifecycle choice), including the Agent payout signer boundary (plain transfer, exact recipient and amount).
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 
@@ -158,5 +184,5 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
    - A chain-only rule is never used.
    - **Open for FD-2:** a runtime-created SPV policy needs the equity-specific issuance rule after `deployEquity` (the equity address is unknown before). The owner key never enters the runtime, so how that rule is added is decided at FD-2 and not assumed here.
 3. **Lifecycle / distribution operation.** `hedera-engineer` recommends the ATS dividend corporate action (`setDividend` plus its role/initialization) as the on-chain lifecycle step. The payout to Investor A only is a native HBAR transfer from the Agent wallet, and B is held. The prize requires issuance, configuration and ≥1 lifecycle operation on testnet.
-4. **Resource vocabulary.** `spv:catenor-demo-001` [REF-IMPL] replaces `asset:catenor-one-demo:001` in code, tests and the grant `info` field when FD-2/FD-3 land.
-5. **Issuer of the Agent's `EXECUTE_DISTRIBUTION` Capability.** Default: the ACTIVE Trust Anchor, with the same grant mechanism as `TOKENIZE_ASSET`. A delegation chain (Sponsor → Agent) is deferred.
+4. **Resource vocabulary.** DONE: `spv:catenor-demo-001` [REF-IMPL] is used in code, tests and the on-chain grant `info`.
+5. **Issuer of the Agent's `EXECUTE_DISTRIBUTION` Capability.** Implemented with the default: the ACTIVE Trust Anchor, same grant mechanism as `TOKENIZE_ASSET` (CP7). A delegation chain (Sponsor → Agent) is deferred.

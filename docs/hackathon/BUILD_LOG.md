@@ -1176,6 +1176,59 @@ Artifacts: `artifacts/hedera/final-demo/issue-investor-b.md`, `issue-investor-b.
 
 Commit: the `feat(hedera)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP7: live Distribution Agent + REAL Sumsub via CRE SIMULATION + A ALLOW / B HOLD plan
+
+Goal: the distinctive Catenor path (maintainer prompt 2026-09-11-015); no Hedera lifecycle/dividend yet.
+
+Work completed:
+
+- **FD-2 clarified in FINAL-DEMO/TASKS:**
+  - the SPV wallet may be pre-seeded and funded;
+  - after the Sponsor's ALLOW, Catenor creates the SPV EXECUTION POLICY through Privy and activates it for that wallet.
+- Issuance is to be integrated into the authorized tokenization orchestration, with exact token, addresses, amounts and partition, and no generic mint API. Both FD-2 and the integrated issuance remain OPEN.
+- **CREATE DISTRIBUTION AGENT (live):**
+  - AGENT Subject with a random `did:catenor`;
+  - the Agent Privy EVM wallet and its narrower policy, created by the runtime from public values:
+    - chain 296 ∧ `to` ∈ {Investor A, Investor B} ∧ value ≤ 20 HBAR;
+    - export denied; default-deny;
+    - the policy owner key stays outside the runtime;
+  - a private `AGENT_EXECUTION` Account Binding;
+  - a Trust Anchor-signed Capability `EXECUTE_DISTRIBUTION` [REF-IMPL] on `spv:catenor-demo-001`.
+  - The Agent signer infrastructure (owner and runtime-signer keys plus the runtime quorum) was pre-seeded by `provision-agent-signer.mjs`; the keys are outside the repo.
+- **`privy-engineer` live probe:** the `in` operator for `to` and a numeric hex `value lte` were CONFIRMED (9/9); empty calldata cannot be required by policy, so the Catenor signer boundary will enforce plain transfers at payout.
+- **CRE:** a new `INVESTOR_ELIGIBILITY` operation of `identity-confidential` (`handlerInTee`; main-session semantics reusing the S001 normalization, reconciliation and commitment):
+  - one REAL Sumsub sandbox GET and the binding gate;
+  - facts `INVESTOR_IDENTITY_VERIFIED`, `INVESTOR_AML_CLEAR`, `EVIDENCE_FRESH`;
+  - an authenticated callback on the same channel.
+  - `cre-engineer` (headless, simulation only): the D6 suite passes 8/8 unchanged; the `INVESTOR_ELIGIBILITY` router, the allowlisted logs and the `{status, code}`-only return are confirmed; a missing config gives `CONFIG_INVALID`.
+- **Distribution (API):**
+  - `policy:distribution-eligibility:v1` [REF-IMPL] in `packages/policy`, separate from the frozen S001 facts;
+  - private `AccountBinding` table (migration `20260911181457_final_demo_distribution`) plus the `INVESTOR` provider-binding role and 5 [REF-IMPL] audit types;
+  - `DistributionService`: register investor, CREATE DISTRIBUTION AGENT, and the plan (Agent grant authorization → READ-ONLY Hedera holdings → blind DRY RUN → CRE check per holder → protocol Decision `RECEIVE_DISTRIBUTION` → PAY / HOLD);
+  - the capability grant is generalized (`TOKENIZE_ASSET`, `EXECUTE_DISTRIBUTION`) without changing Part B.
+- **Live run** `pnpm demo:s001 --distribution`:
+  - S001 ACTIVE; Part B read-only; investors with REAL Sumsub sandbox (A GREEN, B RED);
+  - Agent `did:catenor:bb5870b9b4d00001b71a8a60ece520f3`, wallet `0x5037705014596A9050A51Bc131c9B55Cf98fFC51`;
+  - wrong requester → DENY `SUBJECT_MISMATCH`;
+  - revenue 10 HBAR → blind A 6 / B 4 (dry run);
+  - controlled: A (600 units) CONSISTENT → ALLOW → PAY 6; B (400 units) RED (SANCTIONS, FINAL) → MISMATCH → DENY → HOLD 4;
+  - executed = false; audit chain valid.
+
+Validation: `pnpm check` green (348 unit tests); `pnpm test:integration` 108/108 (distribution 6 new; migration catalog updated to 10 private tables / 15 FKs, all RESTRICT, no cross-schema FK).
+
+Not done: the Hedera lifecycle/dividend and the A-only payout (next checkpoint); FD-2; integrated issuance; the HTTP revenue trigger and Judge Inspector (FD-8).
+
+AI assistance: Claude Code main session; `privy-engineer` (live policy probe); `cre-engineer` (simulation validation).
+
+Human review: maintainer decisions in prompt 2026-09-11-015; report pending.
+
+Artifacts:
+
+- `artifacts/privy/final-demo/cp7-distribution-agent.md`;
+- `artifacts/chainlink/final-demo/investor-eligibility-simulation.md`.
+
+Commit: the `feat(cre)`, `feat(distribution)` and `docs(hackathon)` commits of this checkpoint.
+
 ## Entry template
 
 ```md

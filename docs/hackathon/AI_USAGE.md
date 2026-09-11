@@ -329,3 +329,10 @@ The main session audited both transcripts and re-ran the Hedera read-only check.
 
 Checkpoint 4 (same day): `privy-engineer` ran a live policy-capability probe on throwaway Privy resources: a function-level `issueByPartition` restriction and owner-authorized policy updates. The main session audited the probe scripts and re-ran the SDK wrapper check before writing the maintainer-run policy-update script. The maintainer decided the issuance-policy rule, the investor-wallet model and the STOP before any issuance broadcast.
 
+Checkpoint 7 (same day):
+
+- `privy-engineer` probed the Distribution Agent policy predicates live on throwaway resources.
+- `cre-engineer` validated the new `INVESTOR_ELIGIBILITY` operation in `cre workflow simulate`: the existing suite plus investor cases with synthetic secrets, simulation only, forbidden commands blocked.
+- The main session wrote the Catenor semantics: investor facts, the distribution-eligibility policy, the Agent capability and the plan. It also audited both subagents' outputs.
+- The maintainer decided the FD-2 clarification, the issuance-integration requirement and the STOP before the Hedera lifecycle operation.
+

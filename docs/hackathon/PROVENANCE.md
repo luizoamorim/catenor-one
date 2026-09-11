@@ -702,3 +702,27 @@ CP5 (2026-09-11): `apps/api/scripts/hedera/issue-to-investor.ts` is original Cat
 
 CP6 (2026-09-11): the same script issued to Investor B, tx `0x5ea23774ef08a9046ae2135bfeb243e1bd385d153b8d1d8a703c883d4c8c58f7`. The rehearsal equity now has total supply 1,000 (A 600, B 400).
 
+## 27. 2026-09-11 — Final demo CP7: Distribution Agent, investor eligibility (CRE), distribution plan
+
+No new dependencies. Original Catenor One code, written by Claude Code in the main session:
+
+- `workflows/identity-confidential/src/investor-eligibility/` — Catenor semantics; reuses the S001 normalization, facts and commitment helpers; router and config wiring in `workflow.ts`;
+- `packages/policy/src/distribution-eligibility.ts`;
+- `apps/api/src/modules/distribution/`;
+- `apps/api/src/modules/capability-grants/`;
+- `apps/api/src/infrastructure/key-management/privy-distribution-agent.ts`;
+- `apps/api/src/infrastructure/execution/hedera-ats-holdings.ts`;
+- `apps/api/scripts/privy/provision-agent-signer.mjs`;
+- the `AccountBinding` migration;
+- demo Part C.
+
+Sources:
+
+- The Privy policy condition shapes (`in` on `to`, hex `value lte`) come from current Privy documentation and the live CP7 probe by `privy-engineer`; no SDK example code was copied.
+- The CRE mechanics were validated in simulation by `cre-engineer`.
+
+Live sponsor resources:
+
+- **Privy development app:** the Agent runtime-signer key quorum (pre-seeded), plus one Agent policy and one Agent EVM wallet created by the demo run. The keys are outside the repository.
+- **Sumsub sandbox:** synthetic investor applicants, created per run.
+
