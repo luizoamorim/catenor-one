@@ -20,7 +20,9 @@
     "@catenor-one/policy": "workspace:*",
     "@noble/curves": "2.4.0",
     "@prisma/adapter-pg": "7.10.0",
-    "@prisma/client": "7.10.0"
+    "@prisma/client": "7.10.0",
+    "@privy-io/node": "0.34.0",
+    "@scure/base": "2.4.0"
   },
   "devDependencies": {
     "@catenor-one/test-vectors": "workspace:*",

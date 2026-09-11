@@ -8,6 +8,12 @@ export default defineConfig({
   ssr: { resolve: { conditions } },
   test: {
     environment: 'node',
-    include: ['packages/*/src/**/*.test.ts', 'test-vectors/src/**/*.test.ts'],
+    include: [
+      'packages/*/src/**/*.test.ts',
+      'test-vectors/src/**/*.test.ts',
+      'apps/*/src/**/*.test.ts',
+    ],
+    // Integration tests need Docker (`pnpm test:integration`); live sponsor tests are opt-in (`pnpm test:privy-live`).
+    exclude: ['**/node_modules/**', '**/*.int.test.ts', '**/*.live.test.ts'],
   },
 });
