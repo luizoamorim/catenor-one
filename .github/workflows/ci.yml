@@ -19,6 +19,14 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - name: CRE workflow dependencies (workflows/identity-confidential)
+        run: bun install --frozen-lockfile --cwd workflows/identity-confidential
+      - name: CRE workflow typecheck
+        working-directory: workflows/identity-confidential
+        run: bunx tsc --noEmit
       - name: Lint (ESLint + Prettier)
         run: pnpm lint
       - name: Typecheck

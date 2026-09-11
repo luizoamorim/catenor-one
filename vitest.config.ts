@@ -12,6 +12,7 @@ export default defineConfig({
       'packages/*/src/**/*.test.ts',
       'test-vectors/src/**/*.test.ts',
       'apps/*/src/**/*.test.ts',
+      'workflows/*/test/unit/**/*.test.ts',
     ],
     // Integration tests need Docker (`pnpm test:integration`); live sponsor tests are opt-in (`pnpm test:privy-live`).
     exclude: ['**/node_modules/**', '**/*.int.test.ts', '**/*.live.test.ts'],

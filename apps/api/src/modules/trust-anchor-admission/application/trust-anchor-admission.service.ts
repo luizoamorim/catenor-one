@@ -462,7 +462,12 @@ export class TrustAnchorAdmissionService {
       if (run === undefined || run.sessionId !== s.session.id) {
         return { accepted: false, reason: 'UNKNOWN_RUN' };
       }
-      const rejection = rejectionOf(result, config, hash);
+      // The integration label must be what this API actually invoked: a SIMULATION or FAKE result can never be
+      // recorded as DEPLOYED (and vice versa).
+      const rejection =
+        result.mode !== this.deps.verifier.mode
+          ? 'EXECUTION_MODE_MISMATCH'
+          : rejectionOf(result, config, hash);
       const failed = rejection !== undefined || result.status !== 'OK';
       const status = rejection
         ? 'ERROR'

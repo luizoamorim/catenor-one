@@ -1,0 +1,19 @@
+# Secrets / environment — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Build outputs
+node_modules/
+dist/
+*.js.map
+.cre_build_tmp.*
+
+# Generated test payloads (contain dynamic timestamps)
+**/test/payloads/
+
+# OS
+.DS_Store
+
+# Per-run simulation payloads/configs written by the API simulation adapter
+.sim/

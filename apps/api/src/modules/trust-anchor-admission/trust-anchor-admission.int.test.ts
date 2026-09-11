@@ -342,6 +342,20 @@ describe('S001 DENY paths', () => {
   });
 });
 
+describe('integration labels', () => {
+  it('a result labeled with another execution mode is rejected (SIMULATION/FAKE never recorded as DEPLOYED)', async () => {
+    const h = await harness('trust-domain:deny-mode');
+    const started = await throughKeyProof(h);
+    await h.service.proveKeyPossessionWithSecureSigner(started.sessionRef);
+    const { runId } = await h.service.requestConfidentialVerification(started.sessionRef);
+    const relabeled = { ...h.verifier.resultFor(runId, 'GREEN'), mode: 'DEPLOYED' } as const;
+    expect(await h.service.recordConfidentialVerificationResult(relabeled)).toEqual({
+      accepted: false,
+      reason: 'EXECUTION_MODE_MISMATCH',
+    });
+  });
+});
+
 describe('U4 assertion key provisioning', () => {
   it('reuses an existing ACTIVE assertion key of the Subject instead of creating another wallet', async () => {
     const h = await harness('trust-domain:reuse-key');

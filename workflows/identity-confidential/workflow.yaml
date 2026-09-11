@@ -1,0 +1,24 @@
+# ==========================================================================
+# CRE WORKFLOW SETTINGS FILE — identity-confidential
+# ==========================================================================
+# deployment-registry: "private" is set explicitly per target because
+# `cre init --deployment-registry` is NOT persisted (T0.7 finding).
+# Never use onchain:ethereum-mainnet without explicit maintainer approval (D9).
+staging-settings:
+  user-workflow:
+    workflow-name: "identity-confidential-staging"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./main.ts"
+    config-path: "./config.simulation.json"
+    secrets-path: "../secrets.yaml"
+
+# ==========================================================================
+production-settings:
+  user-workflow:
+    workflow-name: "identity-confidential-production"
+    deployment-registry: "private"
+  workflow-artifacts:
+    workflow-path: "./main.ts"
+    config-path: "./config.production.json"
+    secrets-path: "../secrets.yaml"

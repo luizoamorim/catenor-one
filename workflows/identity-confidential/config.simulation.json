@@ -1,0 +1,39 @@
+{
+  "callbackUrl": "http://127.0.0.1:18787/v1/internal/cre/identity-confidential/results",
+  "sumsubBaseUrl": "http://127.0.0.1:18788",
+  "httpRequestTimeout": "8s",
+  "executionMode": "SIMULATION",
+  "companyEvidence": {
+    "source": "SYNTHETIC_MOCK",
+    "scenario": "MOCK_COMPANY_ACTIVE_GREEN",
+    "label": "MOCK — not Sumsub KYB"
+  },
+  "bootstrapConfigurationHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "acceptedEvidence": {
+    "evidenceProfile": "HYBRID_DEMO",
+    "evidenceSources": {
+      "company": "SYNTHETIC_MOCK",
+      "representative": "REAL_SUMSUB_SANDBOX"
+    },
+    "companyLevelNames": [
+      "MOCK_KYB_LEVEL"
+    ],
+    "representativeLevelNames": [
+      "id-only"
+    ],
+    "authorityRoles": [
+      "MOCK_AUTHORIZED_SIGNATORY"
+    ],
+    "activeRegistryStatuses": [
+      "MOCK_ACTIVE"
+    ],
+    "evidenceMaxAgeDays": 180
+  },
+  "authorizedTriggerAddress": "0x0000000000000000000000000000000000000000",
+  "authorizedKeys": [
+    {
+      "type": "KEY_TYPE_ECDSA_EVM",
+      "publicKey": "0x0000000000000000000000000000000000000000"
+    }
+  ]
+}

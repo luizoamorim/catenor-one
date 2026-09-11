@@ -11,3 +11,5 @@ artifacts
 schemas/catenor-protocol
 *.md
 test-vectors/s001/*.json
+# CRE project keeps the official cre-templates formatting (typechecked by its own compiler)
+workflows

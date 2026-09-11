@@ -5,5 +5,5 @@
     "customConditions": ["@catenor-one/source"]
   },
   "include": ["src", "prisma.config.ts"],
-  "exclude": ["src/infrastructure/persistence/prisma/generated"]
+  "exclude": ["src/infrastructure/persistence/prisma/generated", "src/**/*.contract.test.ts"]
 }
