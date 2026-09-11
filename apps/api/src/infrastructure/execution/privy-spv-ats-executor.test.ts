@@ -29,7 +29,8 @@ function fixture(opts: {
   const signed: PreparedTransaction[] = [];
   const api: PrivyEvmSigningApi = {
     walletAddress: async () => opts.privyAddress ?? spv.address,
-    signTransaction: async (_walletId, tx) => {
+    signTransaction: async (_walletId, input) => {
+      const tx = input as PreparedTransaction; // this suite only signs SPV contract calls
       signed.push(tx);
       const t = opts.signedTamper ? opts.signedTamper(tx) : tx;
       return spv.signTransaction({

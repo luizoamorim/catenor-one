@@ -17,7 +17,8 @@
     "preflight:issuance": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-issuance.ts",
     "issue:investor": "node --conditions=@catenor-one/source --import tsx scripts/hedera/issue-to-investor.ts",
     "preflight:lifecycle": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-spv-lifecycle.ts",
-    "lifecycle:dividend": "node --conditions=@catenor-one/source --import tsx scripts/hedera/dividend-lifecycle.ts"
+    "lifecycle:dividend": "node --conditions=@catenor-one/source --import tsx scripts/hedera/dividend-lifecycle.ts",
+    "preflight:payout": "node --conditions=@catenor-one/source --import tsx scripts/hedera/preflight-agent-payout.ts"
   },
   "dependencies": {
     "@catenor-one/audit": "workspace:*",

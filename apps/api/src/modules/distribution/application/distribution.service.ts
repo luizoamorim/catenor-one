@@ -51,7 +51,20 @@ export interface DistributionAgentWalletProvisioner {
     readonly policyRef: string;
     /** Human-readable summary of the wallet controls as stored by the provider. */
     readonly controls: readonly string[];
+    /** CREATED_LIVE, or PRE_SEEDED_VERIFIED (a funded wallet provisioned before the demo, verified now). */
+    readonly provisioning?: 'CREATED_LIVE' | 'PRE_SEEDED_VERIFIED';
   }>;
+}
+
+/** What Catenor approved for one holder (from a controlled plan) plus its private binding — input to the payout signer. */
+export interface ApprovedPayout {
+  readonly planRef: string;
+  readonly investor: string;
+  readonly controlled: 'PAY' | 'HOLD';
+  /** The amount the approved plan assigned to this holder (18-decimal weibar). */
+  readonly approvedWeibar: bigint;
+  /** The investor's privately bound receiving account (address part of the CAIP-10 binding). */
+  readonly boundAccount: string;
 }
 
 /** READ-ONLY holdings on the execution network (Hedera ATS). */
@@ -209,7 +222,13 @@ export class DistributionService {
     readonly validUntil: string;
   }): Promise<{
     did: CatenorDid;
-    wallet: { address: string; walletRef: string; policyRef: string; controls: readonly string[] };
+    wallet: {
+      address: string;
+      walletRef: string;
+      policyRef: string;
+      controls: readonly string[];
+      provisioning?: 'CREATED_LIVE' | 'PRE_SEEDED_VERIFIED';
+    };
     grant: CapabilityGrant;
   }> {
     const recipients = await this.deps.uow.run(async (p) => {
@@ -242,6 +261,7 @@ export class DistributionService {
         walletProvider: this.deps.provisioner.adapter,
         walletAddress: wallet.address,
         resource: input.resource,
+        provisioning: wallet.provisioning ?? 'CREATED_LIVE',
         controls: [...wallet.controls],
       });
     });
@@ -253,6 +273,26 @@ export class DistributionService {
       validUntil: input.validUntil,
     });
     return { did, wallet, grant };
+  }
+
+  /**
+   * The approved payout for one holder of an ALLOW plan: PAY/HOLD and amount exactly as the controlled plan decided,
+   * recipient from the holder's PRIVATE receiving-account binding (never from the caller).
+   */
+  async approvedPayout(
+    plan: Extract<DistributionPlan, { decision: 'ALLOW' }>,
+    investor: string,
+  ): Promise<ApprovedPayout> {
+    const outcome = plan.holders.find((h) => h.investor === investor);
+    if (!outcome) throw new Error('the investor is not a holder in this plan');
+    const account = await this.deps.uow.run((p) => this.receivingAccount(p, investor));
+    return {
+      planRef: plan.planRef,
+      investor,
+      controlled: outcome.controlled,
+      approvedWeibar: outcome.controlled === 'PAY' ? outcome.proposedWeibar : 0n,
+      boundAccount: addressOf(account),
+    };
   }
 
   /** Delivery of an authenticated INVESTOR_ELIGIBILITY callback (from the CRE callback receiver). */

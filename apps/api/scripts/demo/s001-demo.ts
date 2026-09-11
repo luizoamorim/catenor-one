@@ -28,7 +28,7 @@ import { verifyChain } from '@catenor-one/audit';
 import { bootstrapConfigurationHash, parseBootstrapConfiguration } from '@catenor-one/authority';
 import { policyHash } from '@catenor-one/policy';
 import { PrivyClient } from '@privy-io/node';
-import { formatEther, keccak256 } from 'ethers';
+import { formatEther, getAddress, keccak256 } from 'ethers';
 import { startCallbackReceiver } from '../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
 import { deriveChannelKeys } from '../../src/infrastructure/confidential-compute/cre-channel.js';
 import { CreSimulationConfidentialVerifier } from '../../src/infrastructure/confidential-compute/cre-simulation-verifier.js';
@@ -51,6 +51,14 @@ import {
   type InvestorEligibilityResult,
 } from '../../src/modules/distribution/application/distribution.service.js';
 import { HederaAtsHoldingsReader } from '../../src/infrastructure/execution/hedera-ats-holdings.js';
+import {
+  PayoutRefused,
+  PrivyAgentPayoutExecutor,
+} from '../../src/infrastructure/execution/privy-agent-payout-executor.js';
+import {
+  privyEvmSigningApi,
+  type PrivyEvmSigningApi,
+} from '../../src/infrastructure/execution/privy-spv-ats-executor.js';
 import { PrivyDistributionAgentProvisioner } from '../../src/infrastructure/key-management/privy-distribution-agent.js';
 import { DEMO_INVESTORS, REHEARSAL_EQUITY } from './final-demo-config.js';
 import { TrustAnchorAdmissionService } from '../../src/modules/trust-anchor-admission/application/trust-anchor-admission.service.js';
@@ -63,6 +71,8 @@ const TD = 'trust-domain:catenor-one-demo';
 const representativeAnswer = process.argv.includes('RED') ? 'RED' : 'GREEN';
 const hederaLive = process.argv.includes('--hedera-live');
 const runDistribution = process.argv.includes('--distribution');
+// Broadcasts the Agent payouts of PAY holders (maintainer-authorized only); without it the payout is dry-signed.
+const agentPayoutLive = process.argv.includes('--agent-payout-live');
 const RESOURCE = 'spv:catenor-demo-001';
 const HBAR = 10n ** 18n; // Hedera JSON-RPC weibar
 
@@ -420,6 +430,105 @@ async function runPartC(trustAnchor: string) {
     heldHbar: formatEther(plan.heldWeibar),
     executed: false,
   });
+
+  // Agent payout: only PAY holders reach the payout signer; every Privy signature request is recorded.
+  const runtimeKey = process.env['CATENOR_AGENT_RUNTIME_AUTHORIZATION_KEY'] ?? '';
+  if (!runtimeKey) {
+    say(
+      'AGENT PAYOUT',
+      'LOCAL',
+      'skipped — CATENOR_AGENT_RUNTIME_AUTHORIZATION_KEY not configured',
+    );
+    return;
+  }
+  const signatureRequests: string[] = [];
+  const privyApi = privyEvmSigningApi(privy);
+  const recordingApi: PrivyEvmSigningApi = {
+    walletAddress: (id) => privyApi.walletAddress(id),
+    signTransaction: (id, tx, key) => {
+      signatureRequests.push(getAddress(tx.to));
+      return privyApi.signTransaction(id, tx, key);
+    },
+  };
+  const payout = new PrivyAgentPayoutExecutor(recordingApi, {
+    walletId: agent.wallet.walletRef,
+    walletAddress: agent.wallet.address,
+    runtimeAuthorizationKey: runtimeKey,
+  });
+  const nonceBefore = await payout.nonce();
+  const payouts = [];
+  for (const h of plan.holders) {
+    const approval = await distribution.approvedPayout(plan, h.investor);
+    if (approval.controlled !== 'PAY') {
+      payouts.push({
+        investor: label(h.investor),
+        controlled: approval.controlled,
+        transactionConstructed: false,
+        privySignatureRequested: false,
+      });
+      continue;
+    }
+    let prepared;
+    try {
+      prepared = await payout.prepare(approval, {
+        recipient: approval.boundAccount,
+        amountWeibar: approval.approvedWeibar,
+      });
+    } catch (e) {
+      // Fail closed: a refused payout never reaches Privy.
+      payouts.push({
+        investor: label(h.investor),
+        controlled: approval.controlled,
+        refused: e instanceof PayoutRefused ? e.code : 'ERROR',
+        privySignatureRequested: false,
+      });
+      continue;
+    }
+    const common = {
+      investor: label(h.investor),
+      controlled: approval.controlled,
+      to: prepared.transaction.to,
+      amountHbar: formatEther(approval.approvedWeibar),
+      data: prepared.transaction.data,
+      chainId: prepared.transaction.chain_id,
+      nonce: prepared.transaction.nonce,
+      estimatedGas: String(prepared.estimatedGas),
+      gasLimit: prepared.transaction.gas_limit,
+      maxCostHbar: formatEther(prepared.maxCostWeibar),
+    };
+    if (agentPayoutLive) {
+      const executed = await payout.execute(prepared);
+      payouts.push({
+        ...common,
+        transaction: executed.transactionId,
+        hashscan: executed.explorerUrl,
+      });
+    } else {
+      const { recoveredFrom } = await payout.sign(prepared); // dry signature, discarded
+      payouts.push({
+        ...common,
+        privyDrySignature: 'SIGNED (discarded, not broadcast)',
+        recoveredFrom,
+      });
+    }
+  }
+  const nonceAfter = await payout.nonce();
+  say(
+    agentPayoutLive
+      ? 'AGENT PAYOUT (LIVE)'
+      : 'AGENT PAYOUT PREFLIGHT (Privy dry signature; NOTHING BROADCAST)',
+    'REAL',
+    {
+      agentWallet: agent.wallet.address,
+      agentWalletProvisioning: agent.wallet.provisioning ?? 'CREATED_LIVE',
+      agentBalanceHbar: formatEther(
+        await new HederaAtsHoldingsReader().nativeBalance(agent.wallet.address),
+      ),
+      payouts,
+      privySignatureRequestsTo: signatureRequests,
+      agentNonce: { before: nonceBefore, after: nonceAfter },
+    },
+  );
 }
 
 try {

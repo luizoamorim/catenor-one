@@ -27,9 +27,21 @@ export interface PrivyEvmSigningApi {
   /** EVM eth_signTransaction (legacy, EIP-155) authorized by a runtime-signer authorization key; returns RLP hex. */
   signTransaction(
     walletId: string,
-    transaction: PreparedTransaction,
+    transaction: PreparedTransaction | NativeTransferTransaction,
     authorizationKey: string,
   ): Promise<string>;
+}
+
+/** A plain native HBAR transfer (Distribution Agent payout): value in 18-decimal weibar (hex), empty calldata. */
+export interface NativeTransferTransaction {
+  readonly chain_id: number;
+  readonly to: string;
+  readonly data: '0x';
+  readonly value: string;
+  readonly nonce: number;
+  readonly gas_limit: number;
+  readonly gas_price: string;
+  readonly type: 0;
 }
 
 export interface PreparedTransaction {

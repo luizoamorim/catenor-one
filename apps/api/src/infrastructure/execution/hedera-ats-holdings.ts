@@ -10,4 +10,9 @@ export class HederaAtsHoldingsReader implements HoldingsReader {
   balanceOf(asset: string, holder: string): Promise<bigint> {
     return IAsset__factory.connect(asset, asRunner(this.provider)).balanceOf(holder);
   }
+
+  /** Native HBAR balance (18-decimal weibar) — READ-ONLY. */
+  nativeBalance(account: string): Promise<bigint> {
+    return this.provider.getBalance(account);
+  }
 }

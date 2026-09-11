@@ -1,6 +1,6 @@
 // Distribution Agent wallet policy — offline shape checks (the live Privy behaviour was probed in CP7).
 import { describe, expect, it } from 'vitest';
-import { agentPolicyRules } from './privy-distribution-agent.js';
+import { agentPolicyMatches, agentPolicyRules } from './privy-distribution-agent.js';
 
 const A = '0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78';
 const B = '0x72f94a15A815853B488BCf225ec3cb67eC5ba444';
@@ -36,5 +36,21 @@ describe('agentPolicyRules (narrower than the SPV policy)', () => {
     expect(() => agentPolicyRules([], 1n)).toThrow();
     expect(() => agentPolicyRules(['0x1234'], 1n)).toThrow();
     expect(() => agentPolicyRules([A], 0n)).toThrow();
+  });
+});
+
+describe('agentPolicyMatches (pre-seeded Agent wallet verification)', () => {
+  const cap = 20n * 10n ** 18n;
+  it('accepts the stored rules only when they are exactly the approved boundary', () => {
+    const stored = agentPolicyRules([A, B], cap);
+    expect(agentPolicyMatches(stored, [A, B], cap)).toBe(true);
+    expect(agentPolicyMatches(stored, [A], cap)).toBe(false);
+    expect(agentPolicyMatches(stored, [A, B], cap + 1n)).toBe(false);
+    const widened = [
+      { ...stored[0]!, conditions: stored[0]!.conditions.filter((c) => c.field !== 'to') },
+      ...stored.slice(1),
+    ];
+    expect(agentPolicyMatches(widened, [A, B], cap)).toBe(false);
+    expect(agentPolicyMatches(stored.slice(0, 1), [A, B], cap)).toBe(false);
   });
 });
