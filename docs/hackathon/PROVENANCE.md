@@ -747,3 +747,5 @@ CP10 (2026-09-11), original Catenor One code without new dependencies:
 
 CP13 (2026-09-11): `apps/api/scripts/hedera/bootstrap-investor-accounts.ts` is original Catenor One code. Pre-demo testnet account activation only: 1 HBAR each to the investor receiving wallets from the Privy Agent wallet, txs `0x40c48ff3…6e07` and `0x0260e56f…548d` (`artifacts/hedera/pre-demo-bootstrap/`).
 
+CP14 (2026-09-11): the live selective payout, 6 HBAR to Investor A from the Privy Distribution Agent wallet, tx `0x5db611642921708fc1fa88b78ed883acebd5d99316ede4481c141e076be42b88`. It was produced by the live Catenor-controlled plan (`artifacts/hedera/final-demo/selective-payout.md`). No new dependencies.
+

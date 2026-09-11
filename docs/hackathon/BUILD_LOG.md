@@ -1395,6 +1395,40 @@ Artifacts: `artifacts/hedera/pre-demo-bootstrap/` (kept separate from the distri
 
 Commit: the `chore(hedera)` commit that contains this entry.
 
+## 2026-09-11 — Final demo CP14: LIVE selective controlled distribution — Investor A paid, Investor B held
+
+Goal: the single maintainer-authorized live payout (prompt 2026-09-11-022), broadcast only from the live recomputed Catenor plan A ALLOW/PAY 6 and B DENY/HOLD 4.
+
+Work completed:
+
+- **Live guard:** the broadcast requires the plan to be exactly A ALLOW/PAY 6 HBAR and B DENY/HOLD 4 HBAR, with exactly one PAY payout to A's bound account and empty calldata. Post-checks include B's ATS units and dividend entitlement; the nonce is polled after the receipt.
+- **`pnpm demo:s001 --distribution --agent-payout-live`** (one run):
+  - S001 ACTIVE (CRE SIMULATION, REAL Sumsub sandbox representative, MOCK company);
+  - CREATE DISTRIBUTION AGENT verified the pre-seeded wallet and the Trust Anchor granted `EXECUTE_DISTRIBUTION`;
+  - wrong requester DENY;
+  - revenue 10 HBAR → blind dry run A 6 / B 4;
+  - controlled plan (CRE SIMULATION on REAL Sumsub sandbox reviews): A CONSISTENT → ALLOW/PAY 6; B MISMATCH (SANCTIONS, FINAL) → DENY/HOLD 4.
+- **Payout** tx `0x5db611642921708fc1fa88b78ed883acebd5d99316ede4481c141e076be42b88`:
+  - receipt SUCCESS, Mirror Node SUCCESS;
+  - 21,000 gas = 0.02394 HBAR;
+  - Agent 96.61408832 → 90.59014832 HBAR, nonce 2 → 3;
+  - **A 1 → 7 HBAR**; **B 1 → 1 HBAR**;
+  - Privy signature requests: 1, to A only (0 for B);
+  - B still holds 400 units with dividend entitlement 4;
+  - audit chain valid.
+
+Validation: `pnpm check` green (see commit).
+
+Not done: a dedicated payout audit event type; FD-8 (HTTP revenue trigger, Judge Inspector, guided UI); FD-9 (submission evidence, README, video).
+
+AI assistance: Claude Code main session.
+
+Human review: the maintainer authorized the payout explicitly (prompt 2026-09-11-022).
+
+Artifacts: `artifacts/hedera/final-demo/selective-payout.md`, `selective-payout.json`.
+
+Commit: the `feat(distribution)` commit that contains this entry.
+
 ## Entry template
 
 ```md

@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { verifyChain } from '@catenor-one/audit';
 import { bootstrapConfigurationHash, parseBootstrapConfiguration } from '@catenor-one/authority';
 import { policyHash } from '@catenor-one/policy';
+import { IAsset__factory } from '@hashgraph/asset-tokenization-contracts';
 import { PrivyClient } from '@privy-io/node';
 import { JsonRpcProvider, formatEther, getAddress, keccak256 } from 'ethers';
 import { startCallbackReceiver } from '../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
@@ -50,7 +51,10 @@ import {
   DistributionService,
   type InvestorEligibilityResult,
 } from '../../src/modules/distribution/application/distribution.service.js';
-import { HEDERA_TESTNET } from '../../src/infrastructure/execution/hedera-ats-executor.js';
+import {
+  HEDERA_TESTNET,
+  asRunner,
+} from '../../src/infrastructure/execution/hedera-ats-executor.js';
 import { HederaAtsHoldingsReader } from '../../src/infrastructure/execution/hedera-ats-holdings.js';
 import {
   PayoutRefused,
@@ -528,9 +532,23 @@ async function runPartC(trustAnchor: string) {
   }
   let executed: Awaited<ReturnType<typeof payout.execute>> | undefined;
   if (agentPayoutLive) {
-    // The maintainer authorized exactly ONE payout: 6 HBAR to Investor A's bound account, empty calldata.
+    // The maintainer authorized exactly ONE payout, and only if the live plan is exactly A ALLOW/PAY 6 HBAR and
+    // B DENY/HOLD 4 HBAR: 6 HBAR to Investor A's bound account, empty calldata.
     const only = readyToExecute[0];
+    const byLabel = (l: 'A' | 'B') =>
+      plan.holders.find((h) => h.investor === investors.find((i) => i.label === l)!.did);
+    const holderA = byLabel('A');
+    const holderB = byLabel('B');
+    const planIsAuthorized =
+      plan.holders.length === 2 &&
+      holderA?.eligibility.outcome === 'ALLOW' &&
+      holderA.controlled === 'PAY' &&
+      holderA.proposedWeibar === 6n * HBAR &&
+      holderB?.eligibility.outcome === 'DENY' &&
+      holderB.controlled === 'HOLD' &&
+      holderB.proposedWeibar === 4n * HBAR;
     if (
+      !planIsAuthorized ||
       readyToExecute.length !== 1 ||
       !only ||
       only.transaction.to !== getAddress(DEMO_INVESTORS.A.address) ||
@@ -562,7 +580,24 @@ async function runPartC(trustAnchor: string) {
       executed.transactionId,
     );
     const gasPrice = receipt?.gasPrice ?? 0n;
+    // Investor B keeps its ATS position and its ATS dividend entitlement (ownership ≠ current eligibility).
+    const equity = IAsset__factory.connect(
+      REHEARSAL_EQUITY,
+      asRunner(new JsonRpcProvider(HEDERA_TESTNET.rpcUrl)),
+    );
+    const [unitsA, unitsB, entA, entB] = await Promise.all([
+      equity.balanceOf(DEMO_INVESTORS.A.address),
+      equity.balanceOf(DEMO_INVESTORS.B.address),
+      equity.getDividendAmountFor(1n, DEMO_INVESTORS.A.address),
+      equity.getDividendAmountFor(1n, DEMO_INVESTORS.B.address),
+    ]);
+    const entitlement = (e: { numerator: bigint; denominator: bigint }) =>
+      e.denominator === 0n ? null : Number(e.numerator) / Number(e.denominator);
     say('AGENT PAYOUT (LIVE) — verification', 'REAL', {
+      atsAfterPayout: {
+        investorA: { units: String(unitsA), dividend1Entitlement: entitlement(entA) },
+        investorB: { units: String(unitsB), dividend1Entitlement: entitlement(entB) },
+      },
       transaction: executed.transactionId,
       hashscan: executed.explorerUrl,
       receiptStatus: receipt?.status === 1 ? 'SUCCESS' : String(receipt?.status),
@@ -583,6 +618,8 @@ async function runPartC(trustAnchor: string) {
           getAddress(DEMO_INVESTORS.B.address),
         ),
         mirrorNodeSuccess: mirror['result'] === 'SUCCESS',
+        investorBRetains400Units: unitsB === 400n,
+        investorBRetainsDividendEntitlement4: entitlement(entB) === 4,
       },
     });
   }

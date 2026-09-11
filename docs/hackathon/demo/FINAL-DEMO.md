@@ -151,7 +151,11 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - The new `INVESTOR_ELIGIBILITY` operation of `identity-confidential` gives A CONSISTENT and B MISMATCH (SANCTIONS, FINAL).
   - The S001 representative already used the real sandbox; the mock Sumsub server is not used in the demo.
   - Evidence: `artifacts/chainlink/final-demo/investor-eligibility-simulation.md`.
-- [ ] FD-7 `feat(distribution)`: revenue trigger, blind dry run, controlled distribution, A executed / B held.
+- [x] FD-7 `feat(distribution)`: revenue trigger, blind dry run, controlled distribution, A executed / B held.
+  - **LIVE 2026-09-11 (CP14):** tx `0x5db61164…2b88` paid **6 HBAR to Investor A** (1 → 7 HBAR) from the Privy Agent wallet, from the live controlled plan (A ALLOW/PAY 6, B DENY/HOLD 4).
+  - **Investor B:** no transaction, 0 Privy signature requests, 1 → 1 HBAR, still holds 400 units and ATS dividend entitlement 4.
+  - Evidence: `artifacts/hedera/final-demo/selective-payout.md`.
+  - The HTTP revenue trigger (the demo uses an in-script trigger) moves to FD-8.
   - **Done 2026-09-11:**
     - the revenue event (in-script trigger; HTTP button pending, FD-8);
     - the blind DRY RUN (A 6 / B 4 HBAR, nothing sent);
@@ -168,7 +172,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - the investor receiving accounts were activated by 1 HBAR testnet bootstrap transfers from the Agent wallet (`artifacts/hedera/pre-demo-bootstrap/`, no Catenor audit events).
     - Baseline: A 1 HBAR, B 1 HBAR, Agent nonce 2.
     - `preflight:payout` PASS; payout gas estimate 22,828 ≤ 30,000.
-  - **Pending:** the maintainer-authorized live payout, 6 HBAR to A only (`--agent-payout-live`). Expected A 1 → 7, B 1 → 1.
+  - **DONE (CP14):** live payout 6 HBAR to A only; A 1 → 7, B 1 → 1 (see above).
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 

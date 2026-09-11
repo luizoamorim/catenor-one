@@ -1,0 +1,264 @@
+{
+  "label": "LIVE selective controlled-distribution payout — run 2026-09-11T21:59Z (pnpm demo:s001 --distribution --agent-payout-live)",
+  "labels": {
+    "REAL": "PostgreSQL, Privy (Agent wallet/policy/signature), Sumsub SANDBOX investor applicants, Hedera Testnet",
+    "SIMULATION": "Chainlink CRE identity-confidential INVESTOR_ELIGIBILITY (cre workflow simulate; not a deployed TEE)",
+    "MOCK": "company/KYB evidence in the S001 admission only (SYNTHETIC MOCK)"
+  },
+  "s001ConfidentialVerification": {
+    "evidenceLabel": "SIMULATION",
+    "data": {
+      "handler": "{\"status\":\"DELIVERED\",\"code\":\"OK\"}",
+      "callback": {
+        "accepted": true,
+        "runId": "run:d4ea7396-93ab-4fc4-a30c-2678e0b02ebf"
+      }
+    }
+  },
+  "wrongRequesterDeny": {
+    "evidenceLabel": "LOCAL",
+    "data": {
+      "decision": "DENY",
+      "reasons": [
+        "SUBJECT_MISMATCH"
+      ]
+    }
+  },
+  "revenueTrigger": {
+    "evidenceLabel": "LOCAL",
+    "data": {
+      "resource": "spv:catenor-demo-001",
+      "revenueHbar": "10.0",
+      "source": "demo trigger — in production a PMS, bank webhook, schedule or reconciliation event"
+    }
+  },
+  "blindDryRun": {
+    "evidenceLabel": "LOCAL",
+    "data": {
+      "asset": "0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418 (Hedera testnet, READ-ONLY balances)",
+      "proposed": [
+        {
+          "investor": "Investor A",
+          "hbar": "6.0"
+        },
+        {
+          "investor": "Investor B",
+          "hbar": "4.0"
+        }
+      ]
+    }
+  },
+  "controlledPlan": {
+    "evidenceLabel": "SIMULATION",
+    "data": {
+      "planRef": "distribution-plan:b40e4f18-d358-4579-b9cb-3cc11206ae10",
+      "holders": [
+        {
+          "investor": "Investor A",
+          "units": "600",
+          "proposedHbar": "6.0",
+          "confidentialRun": {
+            "mode": "SIMULATION",
+            "status": "OK",
+            "reconciliation": "CONSISTENT",
+            "evidenceCommitment": "0xae3bcc6e6854ddb4986342ff88d89749797de8dbeb9a51afad7f67c6f86cfe3d"
+          },
+          "policy": "policy:distribution-eligibility:v1",
+          "decision": "ALLOW",
+          "trace": [
+            "HOLDS_ASSET=TRUE",
+            "INVESTOR_IDENTITY_VERIFIED=TRUE",
+            "INVESTOR_AML_CLEAR=TRUE",
+            "EVIDENCE_FRESH=TRUE"
+          ],
+          "factReasons": {},
+          "decisionCommitment": "0x9bb87688cbb8eb70b6a907c1ad40c976cb44f13fd35188c9abf59fc6769c7f46",
+          "controlled": "PAY"
+        },
+        {
+          "investor": "Investor B",
+          "units": "400",
+          "proposedHbar": "4.0",
+          "confidentialRun": {
+            "mode": "SIMULATION",
+            "status": "OK",
+            "reconciliation": "MISMATCH",
+            "evidenceCommitment": "0xed1688b77fa50fa1decc38515feddd8d08e6435172f9d8a68344bc9fed1ef4a1"
+          },
+          "policy": "policy:distribution-eligibility:v1",
+          "decision": "DENY",
+          "trace": [
+            "HOLDS_ASSET=TRUE",
+            "INVESTOR_IDENTITY_VERIFIED=FALSE",
+            "INVESTOR_AML_CLEAR=FALSE",
+            "EVIDENCE_FRESH=TRUE"
+          ],
+          "factReasons": {
+            "INVESTOR_IDENTITY_VERIFIED": [
+              "SANCTIONS",
+              "FINAL"
+            ],
+            "INVESTOR_AML_CLEAR": [
+              "SANCTIONS",
+              "FINAL"
+            ]
+          },
+          "decisionCommitment": "0xb7beaee5fafa3fe64cb0703e3f3771c026924059e147575261bc2d019887bb3a",
+          "controlled": "HOLD"
+        }
+      ],
+      "payHbar": "6.0",
+      "heldHbar": "4.0",
+      "executed": false
+    }
+  },
+  "payoutVerification": {
+    "evidenceLabel": "REAL",
+    "data": {
+      "atsAfterPayout": {
+        "investorA": {
+          "units": "600",
+          "dividend1Entitlement": 6
+        },
+        "investorB": {
+          "units": "400",
+          "dividend1Entitlement": 4
+        }
+      },
+      "transaction": "0x5db611642921708fc1fa88b78ed883acebd5d99316ede4481c141e076be42b88",
+      "hashscan": "https://hashscan.io/testnet/transaction/0x5db611642921708fc1fa88b78ed883acebd5d99316ede4481c141e076be42b88",
+      "receiptStatus": "SUCCESS",
+      "gasUsed": "21000",
+      "gasFeeHbar": "0.02394",
+      "mirrorNode": {
+        "result": "SUCCESS",
+        "timestamp": "1789163937.118711104"
+      },
+      "agentHbar": {
+        "before": "96.61408832",
+        "after": "90.59014832"
+      },
+      "investorAHbar": {
+        "before": "1.0",
+        "after": "7.0"
+      },
+      "investorBHbar": {
+        "before": "1.0",
+        "after": "1.0"
+      },
+      "agentNonce": {
+        "before": 2,
+        "after": 3
+      },
+      "checks": {
+        "agentNonceIncrementedByOne": true,
+        "investorAReceivedExactly6Hbar": true,
+        "investorBUnchanged": true,
+        "agentPaid6HbarPlusGas": true,
+        "zeroSignatureRequestsForInvestorB": true,
+        "mirrorNodeSuccess": true,
+        "investorBRetains400Units": true,
+        "investorBRetainsDividendEntitlement4": true
+      }
+    }
+  },
+  "payoutSteps": {
+    "evidenceLabel": "REAL",
+    "data": {
+      "agentWallet": "0x5037705014596A9050A51Bc131c9B55Cf98fFC51",
+      "agentWalletProvisioning": "PRE_SEEDED_VERIFIED",
+      "agentBalanceHbar": "90.59014832",
+      "payouts": [
+        {
+          "investor": "Investor A",
+          "controlled": "PAY",
+          "to": "0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78",
+          "amountHbar": "6.0",
+          "data": "0x",
+          "chainId": 296,
+          "nonce": 2,
+          "estimatedGas": "22828",
+          "gasLimit": 30000,
+          "maxCostHbar": "6.036",
+          "status": "PREPARED FOR THE AUTHORIZED BROADCAST"
+        },
+        {
+          "investor": "Investor B",
+          "controlled": "HOLD",
+          "transactionConstructed": false,
+          "privySignatureRequested": false
+        }
+      ],
+      "privySignatureRequestsTo": [
+        "0x8D726Ab3aD261f03C60D9073F2bf05C9899a7F78"
+      ],
+      "agentNonce": {
+        "before": 2,
+        "after": 3
+      }
+    }
+  },
+  "auditChain": {
+    "evidenceLabel": "LOCAL",
+    "data": {
+      "events": [
+        "SUBJECT_CREATED",
+        "ADMISSION_REQUESTED",
+        "PROVIDER_REFERENCES_ATTACHED",
+        "KEY_ADDED",
+        "DID_DOCUMENT_CREATED",
+        "KEY_POSSESSION_VERIFIED",
+        "CONFIDENTIAL_VERIFICATION_REQUESTED",
+        "CONFIDENTIAL_EVIDENCE_VERIFIED",
+        "POLICY_EVALUATED",
+        "BOOTSTRAP_ENDORSEMENT_CREATED",
+        "TRUST_ANCHOR_ADMITTED",
+        "SUBJECT_CREATED",
+        "SUBJECT_CREATED",
+        "CAPABILITY_GRANTED",
+        "ASSET_ACTION_DENIED",
+        "ASSET_ACTION_DENIED",
+        "SUBJECT_CREATED",
+        "ACCOUNT_BINDING_CREATED",
+        "PROVIDER_REFERENCES_ATTACHED",
+        "SUBJECT_CREATED",
+        "ACCOUNT_BINDING_CREATED",
+        "PROVIDER_REFERENCES_ATTACHED",
+        "SUBJECT_CREATED",
+        "AGENT_EXECUTION_WALLET_PROVISIONED",
+        "CAPABILITY_GRANTED",
+        "DISTRIBUTION_REQUEST_DENIED",
+        "DISTRIBUTION_ELIGIBILITY_EVALUATED",
+        "DISTRIBUTION_ELIGIBILITY_EVALUATED",
+        "DISTRIBUTION_PLAN_CREATED"
+      ],
+      "chain": {
+        "valid": true
+      }
+    }
+  },
+  "createDistributionAgent": {
+    "evidenceLabel": "REAL",
+    "data": {
+      "agentDid": "did:catenor:3e959b7969b9550d6337b8d1ac551a84",
+      "privyAgentWallet": "0x5037705014596A9050A51Bc131c9B55Cf98fFC51",
+      "privyAgentPolicyControls": [
+        "ALLOW eth_signTransaction iff chain_id = 296 ∧ to ∈ {the 2 investor receiving wallets of spv:catenor-demo-001} ∧ value ≤ 20.0 HBAR",
+        "DENY exportPrivateKey, exportSeedPhrase",
+        "everything else denied by default (no ATS contract, no SPV wallet, no other chain)",
+        "policy owned by the Agent management-owner key (outside the runtime); the runtime signer cannot change it",
+        "wallet and policy pre-provisioned (funded) before the demo; read back and verified by Catenor at CREATE DISTRIBUTION AGENT"
+      ],
+      "capability": {
+        "subject": "did:catenor:3e959b7969b9550d6337b8d1ac551a84",
+        "action": "EXECUTE_DISTRIBUTION",
+        "resource": "spv:catenor-demo-001",
+        "constraints": {
+          "validUntil": "2026-09-12T21:58:39Z"
+        }
+      },
+      "issuer": "the ACTIVE Trust Anchor",
+      "proof": "eddsa-jcs-2022 via the Trust Anchor's Privy Credential Assertion Key"
+    }
+  }
+}
