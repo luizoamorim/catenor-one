@@ -47,5 +47,21 @@ record is in [`aborted-c1-202609121438/`](aborted-c1-202609121438/RUN-LOG.md).
 **Why the database is on Railway.** The maintainer decided that the demo state lives in the deployed backend's
 database rather than on this machine. The API is unchanged: it stays inert and only probes the database.
 
+### Stage 10 — Trust Domain bootstrap configuration (17:08 UTC)
+
+**Mode:** SPONSOR LIVE (non-spending), Privy development app `catenor-one-ethonline-2026`.
+
+| Item | Value |
+|---|---|
+| Trust Domain | `trust-domain:catenor-one-demo` |
+| Admission policy | `policy:trust-anchor-admission:v1` |
+| Bootstrap Endorsement Key wallet | `frpd7k5nwsurmsabp3n9bsao` (Solana, `HKQY5…nVEk`) |
+| Policies | `P_BOOTSTRAP` `vzww22mkxmtn4f333fdqpse7` · `P_ASSERT` `e8d0ndsssfq6rr7p2im0ptt4` (allow signMessage; deny exportPrivateKey and exportSeedPhrase) |
+| Runtime quorums | `…-bootstrap` `eucmxca0yokwgp9xr68plx6m` (signer for the bootstrap wallet) · `…-assertion` `px0qht07z0tbilnqqfcb3o2n` |
+| Owner keys | 2, registered in Privy by public key; the private keys stay in `~/.catenor-one/clean-room/c1-202609121659/` |
+| **Bootstrap Configuration hash** | `0x88314d8bae7f81ff33c8192124f7870a4f27586beba74e9772b735a3af007fff`, the input to CRE deploy #1 |
+
+Screenshots: [`screenshots/`](screenshots/README.md) (`10-before-*`, `10-after-*`), with what each object is and why.
+
 **Record labels.** The stage 01 record labels CRE as SIMULATION because no workflow is configured yet; stage 01 makes
-no CRE call. The label becomes DEPLOYED after Phase C.
+no CRE call. The label becomes DEPLOYED after Phase C. The stage 10 record carries the same default label; stage 10 makes no CRE call either.

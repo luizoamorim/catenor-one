@@ -31,7 +31,27 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `10-before-privy-wallets.png` | 10, before | Privy app `catenor-one-ethonline-2026`: **no wallets** |
 | `10-before-privy-keys-and-quorums.png` | 10, before | **no key quorums** |
 | `10-before-privy-policies.png` | 10, before | **no policies**: the app starts empty |
+| `10-after-terminal.png` | 10, after | stage 10 output: signer infrastructure CREATED LIVE; Bootstrap Configuration hash `0x88314d8b…7fff` |
+| `10-after-privy-wallets.png` | 10, after | **1 wallet**, Solana (SVM): the Bootstrap Endorsement Key `HKQY5…nVEk` |
+| `10-after-privy-policies.png` | 10, after | **2 policies**: `P_BOOTSTRAP` (1 wallet) and `P_ASSERT` (0 wallets until stage 11) |
+| `10-after-privy-policy-P_BOOTSTRAP-json.png` | 10, after | `P_BOOTSTRAP` rules: allow `signMessage`; deny `exportPrivateKey` and `exportSeedPhrase` |
+| `10-after-privy-policy-P_ASSERT-json.png` | 10, after | `P_ASSERT` rules: the same three |
+| `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
 
 (Filled in after each stage, from the stage output and the Privy / Sumsub / Hedera / CRE views.)
+
+### Stage 10: Trust Domain bootstrap configuration
+
+The stage creates, in Privy, the signer infrastructure that the Trust Anchor admission (stage 11) needs. It then pins
+the acceptance rules by hash.
+
+| Created | What it is | Why |
+|---|---|---|
+| Wallet `HKQY5…nVEk` (Solana) | the **Bootstrap Endorsement Key**: an Ed25519 key held by Privy | Only this key may endorse the first Trust Anchor after an ALLOW decision. It is a separate key from the Trust Anchor's own assertion key |
+| Policy `P_BOOTSTRAP` | allows `signMessage`; denies `exportPrivateKey` and `exportSeedPhrase`; anything else is denied by default | The bootstrap key can sign an endorsement but can never be exported or used for a transaction |
+| Policy `P_ASSERT` | the same rules, for credential-assertion wallets | Applied in stage 11 to the Trust Anchor's assertion key: it signs credentials, never money (Credential Assertion Key ≠ Financial Execution Key) |
+| Quorums `…-bootstrap` and `…-assertion` | the **runtime signers**: 1-of-1 P-256 authorization keys | The runtime asks Privy for a signature through these. `…-bootstrap` is already the signer of the bootstrap wallet; `…-assertion` becomes a signer in stage 11 |
+| 2 management-owner keys (unnamed rows) | the owners of the wallet and the policies | Their private keys stay on the maintainer's machine (`~/.catenor-one/`), never on Railway. A policy change needs the owner, not the runtime |
+| Bootstrap Configuration `0x88314d8b…7fff` | the Trust Domain's acceptance rules (policy `trust-anchor-admission:v1`, bootstrap key, evidence profile), hashed | The CRE workflow is deployed with this hash, so the admission is checked against these exact rules |
