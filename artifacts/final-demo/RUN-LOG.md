@@ -63,5 +63,22 @@ database rather than on this machine. The API is unchanged: it stays inert and o
 
 Screenshots: [`screenshots/`](screenshots/README.md) (`10-before-*`, `10-after-*`), with what each object is and why.
 
+### Phase C — CRE deploy #1 (for the admission)
+
+**C1 — `cre/configure.sh --relay-url=…` (17:24 UTC).** This wrote `workflows/identity-confidential/.deploy/config.json`
+(git-ignored) in `executionMode: DEPLOYED`.
+
+| Setting | Value |
+|---|---|
+| Callback | `https://catenor-one-production.up.railway.app/v1/internal/cre/identity-confidential/results`: the workflow's results go to the Railway relay, and the stage runner pulls them |
+| Authorized HTTP-trigger key | `0x18487BeFE194528cf429f5889BAE3aCbdA104a6c`. Its private key stays in `.catenor-demo/runtime.env` (0600) |
+| Issuer rules | not set yet. They need the Trust Anchor's key from stage 11 and are added by deploy #2 |
+
+The runner stays in SIMULATION until the workflow id is recorded with `--use-deployed`.
+
+**C2 — `cre/check-relay.sh` (17:24 UTC): OK.** A probe signed with the channel key was accepted by Railway
+(`202 RELAYED`), pulled back (`200`) and re-authenticated locally. The `CATENOR_INTERNAL_API_TOKEN` sealed on Railway
+therefore equals the one the CRE secrets will carry.
+
 **Record labels.** The stage 01 record labels CRE as SIMULATION because no workflow is configured yet; stage 01 makes
 no CRE call. The label becomes DEPLOYED after Phase C. The stage 10 record carries the same default label; stage 10 makes no CRE call either.

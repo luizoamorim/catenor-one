@@ -36,6 +36,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `10-after-privy-policies.png` | 10, after | **2 policies**: `P_BOOTSTRAP` (1 wallet) and `P_ASSERT` (0 wallets until stage 11) |
 | `10-after-privy-policy-P_BOOTSTRAP-json.png` | 10, after | `P_BOOTSTRAP` rules: allow `signMessage`; deny `exportPrivateKey` and `exportSeedPhrase` |
 | `10-after-privy-policy-P_ASSERT-json.png` | 10, after | `P_ASSERT` rules: the same three |
+| `C1-cre-configure-terminal.png` | C1 | CRE config generated in DEPLOYED mode: callback to the Railway relay, HTTP-trigger key `0x18487BeF…4a6c` authorized, issuer rules not set yet (normal before stage 11) |
+| `C2-cre-check-relay-terminal.png` | C2 | relay check **OK**: `202 RELAYED` → pull `200` → re-authenticated locally. Railway and this instance share the channel secret |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
