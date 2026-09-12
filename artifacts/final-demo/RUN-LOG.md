@@ -657,3 +657,21 @@ document or applicant data left it. Catenor records one protocol Decision per ho
 Bart's presentation is still cryptographically valid, yet he is not eligible today: **ownership ≠ current
 eligibility**.
 
+**Stage 83 — the Agent pays exactly the TEE-approved PAY holders (22:45 UTC, `--live`, confirmation typed).** For
+plan `distribution-plan:034ffe82-92e3-4e16-a6ff-6ed21562e4a5`, the path was the approved plan → Catenor signer
+boundary → the Agent's Privy policy → a Hedera transfer:
+
+| Holder | Controlled | Result |
+|---|---|---|
+| Investor A (Lisa) | **PAY 6.0 HBAR** | transaction `0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24`, **SUCCESS**, block 40440606: Agent account `0.0.10511413` → Lisa's account `0.0.10509881`, **6.00000000 ℏ** (fee 0.024 ℏ); received 6.0 |
+| Investor B (Bart) | **HOLD 4.0 HBAR** | **no transaction constructed, no Privy signature requested** |
+
+- **Privy signature requests** went only to `0x7de5…2473`, Lisa's bound account. **Investor B signature requests: 0.**
+- **Agent nonce:** 0 → 1, so exactly one transaction was sent.
+- **Guards at signing time:** the transfer went to the privately bound account with empty calldata on chain 296. The
+  Agent's Privy policy (`to` ∈ {A, B}, value ≤ 20 HBAR) allowed it.
+
+**The thesis, end to end.** Bart still holds 400 units, his dividend entitlement of 4 and a validly signed ACTIVE
+credential. Because he is not eligible today, decided inside the TEE from the current evidence, **his 4 HBAR are held,
+and no signature or transaction for him ever existed**. Lisa received her 6 HBAR on-chain.
+
