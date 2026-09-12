@@ -737,3 +737,23 @@ the recorded signed documents; the database is an index, not proof.
 - **Credentials:** both investor credentials are issuer-signed by the Trust Anchor and **ACTIVE**. Bart's is still
   valid, as the thesis requires.
 
+**Stage 99 — complete demo verification (22:59 UTC; read-only).** **All 24 executed stages ran and are `ok: true`**,
+from `01-setup-env` (16:59 UTC) to `83-execute-approved-distribution` (22:45 UTC):
+
+| Mode | Stages |
+|---|---|
+| LOCAL | 2 |
+| SPONSOR LIVE (non-spending) | 12 |
+| **CONFIDENTIAL (CRE), DEPLOYED** | 4: stages 11, 42, 44 and 82 |
+| **TESTNET LIVE (spends HBAR)** | 6: stages 50, 60, 61, 62, 63 and 83 |
+
+The Catenor verification passes with the same result as stage 93.
+
+**The final demo is complete.** It ran end to end on:
+
+- the **deployed** Chainlink Confidential Workflow;
+- a Privy development app with policy-bounded server wallets;
+- the Sumsub sandbox;
+- Hedera testnet through ATS;
+- the Railway backend database and relay.
+

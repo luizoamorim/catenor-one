@@ -111,6 +111,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `91-verify-hedera-final.png` | 91, final | **6 transactions SUCCESS** from public chain data: `deployEquity`, 2× `issueByPartition`, `grantRole`, `setDividend`, **Agent payout → Investor A** (21,000 gas). Holdings **A 600 / B 400**; balances **A 7.0 ℏ (1 + 6 paid) / B 1.0 ℏ (nothing paid)**; entitlements A 6 / B 4 |
 | `92-verify-privy.png` | 92 | Privy read-back: SPV, Agent and treasury wallets each carry **exactly one Catenor-created policy** (owner matches the wallet), their runtime signer is **override-scoped**, and exports are denied. The investor receiving wallets have **no signer and no policy**. **Agent policy exactly the approved boundary: true** |
 | `93-verify-catenor-audit.png` | 93 | Catenor re-verification from the signed documents (the DB is an index, not proof): **audit hash chain valid (79 events)**; Trust Anchor VALID; Sponsor relationship valid and 5 capabilities ALLOW; Agent relationship valid and delegated chain ALLOW; both credentials issuer-signed and ACTIVE |
+| `99-verify-complete-demo-stages.png` | 99 | **all 24 stages ran and are `ok: true`**, each with its mode: LOCAL, SPONSOR LIVE (non-spending), **CONFIDENTIAL (CRE)** ×4, TESTNET LIVE (spends HBAR) ×6 |
+| `99-verify-complete-demo-catenor.png` | 99 | the Catenor verification in the final summary: audit chain valid (79 events), Trust Anchor VALID, Sponsor and Agent chains ALLOW, credentials issuer-signed |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
