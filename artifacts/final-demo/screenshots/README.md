@@ -84,6 +84,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `60-after-hashscan-treasury.png` | 60, after | the Privy treasury account `0.0.10509855` (`0x49e9…5210`): **70.92 ℏ** left of the 100 ℏ from the faucet (27 ℏ sent plus fees) |
 | `60-after-hashscan-ats-factory.png` | 60, after | the official **ATS v8 Factory** contract `0.0.9213391` (`0xd1f1…379d`), the only target the SPV policy allowed for the deploy |
 | `60-after-privy-spv-policy-rules.png` | 60, after | SPV policy Rules view: under `eth_signTransaction`, `allow-ats-factory-hedera-testnet` + **the three equity-pinned rules**; exports denied; default deny (full JSON in `artifacts/privy/final-demo/clean-room-c1-202609121659/spv-policy-after-equity.json`) |
+| `61-terminal.png` | 61 | Investor A's stage 44 ALLOW decision (`decision:8c0a…53dd`, 600 units) + Sponsor `TOKENIZE_ASSET` → **`issueByPartition(600)`** to her private receiving binding, signed by the SPV Privy wallet: tx `0x5935…fa4e`, holder balance **600** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

@@ -482,3 +482,20 @@ This step spent no HBAR.
   `artifacts/privy/final-demo/clean-room-c1-202609121659/spv-policy-after-equity.json`. It was copied from the Privy
   dashboard, and only the ABI arrays are abbreviated.
 
+**Stage 61 — Investor A investment (21:55 UTC).** Catenor authorized the issuance before anything was signed:
+
+- Investor A's stage 44 decision `decision:8c0a84a1-d53f-4c2b-94f8-f88787ab53dd` is ALLOW, unused, and within the
+  offering total;
+- the Sponsor's `TOKENIZE_ASSET` grant `capability-grant:1984657d…3cc6` evaluates ALLOW.
+
+The dry run simulated the call (485,034 gas estimated) and got a Privy dry signature. The live issuance followed:
+
+| Item | Value |
+|---|---|
+| Call | `issueByPartition(600 units, default partition)` on the equity `0xf37A…7ABC`, to her private receiving binding `0x7de5…2473` |
+| Signer | the SPV Privy wallet, allowed only by the equity-pinned `allow-issueByPartition-equity` rule |
+| Transaction | `0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e` |
+| Holder balance after | **600** |
+
+**No generic mint:** the amount is exactly the one the TEE-backed decision approved, and the decision is consumed.
+
