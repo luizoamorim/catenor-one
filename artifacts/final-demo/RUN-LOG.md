@@ -404,3 +404,31 @@ Railway relay keeps the first authenticated result for a run and answers `409 LA
 
 Phase G is complete: Lisa and Bart are both eligible (**green**) before the investment.
 
+### Phase H — Hedera ATS (testnet, spends HBAR)
+
+**Stage 50 — TESTNET BOOTSTRAP FUNDING (20:55–20:57 UTC).** This is not Catenor authority and not a distribution.
+
+**Treasury** (`--setup-treasury`): the maintainer chose the optional **Privy testnet treasury** so the faucet is used
+once:
+
+- **Wallet:** EVM `0x49e969483fEd8b2419D60EcB23D34C89af2E5210` (`jmzbtjnuv7f6x2w1h0fg239e`).
+- **Policy:** `catenor-one-clean-room-testnet-treasury` (`zqr5ynnrd3mi6o9snqq8ex8g`). It allows `eth_signTransaction`
+  only when `chain_id = 296` and the value is ≤ 30 HBAR, and denies both exports.
+- **Keys:** the owner key stays outside the runtime; the runtime signer is a separate quorum,
+  `catenor-one-clean-room-treasury`.
+
+The maintainer funded the treasury with **100 HBAR** from the Hedera portal faucet. The balance was read before the
+broadcast.
+
+**Transfers** (`--live --from-treasury`, confirmation typed): three plain transfers, each signed by the treasury's
+Privy wallet and checked at the signer boundary (from, to, value, data and chain are exactly the prepared transfer):
+
+| To | HBAR | Transaction | Status |
+|---|---|---|---|
+| SPV execution wallet `0x182F…9926` | 25 | `0xa2b789128e5fd40ff8ad2b7815ca3c26c24a3e17cfca848345f0af46650b7f08` | SUCCESS |
+| Investor A receiving wallet `0x7de5…2473` | 1 | `0x79829109bd42301ea5a4dab455c9e4b6d539d1c93865f4e52cf7f4430b760060` | SUCCESS |
+| Investor B receiving wallet `0xCfCa…Da73` | 1 | `0xeb370383f7ed074da4c6fd61eaa0b4d6782a2483e7dcda7ffda2423999406c4f` | SUCCESS |
+
+The investor transfers are account activation only (HIP-583 lazy create). The Agent wallet, which does not exist yet,
+is funded after stage 70.
+
