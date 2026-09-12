@@ -90,4 +90,4 @@ This is the public, reviewed record of what each stage did. The full stage recor
   - `handler_completed status=DELIVERED code=OK`
 - **`policy:trust-anchor-admission:v1`:** **ALLOW**, `decision:a1bbb59d-6437-4b64-80a0-fcb0b5818cc2`.
 - **Outcome:** bootstrap endorsement (Bootstrap Endorsement Key), then ACTIVE, then **`TRUST_ANCHOR_VALID: true`**.
-- **Screenshots:** pending.
+- **Screenshots:** `11-after-privy-wallets.png`, showing the Trust Anchor assertion wallet `i8uo7gzhtabga3oivc0uq9hm`. The Sumsub representative screenshot is optional.

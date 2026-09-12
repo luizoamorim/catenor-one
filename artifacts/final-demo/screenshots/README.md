@@ -49,6 +49,7 @@ Sumsub applicant IDs are private by design. They are cropped or blurred before a
 | `10-after-privy-policies.png` | 10, after | `catenor-one-clean-room-P_BOOTSTRAP` (1 wallet) and `catenor-one-clean-room-P_ASSERT` (0 wallets for now) |
 | `10-after-privy-policy-p-bootstrap-json.png` | 10, after | `P_BOOTSTRAP` as JSON (`solana`): `allow-signMessage` ALLOW, `deny-exportPrivateKey` DENY, `deny-exportSeedPhrase` DENY — no rule allows signing a transaction |
 | `10-after-privy-policy-p-assert-json.png` | 10, after | `P_ASSERT` as JSON: the same three rules, for the Credential Assertion Key wallets |
+| `11-after-privy-wallets.png` | 11, after (also 20, before) | two Solana wallets: the bootstrap wallet and the **Trust Anchor Credential Assertion Key** `i8uo7gzhtabga3oivc0uq9hm` (`39QFy…13bS`), created 16:10 UTC |
 
 ## What each stage created, and why
 
@@ -78,3 +79,12 @@ The outcome is the **Bootstrap Configuration** (`.catenor-demo/bootstrap-configu
   mock company.
 
 Every later check refers back to this hash. That includes the CRE workflow configuration.
+
+### Stage 11: Root Trust Anchor admission
+
+| Object | ID (public ref) | What it is | Why it exists |
+|---|---|---|---|
+| Privy wallet (Solana, Ed25519) | `i8uo7gzhtabga3oivc0uq9hm` | the **Credential Assertion Key** of the Trust Anchor `did:catenor:37e4dcccfa220e37117ad750f29c72bb`, published in its DID Document as `#assertion-key-1` | It signs everything the Trust Anchor asserts: the Sponsor's relationship and capability credentials (stage 21) and the investors' eligibility credentials (stage 42). It sits under `P_ASSERT` (signMessage only), is owned by the assertion management-owner key and is signed through the `catenor-one-clean-room-assertion` runtime quorum. Before admission, the candidate proved possession of this key with a Privy `signMessage` (`eddsa-jcs-2022`) |
+| Sumsub sandbox applicant "Catenor DemoRepresentative" | private | the candidate organization's representative, a synthetic person at level `id-only`, review forced GREEN | It is the real sandbox evidence that the CRE `TRUST_ANCHOR_ADMISSION` operation reads inside `handlerInTee`. Its applicant ID is bound to the Subject only through a private `bindingRef`, never through the DID |
+| Bootstrap endorsement | — | a signature by the Bootstrap Endorsement Key (stage 10 wallet) over the admission | It is created only after `policy:trust-anchor-admission:v1` returned ALLOW. It is what makes the Trust Anchor ACTIVE: authority comes from Admission, not from declaring it |
+
