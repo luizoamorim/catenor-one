@@ -49,6 +49,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `11-after-privy-wallets.png` | 11, after | 5 Solana wallets: bootstrap `HKQY5…nVEk` (17:08 UTC); the Trust Anchor's assertion key `9PvXY…PGkT` (19:18); three abandoned attempt keys `CMhqU…`, `5SUTj…`, `GMQ6i…` (see RUN-LOG, stage 11) |
 | `11-after-privy-keys-and-quorums.png` | 11, after | `…-assertion` quorum: **signer for 4 wallets** (the assertion keys); `…-bootstrap`: signer for the bootstrap wallet only; the assertion owner key owns 4 wallets and `P_ASSERT` |
 | `E2-cre-redeploy-terminal.png` | E1–E2 | config regenerated (`issuerRules`: Trust Anchor key pinned). Deploy #2 of `identity-confidential-production`: **same binary** `9902db58…`, new config `e7703b19…`; the CLI updated the existing workflow; new ID `0000e58d…25c8`, **Active** |
+| `20-after-privy-wallets.png` | 20, after | new Solana wallet `GLHPd…oTdX` (19:58 UTC): the Sponsor's Credential Assertion Key. The "before" is `11-after-privy-wallets.png` (5 wallets) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

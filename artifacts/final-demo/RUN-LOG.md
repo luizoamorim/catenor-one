@@ -268,3 +268,11 @@ A re-run a few minutes later was clean:
 - deployment **ACTIVE**, deployed 19:36:04 UTC;
 - last execution `394f…4bd8` SUCCESS, 8 s.
 
+### Phase F — Sponsor, SPV and offering (Privy only, no spending)
+
+**Stage 20 — Sponsor Subject (19:58 UTC).** The Sponsor is `did:catenor:5b87cad5d25e94dbf62f4443cf85761d`, an
+ORGANIZATION with a random DID and no PII. Its assertion method is `#assertion-key-1`, the Privy Solana wallet
+`GLHPd…oTdX` (`o2kjl90on5veciqodvlppp2u`), a signMessage-only key.
+
+At this point the Sponsor is not a Trust Anchor and holds no capability.
+
