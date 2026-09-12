@@ -499,3 +499,18 @@ The dry run simulated the call (485,034 gas estimated) and got a Privy dry signa
 
 **No generic mint:** the amount is exactly the one the TEE-backed decision approved, and the decision is consumed.
 
+**Stage 62 — Investor B investment (21:57 UTC).** Investor B's decision
+`decision:3000f2f5-0376-446f-b9b9-bbffdd8078ef` was ALLOW, for 400 units. `issueByPartition(400)` went to his private
+receiving binding `0xCfCa…Da73`, signed by the SPV Privy wallet, in transaction
+`0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62`. His holder balance is **400**.
+
+**On-chain read-back after both issuances** (`eth_call` on the equity `0xf37A…7ABC`, Hedera testnet, 22:0x UTC):
+
+| Read | Value |
+|---|---|
+| `totalSupply()` | **1000** (`decimals()` is 0) |
+| `balanceOf(Investor A 0x7de5…2473)` | **600** |
+| `balanceOf(Investor B 0xCfCa…Da73)` | **400** |
+
+The whole offering is issued, and exactly the approved units went to each investor.
+
