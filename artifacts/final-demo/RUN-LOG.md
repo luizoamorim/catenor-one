@@ -368,3 +368,39 @@ Verifiable Presentation over their credential with the **holder key** (`authenti
 
 **Negative path:** replaying either presentation with another challenge → **`HOLDER_PROOF_VALID` false**.
 
+**Stage 44 — offering eligibility on the deployed workflow (20:45 UTC).** **One** sealed `OFFERING_ELIGIBILITY` run,
+execution `0xfecb527d3d0133d4fd23a4c29a36b7998a1dc379c137a65175d72f4272464715` (DEPLOYED, 8 s). Each investor was
+given a fresh challenge and presented their VP, and the issuer signed a status statement. Inside `handlerInTee`, the
+workflow checked:
+
+- the holder proof, the VC signature, the issuer's authority (the pinned Trust Anchor key), the subject, the validity
+  window and the status;
+- the **current** Sumsub evidence, and its reconciliation with the credential;
+- `policy:offering-eligibility:v1`.
+
+Only minimized conclusions left the TEE.
+
+| | Units | Decision | Decision ref | Decision commitment |
+|---|---|---|---|---|
+| Investor A | 600 | **ALLOW** `SUBSCRIBE_OFFERING` on `spv:catenor-demo-001` | `decision:8c0a84a1-d53f-4c2b-94f8-f88787ab53dd` | `0xc840946f7ce24f007a5e6ce7790f70495299fa08642a09b42d8d8d5b276830b0` |
+| Investor B | 400 | **ALLOW** | `decision:3000f2f5-0376-446f-b9b9-bbffdd8078ef` | `0xc30ba843a87f17c3d3b42d7cae738c8a2971950d40c9f61b64bb68835317d59e` |
+
+**Both investors had:**
+
+- a trace where every requirement is TRUE (presentation valid, identity verified, AML clear, evidence fresh);
+- 7/7 presentation checks;
+- reconciliation CONSISTENT, both credential against current and against the provider;
+- no reason codes.
+
+One run covers both investors, so both carry the run's evidence commitment
+`0x83db064bab91f7dfd86dfd0309cbfe6f5d68f568116554fa2b21715b92599beb`.
+
+**Observed on the deployed platform: TEE user logs are visible.** The CRE dashboard's Logs tab shows **user logs from
+several DON nodes** (Node 1, 2, 4, 5, 8, 9…), each with the same markers. The simulator's banner says otherwise: "user
+logs … will not be visible, and will not leave the TEE". The workflow logs only non-sensitive markers through
+`safe-log` (event names, status and error codes, no values), so nothing sensitive appears. Catenor therefore does not
+claim that logs stay inside the enclave. Each node's copy also calls back (`handler_completed status=DELIVERED`). The
+Railway relay keeps the first authenticated result for a run and answers `409 LATE_OR_DUPLICATE_RESULT` to the rest.
+
+Phase G is complete: Lisa and Bart are both eligible (**green**) before the investment.
+
