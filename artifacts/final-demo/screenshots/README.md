@@ -44,11 +44,22 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `11-before-sumsub-applicants.png` | 11, before | Sumsub sandbox applicants from **earlier runs**: the 2026-09-11 rehearsal (representative, Investor A Approved, Investor B Rejected/Sanctions) and the aborted instance's representative (16:10 UTC). This instance has none yet. **Applicant IDs redacted** |
 | `11-diag-cre-deployment-tab.png` | 11, diagnosis | CRE Deployments tab before the fix: `00e1…d250` **Active**, 0 success / 0 error, "No status message" |
 | `11-after-terminal.png` | 11, after | admission on the **deployed** workflow: `mode DEPLOYED`, `EVIDENCE_RECEIVED`, `policy:trust-anchor-admission:v1` **ALLOW**, `TRUST_ANCHOR_VALID: true` |
+| `11-after-cre-execution-events.png` | 11, after | CRE execution `394f…4bd8`: **Success**, triggered 19:18 UTC, 8 s, $0. Events: `trigger` (19:18:36), then **two `http-actions` `SendRequest`** (19:18:45), the Sumsub sandbox calls made from inside the TEE with the Vault secrets |
+| `11-after-sumsub-representative.png` | 11, after | the new Sumsub sandbox representative (synthetic "Catenor DemoRepresentative", level `id-only`): **Approved** at 19:18:17 UTC, before the trigger. **Applicant ID redacted** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
 
 (Filled in after each stage, from the stage output and the Privy / Sumsub / Hedera / CRE views.)
+
+### Stage 11: root Trust Anchor admission, on the deployed CRE
+
+| Created / used | What it is | Why |
+|---|---|---|
+| `did:catenor:656d…3cab` + Privy Ed25519 assertion wallet (`P_ASSERT`) | the organization's canonical identity and its **Credential Assertion Key** | The Trust Anchor signs credentials with this key. The key can sign messages only; it can never move money or be exported |
+| Sumsub sandbox representative (synthetic), Approved | the evidence that a real person represents the organization | Catenor never reads that evidence. Only the workflow does, inside the TEE |
+| CRE execution `394f…4bd8` (DEPLOYED, 8 s) | the Confidential Workflow run: it opens the sealed context, fetches the Vault secrets, calls Sumsub twice and derives 6 facts | Sensitive evidence stays in the enclave. What leaves is facts plus a commitment, signed and relayed through Railway |
+| Decision ALLOW → bootstrap endorsement → ACTIVE | `policy:trust-anchor-admission:v1` over those facts, then the separate bootstrap key endorses | Trust Anchor authority comes from Admission, not from a database flag |
 
 ### Stage 10: Trust Domain bootstrap configuration
 
