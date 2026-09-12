@@ -1,0 +1,26 @@
+# Docker build context for apps/api/Dockerfile (context = repository root). Secrets and local demo state never enter
+# an image: every .env file, the clean-room state, the CRE workflow folder (its .env holds the Vault DON secret values)
+# and local tooling are excluded. Management-owner keys (~/.catenor-one/) are outside the context altogether.
+.git
+.github
+.agents
+.claude
+.mcp.json
+skills-lock.json
+**/node_modules
+**/.env
+**/.env.*
+.catenor-demo
+scratch
+workflows
+artifacts
+contracts
+docs
+slices
+tests
+coverage
+**/dist
+**/*.tsbuildinfo
+**/.DS_Store
+apps/api/src/infrastructure/persistence/prisma/generated
+apps/web/.next

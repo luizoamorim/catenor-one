@@ -1,0 +1,25 @@
+# Railway config-as-code for the Catenor One API service (prompt 024; docs/deployment/RAILWAY.md).
+# Service settings: Root Directory = / (repository root — the pnpm workspace), Config-as-code path = /apps/api/railway.toml.
+# Migrations are NOT run automatically: the maintainer runs `prisma migrate deploy` explicitly (RAILWAY.md, step 6).
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "apps/api/Dockerfile"
+watchPatterns = [
+  "apps/api/**",
+  "packages/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  ".dockerignore",
+]
+
+[deploy]
+healthcheckPath = "/v1/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+# One instance: the CRE callback relay mailbox is in memory, so a callback and its pull must reach the same process.
+numReplicas = 1
+overlapSeconds = 0
+drainingSeconds = 10
