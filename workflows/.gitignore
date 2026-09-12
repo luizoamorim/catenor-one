@@ -17,3 +17,8 @@ dist/
 
 # Per-run simulation payloads/configs written by the API simulation adapter
 .sim/
+
+# Local CRE build outputs (`cre workflow build` / `cre workflow deploy`) and generated deployment configs
+binary.wasm
+*.wasm.br.b64
+.deploy/

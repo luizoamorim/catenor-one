@@ -6,6 +6,8 @@
  * Operations:
  *   TRUST_ANCHOR_ADMISSION → src/trust-anchor-admission/index.ts
  *   INVESTOR_ELIGIBILITY   → src/investor-eligibility/index.ts (final demo [REF-IMPL])
+ *   OFFERING_ELIGIBILITY / CONFIDENTIAL_DISTRIBUTION → src/investor-credentials/operations.ts (clean-room demo
+ *     [REF-IMPL]: Verifiable Presentation + current evidence; the distribution itself is computed in the TEE)
  *   (future S002: SUBJECT_CONTINUITY)
  *
  * The handler's return value is DON-visible: only {status, code}.
@@ -21,8 +23,16 @@ import { safeLog } from './shared/safe-log.js'
 import { base64Encode } from './shared/base64.js'
 import { runTrustAnchorAdmission, type TtaRuntime } from './src/trust-anchor-admission/index.js'
 import { runInvestorEligibility } from './src/investor-eligibility/index.js'
+import { runCredentialOperation } from './src/investor-credentials/operations.js'
 
 // ── Config Schema (validated by the SDK at startup) ──────────────────
+
+const policyDocumentSchema = z.object({
+  id: z.string(),
+  action: z.string(),
+  requirements: z.array(z.object({ claim: z.string(), equals: z.boolean() })),
+  decision: z.object({ allRequirementsSatisfied: z.string(), otherwise: z.string() }),
+})
 
 export const configSchema = z.object({
   callbackUrl: z.string(),
@@ -55,6 +65,22 @@ export const configSchema = z.object({
   investorEvidence: z.object({
     levelNames: z.array(z.string()),
     evidenceMaxAgeDays: z.number(),
+  }).optional(),
+  // [REF-IMPL] clean-room demo: the Trust Domain's issuer rules and the pinned investor policies for
+  // OFFERING_ELIGIBILITY / CONFIDENTIAL_DISTRIBUTION; absent → those operations fail closed with CONFIG_INVALID.
+  credentialRules: z.object({
+    credentialType: z.string(),
+    acceptedIssuers: z.array(z.object({
+      did: z.string(),
+      verificationMethod: z.string(),
+      publicKeyMultibase: z.string(),
+      credentialTypes: z.array(z.string()),
+    })),
+    maxStatusAgeSeconds: z.number(),
+    policies: z.object({
+      offering: policyDocumentSchema,
+      distribution: policyDocumentSchema,
+    }),
   }).optional(),
   authorizedTriggerAddress: z.string(),
   // T0.7: use z.enum for KeyType so type checks stay on
@@ -113,7 +139,12 @@ const onHttpTrigger = (
 
   let result: WorkflowResult
 
-  if (operation === 'TRUST_ANCHOR_ADMISSION' || operation === 'INVESTOR_ELIGIBILITY') {
+  if (
+    operation === 'TRUST_ANCHOR_ADMISSION' ||
+    operation === 'INVESTOR_ELIGIBILITY' ||
+    operation === 'OFFERING_ELIGIBILITY' ||
+    operation === 'CONFIDENTIAL_DISTRIBUTION'
+  ) {
     // Build the TtaRuntime adapter wrapping CRE SDK calls
     const config = runtime.config
     const httpClient = new cre.capabilities.HTTPClient()
@@ -154,7 +185,12 @@ const onHttpTrigger = (
     // (.result()) resolve synchronously in QuickJS, so the handler runs to
     // completion in a single turn.
     try {
-      const run = operation === 'TRUST_ANCHOR_ADMISSION' ? runTrustAnchorAdmission : runInvestorEligibility
+      const run =
+        operation === 'TRUST_ANCHOR_ADMISSION'
+          ? runTrustAnchorAdmission
+          : operation === 'INVESTOR_ELIGIBILITY'
+            ? runInvestorEligibility
+            : (i: Parameters<typeof runInvestorEligibility>[0]) => runCredentialOperation(operation, i)
       result = run({
         runId: payload.runId,
         context,
