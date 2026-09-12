@@ -12,6 +12,7 @@ português, porque é o roteiro de operação desta sessão.
 | Item | Estado |
 |---|---|
 | **Railway** | `https://catenor-one-production.up.railway.app`: commit `bc19c10`, startup INERT, Postgres migrado (5/5), `creRelay: ENABLED` com o `CATENOR_INTERNAL_API_TOKEN` sealed. Auto deploy **desligado**. Os commits locais depois de `bc19c10` só mudam scripts e docs, então **não precisa redeploy** |
+| **Banco** | o runner grava no **Postgres da Railway** (`RAILWAY_DATABASE_PUBLIC_URL` no `apps/api/.env`, o `DATABASE_PUBLIC_URL` do serviço Postgres). O `02` nunca mexe nele; o `01` recusa um banco com dados de outra instância |
 | **Privy** | app **novo** `catenor-one-ethonline-2026`, vazio (prints do antes da stage 10 já salvos). O `apps/api/.env` deve ter o `PRIVY_APP_ID` e o `PRIVY_APP_SECRET` **deste** app |
 | **Sumsub** | sandbox com o app token antigo (decisão do maintainer). O level `id-only` já existe. Os nomes fictícios são **Lisa Simpson** (Investor A, fica verde) e **Bart Simpson** (Investor B, vira vermelho) |
 | **`workflows/.env`** | `SUMSUB_APP_TOKEN_VAR`, `SUMSUB_SECRET_KEY_VAR` e `CATENOR_INTERNAL_API_TOKEN_VAR`. O último é **o mesmo valor da Railway**: **não apagar** essa linha |
@@ -85,7 +86,7 @@ Legenda: 🎥 = gravar · ⏸ = parar e mandar a saída ao Claude antes de segui
 | A2 | `docker builder prune` | libera disco para as gravações |
 | A3 | conferir que o `apps/api/.env` tem as credenciais do app **`catenor-one-ethonline-2026`** | — |
 | A4 | `scripts/demo/02-reset-local-demo.sh --yes` | Postgres local removido, state movido para `.bak-*`, owner keys antigas mantidas |
-| A5 ⏸ | `scripts/demo/01-setup-env.sh` | as quatro credenciais PRESENT; **`CATENOR_INTERNAL_API_TOKEN_VAR: PRESENT`** (não GENERATED); instância **nova** `c1-2026091…`; 5 migrações |
+| A5 ⏸ | `scripts/demo/01-setup-env.sh` | as quatro credenciais PRESENT; **`CATENOR_INTERNAL_API_TOKEN_VAR: PRESENT`** (não GENERATED); instância **nova** `c1-2026091…`; `database: RAILWAY PostgreSQL … 0 Catenor rows; 5 migrations` |
 
 ### Fase B — Trust Domain
 

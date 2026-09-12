@@ -6,7 +6,7 @@
 // explicit confirmation (typing the stage id, or CATENOR_DEMO_CONFIRM=<stage-id>). Hedera Testnet (296) only.
 import { Context } from './context.js';
 import { banner, type Flags, type Stage } from './stage.js';
-import { loadEnvironment, writeRun } from './state.js';
+import { env, loadEnvironment, writeRun } from './state.js';
 import {
   admitTrustAnchor,
   authorizeSponsor,
@@ -128,6 +128,10 @@ try {
         companyKyb: 'SYNTHETIC MOCK (S001 admission only)',
         privy: 'REAL (development app)',
         hedera: 'Hedera Testnet (chain 296)',
+        database:
+          env('DEMO_DATABASE') === 'RAILWAY'
+            ? 'RAILWAY PostgreSQL (the deployed backend database)'
+            : 'LOCAL PostgreSQL (Docker)',
       },
     });
     console.log(`\nEvidence: ${file}`);

@@ -128,7 +128,7 @@ B still holds its 400 units and its ATS dividend entitlement. It just is not pai
 |---|---|---|
 | Node.js | ≥ 24 (24.10) | everything |
 | pnpm | 10.11 | `pnpm install` (workspace) |
-| Docker | running daemon | the local PostgreSQL (stage 01) |
+| Docker | running daemon | the local PostgreSQL (stage 01), unless `RAILWAY_DATABASE_PUBLIC_URL` points the runner at the Railway Postgres |
 | Bun | 1.4 | the CRE workflow dependencies (`workflows/identity-confidential`) |
 | Chainlink CRE CLI | v1.33.0 (`~/.cre/bin/cre`) | CRE simulation / deployment |
 | curl | any | reachability checks |
@@ -218,7 +218,7 @@ and wallets. Previously funded demo wallets are never part of the clean-room ide
 
 ```bash
 scripts/demo/00-check-prerequisites.sh
-scripts/demo/01-setup-env.sh          # local PostgreSQL (postgres:17.11-alpine on 127.0.0.1:55432) + migrations
+scripts/demo/01-setup-env.sh          # PostgreSQL (Railway if RAILWAY_DATABASE_PUBLIC_URL is set, else local Docker) + migrations
 scripts/demo/run-all.sh               # the whole walkthrough, SAFE: no Hedera broadcast
 ```
 
@@ -278,7 +278,7 @@ when not interactive. `--yes` never authorizes a broadcast.
 | # | Script | What happens | Expected |
 |---|---|---|---|
 | 00 | `00-check-prerequisites.sh` | tools, deps, relay + Mirror Node reachability | RESULT: OK |
-| 01 | `01-setup-env.sh` | credentials check (never printed), channel token, local PostgreSQL + migrations | all PRESENT |
+| 01 | `01-setup-env.sh` | credentials check (never printed), channel token, PostgreSQL (Railway or local) + migrations | all PRESENT |
 | 02 | `02-reset-local-demo.sh [--yes]` | local reset only (§13) | — |
 | 10 | `10-create-trust-domain.sh` | fresh S001 signer infrastructure (Privy: assertion quorum + P_ASSERT, separate bootstrap key); hash-pinned Bootstrap Configuration | configuration hash |
 | 11 | `11-admit-root-trust-anchor.sh` | S001 admission: ORGANIZATION did, Privy assertion key, key possession, Sumsub sandbox representative GREEN, **CRE** TRUST_ANCHOR_ADMISSION, policy, bootstrap endorsement | ALLOW → ACTIVE → TRUST_ANCHOR_VALID |
@@ -400,6 +400,10 @@ instead of repeating a payout, and it never fakes a sponsor result.
 scripts/demo/02-reset-local-demo.sh          # dry run: lists what would be removed and what stays
 scripts/demo/02-reset-local-demo.sh --yes    # removes the local PostgreSQL container + volume; moves state files aside
 ```
+
+With `RAILWAY_DATABASE_PUBLIC_URL` set, the reset never touches the Railway database; it only prints its Catenor row
+count. The audit log is append-only, so a used Railway database is emptied only by recreating it (a maintainer action
+in Railway), and stage 01 refuses to start a new instance on a non-empty one.
 
 A reset is **local only**. It cannot and does not pretend to revert:
 

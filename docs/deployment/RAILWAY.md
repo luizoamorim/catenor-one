@@ -152,10 +152,19 @@ admission result. `--callback-url=` (a tunnel to the local receiver) clears the 
 | Automatic? | **No.** Neither startup nor any deploy setting runs migrations (no pre-deploy step) |
 | Migrations | 5, all additive: schemas and tables, CHECK constraints, and plpgsql immutability / append-only triggers. No `DROP` or `TRUNCATE`, no extensions. Railway's default `postgres` role can apply them |
 | Clean database | the API boots and stays healthy with no database at all; `/v1/health/db` reports `applied: 0` until step 6 and `applied: 5, packaged: 5` after it |
-| Demo data | none is written by Railway. The local runner keeps using its own `DEMO_DATABASE_URL`, and the CRE relay needs no database |
+| Demo data | written by the **local runner**, never by the Railway API. Since the final demo (2026-09-12) the runner writes into this Railway Postgres (below); the CRE relay needs no database |
 
-Pointing the local runner at Railway Postgres, so that later read APIs (FD-8) can serve the demo state, is **not**
-configured. It would need the Postgres TCP proxy, which the S001 plan (T15.2) keeps off; decide that separately.
+**Final-demo database (maintainer decision, 2026-09-12).** The clean-room runner uses the Railway Postgres instead of a
+local Docker one, so the demo state lives in the deployed backend's database:
+
+- **How:** `RAILWAY_DATABASE_PUBLIC_URL` in the git-ignored `apps/api/.env`, set to the Postgres service's
+  `DATABASE_PUBLIC_URL` (the TCP proxy). Stage 01 then starts no container, runs `prisma migrate deploy` against it
+  (nothing pending) and refuses a database that already holds Catenor rows. Stage 02 never touches it.
+- **What it holds:** the same operational index as the local database: public DID projections, and the private
+  provider and account bindings. No private key is ever stored there.
+- **The API is unchanged:** it keeps the private `${{Postgres.DATABASE_URL}}` and only probes the database.
+- **TCP proxy:** needed only while the local runner writes; it can be turned off after the demo without affecting the
+  API. This supersedes the S001 plan's T15.2 default (proxy off) for the demo.
 
 ## 6. Environment
 
@@ -194,7 +203,8 @@ Nothing is required at boot: the API starts with zero variables. Never paste a v
   are loaded by the local runner, and are not used by the Railway API today.
 - **Sumsub credentials:** `SUMSUB_APP_TOKEN_VAR` and `SUMSUB_SECRET_KEY_VAR`. These come from the **new** Sumsub sandbox
   and go into `workflows/.env`, which the Vault DON and the local runner use.
-- **Runner configuration:** `DEMO_DATABASE_URL`, the public refs in `.catenor-demo/state.env`, `CRE_BIN`,
+- **Runner configuration:** `RAILWAY_DATABASE_PUBLIC_URL` (apps/api/.env), `DEMO_DATABASE_URL`, the public refs in
+  `.catenor-demo/state.env`, `CRE_BIN`,
   `CATENOR_DEMO_CONFIRM` and `CATENOR_HEDERA_LIVE`.
 
 ## 7. Privy, Sumsub and CRE for the final demo
