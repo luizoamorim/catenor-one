@@ -66,6 +66,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `41-terminal.png` | 41 | Investor B ("Bart Simpson", fictional, sandbox only): receiving wallet `0xCfCa…Da73`; **investor DID and holder-key id redacted** |
 | `41-after-privy-wallets.png` | 41, after | +1 EVM `0xCfC…Da73` (Bart's receiving wallet) and +1 Solana `BX1N2…GgCa` (his holder key) |
 | `41-after-privy-keys-and-quorums.png` | 41, after | two new owner keys, one per receiving wallet (`hywxrz…` for Lisa, `swcl2t…` for Bart): **no signer, no policy**, the wallets only receive. The assertion owner and quorum now cover **7** Ed25519 keys (+2 holder keys); SPV and bootstrap are unchanged |
+| `42-before-cre-workflow.png` | 42, before | CRE workflow now `0000e5…3f25c8` (deploy #2), Active, Private, owner Catenor One; **1 execution**: the admission `394f…4bd8` (Success, 19:18:37 UTC, recorded under the deploy #1 ID `00e125…d250`) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
