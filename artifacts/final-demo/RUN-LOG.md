@@ -47,6 +47,9 @@ record is in [`aborted-c1-202609121438/`](aborted-c1-202609121438/RUN-LOG.md).
 **Why the database is on Railway.** The maintainer decided that the demo state lives in the deployed backend's
 database rather than on this machine. The API is unchanged: it stays inert and only probes the database.
 
+**Record labels.** The stage 01 record labels CRE as SIMULATION because no workflow is configured yet; stage 01 makes
+no CRE call. The label becomes DEPLOYED after Phase C. The stage 10 record carries the same default label; stage 10 makes no CRE call either.
+
 ### Stage 10 — Trust Domain bootstrap configuration (17:08 UTC)
 
 **Mode:** SPONSOR LIVE (non-spending), Privy development app `catenor-one-ethonline-2026`.
@@ -79,6 +82,3 @@ The runner stays in SIMULATION until the workflow id is recorded with `--use-dep
 **C2 — `cre/check-relay.sh` (17:24 UTC): OK.** A probe signed with the channel key was accepted by Railway
 (`202 RELAYED`), pulled back (`200`) and re-authenticated locally. The `CATENOR_INTERNAL_API_TOKEN` sealed on Railway
 therefore equals the one the CRE secrets will carry.
-
-**Record labels.** The stage 01 record labels CRE as SIMULATION because no workflow is configured yet; stage 01 makes
-no CRE call. The label becomes DEPLOYED after Phase C. The stage 10 record carries the same default label; stage 10 makes no CRE call either.
