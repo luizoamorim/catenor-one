@@ -706,3 +706,16 @@ The equity `C1SPV001` has totalSupply 1000: **Investor A 600 units, 7.0 ℏ** (1
 
 On a public ledger this reads: **Bart is entitled to 4 and received 0; Lisa is entitled to 6 and received 6.**
 
+**Stage 92 — independent Privy verification (22:55 UTC; read-only `wallets().get` / `policies().get`).** As stored
+by Privy:
+
+| Wallet | Owner | Additional signer | Policy (owner matches the wallet) | Rules |
+|---|---|---|---|---|
+| SPV `0x182F…9926` | set | 1, **override-scoped** | `catenor-one-spv-execution-4c875d44` | the Factory rule (chain ∧ to); DENY both exports; issueByPartition (chain ∧ to ∧ function ∧ partition); grantRole (chain ∧ to ∧ function ∧ role ∧ account); setDividend (chain ∧ to ∧ function) |
+| Agent `0x9089…13E3` | set | 1, **override-scoped** | `catenor-one-distribution-agent-3d8dc074` | ALLOW `eth_signTransaction` [chain ∧ to ∈ ∧ value ≤]; DENY both exports |
+| Treasury `0x49e9…5210` | set | 1, **override-scoped** | `catenor-one-clean-room-testnet-treasury` | ALLOW [chain ∧ value ≤]; DENY both exports |
+| Investor A `0x7de5…2473` | set | **none** | **none** | receive-only |
+| Investor B `0xCfCa…Da73` | set | **none** | **none** | receive-only |
+
+**"Agent policy exactly the approved boundary: true."**
+

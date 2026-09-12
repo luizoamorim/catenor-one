@@ -109,6 +109,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `83-terminal.png` | 83 | the Agent executes exactly the TEE-approved plan: **Investor A (Lisa) PAY 6.0 HBAR**, tx `0x4781…ff24`, received 6.0. **Investor B (Bart) HOLD 4.0: `transactionConstructed: false`, `privySignatureRequested: false`**. Privy signature requests went to Lisa's address only; **investorBSignatureRequests: 0**; Agent nonce 0 → 1 |
 | `83-after-hashscan-payout-tx.png` | 83, after | HashScan: the payout, **SUCCESS**, block 40440606. **Agent account `0.0.10511413` → Lisa's account `0.0.10509881`: 6.00000000 ℏ** (fee 0.024 ℏ) |
 | `91-verify-hedera-final.png` | 91, final | **6 transactions SUCCESS** from public chain data: `deployEquity`, 2× `issueByPartition`, `grantRole`, `setDividend`, **Agent payout → Investor A** (21,000 gas). Holdings **A 600 / B 400**; balances **A 7.0 ℏ (1 + 6 paid) / B 1.0 ℏ (nothing paid)**; entitlements A 6 / B 4 |
+| `92-verify-privy.png` | 92 | Privy read-back: SPV, Agent and treasury wallets each carry **exactly one Catenor-created policy** (owner matches the wallet), their runtime signer is **override-scoped**, and exports are denied. The investor receiving wallets have **no signer and no policy**. **Agent policy exactly the approved boundary: true** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
