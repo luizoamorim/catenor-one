@@ -59,6 +59,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `30-after-privy-policy-spv-json.png` | 30, after | SPV policy JSON: `allow-ats-factory-hedera-testnet`, **`eth_signTransaction` ALLOW only if `chain_id` eq `296` AND `to` eq `0xd1F1…379d`** (ATS v8 Factory); DENY `exportPrivateKey`, `exportSeedPhrase`. This is the Privy control that bounds the SPV's execution key |
 | `30-after-privy-keys-and-quorums.png` | 30, after | **new, separate** SPV signer set: the management-owner key `nsnv8alo…` (owns the wallet and its policy) and the runtime quorum `…-spv-runtime` (signer for 1 wallet). The assertion and bootstrap entries are unchanged |
 | `31-terminal.png` | 31 | offering `ab27ec9a…` signed by the Sponsor: 1,000 equity-interest units in "Catenor One Demo SPV 001"; eligibility = `policy:offering-eligibility:v1` pinned by hash `0xa3326b33…51a2`; verified **ALLOW** |
+| `40-before-sumsub-applicants.png` | 40, before | Sumsub sandbox: the four stage 11 representatives (19:18, 19:12, 17:55, 17:50 UTC), all Approved; **no investors yet**. **Applicant IDs redacted** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
