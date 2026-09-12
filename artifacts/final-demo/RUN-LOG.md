@@ -591,3 +591,15 @@ Delegated authority stays within the delegator's authority.
 None of this uses the CRE, by design. Relationships, capabilities and delegation are public-key-verifiable authority
 with no sensitive input. The TEE is used for current eligibility (stage 82).
 
+**Stage 50, second run — Agent funding (22:28 UTC, TESTNET BOOTSTRAP FUNDING, confirmation typed).** Two transfers
+from the Privy treasury:
+
+| To | HBAR | Transaction |
+|---|---|---|
+| Distribution Agent wallet `0x9089…13E3` | 12 | `0x229a0682afe9e2c2b9e920d28733307d1c3d0da56c2a14bcd4a083310d4fc5a2` |
+| SPV execution wallet `0x182F…9926` | 25 | `0xd1180ca8d1707100be6f8af25a2316190c57c717db5fb645b5a9aec7d894638e` |
+
+The SPV top-up was **unneeded**. The script tops up any wallet below its suggested amount, and the SPV had 15.34 HBAR
+after its five transactions. The maintainer accepted it to save time: it is testnet HBAR, and the SPV has no further
+transactions in the demo.
+
