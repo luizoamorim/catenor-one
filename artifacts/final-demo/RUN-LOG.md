@@ -526,3 +526,16 @@ The sender is the SPV account's long-zero address `0x…a05e37`, which is `0.0.1
 "Catenor One Demo SPV 001 (SYNTHETIC)", symbol `C1SPV001`, totalSupply **1000**: **Investor A 600, Investor B 400**,
 1 ℏ each. No dividend is recorded yet. HashScan shows both issuances SUCCESS, in blocks 40439213 and 40439263.
 
+**Stage 63 — dividend corporate action (22:05 UTC).** The SPV Privy wallet sent two transactions, each confirmed
+separately and each allowed only by its equity-pinned policy rule:
+
+| Call | Transaction | Gas |
+|---|---|---|
+| `grantRole(ROLE_CORPORATE_ACTION, SPV)` | `0x726032ce12d343d9ced3933035e2a55833f527dd2de128c90d776139818d9f94` | 179,949 |
+| `setDividend(recordDate 1789250830, executionDate 1789251010, amount 1, decimals 2)` | `0xaac4a085a3c9c2532c315ecb641028bb35525cb338b628715505aac3cd3ef865` | 532,107 |
+
+The record date is 2026-09-12 22:07:10 UTC and the execution date 22:10:10 UTC.
+
+**What ATS computes:** entitlements by ownership only, Investor A 600 → **6**, Investor B 400 → **4**. **No funds
+move.** Who is actually **paid** is decided later by Catenor, in the TEE.
+
