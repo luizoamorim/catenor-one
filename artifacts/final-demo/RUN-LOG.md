@@ -429,6 +429,9 @@ Privy wallet and checked at the signer boundary (from, to, value, data and chain
 | Investor A receiving wallet `0x7de5…2473` | 1 | `0x79829109bd42301ea5a4dab455c9e4b6d539d1c93865f4e52cf7f4430b760060` | SUCCESS |
 | Investor B receiving wallet `0xCfCa…Da73` | 1 | `0xeb370383f7ed074da4c6fd61eaa0b4d6782a2483e7dcda7ffda2423999406c4f` | SUCCESS |
 
-The investor transfers are account activation only (HIP-583 lazy create). The Agent wallet, which does not exist yet,
+The investor transfers are account activation only (HIP-583 lazy create). HashScan now shows Hedera accounts
+`0.0.10509879` (SPV, 25 ℏ), `0.0.10509881` (Investor A, 1 ℏ) and `0.0.10509882` (Investor B, 1 ℏ). The Privy dashboard
+shows none of this: Privy's balance lookup does not cover Hedera (chain 296), and Privy only signed; the runner
+broadcast the transactions. The Agent wallet, which does not exist yet,
 is funded after stage 70.
 

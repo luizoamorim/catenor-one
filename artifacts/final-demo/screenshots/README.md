@@ -74,6 +74,9 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `44-after-cre-executions.png` | 44, after | CRE: **4 successful, 0 unsuccessful**. New: `fecb52…4715` (20:45:11 UTC) |
 | `44-after-cre-execution-logs.png` | 44, after | execution `fecb…4715` Logs tab (8 s, $0). Every DON node's copy of the run emits the same **non-sensitive markers only**: `workflow_started`, `secrets_fetched`, `context_opened`, `operation_routed operation=OFFERING_ELIGIBILITY`, `offering_evaluated status=OK`, `handler_completed status=DELIVERED` |
 | `44-after-sumsub-both-green.png` | 44, after | Sumsub sandbox: **Bart Simpson and Lisa Simpson both Approved** (level `id-only`): the "both green" state before the investment. **Applicant IDs redacted** |
+| `50-after-hashscan-spv.png` | 50, after | HashScan testnet account `0.0.10509879` = SPV wallet `0x182f…9926`: **25 ℏ** (created by the funding transfer, HIP-583 lazy create) |
+| `50-after-hashscan-investor-a.png` | 50, after | account `0.0.10509881` = Investor A receiving wallet `0x7de5…2473`: **1 ℏ** (activation only) |
+| `50-after-hashscan-investor-b.png` | 50, after | account `0.0.10509882` = Investor B receiving wallet `0xcfca…da73`: **1 ℏ** (activation only) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
