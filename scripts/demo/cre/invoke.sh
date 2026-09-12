@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # How a DEPLOYED workflow is invoked: there is no CLI helper. The HTTP trigger is called through the CRE gateway
-# (private registry: https://01.enterprise-gateway.zone-a.cre.chain.link/) as JSON-RPC `workflows.execute`, with a
+# (https://01.gateway.zone-a.cre.chain.link — the documented enterprise-gateway URL answered "Workflow not found") as JSON-RPC `workflows.execute`, with a
 # JWT (alg ETH) signed by the key in authorizedKeys — implemented in
 # apps/api/src/infrastructure/confidential-compute/cre-gateway-verifier.ts (spec: docs.chain.link/cre/guides/workflow/
 # using-triggers/http-trigger/triggering-deployed-workflows). The demo stages use it after `configure.sh --use-deployed`:

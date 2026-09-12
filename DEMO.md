@@ -465,7 +465,7 @@ and the `production-settings` target, which uses the private registry.
 | secrets | `scripts/demo/cre/secrets.sh --live` | `cre secrets create secrets.yaml --secrets-auth browser -T production-settings -e workflows/.env` |
 | deploy | `scripts/demo/cre/deploy.sh --live` | `cre workflow deploy identity-confidential -T production-settings --config .deploy/config.json` (starts PAUSED) |
 | activate | `scripts/demo/cre/activate.sh --live` | `cre workflow activate identity-confidential -T production-settings` |
-| invoke | the stages, after `configure.sh --workflow-id=<id> --use-deployed` | gateway `https://01.enterprise-gateway.zone-a.cre.chain.link/`, JSON-RPC `workflows.execute`, JWT `alg: ETH` signed by the `authorizedKeys` key (`cre-gateway-verifier.ts`) |
+| invoke | the stages, after `configure.sh --workflow-id=<id> --use-deployed` | gateway `https://01.gateway.zone-a.cre.chain.link` (the documented `01.enterprise-gateway…` answered "Workflow not found" for this organization's private-registry workflows on 2026-09-12), JSON-RPC `workflows.execute`, JWT `alg: ETH` signed by the `authorizedKeys` key (`cre-gateway-verifier.ts`) |
 | inspect | `scripts/demo/cre/status.sh [uuid]` | `cre workflow get …`, `cre execution list identity-confidential-production`, `cre execution status/events/logs <uuid>` |
 | pause / delete | `scripts/demo/cre/pause.sh --live [--delete]` | `cre workflow pause|delete identity-confidential -T production-settings` |
 

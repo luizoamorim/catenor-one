@@ -174,3 +174,21 @@ No execution was created and no Trust Anchor was admitted. Read-only checks afte
 ACTIVE? Confidential Workflows is a private beta that needs enrollment through the Chainlink account team. The CLI
 deployed without complaint, but nothing shows whether this organization's Workflow DON loads confidential workflows.
 
+**Control experiment (about 18:15 UTC): the cause is the gateway URL.** A minimal **non-confidential** workflow was
+deployed to the same private registry:
+
+- `catenor-http-control`, workflow ID `0038de787580f971728b4e2599d83107eb6e8933a632b8021f67c72a3672a66f`;
+- a plain handler with the same HTTP trigger and the same authorized trigger key, returning `"ok"`;
+- scaffolded in the git-ignored `scratch/`.
+
+It was then triggered with the demo's JWT code:
+
+| Gateway | Result |
+|---|---|
+| `https://01.enterprise-gateway.zone-a.cre.chain.link/`, the one the docs give for the private registry | HTTP 400 `-32600 Workflow not found`, twice, including about 5 min after the deploy |
+| `https://01.gateway.zone-a.cre.chain.link`, the only gateway URL embedded in CRE CLI v1.33.0 | **HTTP 200, `ACCEPTED`**, execution `0xf85c571f52d9605e711f3ab37ef64dbd53af6aac67cf14245b1125e880e660b6` |
+
+**The fix:** the verifier's default gateway is now `https://01.gateway.zone-a.cre.chain.link`, overridable with
+`DEMO_CRE_GATEWAY_URL`. The two stage 11 failures were therefore neither an enrollment problem nor a TEE problem. The
+same signed request had simply gone to a gateway that does not serve this organization's workflows.
+

@@ -13,8 +13,14 @@ import { canonicalizeToString } from '@catenor-one/audit';
 import { Signature, Wallet } from 'ethers';
 import { sealContext, type ChannelKeys, type SealableContext } from './cre-channel.js';
 
-/** Private-registry gateway (Chainlink docs, "Triggering Deployed Workflows"). */
-export const CRE_PRIVATE_REGISTRY_GATEWAY = 'https://01.enterprise-gateway.zone-a.cre.chain.link/';
+/**
+ * Gateway for this organization's private-registry workflows (DON family zone-a). The docs page "Triggering Deployed
+ * Workflows" lists `https://01.enterprise-gateway.zone-a.cre.chain.link/` for the private registry, but on 2026-09-12
+ * that gateway answered "Workflow not found" for two ACTIVE private-registry workflows (one confidential, one plain
+ * control workflow). `https://01.gateway.zone-a.cre.chain.link`, the gateway the CRE CLI v1.33.0 itself embeds, accepted
+ * the same signed request (HTTP 200, ACCEPTED). Override with `gatewayUrl` (DEMO_CRE_GATEWAY_URL in the demo runner).
+ */
+export const CRE_PRIVATE_REGISTRY_GATEWAY = 'https://01.gateway.zone-a.cre.chain.link';
 
 export interface CreGatewayOptions {
   readonly keys: ChannelKeys;

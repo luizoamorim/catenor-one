@@ -231,6 +231,7 @@ export class Context {
         keys,
         workflowId: need('DEMO_CRE_WORKFLOW_ID', 'scripts/demo/cre/deploy.sh --live'),
         triggerPrivateKey: need('DEMO_CRE_TRIGGER_PRIVATE_KEY', 'scripts/demo/cre/configure.sh'),
+        ...(env('DEMO_CRE_GATEWAY_URL') ? { gatewayUrl: env('DEMO_CRE_GATEWAY_URL') } : {}),
       });
       // Railway relay (configure.sh --relay-url): the workflow calls back to the public API, and this process pulls
       // each of its results and delivers it through the same authenticateCallback → deliver path as the receiver.
