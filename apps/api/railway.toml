@@ -1,6 +1,8 @@
-# Railway config-as-code for the Catenor One API service (prompt 024; docs/deployment/RAILWAY.md).
-# Service settings: Root Directory = / (repository root — the pnpm workspace), Config-as-code path = /apps/api/railway.toml.
-# Migrations are NOT run automatically: the maintainer runs `prisma migrate deploy` explicitly (RAILWAY.md, step 6).
+# Catenor One API service settings (prompt 024; docs/deployment/RAILWAY.md).
+# NOT read by the production service: Railway deprecated Config as Code, and services created after 2026-08-28 cannot opt
+# in. The same values are set in the Railway dashboard (RAILWAY.md §8, step 4); this file is their written record. The
+# production service also sets the variable PORT=8080 (the domain's target port) and has auto deploy disabled.
+# Migrations are NOT run automatically: the maintainer runs `prisma migrate deploy` from the service Console (step 6).
 
 [build]
 builder = "DOCKERFILE"

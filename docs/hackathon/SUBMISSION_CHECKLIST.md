@@ -156,7 +156,7 @@
 - [ ] Contract tests pass where applicable.
 - [ ] CRE workflow simulations pass.
 - [ ] Build passes.
-- [ ] Railway deployment is reachable.
+- [x] Railway deployment is reachable (`https://catenor-one-production.up.railway.app/v1/health`, 2026-09-12; API only — web not deployed).
 - [ ] Real CRE deployed workflow is reachable/invokable.
 - [ ] No unsafe demo bypass remains in judge path.
 - [ ] Secret/privacy scan passes over repo and artifacts.

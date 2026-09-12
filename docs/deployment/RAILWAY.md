@@ -1,23 +1,32 @@
 # Catenor One API on Railway
 
-**Prompt:** `docs/hackathon/prompts/2026-09-12-024-railway-backend-preparation.md` · **Status:** prepared, **not deployed**.
-Nothing on this page has been executed against Railway, Privy, Sumsub, Hedera or Chainlink. Every external step is in
-§8 for the maintainer to run by hand.
+**Prompt:** `docs/hackathon/prompts/2026-09-12-024-railway-backend-preparation.md`
+
+**Status:** **deployed** on 2026-09-12 by the maintainer, by hand, following §8.
+
+- **URL:** `https://catenor-one-production.up.railway.app`.
+- **Commit:** `bc19c10`.
+- **Database:** PostgreSQL, migrated (5/5).
+- **State:** no demo state; the CRE relay is not configured yet.
+
+Nothing was done in Privy, Sumsub, Hedera or Chainlink.
 
 ## 1. What is deployed
 
 | Item | Value |
 |---|---|
-| Service | `@catenor-one/api` (`apps/api`), one Railway service |
-| Root Directory | `/` (repository root). The API imports the workspace packages `packages/*`, so the whole pnpm workspace is the build context |
-| Config-as-code path | `/apps/api/railway.toml` (set explicitly: Railway does not look for it under a Root Directory) |
-| Builder | `DOCKERFILE`, using `apps/api/Dockerfile` (Node 24.10.0 slim, pnpm 10.11.0) |
+| Service | `@catenor-one/api` (`apps/api`), one Railway service (`catenor-one`, production) |
+| Root Directory | empty, meaning the repository root. The API imports the workspace packages `packages/*`, so the whole pnpm workspace is the build context |
+| Service settings | set in the **dashboard** (Railway deprecated Config as Code, and services created after 2026-08-28 cannot opt in). `apps/api/railway.toml` is kept only as a written record of the same values |
+| Builder | **Dockerfile**, with Dockerfile path `apps/api/Dockerfile` (Node 24.10.0 slim, pnpm 10.11.0) |
 | Build | `pnpm install --frozen-lockfile --filter "@catenor-one/api..."`, then `pnpm --filter @catenor-one/api db:generate` (runs inside the Dockerfile; needs no database and no secret) |
-| Start | `node --conditions=@catenor-one/source --import tsx src/main.ts` (cwd `apps/api`; same as `pnpm --filter @catenor-one/api start`) |
-| PORT | reads `PORT`, which Railway injects (default 8080); listens on `::` (IPv4 and IPv6) |
-| Health check | `GET /v1/health`: static, with no database or sponsor call |
-| Replicas | exactly 1 (`numReplicas = 1`), because the CRE relay mailbox is held in memory |
-| Migrations | **not automatic**; run by the maintainer (§8, step 6) |
+| Start | the Dockerfile `CMD`, `node --conditions=@catenor-one/source --import tsx src/main.ts` (cwd `apps/api`). No custom start command |
+| PORT | variable `PORT=8080`, set explicitly so it matches the domain's target port. Listens on `::` (IPv4 and IPv6) |
+| Domain | `catenor-one-production.up.railway.app` → target port 8080 |
+| Health check | healthcheck path `/v1/health`: static, with no database or sponsor call |
+| Replicas | exactly 1, because the CRE relay mailbox is held in memory |
+| Auto deploy | **disabled**; every deploy is triggered by hand (Redeploy) |
+| Migrations | **not automatic**; run once by the maintainer from the service Console (§8, step 6) |
 
 There was no HTTP server in `apps/api` before this change: every flow ran from the local stage runner. `src/main.ts`
 is new and deliberately minimal. It is not the planned NestJS app; T4.1 is still open.
@@ -140,7 +149,7 @@ admission result. `--callback-url=` (a tunnel to the local receiver) clears the 
 | `DATABASE_URL` | a standard PostgreSQL connection string. On Railway use the reference variable `${{Postgres.DATABASE_URL}}` (the private-network URL). No `?schema=`: the model uses two schemas, `catenor_public` and `catenor_private` |
 | Generate | `pnpm --filter @catenor-one/api db:generate` (`prisma generate`; no database needed; runs in the image build) |
 | Migrate | `pnpm --filter @catenor-one/api db:migrate:deploy` (`prisma migrate deploy`: applies pending committed migrations only; never resets, drops or seeds) |
-| Automatic? | **No.** Neither startup nor `railway.toml` runs migrations |
+| Automatic? | **No.** Neither startup nor any deploy setting runs migrations (no pre-deploy step) |
 | Migrations | 5, all additive: schemas and tables, CHECK constraints, and plpgsql immutability / append-only triggers. No `DROP` or `TRUNCATE`, no extensions. Railway's default `postgres` role can apply them |
 | Clean database | the API boots and stays healthy with no database at all; `/v1/health/db` reports `applied: 0` until step 6 and `applied: 5, packaged: 5` after it |
 | Demo data | none is written by Railway. The local runner keeps using its own `DEMO_DATABASE_URL`, and the CRE relay needs no database |
@@ -167,7 +176,7 @@ Nothing is required at boot: the API starts with zero variables. Never paste a v
 
 | Variable | Default and meaning |
 |---|---|
-| `PORT` | injected by Railway; 8080 otherwise |
+| `PORT` | 8080 if unset. **Set to `8080` in production** so that it equals the domain's target port |
 | `HOST` | `::` |
 | `RAILWAY_GIT_COMMIT_SHA` | injected by Railway; its first 12 characters appear in `/v1/health` |
 
@@ -201,43 +210,56 @@ Nothing is required at boot: the API starts with zero variables. Never paste a v
 - **CRE.** The public callback URL becomes `https://<railway-host>/v1/internal/cre/identity-confidential/results` (§4).
   Deploying and activating CRE stays a separate, manual step (`scripts/demo/cre/*.sh --live`).
 
-## 8. Manual deployment plan (maintainer; nothing here has been run)
+## 8. Deployment procedure (as executed on 2026-09-12)
 
-Run and inspect each step before starting the next. The Railway CLI is optional; every step also exists in the
-dashboard.
+These are the steps the maintainer ran, and how to repeat them. Run and inspect each step before starting the next.
 
-1. **Local gate.** Run `pnpm lint && pnpm typecheck && pnpm test && pnpm boundaries && pnpm secret-scan`.
-   Optionally build the image: `docker build -f apps/api/Dockerfile -t catenor-one-api:local .`
-2. **Push the branch** that contains this change to GitHub (Railway deploys from the repository).
-3. **Create the project and service.** Railway dashboard → New Project → Deploy from GitHub repo → this repository.
-   Then open service Settings:
-   - Root Directory `/`;
-   - Config-as-code path `/apps/api/railway.toml`;
-   - confirm the builder shows **Dockerfile** and the Dockerfile path `apps/api/Dockerfile`.
-4. **Add PostgreSQL.** In the project, add → Database → PostgreSQL. Do **not** enable its public TCP proxy.
-5. **Set the variables** on the API service (Variables tab):
-   - `DATABASE_URL = ${{Postgres.DATABASE_URL}}`.
-   - `CATENOR_INTERNAL_API_TOKEN`, only once the fresh clean-room instance exists. Use the value of that instance's
-     `CATENOR_INTERNAL_API_TOKEN_VAR` (the local `01-setup-env.sh` generates it). Mark it **sealed**, and do not print
-     it; paste it from the file.
-   - Nothing else.
-6. **Deploy, then migrate by hand.** Trigger the deploy and wait for the `/v1/health` check to pass. Then run the
-   migration inside Railway's network:
-   - `railway ssh --service <api-service>`
-   - in the shell: `cd /app && pnpm --filter @catenor-one/api db:migrate:deploy`
-   - Alternatively, set the service's Pre-deploy Command to `pnpm --filter @catenor-one/api db:migrate:deploy` for one
-     deploy, then remove it.
-7. **Generate a domain.** Settings → Networking → Generate Domain, which gives `https://<service>.up.railway.app`.
-8. **Verify** from your machine:
-   - `curl -s https://<host>/v1/health` should show `startup: INERT`, and `creRelay: ENABLED` once the token is set;
-   - `curl -s https://<host>/v1/health/db` should show `database: REACHABLE` and `migrations {applied: 5, packaged: 5}`;
+1. **Local gate.** Run `pnpm check`. Optionally build the image:
+   `docker build -f apps/api/Dockerfile -t catenor-one-api:local .`
+2. **Push** `main` to GitHub (Railway deploys from the repository).
+3. **Create the project and service.** Railway → New Project → Deploy from GitHub repo → `luizoamorim/catenor-one`,
+   branch `main`.
+   - The automatic first deploy **fails**, and that is expected: the default Railpack builder sees a monorepo root and
+     stops. Nothing is created.
+   - Do not use Settings → Config-as-code ("Add File Path"). It is deprecated and cannot be enabled on new services.
+4. **Configure the service** in the dashboard (Settings):
+   - **Source:** Root Directory empty. Auto deploy can stay **disabled**.
+   - **Build:** Builder **Dockerfile**, Dockerfile path `apps/api/Dockerfile`. If the path field is missing, set the
+     variable `RAILWAY_DOCKERFILE_PATH=apps/api/Dockerfile`. No custom build command.
+   - **Deploy:** no custom start command, no pre-deploy step, Healthcheck Path `/v1/health`.
+   - **Scale:** 1 replica.
+   - **Variables:** `PORT=8080`.
+   - **Networking:** Generate Domain with target port `8080`.
+   - Then run Deployments → ⋮ → **Redeploy**.
+5. **Check liveness.** `curl -s https://<host>/v1/health` should show `startup: INERT`, and `commit` should be the
+   deployed commit.
+6. **Add PostgreSQL, then migrate by hand.**
+   1. Project → Create → Database → PostgreSQL. Do **not** enable its public TCP proxy.
+   2. Add the API variable `DATABASE_URL = ${{Postgres.DATABASE_URL}}` and deploy the change.
+   3. `curl -s https://<host>/v1/health/db` should show `REACHABLE` with `applied: 0, packaged: 5`.
+   4. In the service **Console**, run `cd /app && pnpm --filter @catenor-one/api db:migrate:deploy`. It should print
+      `All migrations have been successfully applied.`
+   5. `/v1/health/db` should now show `applied: 5, packaged: 5`.
+
+   Other ways to migrate: `railway ssh --service <api>` with the same command; or a pre-deploy step with the same
+   command for one deploy, removed afterwards.
+
+   Notes:
+   - The Console shell runs as `root`, while the API process runs as `node`.
+   - Ignore Prisma's "update available" banner: the project pins 7.10.0.
+7. **Later: CRE relay.** Do this only once the fresh clean-room instance exists:
+   - Set `CATENOR_INTERNAL_API_TOKEN` as a **sealed** variable, with that instance's `CATENOR_INTERNAL_API_TOKEN_VAR`
+     (generated by the local `01-setup-env.sh`). Paste it from the file; never print it. Deploy the change.
+   - `curl -s https://<host>/v1/health` should show `creRelay: ENABLED`.
    - `curl -s -X POST https://<host>/v1/internal/cre/identity-confidential/results -d '{}'` should answer 401
-     `CALLBACK_UNAUTHENTICATED`, which proves the route is live and closed.
-9. **Later, when you choose to** (separate authorizations, not part of this deployment):
-   - run `scripts/demo/cre/configure.sh --relay-url=https://<host>`;
-   - put the same token into `workflows/.env` and run `scripts/demo/cre/secrets.sh --live`;
-   - run `deploy.sh --live`, then `activate.sh --live`;
-   - run `configure.sh --workflow-id=<id> --use-deployed`.
+     `CALLBACK_UNAUTHENTICATED`; without the token it answers 503 `CRE_RELAY_NOT_CONFIGURED`.
+8. **Later: CRE deployment.** Separate authorizations, not part of this deployment:
+   - `scripts/demo/cre/configure.sh --relay-url=https://<host>`;
+   - put the same token into `workflows/.env`, then run `scripts/demo/cre/secrets.sh --live`;
+   - `deploy.sh --live`, then `activate.sh --live`;
+   - `configure.sh --workflow-id=<id> --use-deployed`.
+
+Do not redeploy the API while a live CRE run is in flight: relayed results that have not been pulled yet are lost.
 
 ## 9. Local verification (no Railway)
 

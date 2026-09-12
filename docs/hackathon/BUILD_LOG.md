@@ -1550,6 +1550,40 @@ Human review: pending (checkpoint report).
 
 Artifacts: `docs/deployment/RAILWAY.md`, prompt `2026-09-12-024`, plan `2026-09-12-009-railway-backend.md`.
 
+## 2026-09-12 — Railway API deployed (maintainer, manual; follow-up to prompt 024)
+
+Goal: put the prepared API on Railway as the final demo's stable HTTPS backend.
+
+Executed by the maintainer, by hand. Claude Code guided the steps in the session and ran nothing against Railway.
+
+1. Pushed `main`, then Railway → New Project → Deploy from GitHub (`luizoamorim/catenor-one`, `main`).
+2. The first automatic build failed as expected: Railpack stopped at the monorepo root. Nothing was created.
+3. Railway has deprecated **Config as Code**; services created after 2026-08-28 cannot opt in. So `apps/api/railway.toml`
+   is not read. The same values were set in the dashboard instead:
+   - Builder **Dockerfile**, path `apps/api/Dockerfile`, Root Directory empty;
+   - healthcheck `/v1/health`, 1 replica, auto deploy disabled;
+   - variable `PORT=8080`, and a domain with target port 8080.
+4. Redeploy. `GET /v1/health` answered `status ok`, `startup: INERT`, `creRelay: NOT_CONFIGURED`,
+   `database: NOT_CONFIGURED`, `commit: bc19c10b5e4a`.
+5. Added PostgreSQL (no TCP proxy) and `DATABASE_URL = ${{Postgres.DATABASE_URL}}`. `/v1/health/db` then answered
+   `REACHABLE`, with 0 of 5 migrations applied.
+6. Service Console (a root shell): `cd /app && pnpm --filter @catenor-one/api db:migrate:deploy` applied all five
+   migrations against `postgres.railway.internal:5432`, schemas `catenor_private` and `catenor_public`.
+   `/v1/health/db` then answered 5 of 5.
+
+Result: `https://catenor-one-production.up.railway.app` is live and inert, and its database is migrated and empty.
+
+Not configured yet:
+
+- `CATENOR_INTERNAL_API_TOKEN`, which enables the CRE relay. It waits for the fresh clean-room instance.
+- The CRE deployment.
+- Any demo state.
+
+No Privy, Sumsub, Hedera or Chainlink action was taken.
+
+Docs: `RAILWAY.md` now records the dashboard configuration and the executed procedure. The `railway.toml` header marks
+the file as a record only, and T15.1 and the submission checklist are updated.
+
 ## Entry template
 
 ```md
