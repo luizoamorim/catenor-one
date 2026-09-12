@@ -53,6 +53,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `20-terminal.png` | 20 | Sponsor `did:catenor:5b87…761d` with `#assertion-key-1` (NOT a Trust Anchor; no capability yet) |
 | `21-terminal.png` | 21 | Relationship `AUTHORIZED_SPONSOR_IN` **valid** + five Capability grants on `spv:catenor-demo-001`, all **ALLOW**; the same capability on another resource → **DENY `CAPABILITY_MISSING`** |
 | `20-after-privy-keys-and-quorums.png` | 20, after | the assertion owner key and the `…-assertion` quorum now cover **5 wallets** (4 from the stage 11 attempts + the Sponsor's key); the bootstrap key and quorum still cover **only 1**. One owner and one runtime signer for all signMessage-only assertion keys, kept apart from the bootstrap key |
+| `30-terminal.png` | 30 | SPV `did:catenor:bd78…5d44` + Privy EVM wallet `0x182F…9926`, created after the Sponsor's `TOKENIZE_ASSET` ALLOW; the execution-policy controls listed |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

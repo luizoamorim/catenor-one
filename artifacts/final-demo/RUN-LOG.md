@@ -286,3 +286,21 @@ At this point the Sponsor is not a Trust Anchor and holds no capability.
 - **Negative path:** the same capability on another resource → **DENY `CAPABILITY_MISSING`**. Authority is scoped to
   the resource.
 
+**Stage 30 — SPV creation under `TOKENIZE_ASSET` (20:08 UTC).** The Sponsor's `TOKENIZE_ASSET` on
+`spv:catenor-demo-001` evaluated ALLOW. Only then were these created:
+
+- **SPV:** `did:catenor:bd7856964b7ab1cce73a0e9c4c875d44`, an ORGANIZATION ("Catenor One Demo SPV 001", a synthetic
+  real-estate SPV).
+- **Privy EVM execution wallet:** `0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926`, holding 0 HBAR until stage 50.
+- **SPV execution policy**, owned by the SPV management-owner key outside the runtime, so the runtime signer cannot
+  change it:
+  - ALLOW `eth_signTransaction` only if `chain_id = 296` and `to` is the ATS v8 Factory
+    `0xd1F118A40f3b02883D35909eF2517e7EDd78379d`;
+  - DENY `exportPrivateKey` and `exportSeedPhrase`; everything else is denied by default;
+  - after `deployEquity`, owner-authorized rules add `issueByPartition` (default partition),
+    `grantRole(ROLE_CORPORATE_ACTION, SPV)` and `setDividend`, each pinned to the new equity.
+- **A private `SPV_EXECUTION` Account Binding**, and a Relationship Credential: SPV `SPONSORED_BY` Sponsor.
+
+This is the separation in practice. Catenor's authority (the capability) decides whether the SPV may exist. Privy's
+policy constrains what its wallet may sign.
+
