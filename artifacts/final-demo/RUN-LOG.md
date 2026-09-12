@@ -252,3 +252,13 @@ update the existing workflow"*, and the maintainer confirmed the overwrite.
 The deploy #1 version (`00e12517…d250`) was replaced. Its only use was the admission, whose execution `394f…4bd8` is
 recorded above.
 
+**E3 — `cre/configure.sh --workflow-id=0000e58d…25c8` (19:38 UTC).** The runner now points at the new workflow, still
+`DEPLOYED`. In `status.sh`:
+
+- `cre workflow get` failed with a transient CLI account error ("unable to retrieve organization info… try again in a
+  few minutes");
+- the execution list worked. It still shows the admission execution `394f…4bd8` (SUCCESS, 19:18:37–19:18:45 UTC, 8 s)
+  under `identity-confidential-production`, so the history survived the in-place update.
+
+The deployed triggers do not depend on the CLI session: they are signed with the trigger key.
+
