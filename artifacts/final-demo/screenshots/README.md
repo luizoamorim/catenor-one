@@ -96,6 +96,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `70-after-privy-keys-and-quorums.png` | 70, after | a **new, separate** Agent signer set: owner key `blemb6kw…` (wallet + policy) and runtime quorum `…-agent-runtime`; the treasury has its own pair |
 | `70-after-privy-wallets.png` | 70, after | new EVM wallet `0x908…13E3` (the Agent's execution wallet) |
 | `70-after-privy-agent-policy-json.png` | 70, after | Agent policy JSON: `allow-distribution-payout-hedera`, `eth_signTransaction` ALLOW only if `chain_id` eq 296 **AND `to` in [Investor A, Investor B receiving wallets]** AND `value` lte `0x1158e460913d00000` (**20 HBAR**); both exports denied (JSON in `artifacts/privy/final-demo/clean-room-c1-202609121659/agent-policy.json`) |
+| `71-terminal.png` | 71 | Relationship Credential **Agent `AGENT_OF` Sponsor** ([REF-IMPL] predicate), signed by the Sponsor, **valid**. The Agent's request with ONLY the relationship → **still DENY `CAPABILITY_MISSING`** (Relationship ≠ Capability) |
+| `72-terminal.png` | 72 | delegated **`EXECUTE_DISTRIBUTION`** (grant `7bd93930…`): authority chain **ALLOW**, Trust Anchor → Sponsor (`CREATE_DISTRIBUTION`, `DELEGATE_DISTRIBUTION_AUTHORITY`, until 10-12) → Agent (until 10-02, inside the Sponsor's window). Negatives: delegate `TOKENIZE_ASSET` → **refused `ACTION_NOT_DELEGABLE`, no signature requested**; Investor A presents the Agent's grant → **DENY `SUBJECT_MISMATCH`** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

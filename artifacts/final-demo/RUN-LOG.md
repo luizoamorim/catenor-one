@@ -561,3 +561,33 @@ and these were created:
 **Negative path:** the Agent requested a distribution **before any delegation** → **DENY `CAPABILITY_MISSING`**. Being
 created is not being authorized.
 
+**Stage 71 — Sponsor → Agent relationship (22:19 UTC).** The relationship credential is
+`urn:uuid:87eb74d1-4314-49bc-bb4c-8ad6d3cb6794`: Agent `AGENT_OF` Sponsor, signed by the Sponsor, **valid**. The
+predicate is [REF-IMPL]: the protocol's only example, `OFFICER_OF`, relates a Human to an Organization, and the
+predicate vocabulary is an open design item.
+
+**Negative path:** the Agent's request with **only the relationship → DENY `CAPABILITY_MISSING`**
+(Relationship ≠ Capability).
+
+**Stage 72 — delegated capability (22:20 UTC).** Before signing, Catenor checked three things: the action is
+explicitly delegable, and the Sponsor holds both `CREATE_DISTRIBUTION` and `DELEGATE_DISTRIBUTION_AUTHORITY` on the
+same resource from the ACTIVE Trust Anchor. The Sponsor then signed grant
+`capability-grant:7bd93930-e21c-4f78-86fd-8f8c9aa46156`: **`EXECUTE_DISTRIBUTION`** on `spv:catenor-demo-001` for the
+Agent. The authority chain evaluates **ALLOW**:
+
+| Grant | Issuer → subject | Action | Valid until |
+|---|---|---|---|
+| `34fd209d…` | Trust Anchor → Sponsor | `CREATE_DISTRIBUTION` | 2026-10-12 |
+| `e250671b…` | Trust Anchor → Sponsor | `DELEGATE_DISTRIBUTION_AUTHORITY` | 2026-10-12 |
+| `7bd93930…` | Sponsor → Agent | `EXECUTE_DISTRIBUTION` | 2026-10-02 (20 days, inside the Sponsor's 30) |
+
+Delegated authority stays within the delegator's authority.
+
+**Negative paths:**
+
+- The Sponsor tried to delegate `TOKENIZE_ASSET` → **refused `ACTION_NOT_DELEGABLE`, no signature requested**.
+- Investor A presented the Agent's grant → **DENY `SUBJECT_MISMATCH`**.
+
+None of this uses the CRE, by design. Relationships, capabilities and delegation are public-key-verifiable authority
+with no sensitive input. The TEE is used for current eligibility (stage 82).
+
