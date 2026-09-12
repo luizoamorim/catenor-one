@@ -24,6 +24,14 @@ export function assertionKeyId(did: CatenorDid, n: number): VerificationMethodId
   return verificationMethodId(did, `assertion-key-${n}`);
 }
 
+/** `<did>#authentication-key-<n>` — a holder key for Verifiable Presentation proofs (final demo [REF-IMPL]). */
+export function authenticationKeyId(did: CatenorDid, n: number): VerificationMethodId {
+  if (!Number.isInteger(n) || n < 1) {
+    throw new TypeError('authentication key index must be a positive integer');
+  }
+  return verificationMethodId(did, `authentication-key-${n}`);
+}
+
 /** The DID part of a verification method id. */
 export function controllerOf(id: string): string {
   const hash = id.indexOf('#');

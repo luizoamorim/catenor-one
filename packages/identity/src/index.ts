@@ -25,6 +25,7 @@ export {
 } from './multikey.js';
 export {
   assertionKeyId,
+  authenticationKeyId,
   controllerOf,
   createVerificationMethod,
   verificationMethodId,
@@ -33,6 +34,7 @@ export {
 } from './verification-method.js';
 export {
   authorizesAssertion,
+  authorizesAuthentication,
   createDidDocument,
   findVerificationMethod,
   type DidDocument,

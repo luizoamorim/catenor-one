@@ -14,6 +14,34 @@ import {
 export const TOKENIZE_ASSET = 'TOKENIZE_ASSET';
 /** Final demo: the Distribution Agent may execute the distribution of an SPV asset (Catenor One [REF-IMPL]). */
 export const EXECUTE_DISTRIBUTION = 'EXECUTE_DISTRIBUTION';
+/** Clean-room demo Sponsor capabilities (Catenor One [REF-IMPL]; the protocol Action vocabulary is open). */
+export const DEFINE_OFFERING_POLICY = 'DEFINE_OFFERING_POLICY';
+export const CREATE_AGENT = 'CREATE_AGENT';
+export const CREATE_DISTRIBUTION = 'CREATE_DISTRIBUTION';
+export const DELEGATE_DISTRIBUTION_AUTHORITY = 'DELEGATE_DISTRIBUTION_AUTHORITY';
+/** The five capabilities the Trust Anchor grants the Sponsor in the clean-room demo. */
+export const SPONSOR_CAPABILITIES = [
+  TOKENIZE_ASSET,
+  DEFINE_OFFERING_POLICY,
+  CREATE_AGENT,
+  CREATE_DISTRIBUTION,
+  DELEGATE_DISTRIBUTION_AUTHORITY,
+] as const;
+
+/**
+ * Explicit delegability [REF-IMPL] (protocol: "Delegability must be explicit", "delegated authority ⊆ delegator
+ * authority"). A delegated action is valid only when the delegator holds BOTH the authority it derives from and the
+ * explicit permission to delegate it, on the same resource. Only EXECUTE_DISTRIBUTION is delegable; depth 1 below
+ * the Trust Anchor's grant.
+ */
+export const DELEGABLE_ACTIONS: Readonly<
+  Record<string, { readonly derivesFrom: string; readonly permission: string }>
+> = {
+  [EXECUTE_DISTRIBUTION]: {
+    derivesFrom: CREATE_DISTRIBUTION,
+    permission: DELEGATE_DISTRIBUTION_AUTHORITY,
+  },
+};
 
 /** Protocol Capability working shape exactly (`capability.schema.json`: these four fields, nothing else). */
 export interface Capability {
@@ -98,7 +126,12 @@ export type CapabilityDenialReason =
   | 'SUBJECT_MISMATCH'
   | 'ACTION_MISMATCH'
   | 'RESOURCE_MISMATCH'
-  | 'EXPIRED';
+  | 'EXPIRED'
+  // Delegated authority (Sponsor → Agent) [REF-IMPL]:
+  | 'ACTION_NOT_DELEGABLE'
+  | 'DELEGATOR_LACKS_AUTHORITY'
+  | 'DELEGATION_NOT_PERMITTED'
+  | 'DELEGATION_EXCEEDS_DELEGATOR';
 
 export interface CapabilityAuthorization {
   readonly decision: 'ALLOW' | 'DENY';
@@ -123,8 +156,26 @@ export function authorizeWithCapability(input: {
   };
   readonly now: Date;
 }): CapabilityAuthorization {
+  const reasons = grantReasons(input, !input.issuerIsActiveTrustAnchor);
+  return { decision: reasons.length === 0 ? 'ALLOW' : 'DENY', reasons };
+}
+
+/** Grant checks shared by direct and delegated authorization (the issuer-trust check is the caller's). */
+function grantReasons(
+  input: {
+    readonly grant: CapabilityGrant | undefined;
+    readonly issuerDocument: DidDocument | undefined;
+    readonly request: {
+      readonly requester: string;
+      readonly action: string;
+      readonly resource: string;
+    };
+    readonly now: Date;
+  },
+  issuerNotActiveTrustAnchor: boolean,
+): CapabilityDenialReason[] {
   const { grant, request } = input;
-  if (grant === undefined) return { decision: 'DENY', reasons: ['CAPABILITY_MISSING'] };
+  if (grant === undefined) return ['CAPABILITY_MISSING'];
   const c = grant.capability;
   if (
     grant.type !== 'CatenorOneCapabilityGrant' ||
@@ -132,10 +183,10 @@ export function authorizeWithCapability(input: {
     typeof c.constraints?.validUntil !== 'string' ||
     !grant.proof
   ) {
-    return { decision: 'DENY', reasons: ['CAPABILITY_MALFORMED'] };
+    return ['CAPABILITY_MALFORMED'];
   }
   const reasons: CapabilityDenialReason[] = [];
-  if (!input.issuerIsActiveTrustAnchor) reasons.push('ISSUER_NOT_ACTIVE_TRUST_ANCHOR');
+  if (issuerNotActiveTrustAnchor) reasons.push('ISSUER_NOT_ACTIVE_TRUST_ANCHOR');
 
   const vmId = grant.proof.verificationMethod;
   const vm = input.issuerDocument && findVerificationMethod(input.issuerDocument, vmId);
@@ -160,5 +211,112 @@ export function authorizeWithCapability(input: {
   if (c.resource !== request.resource) reasons.push('RESOURCE_MISMATCH');
   const until = Date.parse(c.constraints.validUntil);
   if (Number.isNaN(until) || input.now.getTime() > until) reasons.push('EXPIRED');
-  return { decision: reasons.length === 0 ? 'ALLOW' : 'DENY', reasons };
+  return reasons;
+}
+
+/** One verified edge of an Authority Chain, for explanation (issuer → subject: action on resource). */
+export interface AuthorityChainEdge {
+  readonly grantId: string;
+  readonly issuer: string;
+  readonly subject: string;
+  readonly action: string;
+  readonly resource: string;
+  readonly validUntil: string;
+}
+
+export interface DelegatedAuthorization extends CapabilityAuthorization {
+  /** Root → leaf edges that were verified (present only on ALLOW). */
+  readonly chain?: readonly AuthorityChainEdge[];
+}
+
+const edge = (g: CapabilityGrant): AuthorityChainEdge => ({
+  grantId: g.id,
+  issuer: g.issuer,
+  subject: g.capability.subject,
+  action: g.capability.action,
+  resource: g.capability.resource,
+  validUntil: g.capability.constraints.validUntil,
+});
+
+/**
+ * Authorizes a request made under a DELEGATED grant (Catenor One [REF-IMPL], chain depth 2; fail closed):
+ *
+ *   ACTIVE Trust Anchor ──grants──▶ delegator: `derivesFrom` + `permission` on the resource
+ *   delegator ──delegates──▶ requester: the delegable action on the same resource
+ *
+ * Every edge is checked: signatures by the issuers' assertion keys, the root is an ACTIVE Trust Anchor, subjects,
+ * actions, resources, expiry; the action is explicitly delegable; the delegator holds both parent grants; the
+ * delegation was issued while both were valid and does not outlive them.
+ */
+export function authorizeDelegatedCapability(input: {
+  /** The delegated grant (e.g. Sponsor → Agent). */
+  readonly grant: CapabilityGrant | undefined;
+  readonly delegatorDocument: DidDocument | undefined;
+  /** The Trust Anchor's grants to the delegator, as presented with the request. */
+  readonly parentGrants: readonly CapabilityGrant[];
+  readonly rootDocument: DidDocument | undefined;
+  /** S001 Trust Anchor verification of the parents' issuer at request time. */
+  readonly rootIsActiveTrustAnchor: boolean;
+  readonly request: {
+    readonly requester: string;
+    readonly action: string;
+    readonly resource: string;
+  };
+  readonly now: Date;
+}): DelegatedAuthorization {
+  const leaf = input.grant;
+  const reasons = grantReasons(
+    {
+      grant: leaf,
+      issuerDocument: input.delegatorDocument,
+      request: input.request,
+      now: input.now,
+    },
+    false,
+  );
+  if (leaf === undefined || reasons.includes('CAPABILITY_MALFORMED')) {
+    return { decision: 'DENY', reasons };
+  }
+  const rule = DELEGABLE_ACTIONS[leaf.capability.action];
+  if (rule === undefined) {
+    reasons.push('ACTION_NOT_DELEGABLE');
+    return { decision: 'DENY', reasons };
+  }
+  const parent = (action: string) =>
+    input.parentGrants.find(
+      (g) =>
+        g.capability?.action === action &&
+        g.capability.subject === leaf.issuer &&
+        g.capability.resource === leaf.capability.resource,
+    );
+  const authorizedParent = (action: string) => {
+    const g = parent(action);
+    const r = authorizeWithCapability({
+      grant: g,
+      issuerDocument: input.rootDocument,
+      issuerIsActiveTrustAnchor: input.rootIsActiveTrustAnchor,
+      request: { requester: leaf.issuer, action, resource: leaf.capability.resource },
+      now: input.now,
+    });
+    return r.decision === 'ALLOW' ? g : undefined;
+  };
+  const authority = authorizedParent(rule.derivesFrom);
+  const permission = authorizedParent(rule.permission);
+  if (authority === undefined) reasons.push('DELEGATOR_LACKS_AUTHORITY');
+  if (permission === undefined) reasons.push('DELEGATION_NOT_PERMITTED');
+  if (authority && permission) {
+    const leafUntil = Date.parse(leaf.capability.constraints.validUntil);
+    const issued = Date.parse(leaf.issuedAt);
+    const within = (g: CapabilityGrant) =>
+      leafUntil <= Date.parse(g.capability.constraints.validUntil) &&
+      issued >= Date.parse(g.issuedAt) &&
+      issued <= Date.parse(g.capability.constraints.validUntil);
+    if (!within(authority) || !within(permission)) reasons.push('DELEGATION_EXCEEDS_DELEGATOR');
+  }
+  if (reasons.length > 0) return { decision: 'DENY', reasons };
+  return {
+    decision: 'ALLOW',
+    reasons: [],
+    chain: [edge(authority!), edge(permission!), edge(leaf)],
+  };
 }

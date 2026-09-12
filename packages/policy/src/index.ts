@@ -35,3 +35,19 @@ export {
   type DistributionEvidenceFact,
   type DistributionRequirement,
 } from './distribution-eligibility.js';
+export {
+  DISTRIBUTION_ELIGIBILITY_V2_POLICY,
+  DISTRIBUTION_ELIGIBILITY_V2_POLICY_HASH,
+  DISTRIBUTION_ELIGIBILITY_V2_POLICY_ID,
+  INVESTOR_ELIGIBILITY_CREDENTIAL,
+  INVESTOR_REQUIREMENTS,
+  OFFERING_ELIGIBILITY_POLICY,
+  OFFERING_ELIGIBILITY_POLICY_HASH,
+  OFFERING_ELIGIBILITY_POLICY_ID,
+  RECEIVE_DISTRIBUTION_ACTION,
+  SUBSCRIBE_OFFERING,
+  evaluateRequirements,
+  type HolderRequirement,
+  type InvestorRequirement,
+  type RequirementsEvaluation,
+} from './investor-policies.js';

@@ -1,4 +1,5 @@
-// @catenor-one/credentials — W3C Data Integrity eddsa-jcs-2022 hashing and verification (PLAN §3.3).
+// @catenor-one/credentials — W3C Data Integrity eddsa-jcs-2022 hashing and verification (PLAN §3.3), and the
+// W3C VC 2.0 / VP envelopes built on it (final demo [REF-IMPL]).
 export {
   DATA_INTEGRITY_PROOF,
   ED25519_SIGNATURE_LENGTH,
@@ -16,3 +17,29 @@ export {
   type DataIntegrityProof,
   type ProofOptions,
 } from './eddsa-jcs-2022.js';
+export {
+  CATENOR_ONE_CONTEXT,
+  CATENOR_ONE_STATUS_STATEMENT,
+  CATENOR_ONE_STATUS_TYPE,
+  CREDENTIAL_STATUSES,
+  PRESENTATION_CHECKS,
+  W3C_VC_V2_CONTEXT,
+  createCredential,
+  createPresentation,
+  createStatusStatement,
+  prepareCredentialProof,
+  preparePresentationProof,
+  prepareStatusStatementProof,
+  verifyPresentation,
+  type AcceptedIssuer,
+  type Credential,
+  type CredentialStatus,
+  type CredentialStatusStatement,
+  type CredentialSubject,
+  type Presentation,
+  type PresentationCheck,
+  type PresentationVerification,
+  type SignedCredentialStatusStatement,
+  type VerifiableCredential,
+  type VerifiablePresentation,
+} from './verifiable-credentials.js';

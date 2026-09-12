@@ -67,12 +67,38 @@ export {
 export {
   TOKENIZE_ASSET,
   EXECUTE_DISTRIBUTION,
+  DEFINE_OFFERING_POLICY,
+  CREATE_AGENT,
+  CREATE_DISTRIBUTION,
+  DELEGATE_DISTRIBUTION_AUTHORITY,
+  SPONSOR_CAPABILITIES,
+  DELEGABLE_ACTIONS,
+  authorizeDelegatedCapability,
   authorizeWithCapability,
   createCapabilityGrant,
   prepareCapabilityGrantProof,
+  type AuthorityChainEdge,
   type Capability,
   type CapabilityAuthorization,
+  type DelegatedAuthorization,
   type CapabilityDenialReason,
   type CapabilityGrant,
   type CapabilityGrantPayload,
 } from './capability.js';
+export {
+  RELATIONSHIP_CREDENTIAL,
+  RELATIONSHIP_PREDICATES,
+  createRelationshipCredential,
+  prepareRelationshipProof,
+  verifyRelationshipCredential,
+  type RelationshipPredicate,
+  type RelationshipVerification,
+} from './relationship.js';
+export {
+  authorizeOfferingDefinition,
+  createOfferingDefinition,
+  prepareOfferingProof,
+  type OfferingDefinition,
+  type OfferingDefinitionPayload,
+  type OfferingDenialReason,
+} from './offering.js';
