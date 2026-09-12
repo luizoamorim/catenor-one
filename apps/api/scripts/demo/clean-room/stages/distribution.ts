@@ -213,6 +213,12 @@ export const delegateCapability: Stage = {
   },
 };
 
+/** "Investor A (Lisa Simpson)" — the fictional Sumsub sandbox name recorded by stage 40/41, when present. */
+function investorLabel(label: 'A' | 'B'): string {
+  const name = env(`DEMO_INVESTOR_${label}_SANDBOX_NAME`);
+  return name ? `Investor ${label} (${name})` : `Investor ${label}`;
+}
+
 export const invalidateInvestorB: Stage = {
   id: '80-invalidate-investor-b',
   title: 'Provider state change — Investor B becomes RED / SANCTIONS / FINAL (Sumsub sandbox)',
@@ -234,7 +240,7 @@ export const invalidateInvestorB: Stage = {
     const credential = await ctx.services.investors.credentialOf(B);
     const holdings = await atsHoldings();
     const out = {
-      investor: 'Investor B',
+      investor: investorLabel('B'),
       did: B,
       sumsubSandboxReview: { ...review, changed: how },
       credential: {
@@ -337,7 +343,7 @@ export const confidentialDistribution: Stage = {
     }
     const { plan, run } = result;
     setState({ DEMO_PLAN_ID: plan.id });
-    const label = (did: string) => (did === A ? 'Investor A' : 'Investor B');
+    const label = (did: string) => investorLabel(did === A ? 'A' : 'B');
     const view = {
       planId: plan.id,
       computedIn: `Chainlink CRE identity-confidential CONFIDENTIAL_DISTRIBUTION (${run.mode})`,
@@ -412,7 +418,8 @@ export const executeDistribution: Stage = {
     });
     const reader = new HederaAtsHoldingsReader();
     const { A, B } = investorDids();
-    const label = (did: string) => (did === A ? 'Investor A' : did === B ? 'Investor B' : did);
+    const label = (did: string) =>
+      did === A ? investorLabel('A') : did === B ? investorLabel('B') : did;
     const nonceBefore = await executor.nonce();
     const outcomes = [];
     for (const h of plan.holders) {

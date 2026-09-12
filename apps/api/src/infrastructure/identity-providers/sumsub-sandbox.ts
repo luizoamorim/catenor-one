@@ -11,6 +11,12 @@ import { createServer } from 'node:http';
 
 const SANDBOX_BASE_URL = 'https://api.sumsub.com';
 
+/** A fictional sandbox display name (never real PII; never part of a DID or credential). */
+export interface SyntheticPersonName {
+  readonly firstName: string;
+  readonly lastName: string;
+}
+
 function signature(secret: string, ts: string, method: string, pathWithQuery: string, body = '') {
   return createHmac('sha256', secret)
     .update(ts + method + pathWithQuery + body)
@@ -49,21 +55,29 @@ export class SumsubSandboxOperator {
 
   /** Creates a synthetic individual applicant bound to `bindingRef`; returns its applicant ID (private). */
   async createRepresentative(bindingRef: string, levelName = 'id-only'): Promise<string> {
-    return this.createIndividual(bindingRef, 'DemoRepresentative', levelName);
+    return this.createIndividual(
+      bindingRef,
+      { firstName: 'Catenor', lastName: 'DemoRepresentative' },
+      levelName,
+    );
   }
 
-  /** Final demo: a synthetic individual INVESTOR applicant bound to `bindingRef` (e.g. lastName DemoInvestorA). */
+  /**
+   * Final demo: a synthetic individual INVESTOR applicant bound to `bindingRef`. The name is a fictional display name
+   * for the sandbox dashboard only (default "Catenor DemoInvestorA"); it never reaches the DID, a credential or Catenor.
+   */
   async createInvestorApplicant(
     bindingRef: string,
     label: 'A' | 'B',
+    name: SyntheticPersonName = { firstName: 'Catenor', lastName: `DemoInvestor${label}` },
     levelName = 'id-only',
   ): Promise<string> {
-    return this.createIndividual(bindingRef, `DemoInvestor${label}`, levelName);
+    return this.createIndividual(bindingRef, name, levelName);
   }
 
   private async createIndividual(
     bindingRef: string,
-    lastName: string,
+    name: SyntheticPersonName,
     levelName: string,
   ): Promise<string> {
     const applicant = await this.call(
@@ -71,7 +85,7 @@ export class SumsubSandboxOperator {
       `/resources/applicants?levelName=${encodeURIComponent(levelName)}`,
       {
         externalUserId: bindingRef,
-        fixedInfo: { firstName: 'Catenor', lastName, country: 'GBR' },
+        fixedInfo: { firstName: name.firstName, lastName: name.lastName, country: 'GBR' },
       },
     );
     if (typeof applicant.id !== 'string') {

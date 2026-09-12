@@ -286,7 +286,7 @@ when not interactive. `--yes` never authorizes a broadcast.
 | 21 | `21-trust-anchor-authorize-sponsor.sh` | TA → Sponsor: relationship + five grants; same capability on another resource DENIED | VALID |
 | 30 | `30-create-spv.sh` | Sponsor (TOKENIZE_ASSET) → SPV did + Privy EVM wallet + execution policy created **after** the ALLOW; SPV SPONSORED_BY Sponsor | SPV + wallet (0 HBAR) |
 | 31 | `31-create-offering-policy.sh` | Sponsor (DEFINE_OFFERING_POLICY) signs the offering: 1,000 units, `policy:offering-eligibility:v1` pinned by hash | ALLOW |
-| 40/41 | `40-create-investor-a.sh`, `41-create-investor-b.sh` | HUMAN did, Privy receiving wallet, private Account Binding, holder key, Sumsub sandbox applicant GREEN | both currently eligible |
+| 40/41 | `40-create-investor-a.sh`, `41-create-investor-b.sh` | HUMAN did, Privy receiving wallet, private Account Binding, holder key, Sumsub sandbox applicant GREEN (fictional names **Lisa Simpson** = A, **Bart Simpson** = B; `--name="First Last"` to change; the name stays in the sandbox dashboard, never in the DID or a credential) | both currently eligible |
 | 42 | `42-create-investor-credentials.sh` | **CRE** INVESTOR_ELIGIBILITY per investor → Trust Anchor-issued VCs | 2 VCs |
 | 43 | `43-create-investor-presentations.sh` | holder-signed VPs; local 7-check verification; replay with another challenge fails | 7/7 checks |
 | 44 | `44-check-offering-eligibility.sh` | **CRE** OFFERING_ELIGIBILITY (VP/VC/status/current evidence/policy in the TEE) → Decisions | A ALLOW 600 · B ALLOW 400 |

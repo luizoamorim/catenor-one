@@ -10,6 +10,15 @@ import { env, need, setState } from '../state.js';
 
 type Label = 'A' | 'B';
 const ALLOCATION: Record<Label, bigint> = { A: 600n, B: 400n };
+/** Fictional sandbox display names (Sumsub dashboard only); override with --name="First Last". */
+const SANDBOX_NAME: Record<Label, string> = { A: 'Lisa Simpson', B: 'Bart Simpson' };
+
+function sandboxName(label: Label, flag: string | undefined) {
+  const full = (flag ?? SANDBOX_NAME[label]).trim();
+  const m = /^([A-Za-z][A-Za-z'-]{0,39}) ([A-Za-z][A-Za-z' -]{0,39})$/.exec(full);
+  if (!m) throw new Error('--name must be "First Last" (letters, space, apostrophe or hyphen)');
+  return { full, firstName: m[1]!, lastName: m[2]! };
+}
 
 function createInvestor(label: Label): Stage {
   return {
@@ -22,26 +31,33 @@ function createInvestor(label: Label): Stage {
       'Privy EVM receiving wallet (its own owner key → ~/.catenor-one; no signer, no policy — it only receives)',
       'PRIVATE Account Binding did:catenor → eip155:296:<wallet> (never published in the DID Document)',
       'AUTHENTICATION holder key (Privy Ed25519) listed in the DID Document — signs Verifiable Presentations, never money',
-      'Sumsub SANDBOX applicant (level id-only) created with externalUserId = the private bindingRef; review forced GREEN',
+      `Sumsub SANDBOX applicant (level id-only, fictional display name — default ${SANDBOX_NAME[label]}, --name="First Last" to change) created with externalUserId = the private bindingRef; review forced GREEN`,
     ],
     sponsors: ['Privy', 'Sumsub (sandbox)'],
     mode: 'SPONSOR LIVE (non-spending)',
     expected: `Investor ${label}: did:catenor + receiving wallet + GREEN sandbox review (currently eligible)`,
-    async run(ctx) {
+    async run(ctx, flags) {
+      const name = sandboxName(label, flags.options['name']);
       const wallet = await provisionReceivingWallet(ctx.privy, ctx.instance, label);
       const investor = await ctx.services.investors.registerInvestor({
         account: wallet.address,
         walletRef: wallet.walletId,
       });
-      const applicantId = await ctx.sumsub.createInvestorApplicant(investor.bindingRef, label);
+      const applicantId = await ctx.sumsub.createInvestorApplicant(
+        investor.bindingRef,
+        label,
+        name,
+      );
       await ctx.sumsub.forceReview(applicantId, 'GREEN');
       await ctx.services.investors.attachApplicant(investor.did, applicantId);
       setState({
         [`DEMO_INVESTOR_${label}_DID`]: investor.did,
         [`DEMO_INVESTOR_${label}_ADDRESS`]: wallet.address,
         [`DEMO_INVESTOR_${label}_WALLET_ID`]: wallet.walletId,
+        [`DEMO_INVESTOR_${label}_SANDBOX_NAME`]: name.full,
       });
       say(`Investor ${label}`, {
+        sandboxName: `${name.full} (fictional; Sumsub sandbox dashboard only — not in the DID)`,
         did: investor.did,
         receivingWallet: wallet.address,
         holderKey: investor.authenticationMethod,
@@ -51,6 +67,7 @@ function createInvestor(label: Label): Stage {
         receivingWallet: wallet.address,
         accountBinding: 'PRIVATE (eip155:296 CAIP-10; not in the DID Document)',
         holderKey: investor.authenticationMethod,
+        sandboxName: `${name.full} (fictional)`,
         providerEvidence:
           'REAL SUMSUB SANDBOX applicant (synthetic), current review GREEN — applicant id private',
       };
