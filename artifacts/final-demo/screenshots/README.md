@@ -46,6 +46,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `11-after-terminal.png` | 11, after | admission on the **deployed** workflow: `mode DEPLOYED`, `EVIDENCE_RECEIVED`, `policy:trust-anchor-admission:v1` **ALLOW**, `TRUST_ANCHOR_VALID: true` |
 | `11-after-cre-execution-events.png` | 11, after | CRE execution `394f…4bd8`: **Success**, triggered 19:18 UTC, 8 s, $0. Events: `trigger` (19:18:36), then **two `http-actions` `SendRequest`** (19:18:45), the Sumsub sandbox calls made from inside the TEE with the Vault secrets |
 | `11-after-sumsub-representative.png` | 11, after | the new Sumsub sandbox representative (synthetic "Catenor DemoRepresentative", level `id-only`): **Approved** at 19:18:17 UTC, before the trigger. **Applicant ID redacted** |
+| `11-after-privy-wallets.png` | 11, after | 5 Solana wallets: bootstrap `HKQY5…nVEk` (17:08 UTC); the Trust Anchor's assertion key `9PvXY…PGkT` (19:18); three abandoned attempt keys `CMhqU…`, `5SUTj…`, `GMQ6i…` (see RUN-LOG, stage 11) |
+| `11-after-privy-keys-and-quorums.png` | 11, after | `…-assertion` quorum: **signer for 4 wallets** (the assertion keys); `…-bootstrap`: signer for the bootstrap wallet only; the assertion owner key owns 4 wallets and `P_ASSERT` |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

@@ -192,7 +192,11 @@ It was then triggered with the demo's JWT code:
 `DEMO_CRE_GATEWAY_URL`. The two stage 11 failures were therefore neither an enrollment problem nor a TEE problem. The
 same signed request had simply gone to a gateway that does not serve this organization's workflows.
 
-**Attempt 3 (19:18 UTC): ADMITTED on the deployed Confidential Workflow.** The first admission of the root Trust
+**Attempt 3 (19:12 UTC): the same `Workflow not found`.** It ran while the gateway fix was still being written, so it
+still used the documented enterprise gateway. It created candidate 3, with a Privy wallet and a Sumsub applicant, and
+no execution.
+
+**Attempt 4 (19:18 UTC): ADMITTED on the deployed Confidential Workflow.** The first admission of the root Trust
 Anchor to run on a deployed CRE workflow:
 
 | Item | Value |
@@ -211,6 +215,15 @@ deploy #2.
 
 **Leftovers, which stay as they are:**
 
-- the abandoned attempt-1 and attempt-2 candidates, each with a Privy assertion wallet and a Sumsub sandbox applicant;
+- the abandoned attempt-1, 2 and 3 candidates, each with a Privy assertion wallet and a Sumsub sandbox applicant.
+  The Privy wallets are all Solana, under the same `…-assertion` quorum and owner key:
+
+  | Wallet | Created (UTC) | What |
+  |---|---|---|
+  | `HKQY5…nVEk` | 17:08 | Bootstrap Endorsement Key (stage 10) |
+  | `CMhqU…5Stc` | 17:50 | attempt 1, abandoned |
+  | `5SUTj…rFYM` | 17:56 | attempt 2, abandoned |
+  | `GMQ6i…bz53` | 19:13 | attempt 3, abandoned |
+  | `9PvXY…PGkT` | 19:18 | **the Trust Anchor's Credential Assertion Key** (attempt 4) |
 - the control workflow `catenor-http-control`, to be deleted after the demo.
 
