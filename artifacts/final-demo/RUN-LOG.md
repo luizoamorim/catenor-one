@@ -471,3 +471,14 @@ The policy now holds six rules:
 
 This step spent no HBAR.
 
+**HashScan and Privy after stage 60.**
+
+- **The `deployEquity` transaction:** SUCCESS at 21:14:07 UTC in block 40438071. The fee was **7.864 ℏ**, paid by the
+  SPV account `0.0.10509879`, which now holds 17.136 ℏ.
+- **The equity:** contract `0.0.10510175`, EVM `0xf37a…7abc`.
+- **The factory:** the ATS v8 Factory `0.0.9213391`.
+- **The treasury account:** `0.0.10509855`, with 70.92 ℏ left.
+- **The SPV policy:** its JSON after the extension is saved in
+  `artifacts/privy/final-demo/clean-room-c1-202609121659/spv-policy-after-equity.json`. It was copied from the Privy
+  dashboard, and only the ABI arrays are abbreviated.
+

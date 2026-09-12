@@ -1,0 +1,57 @@
+{
+  "id": "cygll4bmgocqr05asp2w6f2s",
+  "version": "1.0",
+  "name": "catenor-one-spv-execution-4c875d44",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "t01al94fattl6okgua0jwpd0",
+      "name": "allow-ats-factory-hedera-testnet",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xd1F118A40f3b02883D35909eF2517e7EDd78379d" }
+      ]
+    },
+    { "id": "nfob7nm7jo55mjuj3bbxq6ii", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "ub7kylldhvex9z8iq08imioj", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] },
+    {
+      "id": "r6bo3tyjsl1glf3vwimo3m0g",
+      "name": "allow-setDividend-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "setDividend", "abi": "[setDividend((uint256 recordDate,uint256 executionDate,uint256 amount,uint8 amountDecimals) newDividend) returns (uint256 dividendId_)]" }
+      ]
+    },
+    {
+      "id": "snvx2odgylm68pz4x14hn3uc",
+      "name": "allow-issueByPartition-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "issueByPartition", "abi": "[issueByPartition((bytes32 partition,address tokenHolder,uint256 value,bytes data) _issueData)]" },
+        { "field_source": "ethereum_calldata", "field": "issueByPartition._issueData.partition", "operator": "eq", "value": "0x0000000000000000000000000000000000000000000000000000000000000001", "abi": "(same issueByPartition ABI)" }
+      ]
+    },
+    {
+      "id": "myjpkp43eogob04pvjjmg20x",
+      "name": "allow-grantRole-corporate-action-to-spv",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "grantRole", "abi": "[grantRole(bytes32 _role,address _account) returns (bool success_)]" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._role", "operator": "eq", "value": "0xa1acfc499025c99f55059195e6276f639d34a18aad7b8121b9192b7f438c55cd", "abi": "(same grantRole ABI)" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._account", "operator": "eq", "value": "0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926", "abi": "(same grantRole ABI)" }
+      ]
+    }
+  ],
+  "_note": "Copied by the maintainer from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 60, final-demo instance c1-202609121659. The full ABI arrays of the calldata conditions are abbreviated here to their signatures; everything else is verbatim. Public data only."
+}

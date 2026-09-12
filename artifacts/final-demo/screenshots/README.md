@@ -78,6 +78,12 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `50-after-hashscan-investor-a.png` | 50, after | account `0.0.10509881` = Investor A receiving wallet `0x7de5…2473`: **1 ℏ** (activation only) |
 | `50-after-hashscan-investor-b.png` | 50, after | account `0.0.10509882` = Investor B receiving wallet `0xcfca…da73`: **1 ℏ** (activation only) |
 | `60-terminal-policy-extended.png` | 60 | re-run after the fix: equity `0xf37A…7ABC` already deployed (tx `0x2396…c570`), **no new deployment**. The SPV policy is extended, owner-authorized: `allow-issueByPartition-equity`, `allow-grantRole-corporate-action-to-spv`, `allow-setDividend-equity`, all pinned to the equity |
+| `60-after-hashscan-deploy-tx.png` | 60, after | the `deployEquity` Ethereum transaction: **SUCCESS**, consensus 21:14:07 UTC, block 40438071; fee **7.864 ℏ** paid by SPV account `0.0.10509879` |
+| `60-after-hashscan-equity-contract.png` | 60, after | the new **ATS equity**: contract `0.0.10510175` = EVM `0xf37a…7abc` |
+| `60-after-hashscan-spv.png` | 60, after | the SPV account now holds **17.136 ℏ** (25 − the 7.864 ℏ fee) |
+| `60-after-hashscan-treasury.png` | 60, after | the Privy treasury account `0.0.10509855` (`0x49e9…5210`): **70.92 ℏ** left of the 100 ℏ from the faucet (27 ℏ sent plus fees) |
+| `60-after-hashscan-ats-factory.png` | 60, after | the official **ATS v8 Factory** contract `0.0.9213391` (`0xd1f1…379d`), the only target the SPV policy allowed for the deploy |
+| `60-after-privy-spv-policy-rules.png` | 60, after | SPV policy Rules view: under `eth_signTransaction`, `allow-ats-factory-hedera-testnet` + **the three equity-pinned rules**; exports denied; default deny (full JSON in `artifacts/privy/final-demo/clean-room-c1-202609121659/spv-policy-after-equity.json`) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
