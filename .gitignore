@@ -20,3 +20,6 @@ apps/api/src/infrastructure/persistence/prisma/generated/
 
 # Demo run records are regenerated per run (commit only curated ones under artifacts/)
 artifacts/demo/
+
+# Clean-room demo state (public refs, runtime keys, private evidence) — local only, never committed
+.catenor-demo/
