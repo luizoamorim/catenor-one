@@ -82,3 +82,20 @@ The runner stays in SIMULATION until the workflow id is recorded with `--use-dep
 **C2 — `cre/check-relay.sh` (17:24 UTC): OK.** A probe signed with the channel key was accepted by Railway
 (`202 RELAYED`), pulled back (`200`) and re-authenticated locally. The `CATENOR_INTERNAL_API_TOKEN` sealed on Railway
 therefore equals the one the CRE secrets will carry.
+
+**C3 — `cre/secrets.sh --live` (17:3x UTC): 3 secrets in the Vault DON.** The command was
+`cre secrets create secrets.yaml --secrets-auth browser -T production-settings`, the private-registry mode, authorized
+by the maintainer's CRE account in the browser. Created in `namespace=main`, owner
+`0x7075057f1589BAf347cB6dD6a993B1FC536B8a0a`:
+
+- `CATENOR_INTERNAL_API_TOKEN`;
+- `SUMSUB_APP_TOKEN`;
+- `SUMSUB_SECRET_KEY`.
+
+No value was printed. The CLI warned: *"Vault gateway validation skipped; the encryption key and response signatures
+will not be verified independently of the gateway."* It is recorded as printed.
+
+The first `--live` attempt failed before any request: `failed to decode the provided private key: invalid hex
+character 'Y'`. The CLI parses `CRE_ETH_PRIVATE_KEY` from the `.env` it is given, even in browser mode, and
+`workflows/.env` still had the `.env.example` placeholder. The fix was a fresh random, **unfunded** key, generated into
+the file without printing it. It is not linked to the account and is not the demo's trigger key.
