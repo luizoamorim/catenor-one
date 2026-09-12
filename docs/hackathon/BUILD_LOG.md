@@ -1489,6 +1489,67 @@ Artifacts: `DEMO.md`, `artifacts/chainlink/final-demo/clean-room-confidential-ru
 
 Commit: the `feat(authority)`, `feat(cre)` ×2, `feat(api)`, `feat(demo)`, `docs(demo)` and `docs(hackathon)` commits of this checkpoint.
 
+## 2026-09-12 — Railway-ready API backend (prompt 2026-09-12-024)
+
+Goal: make the existing API deployable to Railway as the stable HTTPS backend of the final demo, with an operationally
+inert startup. No Railway, Privy, Sumsub, Hedera or CRE action was taken.
+
+Findings:
+
+- **No HTTP server.** `apps/api` had none (T4.1 NestJS is still open); every flow ran from the local stage runner.
+- **CRE results are awaited locally.** The results of investor operations reach an in-memory map in the local runner,
+  so a public copy of the callback route alone could not have delivered them. The maintainer chose the relay design
+  (AskUserQuestion, this session).
+
+Work completed:
+
+- **`apps/api/src/main.ts`** (inert entrypoint), plus `infrastructure/http/api-server.ts`, which serves:
+  - `GET /v1/health`;
+  - `GET /v1/health/db`, read-only;
+  - the existing `POST /v1/internal/cre/identity-confidential/results`, now an authenticated in-memory relay;
+  - an HMAC-authenticated one-time pull for the runner.
+- **`cre-callback-relay.ts`** [REF-IMPL relay key]: the mailbox (TTL 300 s, single use, capacity 64) and the runner
+  poller. The runner re-authenticates each pulled result and delivers it through the unchanged
+  `authenticateCallback → deliver` path.
+- **Runner wiring.**
+  - `configure.sh --relay-url=` enables the relay.
+  - In DEPLOYED mode, stage 11 now waits for its relayed admission result.
+- **`database-probe.ts`**: a lazy, read-only migration count.
+- **Deployment files:** `apps/api/Dockerfile`, `.dockerignore`, `apps/api/railway.toml` (Dockerfile builder, health
+  check, one replica), and a `start` script.
+- **Docs:** `docs/deployment/RAILWAY.md`, and the DEMO.md §4 / §15 callback guidance.
+
+Validation:
+
+- **Unit:** the new server, relay and poller tests, plus `main.inert.test.ts`. That test walks every static and lazy
+  import reachable from `main.ts` and fails on:
+  - the Privy, ATS or ethers SDKs;
+  - `child_process`;
+  - `@catenor-one/authority`;
+  - `src/modules/`;
+  - the signer, provider or execution adapters;
+  - the CRE gateway or simulator.
+- **Local Docker rehearsal**, with a throwaway Postgres 17.11 and a throwaway token:
+  - the image builds and contains no `.env`, `.catenor-demo`, `workflows/` or `.git`;
+  - the API boots inert (`/v1/health/db`: 0 of 5 applied);
+  - a manual `prisma migrate deploy` as the non-root user brings it to 5 of 5;
+  - the relay works end to end: 202 `RELAYED`, pulled once, re-authenticated and delivered;
+  - forged callbacks and unsigned pulls get 401;
+  - after a restart, every Catenor table still holds 0 rows.
+- **Checks:** full suite results are in the checkpoint report.
+
+Not done (maintainer, manual; `RAILWAY.md` §8):
+
+- creating the project, Postgres and variables, the deploy, the manual migration and the domain;
+- the new Privy app, the new Sumsub level (it must be named `id-only`) and the fresh clean-room instance;
+- the CRE deployment.
+
+AI assistance: Claude Code main session only.
+
+Human review: pending (checkpoint report).
+
+Artifacts: `docs/deployment/RAILWAY.md`, prompt `2026-09-12-024`, plan `2026-09-12-009-railway-backend.md`.
+
 ## Entry template
 
 ```md

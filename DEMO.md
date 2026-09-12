@@ -132,7 +132,7 @@ B still holds its 400 units and its ATS dividend entitlement. It just is not pai
 | Bun | 1.4 | the CRE workflow dependencies (`workflows/identity-confidential`) |
 | Chainlink CRE CLI | v1.33.0 (`~/.cre/bin/cre`) | CRE simulation / deployment |
 | curl | any | reachability checks |
-| ngrok (or any HTTPS tunnel) | optional | only for a **deployed** CRE workflow (public callback URL) |
+| Railway API or an HTTPS tunnel | optional | only for a **deployed** CRE workflow (public callback URL; `docs/deployment/RAILWAY.md`) |
 
 ```bash
 pnpm install
@@ -457,7 +457,7 @@ and the `production-settings` target, which uses the private registry.
 | Step | Script | Command |
 |---|---|---|
 | build (local) | `scripts/demo/cre/build.sh` | `cre workflow build identity-confidential -T production-settings` |
-| config (local) | `scripts/demo/cre/configure.sh --callback-url=https://<tunnel>` | writes `.deploy/config.json` (DEPLOYED, Trust Anchor key pinned, trigger key in `authorizedKeys`) |
+| config (local) | `scripts/demo/cre/configure.sh --relay-url=https://<railway-host>` (or `--callback-url=https://<tunnel>`) | writes `.deploy/config.json` (DEPLOYED, Trust Anchor key pinned, trigger key in `authorizedKeys`) |
 | secrets | `scripts/demo/cre/secrets.sh --live` | `cre secrets create secrets.yaml --secrets-auth browser -T production-settings -e workflows/.env` |
 | deploy | `scripts/demo/cre/deploy.sh --live` | `cre workflow deploy identity-confidential -T production-settings --config .deploy/config.json` (starts PAUSED) |
 | activate | `scripts/demo/cre/activate.sh --live` | `cre workflow activate identity-confidential -T production-settings` |
@@ -470,8 +470,10 @@ Blockers, each with its smallest fix:
 1. **Confidential Workflows enrollment.** No CLI command shows it: `cre whoami` shows standard deploy access only.
    Chainlink's docs say enrollment is separate. The maintainer has stated access is now granted; the first
    `deploy.sh --live` confirms it.
-2. **Public callback URL.** The DON must reach Catenor's receiver. Run `ngrok http 8787` (or any HTTPS tunnel) while
-   stages run, then `configure.sh --callback-url=https://…`.
+2. **Public callback URL.** The DON must reach Catenor. Preferred: the Railway API (`docs/deployment/RAILWAY.md`)
+   authenticates the callback and relays it to the stages, which pull their own results:
+   `configure.sh --relay-url=https://<railway-host>`. Fallback: `ngrok http 8787` (or any HTTPS tunnel) to the local
+   receiver while stages run, then `configure.sh --callback-url=https://…`.
 3. **Secrets upload.** `secrets.sh --live` (browser auth, private registry).
 4. **Rate limit.** The deployed HTTP trigger is limited to `every60s:1`, so space the confidential stages ≥ 60 s apart.
 5. **Handler logs.** TEE handler logs are not exported in production. The Catenor callback record (90) is the

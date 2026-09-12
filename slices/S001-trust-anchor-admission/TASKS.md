@@ -140,7 +140,7 @@ Format: **ID — title** · `deps` · `AC` · `TV` · deliverable · done-when.
 
 ## Phase 15 — Railway deployment
 
-- [ ] **T15.1 [FAST] — Services** · deps: T13.2, T3.2 · web + api (root dirs, watch paths, Railpack + pnpm filters), pre-deploy `prisma migrate deploy`, health check; dashboard configuration (D19); staging then production.
+- [ ] **T15.1 [FAST] — Services** · deps: T13.2, T3.2 · web + api (root dirs, watch paths, Railpack + pnpm filters), pre-deploy `prisma migrate deploy`, health check; dashboard configuration (D19); staging then production. **Status 2026-09-12 (prompt 024):** api service prepared, not deployed — inert `src/main.ts`, `/v1/health`, Dockerfile builder (not Railpack) with `apps/api/railway.toml`; migrations run manually instead of pre-deploy (maintainer inspects each step); web service not started. See `docs/deployment/RAILWAY.md`.
 - [ ] **T15.2 [FAST][HUMAN + agent] — Infrastructure review** · deps: T15.1 · no Postgres TCP proxy (saved output); internal `DATABASE_URL`; sealed variables; no evidence objects/keys exist (TV-I05 vacuous) · TV-I02, I05 · AC-053.
 - [ ] **T15.3 [FAST] — Config pin + env** · deps: T7.3, T15.1 · pin, allowlist, Privy vars; boot check passes · TV-B01.
 

@@ -356,3 +356,15 @@ Checkpoint 8 (same day): `hedera-engineer` researched the ATS dividend lifecycle
   - the gateway invocation, which the subagent had marked UNCERTAIN: taken from the Chainlink specification.
 - **Maintainer.** Made the scope decisions and set the STOP gate before any new live broadcast.
 
+
+## 2026-09-12 — Railway-ready API backend (prompt 2026-09-12-024)
+
+- **Main session only**; no subagent.
+- **What it did:**
+  - inspected the API, Prisma, the CRE callback path and the environment usage (from code only; no `.env` file read);
+  - wrote the inert entrypoint, the relay, the deployment files and `docs/deployment/RAILWAY.md`;
+  - rehearsed the image, the manual migration and the relay locally in Docker with a throwaway Postgres and a
+    throwaway token.
+- **Maintainer decision.** Server plus CRE relay, chosen over health-only or route-only (AskUserQuestion). This was
+  needed because investor-operation results are awaited in the local runner's memory.
+- **External actions:** none. No Railway login, link or deploy, and no Privy, Sumsub, Hedera or CRE action.

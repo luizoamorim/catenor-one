@@ -786,3 +786,29 @@ Live sponsor resources created by the non-spending clean-room run (instance `c1-
 
 Owner keys are kept outside the repository. No Hedera transaction was sent.
 
+
+## 29. 2026-09-12 — Railway-ready API backend (prompt 2026-09-12-024)
+
+No new npm dependency; `pnpm-lock.yaml` is unchanged. `tsx` 4.23.13, already an `apps/api` devDependency, is now also the production runner.
+
+Container and deployment inputs, used only in `apps/api/Dockerfile`:
+
+| Input | Version | License | Use |
+|---|---|---|---|
+| Docker image `node:24.10.0-bookworm-slim` | 24.10.0 | Node.js MIT; Debian packages under their own licenses | runtime base image (matches `.nvmrc` / local Node) |
+| Debian `openssl`, `ca-certificates` | bookworm | OpenSSL Apache-2.0; MPL-2.0 (CA bundle) | Prisma CLI (`migrate deploy`) and outbound TLS |
+| `pnpm` via `npm install -g` | 10.11.0 | MIT | the workspace install (same as `packageManager`) |
+
+Railway's public config schema (`https://backboard.railway.app/railway.schema.json`) was read to confirm the `railway.toml` key names (`builder = "DOCKERFILE"`, `dockerfilePath`, `healthcheckPath`, `numReplicas`, `overlapSeconds`, `drainingSeconds`). No text or code was copied.
+
+Original Catenor One code, written by Claude Code in the main session:
+
+- `apps/api/src/main.ts`;
+- `apps/api/src/infrastructure/http/api-server.ts`;
+- `apps/api/src/infrastructure/confidential-compute/cre-callback-relay.ts`, whose relay key is [REF-IMPL]: HKDF info `catenor-one/identity-confidential/relay/v1`;
+- `apps/api/src/infrastructure/persistence/prisma/database-probe.ts`;
+- the relay wiring in `apps/api/scripts/demo/clean-room/{context,stages/cre}.ts`;
+- `apps/api/Dockerfile`, `apps/api/railway.toml`, `.dockerignore`;
+- `docs/deployment/RAILWAY.md`.
+
+No sponsor resource was created or changed (Railway, Privy, Sumsub, Hedera, Chainlink).
