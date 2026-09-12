@@ -90,6 +90,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `62-after-hashscan-issue-b-tx.png` | 62, after | HashScan: Investor B's issuance, same contract and sender: **SUCCESS**, block 40439263, fee 0.46 ℏ |
 | `91-early-verify-hedera.png` | 91 (run early, read-only) | an independent check from public chain data: `deployEquity` + both issuances SUCCESS. Equity "Catenor One Demo SPV 001 (SYNTHETIC)", symbol `C1SPV001`, **totalSupply 1000, Investor A 600, Investor B 400**; no dividend yet |
 | `63-terminal.png` | 63 | two confirmed testnet transactions from the SPV Privy wallet: `grantRole(ROLE_CORPORATE_ACTION, SPV)` (`0x7260…9f94`) and `setDividend(amount 1, decimals 2)` (`0xaac4…f865`). Ownership-based entitlements: A 600 → 6, B 400 → 4; **no funds move** |
+| `63-after-verify-hedera-entitlements.png` | 63, after | read-only re-check (22:08 UTC, after the record date): 5 transactions SUCCESS. Holdings A 600 / B 400; **entitlements dividend 1: Investor A 6, Investor B 4** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

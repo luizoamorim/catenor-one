@@ -539,3 +539,7 @@ The record date is 2026-09-12 22:07:10 UTC and the execution date 22:10:10 UTC.
 **What ATS computes:** entitlements by ownership only, Investor A 600 → **6**, Investor B 400 → **4**. **No funds
 move.** Who is actually **paid** is decided later by Catenor, in the TEE.
 
+**Stage 91 re-check (22:08 UTC, after the record date).** All five transactions are SUCCESS: `deployEquity`, the two
+issuances, `grantRole` and `setDividend`. ATS reports **dividend 1 entitlements: Investor A 6, Investor B 4**. Phase H
+is complete: tokenized, issued and dividend set, on Hedera testnet through ATS.
+
