@@ -91,6 +91,10 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `91-early-verify-hedera.png` | 91 (run early, read-only) | an independent check from public chain data: `deployEquity` + both issuances SUCCESS. Equity "Catenor One Demo SPV 001 (SYNTHETIC)", symbol `C1SPV001`, **totalSupply 1000, Investor A 600, Investor B 400**; no dividend yet |
 | `63-terminal.png` | 63 | two confirmed testnet transactions from the SPV Privy wallet: `grantRole(ROLE_CORPORATE_ACTION, SPV)` (`0x7260…9f94`) and `setDividend(amount 1, decimals 2)` (`0xaac4…f865`). Ownership-based entitlements: A 600 → 6, B 400 → 4; **no funds move** |
 | `63-after-verify-hedera-entitlements.png` | 63, after | read-only re-check (22:08 UTC, after the record date): 5 transactions SUCCESS. Holdings A 600 / B 400; **entitlements dividend 1: Investor A 6, Investor B 4** |
+| `70-terminal.png` | 70 | Sponsor `CREATE_AGENT` → Agent `did:catenor:9b25…c074` + Privy EVM wallet `0x9089…13E3` with its controls. **The Agent's distribution request BEFORE any delegation → DENY `CAPABILITY_MISSING`** (created ≠ authorized) |
+| `70-after-privy-policies.png` | 70, after | new EVM policy `catenor-one-distribution-agent-3d8dc074` (`p99xe36icsfvewrovm1mczwq`, 1 wallet), alongside the treasury, SPV, P_BOOTSTRAP and P_ASSERT (7) policies |
+| `70-after-privy-keys-and-quorums.png` | 70, after | a **new, separate** Agent signer set: owner key `blemb6kw…` (wallet + policy) and runtime quorum `…-agent-runtime`; the treasury has its own pair |
+| `70-after-privy-wallets.png` | 70, after | new EVM wallet `0x908…13E3` (the Agent's execution wallet) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

@@ -543,3 +543,21 @@ move.** Who is actually **paid** is decided later by Catenor, in the TEE.
 issuances, `grantRole` and `setDividend`. ATS reports **dividend 1 entitlements: Investor A 6, Investor B 4**. Phase H
 is complete: tokenized, issued and dividend set, on Hedera testnet through ATS.
 
+### Phase I — Distribution Agent
+
+**Stage 70 — the Sponsor creates the Distribution Agent (22:10 UTC).** The Sponsor's `CREATE_AGENT` evaluated ALLOW,
+and these were created:
+
+- **The Agent:** `did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074`, with its own identity.
+- **Its Privy EVM execution wallet:** `0x90894535F5f35271f2d4112179BF2b4e887913E3`, bound privately
+  (`AGENT_EXECUTION`).
+- **Its own signer set:** the owner key stays in `~/.catenor-one`; the runtime quorum is `…-agent-runtime`.
+- **Policy `catenor-one-distribution-agent-3d8dc074`.** It is narrower than the SPV's:
+  - ALLOW `eth_signTransaction` only if `chain_id = 296`, `to` is one of the **two investor receiving wallets** of
+    `spv:catenor-demo-001`, and the value is **≤ 20 HBAR**;
+  - exports are denied, and everything else is denied by default: no ATS contract, no SPV wallet, no other chain;
+  - the policy is owned by the Agent management-owner key, outside the runtime.
+
+**Negative path:** the Agent requested a distribution **before any delegation** → **DENY `CAPABILITY_MISSING`**. Being
+created is not being authorized.
+
