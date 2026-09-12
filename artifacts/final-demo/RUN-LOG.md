@@ -603,3 +603,18 @@ The SPV top-up was **unneeded**. The script tops up any wallet below its suggest
 after its five transactions. The maintainer accepted it to save time: it is testnet HBAR, and the SPV has no further
 transactions in the demo.
 
+### Phase J — Investor B becomes ineligible
+
+**Stage 80 — provider state change (22:29 UTC).** Catenor did nothing here: the **current external evidence**
+changed. The operator changed Investor B's Sumsub sandbox review to **RED, reject label `SANCTIONS`, FINAL**, and the
+Sumsub dashboard now shows Bart Simpson **Rejected (Sanctions)** and Lisa Simpson **Approved**.
+
+**Everything else is unchanged:**
+
+- **Holdings:** Investor B still has **400 units** (Hedera ATS, read-only) and his dividend entitlement of 4.
+- **Credential:** his credential `urn:uuid:9c25804e-…4530` is **still ACTIVE and validly signed**. Signature validity
+  does not mean current eligibility.
+
+Ownership does not mean current eligibility. Catenor re-checks eligibility confidentially at distribution time
+(stage 82).
+

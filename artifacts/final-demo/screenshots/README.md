@@ -99,6 +99,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `71-terminal.png` | 71 | Relationship Credential **Agent `AGENT_OF` Sponsor** ([REF-IMPL] predicate), signed by the Sponsor, **valid**. The Agent's request with ONLY the relationship → **still DENY `CAPABILITY_MISSING`** (Relationship ≠ Capability) |
 | `72-terminal.png` | 72 | delegated **`EXECUTE_DISTRIBUTION`** (grant `7bd93930…`): authority chain **ALLOW**, Trust Anchor → Sponsor (`CREATE_DISTRIBUTION`, `DELEGATE_DISTRIBUTION_AUTHORITY`, until 10-12) → Agent (until 10-02, inside the Sponsor's window). Negatives: delegate `TOKENIZE_ASSET` → **refused `ACTION_NOT_DELEGABLE`, no signature requested**; Investor A presents the Agent's grant → **DENY `SUBJECT_MISMATCH`** |
 | `50b-terminal-agent-funding.png` | 50 (second run) | treasury → **Agent 12 HBAR** (`0x229a…c5a2`) and a 25 HBAR SPV top-up (`0xd118…638e`), both SUCCESS (TESTNET BOOTSTRAP FUNDING) |
+| `80-terminal.png` | 80 | Investor B (Bart Simpson): Sumsub sandbox review → **RED, `SANCTIONS`, FINAL**. His credential is **still ACTIVE and validly signed**, and his holdings are **still 400** (Hedera ATS, read-only). **Investor DID redacted** |
+| `80-after-sumsub-bart-red.png` | 80, after | Sumsub sandbox: **Bart Simpson Rejected, reject label Sanctions** (reviewed 22:29 UTC); **Lisa Simpson Approved**: one green, one red. **Applicant IDs redacted** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
