@@ -52,6 +52,32 @@ retido (HOLD 4 HBAR).
 
 ## 2. Gravação de tela (para o vídeo final)
 
+**Regras da ETHGlobal para o ETHOnline 2026** (página de detalhes do evento, lida em 2026-09-12):
+
+- **Prazo:** domingo, 2026-09-13, 12:00 EDT (16:00 UTC).
+- **Duração:** entre **2 e 4 minutos**; fora disso o upload é rejeitado automaticamente.
+- **Resolução:** no mínimo 720p.
+- **Proibido:**
+  - acelerar o vídeo;
+  - música com texto na tela descrevendo o projeto;
+  - gravar pelo celular;
+  - voz sintética ou narração por IA.
+- **Recomendado:**
+  - falar com clareza e sem pressa;
+  - introdução de no máximo 20 s;
+  - **pular as esperas** (cortes são permitidos);
+  - slides com no máximo 4 tópicos.
+- **Consequências para nós:**
+  - a narração é **a voz do maintainer**, gravada por cima do corte final;
+  - as esperas saem por **corte**, nunca por aceleração;
+  - as gravações de cada stage são evidência bruta, e o tamanho delas não importa.
+- **O que cada prêmio exige ver:**
+  - **Chainlink:** um handler de TEE processando um input sensível, com evidência do deploy ou da execução.
+  - **Privy B2B:** uma wallet Privy, um fluxo B2B e um controle Privy (policies, signers, quorums), explicando como o
+    Privy viabiliza o produto.
+  - **Hedera Tokenization:** ATS no testnet com emissão, configuração e ao menos uma operação de ciclo de vida
+    (distribuição).
+
 - **Pasta, fora do git:** `mkdir -p ~/Movies/catenor-one-final-demo/raw`. No ⌘⇧5 → Opções → Outro local → essa pasta.
   Ative "Mostrar cliques do mouse" e deixe o microfone desligado.
 - **Área:** ⌘⇧5 → "Gravar parte selecionada", pegando o navegador e o terminal. **Não** gravar o VS Code com `.env`
