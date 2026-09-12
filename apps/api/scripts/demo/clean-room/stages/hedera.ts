@@ -293,8 +293,28 @@ export const tokenizeSpv: Stage = {
   async run(ctx, flags) {
     const sponsor = need('DEMO_SPONSOR_DID', '20-create-sponsor.sh');
     if (env('DEMO_EQUITY_ADDRESS')) {
-      say('equity', `already deployed: ${env('DEMO_EQUITY_ADDRESS')} — nothing to do`);
-      return { equity: env('DEMO_EQUITY_ADDRESS'), alreadyDeployed: true };
+      // Already deployed: never deploy again. A record written as the full asset reference
+      // (`hedera-testnet:ats-equity:0x…`) is normalized to the address the later stages use, and — with --live — the
+      // owner-authorized SPV policy extension is completed if it is missing (Privy only; no HBAR).
+      const equity = equityAddressOf(env('DEMO_EQUITY_ADDRESS'));
+      if (equity !== env('DEMO_EQUITY_ADDRESS')) {
+        setState({ DEMO_EQUITY_ADDRESS: equity, DEMO_EQUITY_REF: env('DEMO_EQUITY_ADDRESS') });
+      }
+      say(
+        'equity',
+        `already deployed: ${equity} (tx ${env('DEMO_DEPLOY_TX') || 'unknown'}) — no new deployment`,
+      );
+      if (!flags.live) {
+        return { equity, alreadyDeployed: true, spvPolicyRules: 'unchanged (read-only run)' };
+      }
+      const rules = await PrivySpvWalletProvisioner.addEquityRules(ctx.privy, {
+        policyId: need('DEMO_SPV_POLICY_ID', '30-create-spv.sh'),
+        equity,
+        spv: need('DEMO_SPV_WALLET_ADDRESS', '30-create-spv.sh'),
+        ownerPrivateKey: readOwnerKey(ctx.instance, 'demo_spv-owner'),
+      });
+      say('SPV policy extended (owner-authorized, pinned to the equity)', rules);
+      return { equity, alreadyDeployed: true, spvPolicyRules: rules };
     }
     const grant = await ctx.services.sponsor.sponsorGrant(sponsor, TOKENIZE_ASSET, RESOURCE);
     const authorization = await ctx.services.sponsor.authorizeSponsorAction(
@@ -368,13 +388,15 @@ export const tokenizeSpv: Stage = {
       grant,
     });
     if (outcome.decision !== 'ALLOW' || !outcome.assetReference) return { authorization, outcome };
+    const equity = equityAddressOf(outcome.assetReference);
     setState({
-      DEMO_EQUITY_ADDRESS: outcome.assetReference,
+      DEMO_EQUITY_ADDRESS: equity,
+      DEMO_EQUITY_REF: outcome.assetReference,
       DEMO_DEPLOY_TX: outcome.transactionId,
     });
     const rules = await PrivySpvWalletProvisioner.addEquityRules(ctx.privy, {
       policyId: need('DEMO_SPV_POLICY_ID', '30-create-spv.sh'),
-      equity: outcome.assetReference,
+      equity,
       spv: need('DEMO_SPV_WALLET_ADDRESS', '30-create-spv.sh'),
       ownerPrivateKey: readOwnerKey(ctx.instance, 'demo_spv-owner'),
     });
@@ -382,6 +404,15 @@ export const tokenizeSpv: Stage = {
     return { authorization, outcome, spvPolicyRules: rules };
   },
 };
+
+/** The EVM address inside an asset reference (`hedera-testnet:ats-equity:0x…`) or a bare address, checksummed. */
+export function equityAddressOf(reference: string): string {
+  const candidate = reference.split(':').pop() ?? '';
+  if (!isAddress(candidate)) {
+    throw new Error(`not an equity address or asset reference: ${reference}`);
+  }
+  return getAddress(candidate);
+}
 
 function invest(label: 'A' | 'B'): Stage {
   return {

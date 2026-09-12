@@ -435,3 +435,26 @@ shows none of this: Privy's balance lookup does not cover Hedera (chain 296), an
 broadcast the transactions. The Agent wallet, which does not exist yet,
 is funded after stage 70.
 
+**Stage 60 — tokenization (21:13–21:14 UTC).** Catenor authorized the Sponsor's `TOKENIZE_ASSET` request as ALLOW,
+under grant `capability-grant:1984657d-ecab-403e-850f-67f5f29d3cc6`. The dry run then simulated the exact
+`deployEquity` (estimated 7.40M gas, 15M limit, at most 18 HBAR) and got a Privy dry signature, which was discarded.
+With `--live` and the typed confirmation:
+
+| Item | Value |
+|---|---|
+| `deployEquity` transaction | `0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570`, **SUCCESS**, 6,898,334 gas, sent from the SPV Privy wallet to the ATS v8 Factory |
+| **Equity** | `0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC` (Hedera contract `0.0.10510175`), the address the preflight predicted |
+
+**Then the runner failed: `invalid equity or SPV address`.** The chain side was already done. The runner had passed
+the asset *reference* (`hedera-testnet:ats-equity:0x…`) where the SPV policy extension needs the bare address, and it
+had recorded that reference as `DEMO_EQUITY_ADDRESS`, which every later stage reads as an address. This path had not
+run live on this runner before.
+
+**The fix.** Stage 60 now:
+
+- records the checksummed address in `DEMO_EQUITY_ADDRESS` and the reference in `DEMO_EQUITY_REF`;
+- when the equity already exists, never deploys again. It normalizes an old reference-shaped record and, with `--live`,
+  completes the owner-authorized SPV policy extension. That step is Privy only and spends no HBAR.
+
+The equity was not deployed twice.
+
