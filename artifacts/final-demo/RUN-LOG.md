@@ -350,3 +350,21 @@ behind the binding gate and returned facts plus a commitment. Only then did the 
 - **Trigger pacing:** the runner waited 44 s between the two triggers because of the deployed rate limit (1 per 60 s).
 - **CRE dashboard:** 3 successful executions, 0 unsuccessful.
 
+**Stage 43 — investor presentations (20:41 UTC).** A local verification; no CRE call. Each investor signed a
+Verifiable Presentation over their credential with the **holder key** (`authentication`, Privy `signMessage` over the
+`eddsa-jcs-2022` hashData). The proof is bound to a verifier challenge and to the domain
+`offering:ab27ec9a-cd89-4b5b-92ea-bef19fbd9f9f`. The Trust Anchor signed a fresh status statement for each credential:
+`ACTIVE`.
+
+**Checks:** both presentations pass the seven checks the TEE also runs:
+
+1. `PRESENTATION_WELL_FORMED`
+2. `HOLDER_PROOF_VALID`
+3. `CREDENTIAL_SIGNATURE_VALID`
+4. `ISSUER_AUTHORIZED`
+5. `SUBJECT_IS_HOLDER`
+6. `WITHIN_VALIDITY_WINDOW`
+7. `STATUS_ACTIVE`
+
+**Negative path:** replaying either presentation with another challenge → **`HOLDER_PROOF_VALID` false**.
+

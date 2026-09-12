@@ -69,6 +69,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `42-before-cre-workflow.png` | 42, before | CRE workflow now `0000e5…3f25c8` (deploy #2), Active, Private, owner Catenor One; **1 execution**: the admission `394f…4bd8` (Success, 19:18:37 UTC, recorded under the deploy #1 ID `00e125…d250`) |
 | `42-after-cre-executions.png` | 42, after | CRE: **3 successful executions, 0 unsuccessful**. New: `e66a41…0b8f` (20:34:36 UTC) and `61485b…64f8` (20:35:39 UTC) on workflow `0000e5…25c8`, about 63 s apart (the trigger rate limit); plus the admission `394f…4bd8` |
 | `42-terminal.png` | 42 | two `CatenorInvestorEligibilityCredential`s issued by the Trust Anchor after **DEPLOYED** runs (facts identity / AML / fresh all true, an evidence commitment each); the runner waited 44 s between triggers. **Investor DIDs redacted** |
+| `43-terminal.png` | 43 | each investor's Verifiable Presentation (holder proof `authentication`, bound to a challenge and the offering domain) passes **7/7 checks**; a Trust Anchor status statement reports `ACTIVE`; a **replay with another challenge fails `HOLDER_PROOF_VALID`**. **Investor DIDs redacted** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
