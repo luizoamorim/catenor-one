@@ -7,6 +7,7 @@ import { deriveChannelKeys } from './cre-channel.js';
 import {
   CRE_PRIVATE_REGISTRY_GATEWAY,
   CreGatewayConfidentialVerifier,
+  gatewayErrorDetail,
   gatewayJwt,
   gatewayRequestBody,
 } from './cre-gateway-verifier.js';
@@ -80,6 +81,33 @@ describe('CRE gateway JWT (alg ETH)', () => {
       operation: 'CONFIDENTIAL_DISTRIBUTION',
       runId: 'run:1',
     });
+  });
+
+  it('surfaces the gateway JSON-RPC error (code + message) on HTTP 400, never the request', async () => {
+    const verifier = new CreGatewayConfidentialVerifier({
+      keys: deriveChannelKeys('11'.repeat(32)),
+      workflowId: 'ab'.repeat(32),
+      triggerPrivateKey: key.privateKey,
+      fetch: (async () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            error: { code: -32600, message: "Auth failure: signer '0xabc' is not authorized\n" },
+          }),
+          { status: 400 },
+        )) as typeof fetch,
+    });
+    await expect(
+      verifier.request({
+        operation: 'TRUST_ANCHOR_ADMISSION',
+        runId: 'run:2',
+        context: { runId: 'run:2', secretApplicantRef: 'must-be-sealed' },
+      }),
+    ).rejects.toThrow(
+      "CRE gateway HTTP 400: -32600 Auth failure: signer '0xabc' is not authorized",
+    );
+    expect(gatewayErrorDetail(undefined)).toBe('no JSON-RPC result');
+    expect(gatewayErrorDetail({ message: 'x'.repeat(500) }).length).toBeLessThanOrEqual(302);
   });
 
   it('refuses a workflow id that is not 64 hex', () => {

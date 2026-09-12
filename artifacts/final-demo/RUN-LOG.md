@@ -135,3 +135,22 @@ reports:
 | Deployment status | **ACTIVE** (deployed 17:38:56 UTC) |
 | Registry | private |
 | Executions | none yet ("Last executed: never") |
+
+### Stage 11 — Root Trust Anchor admission
+
+**Attempt 1 (17:50 UTC): stopped at the gateway, `CRE gateway HTTP 400`.** Before the trigger:
+
+- the candidate `did:catenor:d21efcc6c9f93fa5aacdd438bb99f7a8` was created;
+- its Privy assertion key was provisioned;
+- a Sumsub sandbox representative was created and forced GREEN;
+- key possession verified (`possessionValid` and `purposeValid` true).
+
+The CRE gateway then refused the `workflows.execute` request with HTTP 400. No workflow execution was created, and the
+dashboard still shows 0. The root Trust Anchor was not admitted, so nothing set-once was consumed. The abandoned session
+and the objects it created stay as they are.
+
+**Why the cause is unknown:** the verifier threw only the status and discarded the gateway's JSON-RPC error. The
+documented causes are an invalid JWT, an unauthorized key, or the workflow not being found. The fix: the error now
+carries the gateway's code and message, capped and without control characters. These messages name only public values;
+the request is never echoed. A test covers it. Attempt 2 creates a new session.
+

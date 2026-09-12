@@ -73,6 +73,19 @@ export function gatewayRequestBody(
   });
 }
 
+/**
+ * The gateway's JSON-RPC error, for diagnosis. Its messages name only public values (the signer address, the workflow
+ * ID); the request's sealed payload and JWT are never echoed. Control characters are stripped and the text is capped.
+ */
+export function gatewayErrorDetail(error?: { code?: number; message?: string }): string {
+  if (!error) return 'no JSON-RPC result';
+  const message = [...String(error.message ?? '')]
+    .map((c) => (c < ' ' || c === '\u007f' ? ' ' : c))
+    .join('')
+    .slice(0, 300);
+  return `${error.code ?? '?'} ${message}`.trim();
+}
+
 export class CreGatewayConfidentialVerifier {
   readonly mode = 'DEPLOYED' as const;
   readonly workflowId: string;
@@ -109,13 +122,17 @@ export class CreGatewayConfidentialVerifier {
       },
     );
     const text = await response.text();
-    if (!response.ok) throw new Error(`CRE gateway HTTP ${response.status}`);
-    const parsed = JSON.parse(text) as {
+    let parsed: {
       result?: { workflow_execution_id?: string; status?: string };
       error?: { code?: number; message?: string };
-    };
-    if (parsed.error || !parsed.result?.workflow_execution_id) {
-      throw new Error(`CRE gateway error ${parsed.error?.code ?? ''}`);
+    } = {};
+    try {
+      parsed = JSON.parse(text) as typeof parsed;
+    } catch {
+      // not JSON-RPC: reported by status below
+    }
+    if (!response.ok || parsed.error || !parsed.result?.workflow_execution_id) {
+      throw new Error(`CRE gateway HTTP ${response.status}: ${gatewayErrorDetail(parsed.error)}`);
     }
     return { executionId: parsed.result.workflow_execution_id };
   }
