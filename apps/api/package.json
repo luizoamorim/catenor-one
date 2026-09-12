@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "start": "node --conditions=@catenor-one/source --import tsx src/main.ts",
     "typecheck": "prisma generate && tsc -p tsconfig.json --noEmit",
     "lint": "eslint src prisma.config.ts",
     "db:generate": "prisma generate",

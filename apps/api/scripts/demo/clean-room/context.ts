@@ -13,6 +13,11 @@ import {
   startCallbackReceiver,
   type CallbackReceiver,
 } from '../../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
+import {
+  deriveRelayKey,
+  startRelayPoller,
+  type RelayPoller,
+} from '../../../src/infrastructure/confidential-compute/cre-callback-relay.js';
 import { deriveChannelKeys } from '../../../src/infrastructure/confidential-compute/cre-channel.js';
 import { CreGatewayConfidentialVerifier } from '../../../src/infrastructure/confidential-compute/cre-gateway-verifier.js';
 import { CreSimulationConfidentialVerifier } from '../../../src/infrastructure/confidential-compute/cre-simulation-verifier.js';
@@ -64,6 +69,7 @@ export class Context {
   private _privy?: PrivyClient;
   private _client?: ReturnType<typeof createPrismaClient>;
   private _receiver?: CallbackReceiver;
+  private _relay?: RelayPoller;
   private _sim?: CreSimulationConfidentialVerifier;
   private _services?: {
     admission: TrustAnchorAdmissionService;
@@ -136,10 +142,14 @@ export class Context {
     });
   }
 
-  get channelKeys() {
+  private get internalToken() {
     const token = workflowSecret('CATENOR_INTERNAL_API_TOKEN_VAR');
     if (!token) throw new Error('CATENOR_INTERNAL_API_TOKEN_VAR is missing — run 01-setup-env.sh');
-    return deriveChannelKeys(token);
+    return token;
+  }
+
+  get channelKeys() {
+    return deriveChannelKeys(this.internalToken);
   }
 
   get creMode(): 'SIMULATION' | 'DEPLOYED' {
@@ -216,6 +226,19 @@ export class Context {
         workflowId: need('DEMO_CRE_WORKFLOW_ID', 'scripts/demo/cre/deploy.sh --live'),
         triggerPrivateKey: need('DEMO_CRE_TRIGGER_PRIVATE_KEY', 'scripts/demo/cre/configure.sh'),
       });
+      // Railway relay (configure.sh --relay-url): the workflow calls back to the public API, and this process pulls
+      // each of its results and delivers it through the same authenticateCallback → deliver path as the receiver.
+      const relayUrl = env('DEMO_CRE_RELAY_URL');
+      if (relayUrl) {
+        this._relay = startRelayPoller({
+          baseUrl: relayUrl,
+          relayKey: deriveRelayKey(this.internalToken),
+          keys,
+          runIds: () => this.verifier.requested.map((r) => r.runId),
+          deliver,
+          onEvent: (e) => this.creEvents.push({ operation: 'relay', ...e }),
+        });
+      }
     } else {
       this._sim = new CreSimulationConfidentialVerifier({
         keys,
@@ -253,9 +276,14 @@ export class Context {
     return out;
   }
 
-  /** The last simulator outcome for a run (DON-visible {status, code} + allowlisted log tail). */
-  simulationOutcome(runId: string) {
-    return this._sim?.completion(runId);
+  /**
+   * The last simulator outcome for a run (DON-visible {status, code} + allowlisted log tail). DEPLOYED through the
+   * Railway relay: waits until the run's result was pulled and delivered (no simulator outcome exists).
+   */
+  async simulationOutcome(runId: string) {
+    if (this._sim) return this._sim.completion(runId);
+    await this._relay?.settled(runId);
+    return undefined;
   }
 
   get services() {
@@ -308,6 +336,7 @@ export class Context {
   }
 
   async close() {
+    this._relay?.stop();
     this._sim?.dispose();
     await this._receiver?.close();
     await this._client?.$disconnect();

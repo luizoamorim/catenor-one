@@ -20,6 +20,7 @@ export const creConfigure: Stage = {
   changes: [
     'generates the HTTP-trigger key if absent: private key → .catenor-demo/runtime.env (0600), address → state.env (authorizedKeys)',
     '--callback-url=https://… records the PUBLIC URL that forwards to the local receiver (e.g. a tunnel to 127.0.0.1:8787)',
+    '--relay-url=https://<railway-host> instead: the workflow calls back to the Railway API and the stages pull their results from its relay (docs/deployment/RAILWAY.md)',
     `writes workflows/identity-confidential/.deploy/config.json (git-ignored) with executionMode DEPLOYED`,
     '--workflow-id=<64 hex> records the deployed workflow id; --use-deployed switches stages to the gateway (DEPLOYED); --use-simulation switches back',
   ],
@@ -42,6 +43,18 @@ export const creConfigure: Stage = {
         DEMO_CRE_CALLBACK_PUBLIC_URL: callback.endsWith(CALLBACK_PATH)
           ? callback
           : `${callback.replace(/\/$/, '')}${CALLBACK_PATH}`,
+        DEMO_CRE_RELAY_URL: '',
+      });
+    }
+    const relay = flags.options['relay-url'];
+    if (relay !== undefined) {
+      if (!/^https:\/\/[^\s/]+\/?$/.test(relay)) {
+        throw new Error('--relay-url must be the https origin of the Railway API (no path)');
+      }
+      const origin = relay.replace(/\/$/, '');
+      setState({
+        DEMO_CRE_RELAY_URL: origin,
+        DEMO_CRE_CALLBACK_PUBLIC_URL: `${origin}${CALLBACK_PATH}`,
       });
     }
     const workflowId = flags.options['workflow-id'];
@@ -53,7 +66,9 @@ export const creConfigure: Stage = {
     }
     if (flags.options['use-deployed'] !== undefined) {
       if (!env('DEMO_CRE_WORKFLOW_ID') || !env('DEMO_CRE_CALLBACK_PUBLIC_URL')) {
-        throw new Error('--use-deployed needs --workflow-id and --callback-url first');
+        throw new Error(
+          '--use-deployed needs --workflow-id and --relay-url (or --callback-url) first',
+        );
       }
       setState({ DEMO_CRE_MODE: 'DEPLOYED' });
     }
@@ -71,7 +86,12 @@ export const creConfigure: Stage = {
     const summary = {
       config: 'workflows/identity-confidential/.deploy/config.json',
       executionMode: 'DEPLOYED',
-      callbackUrl: env('DEMO_CRE_CALLBACK_PUBLIC_URL') || 'NOT SET (pass --callback-url=https://…)',
+      callbackUrl:
+        env('DEMO_CRE_CALLBACK_PUBLIC_URL') ||
+        'NOT SET (pass --relay-url= or --callback-url=https://…)',
+      resultPath: env('DEMO_CRE_RELAY_URL')
+        ? 'Railway relay (pulled by the stage runner)'
+        : 'local receiver 127.0.0.1:8787',
       authorizedKey: env('DEMO_CRE_TRIGGER_ADDRESS'),
       issuerRules: (deployedConfig as { credentialRules?: unknown }).credentialRules
         ? 'Trust Anchor key pinned'

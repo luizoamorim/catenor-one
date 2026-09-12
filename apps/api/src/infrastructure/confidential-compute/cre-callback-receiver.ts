@@ -7,14 +7,15 @@ import type { ConfidentialVerificationResult } from '../../modules/trust-anchor-
 import { authenticateCallback, type ChannelKeys } from './cre-channel.js';
 
 export const CALLBACK_PATH = '/v1/internal/cre/identity-confidential/results';
-const MAX_BODY_BYTES = 16 * 1024;
+export const MAX_BODY_BYTES = 16 * 1024;
 
 export interface CallbackReceiver {
   readonly url: string;
   close(): Promise<void>;
 }
 
-async function readBody(req: IncomingMessage): Promise<Uint8Array | undefined> {
+/** The raw request body, or undefined when it exceeds MAX_BODY_BYTES (also used by the Railway API server). */
+export async function readBody(req: IncomingMessage): Promise<Uint8Array | undefined> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
