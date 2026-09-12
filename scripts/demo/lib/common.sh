@@ -19,5 +19,9 @@ header() {
 run_stage() {
   local id="$1"
   shift
+  # The Prisma client is generated code (git-ignored): create it once on a fresh clone.
+  if [[ ! -d "$DEMO_ROOT/apps/api/src/infrastructure/persistence/prisma/generated" ]]; then
+    (cd "$DEMO_ROOT" && pnpm --silent --filter @catenor-one/api db:generate >/dev/null)
+  fi
   (cd "$DEMO_ROOT" && pnpm --silent --filter @catenor-one/api demo:stage "$id" "$@")
 }
