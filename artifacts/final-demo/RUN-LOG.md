@@ -122,3 +122,16 @@ The uploaded config was checked before this entry and holds no secret:
 - the authorized trigger address `0x18487BeF…4a6c`.
 
 There are no issuer rules yet; deploy #2 adds them after stage 11.
+
+**C5 — skipped.** The workflow was already Active.
+
+**C6 — `cre/configure.sh --workflow-id=… --use-deployed` and `cre/status.sh` (17:45 UTC).** The runner is now in
+**`demoCreMode: DEPLOYED`**, so the confidential stages trigger the deployed workflow through the CRE gateway. CRE
+reports:
+
+| Field | Value |
+|---|---|
+| Workflow status | **ACTIVE** (registered 17:38:55 UTC) |
+| Deployment status | **ACTIVE** (deployed 17:38:56 UTC) |
+| Registry | private |
+| Executions | none yet ("Last executed: never") |
