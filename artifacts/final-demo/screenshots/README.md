@@ -60,6 +60,12 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `30-after-privy-keys-and-quorums.png` | 30, after | **new, separate** SPV signer set: the management-owner key `nsnv8alo…` (owns the wallet and its policy) and the runtime quorum `…-spv-runtime` (signer for 1 wallet). The assertion and bootstrap entries are unchanged |
 | `31-terminal.png` | 31 | offering `ab27ec9a…` signed by the Sponsor: 1,000 equity-interest units in "Catenor One Demo SPV 001"; eligibility = `policy:offering-eligibility:v1` pinned by hash `0xa3326b33…51a2`; verified **ALLOW** |
 | `40-before-sumsub-applicants.png` | 40, before | Sumsub sandbox: the four stage 11 representatives (19:18, 19:12, 17:55, 17:50 UTC), all Approved; **no investors yet**. **Applicant IDs redacted** |
+| `40-terminal.png` | 40 | Investor A ("Lisa Simpson", fictional, sandbox only): receiving wallet `0x7de5…2473`; **investor DID and holder-key id redacted** |
+| `40-after-sumsub-lisa.png` | 40, after | Sumsub sandbox: **Lisa Simpson**, level `id-only`, **Approved** at 20:26 UTC. **Applicant IDs redacted** |
+| `40-after-privy-wallets.png` | 40, after | +1 EVM `0x7de…2473` (Lisa's receiving wallet) and +1 Solana `6UtHf…knvg` (her holder key) |
+| `41-terminal.png` | 41 | Investor B ("Bart Simpson", fictional, sandbox only): receiving wallet `0xCfCa…Da73`; **investor DID and holder-key id redacted** |
+| `41-after-privy-wallets.png` | 41, after | +1 EVM `0xCfC…Da73` (Bart's receiving wallet) and +1 Solana `BX1N2…GgCa` (his holder key) |
+| `41-after-privy-keys-and-quorums.png` | 41, after | two new owner keys, one per receiving wallet (`hywxrz…` for Lisa, `swcl2t…` for Bart): **no signer, no policy**, the wallets only receive. The assertion owner and quorum now cover **7** Ed25519 keys (+2 holder keys); SPV and bootstrap are unchanged |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

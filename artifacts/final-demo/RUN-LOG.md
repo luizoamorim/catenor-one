@@ -317,3 +317,21 @@ real-estate SPV whose units are equity interests, not a land deed.
 
 Phase F is complete: Sponsor → authorization → SPV → offering, with no spending.
 
+### Phase G — Investors
+
+**Stages 40–41 — investor onboarding (20:26 and 20:29 UTC).** SPONSOR LIVE (non-spending), Privy and the Sumsub
+sandbox, with **no CRE call by design**. Onboarding creates the objects; the evidence is read only inside the TEE in
+stage 42.
+
+| | Investor A | Investor B |
+|---|---|---|
+| Sumsub sandbox display name (fictional) | Lisa Simpson | Bart Simpson |
+| Sumsub review (sandbox, forced) | GREEN, Approved | GREEN, Approved |
+| Privy receiving wallet (EVM, receive-only: own owner key, no signer, no policy) | `0x7de572532820B22040B561e68543419419b72473` | `0xCfCa833A8e6b7651E44480b92822576BcB78Da73` |
+| Holder key | Privy Ed25519 (`#authentication-key-1`): signs Verifiable Presentations, never money | same |
+| Account Binding | **private**: `did:catenor → eip155:296:<wallet>`, never published in the DID Document | same |
+
+Each investor has a random `did:catenor` with no PII. Following this log's rule, **investor DIDs are not recorded
+here**; they are in the local run records only. Each Sumsub applicant's `externalUserId` is the private bindingRef,
+never the DID.
+
