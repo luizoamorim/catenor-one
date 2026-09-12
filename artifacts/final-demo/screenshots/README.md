@@ -102,6 +102,10 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `80-terminal.png` | 80 | Investor B (Bart Simpson): Sumsub sandbox review → **RED, `SANCTIONS`, FINAL**. His credential is **still ACTIVE and validly signed**, and his holdings are **still 400** (Hedera ATS, read-only). **Investor DID redacted** |
 | `80-after-sumsub-bart-red.png` | 80, after | Sumsub sandbox: **Bart Simpson Rejected, reject label Sanctions** (reviewed 22:29 UTC); **Lisa Simpson Approved**: one green, one red. **Applicant IDs redacted** |
 | `81-terminal.png` | 81 | SPV revenue event `revenue-event:a2400be4…2355`: **10 HBAR** for `spv:catenor-demo-001`, an audit event only; no funds move |
+| `82-before-cre-executions.png` | 82, before | CRE: 4 successful executions (admission, 2 credentials, offering) |
+| `82-during-cre-in-progress.png` | 82, during | the new execution `fd2a96…2d0b` **In Progress** (22:40:08 UTC) on workflow `0000e5…25c8` |
+| `82-terminal.png` | 82 | the confidential distribution plan, computed in CRE **DEPLOYED**: holdings read from Hedera ATS; **Investor A (Lisa) ALLOW → PAY 6 HBAR**, all TRUE, reconciliation CONSISTENT; **Investor B (Bart) DENY → HOLD 4 HBAR**, identity and AML FALSE, reconciliation MISMATCH, reason codes FINAL, SANCTIONS; the authority chain Trust Anchor → Sponsor → Agent; `executed: false`. The negative path first: Investor A requesting the distribution → DENY `CAPABILITY_MISSING` |
+| `82-after-cre-execution-events.png` | 82, after | execution `fd2a…2d0b`: **Success**, 8 s, $0. Events: `trigger` 22:40:04, then **three `http-actions SendRequest`** at 22:40:16 (the current Sumsub evidence, read inside the TEE) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

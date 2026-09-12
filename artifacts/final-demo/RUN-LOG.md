@@ -625,3 +625,35 @@ Ownership does not mean current eligibility. Catenor re-checks eligibility confi
 production, the event would come from a property-management system, a bank webhook, a schedule or a reconciliation.
 The payout itself is paid from the Distribution Agent's wallet, which the treasury funded with 12 HBAR.
 
+**Stage 82 — confidential distribution on the deployed workflow (22:40 UTC).** The negative path came first: Investor
+A requesting the distribution was **DENIED** (`CAPABILITY_MISSING`). Only the Agent holds the delegated
+`EXECUTE_DISTRIBUTION`, and its chain Trust Anchor → Sponsor → Agent was re-verified.
+
+**The run:** **one** sealed `CONFIDENTIAL_DISTRIBUTION` run, execution
+`0xfd2a96fb91bb4be494fd1f65a3e01ebd0e4da49d07520854cb38e2eb76e82d0b` (mode **DEPLOYED**, 8 s). The CRE dashboard shows
+`trigger`, then three `http-actions SendRequest` calls: the current Sumsub evidence, read inside the TEE with the
+Vault secrets. Inside the TEE, the workflow:
+
+1. verified each VP, VC and status statement;
+2. read the **current** provider evidence and reconciled it with each credential;
+3. applied `policy:distribution-eligibility:v2`;
+4. computed 10 HBAR × units / 1000.
+
+Holdings were read from Hedera ATS `0xf37A…7ABC` (`balanceOf`).
+
+| Holder | Units | Share | Decision | Controlled | Trace / reconciliation | Reason codes | Decision commitment |
+|---|---|---|---|---|---|---|---|
+| Investor A (Lisa) | 600 | 6 HBAR | **ALLOW** | **PAY** | all TRUE; CONSISTENT | — | `0x37df46f932c3699bdb089234238e8624911b0b00d38d7bb1f33ca8f3ba76db98` |
+| Investor B (Bart) | 400 | 4 HBAR | **DENY** | **HOLD** | holds the asset, and his presentation is valid (7/7 checks), **but** `INVESTOR_IDENTITY_VERIFIED=FALSE` and `INVESTOR_AML_CLEAR=FALSE`; MISMATCH | `FINAL`, `SANCTIONS` | `0x17b39d3e150434749e75e8510accff82d190b18745bba540824d307e1024e8cf` |
+
+- **Plan:** `distribution-plan:034ffe82-92e3-4e16-a6ff-6ed21562e4a5`, pay 6.0 and hold 4.0.
+- **Evidence commitment:** `0x824b99fd7ef80d1f79c2140b8947a55412eb4a9b51309e49439596c8218e6405`.
+- **`executed: false`:** the plan moves no money. Stage 83 executes it.
+
+**What left the TEE:** only the minimized plan. That is the decisions, the requirement statuses, the check results,
+the reconciliation class, **coarse reason codes** (`FINAL`, `SANCTIONS`) and commitments. No Sumsub response, name,
+document or applicant data left it. Catenor records one protocol Decision per holder.
+
+Bart's presentation is still cryptographically valid, yet he is not eligible today: **ownership ≠ current
+eligibility**.
+
