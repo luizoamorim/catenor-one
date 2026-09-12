@@ -142,7 +142,7 @@ Legenda: 🎥 = gravar · ⏸ = parar e mandar a saída ao Claude antes de segui
 | # | Comando | Esperado |
 |---|---|---|
 | E1 🎥 | `scripts/demo/cre/configure.sh` | a config agora tem `credentialRules` (issuer rules: "Trust Anchor key pinned") |
-| E2 🎥⏸ | `scripts/demo/cre/deploy.sh --live` → `scripts/demo/cre/activate.sh --live` | novo workflow ID. **Desconhecido:** se o CLI atualiza no lugar ou pede pause/delete antes. Inspecionar com o Claude |
+| E2 🎥⏸ | `scripts/demo/cre/deploy.sh --live` (o CLI avisa que o workflow existe e pede confirmação: **Yes**) | novo workflow ID (o hash muda com a config), **Active**; o CLI **atualiza no lugar**, sem pause nem delete |
 | E3 ⏸ | `scripts/demo/cre/configure.sh --workflow-id=<novo id>` → `scripts/demo/cre/status.sh` | o state aponta para o workflow novo, ainda DEPLOYED |
 
 ### Fase F — Sponsor, SPV e oferta (Privy, sem gastar)

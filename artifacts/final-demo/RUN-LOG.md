@@ -227,3 +227,28 @@ deploy #2.
   | `9PvXY…PGkT` | 19:18 | **the Trust Anchor's Credential Assertion Key** (attempt 4) |
 - the control workflow `catenor-http-control`, to be deleted after the demo.
 
+### Phase E — CRE deploy #2: the Trust Anchor's key is pinned (19:33–19:36 UTC)
+
+**E1 — `cre/configure.sh`.** The config now carries `credentialRules`:
+
+- **Credential type:** `CatenorInvestorEligibilityCredential`.
+- **Accepted issuer:** the root Trust Anchor, `did:catenor:656d66dff9ce1db692786ee241bc3cab#assertion-key-1`, whose
+  public key is pinned as `z6MknrBa8Vbrsz5YCoBhgmV54ALJP9p1YSocpeBvgzBgJVXq`.
+- **Credential status:** must be at most 600 s old.
+- **Pinned policies:** `policy:offering-eligibility:v1` and `policy:distribution-eligibility:v2`.
+
+The config is 3.3 KB and holds public data only.
+
+**E2 — `cre/deploy.sh --live`.** The CLI warned *"Workflow identity-confidential-production already exists. This will
+update the existing workflow"*, and the maintainer confirmed the overwrite.
+
+| Field | Value |
+|---|---|
+| **New workflow ID** | `0000e58d50da8eaf29fb4212c236f374d11d7eb2452502c3bad0afe74d3f25c8` |
+| Binary hash | `9902db587a3878b07ad03d599cb9c781f7c77b8ea440b168d8c42fd18b3fb9fb`, **unchanged** from deploy #1: the same code |
+| Config hash | `e7703b193460430b4767b89d44caea2620eda5b3c844deee69f9db9436207d1d` |
+| Status | **Active** (activate not needed) |
+
+The deploy #1 version (`00e12517…d250`) was replaced. Its only use was the admission, whose execution `394f…4bd8` is
+recorded above.
+
