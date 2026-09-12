@@ -67,6 +67,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `41-after-privy-wallets.png` | 41, after | +1 EVM `0xCfC…Da73` (Bart's receiving wallet) and +1 Solana `BX1N2…GgCa` (his holder key) |
 | `41-after-privy-keys-and-quorums.png` | 41, after | two new owner keys, one per receiving wallet (`hywxrz…` for Lisa, `swcl2t…` for Bart): **no signer, no policy**, the wallets only receive. The assertion owner and quorum now cover **7** Ed25519 keys (+2 holder keys); SPV and bootstrap are unchanged |
 | `42-before-cre-workflow.png` | 42, before | CRE workflow now `0000e5…3f25c8` (deploy #2), Active, Private, owner Catenor One; **1 execution**: the admission `394f…4bd8` (Success, 19:18:37 UTC, recorded under the deploy #1 ID `00e125…d250`) |
+| `42-after-cre-executions.png` | 42, after | CRE: **3 successful executions, 0 unsuccessful**. New: `e66a41…0b8f` (20:34:36 UTC) and `61485b…64f8` (20:35:39 UTC) on workflow `0000e5…25c8`, about 63 s apart (the trigger rate limit); plus the admission `394f…4bd8` |
+| `42-terminal.png` | 42 | two `CatenorInvestorEligibilityCredential`s issued by the Trust Anchor after **DEPLOYED** runs (facts identity / AML / fresh all true, an evidence commitment each); the runner waited 44 s between triggers. **Investor DIDs redacted** |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

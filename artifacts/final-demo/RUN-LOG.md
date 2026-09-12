@@ -335,3 +335,18 @@ Each investor has a random `did:catenor` with no PII. Following this log's rule,
 here**; they are in the local run records only. Each Sumsub applicant's `externalUserId` is the private bindingRef,
 never the DID.
 
+**Stage 42 — investor credentials on the deployed workflow (20:34–20:35 UTC).** Two `INVESTOR_ELIGIBILITY` runs on
+workflow `0000e58d…25c8`, mode **DEPLOYED**. For each, the TEE read the investor's current Sumsub sandbox review
+behind the binding gate and returned facts plus a commitment. Only then did the Trust Anchor sign a W3C VC 2.0
+`CatenorInvestorEligibilityCredential` (`eddsa-jcs-2022`, `#assertion-key-1`), with claims
+`investorIdentityVerified` and `investorAmlClear`, no PII, and an issuer-signed status statement.
+
+| | CRE execution | Facts | Evidence commitment |
+|---|---|---|---|
+| Investor A | `0xe66a410799c33f710fa19baefa09ea49f0d2f89aaced4266390d14cdee320b8f` | identity ✓ · AML ✓ · fresh ✓ | `0xfb4c06ba260790febb51433bfc39df2c91189e9393e8d8522e8cd5c6a5e105a2` |
+| Investor B | `0x61485b72ad43bd2a63d466fdb7778d02d49a5dec4206979171aa68a15df064f8` | identity ✓ · AML ✓ · fresh ✓ | `0xf0ebd2f5cf0bcdde1f79426ca494116a553333e0e6460a60315558b15072afee` |
+
+- **Validity:** both VCs run from 2026-09-12 to 2026-12-11.
+- **Trigger pacing:** the runner waited 44 s between the two triggers because of the deployed rate limit (1 per 60 s).
+- **CRE dashboard:** 3 successful executions, 0 unsuccessful.
+
