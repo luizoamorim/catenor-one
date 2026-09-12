@@ -504,7 +504,7 @@ The dry run simulated the call (485,034 gas estimated) and got a Privy dry signa
 receiving binding `0xCfCa…Da73`, signed by the SPV Privy wallet, in transaction
 `0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62`. His holder balance is **400**.
 
-**On-chain read-back after both issuances** (`eth_call` on the equity `0xf37A…7ABC`, Hedera testnet, 22:0x UTC):
+**On-chain read-back after both issuances** (`eth_call` on the equity `0xf37A…7ABC`, Hedera testnet, right after stage 62):
 
 | Read | Value |
 |---|---|
