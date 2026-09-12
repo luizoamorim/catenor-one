@@ -304,3 +304,16 @@ At this point the Sponsor is not a Trust Anchor and holds no capability.
 This is the separation in practice. Catenor's authority (the capability) decides whether the SPV may exist. Privy's
 policy constrains what its wallet may sign.
 
+**Stage 31 — offering defined by the Sponsor (20:22 UTC).** The offering is
+`offering:ab27ec9a-cd89-4b5b-92ea-bef19fbd9f9f`: 1,000 equity-interest units in "Catenor One Demo SPV 001", a synthetic
+real-estate SPV whose units are equity interests, not a land deed.
+
+- **Eligibility:** `policy:offering-eligibility:v1`, pinned by hash
+  `0xa3326b33a0932b68c140a477334160a1585a75d4ccc824e0c89aa68d57dd51a2`. It requires `INVESTOR_PRESENTATION_VALID`,
+  `INVESTOR_IDENTITY_VERIFIED`, `INVESTOR_AML_CLEAR` and `EVIDENCE_FRESH`.
+- **Accepted credential:** `CatenorInvestorEligibilityCredential`.
+- **Verification:** signed with the Sponsor's assertion key and checked against its `DEFINE_OFFERING_POLICY` grant, so
+  **ALLOW**.
+
+Phase F is complete: Sponsor → authorization → SPV → offering, with no spending.
+
