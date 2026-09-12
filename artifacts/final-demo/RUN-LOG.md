@@ -675,3 +675,19 @@ boundary → the Agent's Privy policy → a Hedera transfer:
 credential. Because he is not eligible today, decided inside the TEE from the current evidence, **his 4 HBAR are held,
 and no signature or transaction for him ever existed**. Lisa received her 6 HBAR on-chain.
 
+### Phase L — Verification (read-only)
+
+**Stage 90 — CRE executions (22:53 UTC).** The local sanitized records and the CRE platform's own execution list agree:
+**five DEPLOYED executions, all SUCCESS, 0 credits used**, and nothing that needed simulation.
+
+| Stage | Operation | Execution (runner) | CRE UUID | Window (UTC) | Result |
+|---|---|---|---|---|---|
+| 11 | `TRUST_ANCHOR_ADMISSION` | `0x394f…4bd8` (workflow `00e12517…`) | `579f70e6-2fe3-48fc-8314-5facefbe9eb1` | 19:18:37–19:18:45 | ALLOW; 6 facts; commitment `0x032c…1846` |
+| 42 | `INVESTOR_ELIGIBILITY` (A) | `0xe66a…0b8f` | `3529711c-121f-4aa6-b708-d531c53f5077` | 20:34:36–20:34:45 | facts identity ✓ AML ✓ fresh ✓ |
+| 42 | `INVESTOR_ELIGIBILITY` (B) | `0x6148…64f8` | `5a85768b-1a2e-426c-8089-c8bc11e2922a` | 20:35:39–20:35:47 | facts identity ✓ AML ✓ fresh ✓ |
+| 44 | `OFFERING_ELIGIBILITY` | `0xfecb…4715` | `b6c4ff63-cd01-4d32-958d-c5aabb3bfc11` | 20:45:11–20:45:19 | A ALLOW · B ALLOW |
+| 82 | `CONFIDENTIAL_DISTRIBUTION` | `0xfd2a…2d0b` | `a623ebaa-0fb5-48eb-ad70-c65f95f079ee` | 22:40:08–22:40:16 | A PAY 6 · B HOLD 4 (`FINAL`, `SANCTIONS`) |
+
+The executions from stage 42 on ran on workflow `0000e58d…25c8`. The CRE UUIDs come from `cre execution list`, and the
+runner IDs from the gateway's `workflow_execution_id`.
+
