@@ -99,3 +99,26 @@ The first `--live` attempt failed before any request: `failed to decode the prov
 character 'Y'`. The CLI parses `CRE_ETH_PRIVATE_KEY` from the `.env` it is given, even in browser mode, and
 `workflows/.env` still had the `.env.example` placeholder. The fix was a fresh random, **unfunded** key, generated into
 the file without printing it. It is not linked to the account and is not the demo's trigger key.
+
+**C4 — `cre/deploy.sh --live`: the Confidential Workflow is deployed.** This is the first real Confidential Workflow
+deploy on this account, and it needed no extra enrollment step.
+
+| Field | Value |
+|---|---|
+| Workflow | `identity-confidential-production` (target `production-settings`) |
+| Registry / DON family | `private` (Chainlink-hosted) / `zone-a` |
+| **Workflow ID** | `00e12517fc06c8984befaa63accbadb21b8c4abe529595fcf48542ba097ad250` |
+| Status reported by the CLI | **Active**. The deploy did not leave it PAUSED, so `activate.sh` is not needed |
+| Binary hash | `9902db587a3878b07ad03d599cb9c781f7c77b8ea440b168d8c42fd18b3fb9fb` |
+| Config hash | `7cb69b7b82f6d8a0701ba39b15cc915d6ea3b4ca746c84fd3a805188c38098f8` |
+| Owner | `0x7075057f1589BAf347cB6dD6a993B1FC536B8a0a`, derived from the account; the same owner as the Vault secrets |
+| Artifacts | `https://storage.cre.chain.link/artifacts/00e12517fc06c8984befaa63accbadb21b8c4abe529595fcf48542ba097ad250/{binary.wasm,config}` |
+
+The uploaded config was checked before this entry and holds no secret:
+
+- the Railway callback URL;
+- the Bootstrap Configuration hash `0x88314d8b…7fff`;
+- the evidence-acceptance rules (HYBRID_DEMO: Sumsub sandbox `id-only` plus the synthetic company mock);
+- the authorized trigger address `0x18487BeF…4a6c`.
+
+There are no issuer rules yet; deploy #2 adds them after stage 11.

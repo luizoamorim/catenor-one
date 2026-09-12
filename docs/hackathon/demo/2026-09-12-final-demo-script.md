@@ -128,7 +128,7 @@ Legenda: 🎥 = gravar · ⏸ = parar e mandar a saída ao Claude antes de segui
 | C2 🎥⏸ | `scripts/demo/cre/check-relay.sh` | **`callback 202 RELAYED` → `pull 200` → re-autenticado → OK**. Se der `MISMATCH`, o token da Railway é diferente do `workflows/.env`: **parar** |
 | C3 🎥⏸ | `scripts/demo/cre/secrets.sh` (dry) → `scripts/demo/cre/secrets.sh --live` | autenticação no navegador; 3 secrets no Vault DON (`SUMSUB_APP_TOKEN`, `SUMSUB_SECRET_KEY`, `CATENOR_INTERNAL_API_TOKEN`); nenhum valor impresso |
 | C4 🎥⏸ | `scripts/demo/cre/deploy.sh` (dry) → `scripts/demo/cre/deploy.sh --live` | workflow registrado (PAUSED) → **workflow ID** (64 hex). **Risco:** é o primeiro deploy de Confidential Workflow nesta conta. Se falhar por falta de habilitação, **parar** |
-| C5 🎥 | `scripts/demo/cre/activate.sh --live` | workflow ativo |
+| C5 🎥 | `scripts/demo/cre/activate.sh --live` (**só se o deploy mostrar PAUSED**; no deploy #1 ele já veio `Active`) | workflow ativo |
 | C6 🎥⏸ | `scripts/demo/cre/configure.sh --workflow-id=<id> --use-deployed` e depois `scripts/demo/cre/status.sh` | `demoCreMode: DEPLOYED`; status mostra o workflow ativo |
 
 ### Fase D — Admissão no CRE implantado
