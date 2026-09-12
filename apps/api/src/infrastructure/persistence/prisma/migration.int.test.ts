@@ -20,6 +20,7 @@ const MIGRATIONS = [
   '20260911041606_audit_event_append_only',
   '20260911053426_part_b_audit_event_types',
   '20260911181457_final_demo_distribution',
+  '20260911230000_clean_room_documents',
 ];
 const D = did('1');
 
@@ -80,13 +81,13 @@ describe('migration deploy (T3.2)', () => {
 });
 
 describe('catalog', () => {
-  it('two Postgres schemas: 8 public and 10 private tables (final demo: AccountBinding)', async () => {
+  it('two Postgres schemas: 8 public and 11 private tables (final demo: AccountBinding; clean room: DocumentRecord)', async () => {
     const { rows } = await db.query(
       `SELECT table_schema, count(*)::int AS n FROM information_schema.tables
         WHERE table_schema LIKE 'catenor_%' GROUP BY table_schema ORDER BY table_schema`,
     );
     expect(rows).toEqual([
-      { table_schema: 'catenor_private', n: 10 },
+      { table_schema: 'catenor_private', n: 11 },
       { table_schema: 'catenor_public', n: 8 },
     ]);
   });
@@ -114,7 +115,7 @@ describe('catalog', () => {
     ]);
   });
 
-  it('all 15 foreign keys are ON DELETE RESTRICT / ON UPDATE RESTRICT and none crosses public/private', async () => {
+  it('all 16 foreign keys are ON DELETE RESTRICT / ON UPDATE RESTRICT and none crosses public/private', async () => {
     const { rows } = await db.query(
       `SELECT c.conname, c.confdeltype, c.confupdtype, sn.nspname AS src, tn.nspname AS dst
          FROM pg_constraint c
@@ -122,7 +123,7 @@ describe('catalog', () => {
          JOIN pg_class t ON t.oid = c.confrelid JOIN pg_namespace tn ON tn.oid = t.relnamespace
         WHERE c.contype = 'f' AND sn.nspname LIKE 'catenor_%'`,
     );
-    expect(rows).toHaveLength(15);
+    expect(rows).toHaveLength(16);
     for (const fk of rows) {
       expect(fk, fk.conname).toMatchObject({ confdeltype: 'r', confupdtype: 'r' });
       expect(fk.src, fk.conname).toBe(fk.dst);

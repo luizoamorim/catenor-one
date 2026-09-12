@@ -44,6 +44,9 @@ export function deriveChannelKeys(tokenHex: string): ChannelKeys {
   };
 }
 
+/** Any operation's private context (clean-room operations carry structured JSON); `runId` binds the AAD. */
+export type SealableContext = { readonly runId: string } & Record<string, unknown>;
+
 export interface TriggerPayload {
   readonly v: 1;
   readonly operation: string;
@@ -55,7 +58,7 @@ export interface TriggerPayload {
 export function sealContext(
   keys: ChannelKeys,
   operation: string,
-  context: PrivateVerificationContext | InvestorVerificationContext,
+  context: PrivateVerificationContext | InvestorVerificationContext | SealableContext,
 ): TriggerPayload {
   const nonce = randomBytes(12);
   const cipher = createCipheriv('aes-256-gcm', keys.ctx, nonce);

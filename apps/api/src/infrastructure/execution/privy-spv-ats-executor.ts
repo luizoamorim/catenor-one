@@ -273,12 +273,14 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
   async prepareDeployEquity(input: {
     readonly resource: string;
     readonly grantId: string;
+    readonly asset?: { readonly name: string; readonly symbol: string; readonly isinBody: string };
   }): Promise<DeployEquityPreflight> {
     const operator = await this.spvAddress();
     const { equityData, regulationData } = deployEquityArguments({
       resource: input.resource,
       grantId: input.grantId,
       operator,
+      ...(input.asset ? { asset: input.asset } : {}),
     });
     const iface = Factory__factory.createInterface();
     const data = iface.encodeFunctionData('deployEquity', [equityData, regulationData]);
@@ -338,6 +340,7 @@ export class PrivySpvAtsExecutor implements AssetTokenizationExecutor {
     readonly resource: string;
     readonly requester: string;
     readonly grantId: string;
+    readonly asset?: { readonly name: string; readonly symbol: string; readonly isinBody: string };
   }) {
     const prepared = await this.prepareDeployEquity(input);
     const raw = await this.signPrepared(prepared);

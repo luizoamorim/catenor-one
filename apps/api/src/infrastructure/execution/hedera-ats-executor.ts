@@ -69,6 +69,13 @@ export function isinCheckDigit(first11: string): string {
   return String((10 - (sum % 10)) % 10);
 }
 
+/** Clean-room demo token identity for spv:catenor-demo-001 (SYNTHETIC; "XX" is not an ISIN country prefix). */
+export const CLEAN_ROOM_ASSET = {
+  name: 'Catenor One Demo SPV 001 (SYNTHETIC)',
+  symbol: 'C1SPV001',
+  isinBody: 'XXCATSPV001',
+} as const;
+
 /** The demo assets this adapter may tokenize. SYNTHETIC: "XX" is not an assigned ISIN country prefix. */
 export const DEMO_ASSETS: Readonly<
   Record<string, { readonly name: string; readonly symbol: string; readonly isinBody: string }>
@@ -85,8 +92,10 @@ export function deployEquityArguments(input: {
   readonly resource: string;
   readonly grantId: string;
   readonly operator: string;
+  /** Clean-room demo: an explicit token identity for the resource (else the rehearsal DEMO_ASSETS mapping). */
+  readonly asset?: { readonly name: string; readonly symbol: string; readonly isinBody: string };
 }) {
-  const asset = DEMO_ASSETS[input.resource];
+  const asset = input.asset ?? DEMO_ASSETS[input.resource];
   if (asset === undefined) throw new Error(`no ATS mapping for resource ${input.resource}`);
   const equityData = {
     security: {

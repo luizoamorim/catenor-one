@@ -7,8 +7,15 @@ import type {
   CapabilityGrant,
   CapabilityGrantPayload,
   KeyPossessionChallenge,
+  OfferingDefinitionPayload,
 } from '@catenor-one/authority';
-import type { DataIntegrityProof, ProofOptions } from '@catenor-one/credentials';
+import type {
+  Credential,
+  CredentialStatusStatement,
+  DataIntegrityProof,
+  Presentation,
+  ProofOptions,
+} from '@catenor-one/credentials';
 import type { CatenorDid } from '@catenor-one/identity';
 import type { FactName } from '@catenor-one/policy';
 import type { EvidenceSourceLabel } from './persistence.ports.js';
@@ -16,12 +23,31 @@ import type { EvidenceSourceLabel } from './persistence.ports.js';
 /** Where a result or signature really came from — shown to judges, never blurred. */
 export type IntegrationMode = 'DEPLOYED' | 'SIMULATION' | 'FAKE';
 
+/**
+ * Clean-room demo [REF-IMPL]: structured documents a Subject's key may sign. Issuer statements (credential, status
+ * statement, offering) use `assertionMethod`; a holder's presentation uses `authentication`.
+ */
+export type SignableDocument =
+  | { readonly kind: 'CREDENTIAL'; readonly credential: Credential }
+  | { readonly kind: 'STATUS_STATEMENT'; readonly statement: CredentialStatusStatement }
+  | { readonly kind: 'OFFERING'; readonly offering: OfferingDefinitionPayload }
+  | {
+      readonly kind: 'PRESENTATION';
+      readonly presentation: Presentation;
+      readonly challenge: string;
+      readonly domain: string;
+    };
+
 export interface AssertionSigner {
   /** Adapter name stored with the key reference ("privy"; "fake" only outside production). */
   readonly adapter: string;
+  /**
+   * CREDENTIAL_ASSERTION: an issuer's assertion key. AUTHENTICATION (clean-room demo): a holder key for Verifiable
+   * Presentation proofs — a separate key, never the Subject's financial account.
+   */
   createKey(input: {
     readonly subject: CatenorDid;
-    readonly purpose: 'CREDENTIAL_ASSERTION';
+    readonly purpose: 'CREDENTIAL_ASSERTION' | 'AUTHENTICATION';
   }): Promise<{ readonly signerRef: string; readonly publicKeyMultibase: string }>;
   /** Signs a key-possession proof for `challenge` (eddsa-jcs-2022 hashData built inside the signer). */
   signKeyPossessionProof(
@@ -43,6 +69,15 @@ export interface AssertionSigner {
       readonly created: string;
     },
   ): Promise<CapabilityGrant>;
+  /** Signs one structured document (the signer boundary builds its hashData); returns the proof to attach. */
+  signDocument(
+    signerRef: string,
+    input: {
+      readonly document: SignableDocument;
+      readonly verificationMethod: string;
+      readonly created: string;
+    },
+  ): Promise<DataIntegrityProof>;
 }
 
 export interface BootstrapEndorsementSigner {

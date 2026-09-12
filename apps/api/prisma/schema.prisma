@@ -353,6 +353,16 @@ enum AuditEventType {
   DISTRIBUTION_REQUEST_DENIED
   DISTRIBUTION_ELIGIBILITY_EVALUATED
   DISTRIBUTION_PLAN_CREATED
+  /// Clean-room demo [REF-IMPL] event types (prompt 2026-09-11-023).
+  RELATIONSHIP_ESTABLISHED
+  SPV_EXECUTION_WALLET_PROVISIONED
+  OFFERING_DEFINED
+  CREDENTIAL_ISSUED
+  OFFERING_ELIGIBILITY_EVALUATED
+  INVESTMENT_AUTHORIZED
+  INVESTMENT_EXECUTED
+  REVENUE_RECEIVED
+  DISTRIBUTION_PAYOUT_EXECUTED
 
   @@schema("catenor_private")
 }
@@ -368,6 +378,7 @@ model Subject {
   keyReferences    KeyManagementReference[]
   sessions         AdmissionSession[]
   accountBindings  AccountBinding[]
+  documents        DocumentRecord[]
 
   @@schema("catenor_private")
 }
@@ -399,6 +410,8 @@ enum AccountBindingPurpose {
   DISTRIBUTION_RECEIVING
   /// A Distribution Agent's execution wallet.
   AGENT_EXECUTION
+  /// Clean-room demo: the SPV's execution wallet (tokenization, issuance, lifecycle).
+  SPV_EXECUTION
 
   @@schema("catenor_private")
 }
@@ -419,6 +432,46 @@ model AccountBinding {
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
 
   @@unique([subjectId, purpose])
+  @@schema("catenor_private")
+}
+
+/// Clean-room demo [REF-IMPL]: kind of a privately recorded Catenor document.
+enum DocumentKind {
+  CAPABILITY_GRANT
+  RELATIONSHIP_CREDENTIAL
+  INVESTOR_CREDENTIAL
+  OFFERING_DEFINITION
+  DECISION
+  DISTRIBUTION_PLAN
+
+  @@schema("catenor_private")
+}
+
+/// Current lifecycle status of a recorded credential or grant (credentials/04; UNKNOWN is never stored as ACTIVE).
+enum DocumentStatus {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+
+  @@schema("catenor_private")
+}
+
+/// Private index of Catenor documents (Credential != database row): the `document` column holds the exact signed or
+/// committed object, which is always verified by re-canonicalization — this row is only its lookup and current status.
+/// `subjectId` is the Subject the document is about (credential subject, grant subject, offering/plan owner).
+model DocumentRecord {
+  id              String         @id
+  kind            DocumentKind
+  subjectId       String
+  issuer          String
+  document        Json
+  status          DocumentStatus @default(ACTIVE)
+  createdAt       DateTime       @default(now()) @db.Timestamptz(3)
+  statusChangedAt DateTime       @default(now()) @db.Timestamptz(3)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([subjectId, kind])
   @@schema("catenor_private")
 }
 

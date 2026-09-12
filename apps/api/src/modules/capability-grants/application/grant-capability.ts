@@ -4,6 +4,10 @@
 // Relationship ≠ Capability: authority comes only from this explicit, signed grant.
 import { commit } from '@catenor-one/audit';
 import {
+  CREATE_AGENT,
+  CREATE_DISTRIBUTION,
+  DEFINE_OFFERING_POLICY,
+  DELEGATE_DISTRIBUTION_AUTHORITY,
   EXECUTE_DISTRIBUTION,
   TOKENIZE_ASSET,
   createCapabilityGrant,
@@ -17,8 +21,15 @@ import type {
 } from '../../trust-anchor-admission/application/admission.ports.js';
 import type { UnitOfWork } from '../../trust-anchor-admission/application/persistence.ports.js';
 
-/** The only actions this reference implementation grants. */
-export const GRANTABLE_ACTIONS = [TOKENIZE_ASSET, EXECUTE_DISTRIBUTION] as const;
+/** The only actions this reference implementation grants (all [REF-IMPL] vocabulary). */
+export const GRANTABLE_ACTIONS = [
+  TOKENIZE_ASSET,
+  EXECUTE_DISTRIBUTION,
+  DEFINE_OFFERING_POLICY,
+  CREATE_AGENT,
+  CREATE_DISTRIBUTION,
+  DELEGATE_DISTRIBUTION_AUTHORITY,
+] as const;
 export type GrantableAction = (typeof GRANTABLE_ACTIONS)[number];
 
 export interface CapabilityGrantDeps {
@@ -59,6 +70,23 @@ export async function grantCapability(
   if (!verification.TRUST_ANCHOR_VALID) {
     throw new CapabilityGrantRefused('the issuer is not an ACTIVE Trust Anchor');
   }
+  return signGrant(deps, input);
+}
+
+/**
+ * Signs and records one grant with the issuer's ACTIVE Credential Assertion Key. The CALLER establishes the issuer's
+ * authority first: an ACTIVE Trust Anchor (grantCapability) or a verified delegator (clean-room delegation).
+ */
+export async function signGrant(
+  deps: CapabilityGrantDeps,
+  input: {
+    readonly issuer: string;
+    readonly subject: string;
+    readonly action: GrantableAction;
+    readonly resource: string;
+    readonly validUntil: string;
+  },
+): Promise<CapabilityGrant> {
   const key = await deps.uow.run(async (p) => {
     const resolved = await p.didState.resolve(input.issuer);
     const vmId = resolved?.document.assertionMethod[0];

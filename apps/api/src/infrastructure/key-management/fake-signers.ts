@@ -27,7 +27,9 @@ import { ed25519 } from '@noble/curves/ed25519.js';
 import type {
   AssertionSigner,
   BootstrapEndorsementSigner,
+  SignableDocument,
 } from '../../modules/trust-anchor-admission/application/admission.ports.js';
+import { prepareSignableDocument } from './signable-document.js';
 
 const FAKE = 'fake';
 
@@ -87,6 +89,20 @@ export class FakeAssertionSigner implements AssertionSigner {
       ...input.grant,
       proof: attachProofValue(proofOptions, signBoundary(hashData, secretKey)),
     };
+  }
+
+  async signDocument(
+    signerRef: string,
+    input: { document: SignableDocument; verificationMethod: string; created: string },
+  ): Promise<DataIntegrityProof> {
+    const secretKey = this.keys.get(signerRef);
+    if (secretKey === undefined) throw new Error('unknown signerRef');
+    const { proofOptions, hashData } = prepareSignableDocument(
+      input.document,
+      input.verificationMethod,
+      input.created,
+    );
+    return attachProofValue(proofOptions, signBoundary(hashData, secretKey));
   }
 }
 

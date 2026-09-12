@@ -34,7 +34,9 @@ import { base58 } from '@scure/base';
 import type {
   AssertionSigner,
   BootstrapEndorsementSigner,
+  SignableDocument,
 } from '../../modules/trust-anchor-admission/application/admission.ports.js';
+import { prepareSignableDocument } from './signable-document.js';
 
 const PRIVY = 'privy';
 
@@ -173,6 +175,26 @@ export class PrivyAssertionSigner implements AssertionSigner {
       publicKey,
     );
     return { ...input.grant, proof: attachProofValue(proofOptions, signature) };
+  }
+
+  async signDocument(
+    signerRef: string,
+    input: { document: SignableDocument; verificationMethod: string; created: string },
+  ): Promise<DataIntegrityProof> {
+    const { proofOptions, hashData } = prepareSignableDocument(
+      input.document,
+      input.verificationMethod,
+      input.created,
+    );
+    const publicKey = publicKeyOf(await this.api.walletAddress(signerRef));
+    const signature = await boundarySign(
+      this.api,
+      signerRef,
+      this.config.runtimeAuthorizationKey,
+      hashData,
+      publicKey,
+    );
+    return attachProofValue(proofOptions, signature);
   }
 }
 

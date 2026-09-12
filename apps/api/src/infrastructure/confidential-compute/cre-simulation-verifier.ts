@@ -11,7 +11,7 @@ import type {
   PrivateVerificationContext,
 } from '../../modules/trust-anchor-admission/application/admission.ports.js';
 import type { InvestorVerificationContext } from '../../modules/distribution/application/distribution.service.js';
-import { sealContext, type ChannelKeys } from './cre-channel.js';
+import { sealContext, type ChannelKeys, type SealableContext } from './cre-channel.js';
 
 export interface CreSimulationOptions {
   readonly keys: ChannelKeys;
@@ -50,11 +50,19 @@ export class CreSimulationConfidentialVerifier implements ConfidentialEvidenceVe
     mkdirSync(join(options.projectRoot, options.workflowFolder, this.dir), { recursive: true });
   }
 
-  /** TRUST_ANCHOR_ADMISSION (S001) or INVESTOR_ELIGIBILITY (final demo): same sealing, same callback path. */
+  /**
+   * TRUST_ANCHOR_ADMISSION (S001), INVESTOR_ELIGIBILITY (final demo), OFFERING_ELIGIBILITY and
+   * CONFIDENTIAL_DISTRIBUTION (clean room): same sealing, same callback path.
+   */
   async request(
     input:
       | { operation: 'TRUST_ANCHOR_ADMISSION'; runId: string; context: PrivateVerificationContext }
-      | { operation: 'INVESTOR_ELIGIBILITY'; runId: string; context: InvestorVerificationContext },
+      | { operation: 'INVESTOR_ELIGIBILITY'; runId: string; context: InvestorVerificationContext }
+      | {
+          operation: 'INVESTOR_ELIGIBILITY' | 'OFFERING_ELIGIBILITY' | 'CONFIDENTIAL_DISTRIBUTION';
+          runId: string;
+          context: SealableContext;
+        },
   ): Promise<{ executionId: string }> {
     const n = `${process.pid}-${++this.counter}`;
     const folder = join(this.options.projectRoot, this.options.workflowFolder, this.dir);

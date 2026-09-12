@@ -80,6 +80,41 @@ export class SumsubSandboxOperator {
     return applicant.id;
   }
 
+  /**
+   * Clean-room demo: changes the CURRENT sandbox review of an existing applicant (e.g. GREEN → RED). Tries the review
+   * directly; if the sandbox refuses a second review, resets the applicant (sandbox) and reviews again.
+   */
+  async changeReview(
+    applicantId: string,
+    answer: 'GREEN' | 'RED',
+  ): Promise<'DIRECT' | 'AFTER_RESET'> {
+    try {
+      await this.forceReview(applicantId, answer);
+      return 'DIRECT';
+    } catch {
+      await this.call('POST', `/resources/applicants/${encodeURIComponent(applicantId)}/reset`);
+      await this.forceReview(applicantId, answer);
+      return 'AFTER_RESET';
+    }
+  }
+
+  /** Current review (answer + reject labels only) — READ-ONLY, for the operator's own confirmation. */
+  async currentReview(
+    applicantId: string,
+  ): Promise<{ status: string | null; answer: string | null; labels: string[] }> {
+    const a = await this.call(
+      'GET',
+      `/resources/applicants/${encodeURIComponent(applicantId)}/one`,
+    );
+    const review = (a['review'] ?? {}) as Record<string, unknown>;
+    const result = (review['reviewResult'] ?? {}) as Record<string, unknown>;
+    return {
+      status: typeof review['reviewStatus'] === 'string' ? review['reviewStatus'] : null,
+      answer: typeof result['reviewAnswer'] === 'string' ? result['reviewAnswer'] : null,
+      labels: Array.isArray(result['rejectLabels']) ? (result['rejectLabels'] as string[]) : [],
+    };
+  }
+
   /** Forces the sandbox review result (T0.8: works for individuals directly from init). */
   async forceReview(applicantId: string, answer: 'GREEN' | 'RED'): Promise<void> {
     await this.call(

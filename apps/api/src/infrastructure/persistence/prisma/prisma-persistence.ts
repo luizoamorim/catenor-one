@@ -14,6 +14,10 @@ import type {
   AccountBinding,
   AccountBindingPurpose,
   AccountBindingRegistry,
+  DocumentKind,
+  DocumentRegistry,
+  DocumentStatus,
+  StoredDocument,
   AdmissionRepository,
   AdmissionSession,
   AdmissionSessionUpdate,
@@ -56,6 +60,7 @@ export function persistencePorts(db: Db): PersistencePorts {
   return {
     subjects: new PrismaSubjectRegistry(db),
     accountBindings: new PrismaAccountBindingRegistry(db),
+    documents: new PrismaDocumentRegistry(db),
     didState: new PrismaDidStateRegistry(db),
     admissions: new PrismaAdmissionRepository(db),
     trustAnchors: new PrismaTrustAnchorRegistry(db),
@@ -167,6 +172,60 @@ class PrismaAccountBindingRegistry implements AccountBindingRegistry {
   }
 }
 
+class PrismaDocumentRegistry implements DocumentRegistry {
+  constructor(private readonly db: Db) {}
+
+  async saveDocument(doc: Omit<StoredDocument, 'status'>): Promise<void> {
+    await this.db.documentRecord.create({
+      data: {
+        id: doc.id,
+        kind: doc.kind,
+        subjectId: doc.subjectId,
+        issuer: doc.issuer,
+        document: json(doc.document),
+      },
+    });
+  }
+
+  async findDocument<T>(id: string): Promise<StoredDocument<T> | undefined> {
+    const row = await this.db.documentRecord.findUnique({ where: { id } });
+    return row ? documentOf<T>(row) : undefined;
+  }
+
+  async listDocuments<T>(subjectId: string, kind: DocumentKind): Promise<StoredDocument<T>[]> {
+    const rows = await this.db.documentRecord.findMany({
+      where: { subjectId, kind },
+      orderBy: { createdAt: 'asc' },
+    });
+    return rows.map((r) => documentOf<T>(r));
+  }
+
+  async setDocumentStatus(id: string, status: DocumentStatus): Promise<void> {
+    await this.db.documentRecord.update({
+      where: { id },
+      data: { status, statusChangedAt: new Date() },
+    });
+  }
+}
+
+function documentOf<T>(row: {
+  id: string;
+  kind: DocumentKind;
+  subjectId: string;
+  issuer: string;
+  document: unknown;
+  status: DocumentStatus;
+}): StoredDocument<T> {
+  return {
+    id: row.id,
+    kind: row.kind,
+    subjectId: row.subjectId,
+    issuer: row.issuer,
+    document: row.document as T,
+    status: row.status,
+  };
+}
+
 class PrismaDidStateRegistry implements DidStateRegistry {
   constructor(private readonly db: Db) {}
 
@@ -186,9 +245,14 @@ class PrismaDidStateRegistry implements DidStateRegistry {
         did: vm.controller,
         type: vm.type,
         publicKeyMultibase: vm.publicKeyMultibase,
-        relationships: (document.assertionMethod as readonly string[]).includes(vm.id)
-          ? ['assertionMethod']
-          : [],
+        relationships: [
+          ...((document.assertionMethod as readonly string[]).includes(vm.id)
+            ? ['assertionMethod']
+            : []),
+          ...(((document.authentication ?? []) as readonly string[]).includes(vm.id)
+            ? ['authentication']
+            : []),
+        ],
         status: keyReference.status,
       },
     });

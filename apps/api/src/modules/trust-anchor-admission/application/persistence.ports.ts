@@ -71,7 +71,7 @@ export interface SubjectRegistry {
 
 // ---- AccountBindingRegistry (final demo [REF-IMPL]) ---------------------------------------------------
 
-export type AccountBindingPurpose = 'DISTRIBUTION_RECEIVING' | 'AGENT_EXECUTION';
+export type AccountBindingPurpose = 'DISTRIBUTION_RECEIVING' | 'AGENT_EXECUTION' | 'SPV_EXECUTION';
 
 /** Private Account Binding: did:catenor Subject → one CAIP-10 account for one purpose. Never published. */
 export interface AccountBinding {
@@ -91,6 +91,34 @@ export interface AccountBindingRegistry {
     subjectId: string,
     purpose: AccountBindingPurpose,
   ): Promise<AccountBinding | undefined>;
+}
+
+// ---- DocumentRegistry (clean-room demo [REF-IMPL]) --------------------------------------------------
+
+export type DocumentKind =
+  | 'CAPABILITY_GRANT'
+  | 'RELATIONSHIP_CREDENTIAL'
+  | 'INVESTOR_CREDENTIAL'
+  | 'OFFERING_DEFINITION'
+  | 'DECISION'
+  | 'DISTRIBUTION_PLAN';
+export type DocumentStatus = 'ACTIVE' | 'SUSPENDED' | 'REVOKED';
+
+/** A privately recorded Catenor document: the signed/committed object itself plus its index fields. */
+export interface StoredDocument<T = unknown> {
+  readonly id: string;
+  readonly kind: DocumentKind;
+  readonly subjectId: string;
+  readonly issuer: string;
+  readonly document: T;
+  readonly status: DocumentStatus;
+}
+
+export interface DocumentRegistry {
+  saveDocument(doc: Omit<StoredDocument, 'status'>): Promise<void>;
+  findDocument<T>(id: string): Promise<StoredDocument<T> | undefined>;
+  listDocuments<T>(subjectId: string, kind: DocumentKind): Promise<StoredDocument<T>[]>;
+  setDocumentStatus(id: string, status: DocumentStatus): Promise<void>;
 }
 
 // ---- DidStateRegistry -------------------------------------------------------------------------------
@@ -269,6 +297,7 @@ export interface AuditLog {
 export interface PersistencePorts {
   readonly subjects: SubjectRegistry;
   readonly accountBindings: AccountBindingRegistry;
+  readonly documents: DocumentRegistry;
   readonly didState: DidStateRegistry;
   readonly admissions: AdmissionRepository;
   readonly trustAnchors: TrustAnchorRegistry;
