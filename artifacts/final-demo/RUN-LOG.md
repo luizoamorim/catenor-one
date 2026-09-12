@@ -262,3 +262,9 @@ recorded above.
 
 The deployed triggers do not depend on the CLI session: they are signed with the trigger key.
 
+A re-run a few minutes later was clean:
+
+- workflow `0000e58d…25c8` **ACTIVE**, registered 17:38:55 UTC, last executed 19:18:45 UTC;
+- deployment **ACTIVE**, deployed 19:36:04 UTC;
+- last execution `394f…4bd8` SUCCESS, 8 s.
+
