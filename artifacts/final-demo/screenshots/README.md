@@ -44,3 +44,35 @@ Sumsub applicant IDs are private by design. They are cropped or blurred before a
 | `10-before-privy-wallets.png` | 10, before | Privy app `catenor-one-final-demo` (development mode): **no wallets** |
 | `10-before-privy-keys-and-quorums.png` | 10, before | Privy: **no key quorums** |
 | `10-before-privy-policies.png` | 10, before | Privy: **no policies** — the new app starts empty |
+| `10-after-privy-wallets.png` | 10, after | one Solana (SVM) wallet `yhscbg09z11ofns1lxrb33qy` (address `2Z5uM…oh4j`), the Bootstrap Endorsement Key, balance $0 |
+| `10-after-privy-keys-and-quorums.png` | 10, after | two runtime key quorums (`catenor-one-clean-room-bootstrap`, `catenor-one-clean-room-assertion`) and two management-owner keys |
+| `10-after-privy-policies.png` | 10, after | `catenor-one-clean-room-P_BOOTSTRAP` (1 wallet) and `catenor-one-clean-room-P_ASSERT` (0 wallets for now) |
+
+## What each stage created, and why
+
+### Stage 10: Trust Domain bootstrap (Privy signer infrastructure)
+
+Catenor signs protocol documents: DID proofs, credentials, the bootstrap endorsement. It never holds those private
+keys itself. Each signing key lives in a Privy wallet whose policy allows only one thing: signing a message. Two
+separate key purposes are created, because a Credential Assertion Key is not a Bootstrap Endorsement Key (S001 D36).
+
+| Privy object | ID (public ref) | What it is | Why it exists |
+|---|---|---|---|
+| Wallet (Solana, Ed25519) | `yhscbg09z11ofns1lxrb33qy` | the **Bootstrap Endorsement Key** of the Trust Domain `trust-domain:catenor-one-demo` | It signs the one bootstrap endorsement that turns an Admission **ALLOW** into an ACTIVE Trust Anchor (stage 11). Its public key is pinned inside the Bootstrap Configuration, so nobody can later swap in another key. Solana is used only because it gives an Ed25519 key (`eddsa-jcs-2022` proofs); it holds and moves no money |
+| Policy `P_BOOTSTRAP` | `le7gbximdw0xn4v816cio9pt` | the bootstrap wallet's rules | It **allows** `signMessage` and **denies** private-key and seed-phrase export. Anything else has no allow rule, so Privy refuses it: the key can sign an endorsement but can never sign a transaction or leave Privy |
+| Policy `P_ASSERT` | `ad39kww1rhrdjuybxc3iyk6x` | the same rules, for **Credential Assertion Key** wallets | Each Subject's assertion wallet (the Trust Anchor in stage 11, the Sponsor in stage 20) is created later under this policy. It shows 0 wallets for now |
+| Key quorum `catenor-one-clean-room-bootstrap` | `oh9vraclpkgmfnuf4patym7q` | the **runtime signer** of the bootstrap wallet ("Signer for 1 wallet") | The Catenor runtime asks for signatures through this quorum's authorization key, which stays in local `runtime.env`, 0600. As an additional signer it is still bound by `P_BOOTSTRAP`: it can sign messages, but it cannot change the policy or the wallet |
+| Key quorum `catenor-one-clean-room-assertion` | `qsj70xedok2989aae9cfj9q7` | the runtime signer for the assertion wallets | Same role for Credential Assertion Keys. It becomes "Signer for" each Subject's assertion wallet once those wallets are created |
+| Key `iwat4x7au0xf1z511brolft7` | — | the **bootstrap management owner** ("Owner of 1 wallet, 1 policy") | Only this key can administer the bootstrap wallet and `P_BOOTSTRAP`. Its private key lives only in `~/.catenor-one/clean-room/c1-202609121438/` (0600) and is never loaded by the runtime or sent to Railway |
+| Key `bbww0ajqpr5djym61xzeebu6` | — | the **assertion management owner** ("Owner of 1 policy") | Administers `P_ASSERT` and, later, the assertion wallets. Same local-only custody |
+
+The outcome is the **Bootstrap Configuration** (`.catenor-demo/bootstrap-configuration.json`), pinned by hash
+`0x21f0e18af868321df4fdfcd70b5eef611f8265f85b96ea2000461bc2239dbe1c`. It fixes:
+
+- the Trust Domain;
+- the admission policy `policy:trust-anchor-admission:v1` and its hash;
+- the bootstrap public key above;
+- the accepted evidence: HYBRID_DEMO, with a real Sumsub sandbox representative at level `id-only` and a synthetic
+  mock company.
+
+Every later check refers back to this hash. That includes the CRE workflow configuration.
