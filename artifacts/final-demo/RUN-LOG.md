@@ -458,3 +458,16 @@ run live on this runner before.
 
 The equity was not deployed twice.
 
+**The re-run (21:25 UTC, `--live`)** reported *"already deployed: 0xf37A…7ABC … no new deployment"* and completed the
+owner-authorized SPV policy extension. The SPV management-owner key, from `~/.catenor-one`, added three rules, each
+pinned to the equity: `allow-issueByPartition-equity`, `allow-grantRole-corporate-action-to-spv` and
+`allow-setDividend-equity`.
+
+The policy now holds six rules:
+
+- `allow-ats-factory-hedera-testnet`;
+- `deny-exportPrivateKey` and `deny-exportSeedPhrase`;
+- `allow-issueByPartition-equity`, `allow-grantRole-corporate-action-to-spv` and `allow-setDividend-equity`.
+
+This step spent no HBAR.
+

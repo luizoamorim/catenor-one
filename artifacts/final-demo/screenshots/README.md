@@ -77,6 +77,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `50-after-hashscan-spv.png` | 50, after | HashScan testnet account `0.0.10509879` = SPV wallet `0x182f…9926`: **25 ℏ** (created by the funding transfer, HIP-583 lazy create) |
 | `50-after-hashscan-investor-a.png` | 50, after | account `0.0.10509881` = Investor A receiving wallet `0x7de5…2473`: **1 ℏ** (activation only) |
 | `50-after-hashscan-investor-b.png` | 50, after | account `0.0.10509882` = Investor B receiving wallet `0xcfca…da73`: **1 ℏ** (activation only) |
+| `60-terminal-policy-extended.png` | 60 | re-run after the fix: equity `0xf37A…7ABC` already deployed (tx `0x2396…c570`), **no new deployment**. The SPV policy is extended, owner-authorized: `allow-issueByPartition-equity`, `allow-grantRole-corporate-action-to-spv`, `allow-setDividend-equity`, all pinned to the equity |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
