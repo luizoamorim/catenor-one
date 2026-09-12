@@ -514,3 +514,15 @@ receiving binding `0xCfCa…Da73`, signed by the SPV Privy wallet, in transactio
 
 The whole offering is issued, and exactly the approved units went to each investor.
 
+**Stage 91, run early (22:02 UTC; read-only, public chain data, no keys).** Every recorded transaction is SUCCESS:
+
+| Transaction | Target | Gas |
+|---|---|---|
+| `deployEquity` | the Factory | 6,898,334 |
+| `issueByPartition` → A | the equity | 456,629 |
+| `issueByPartition` → B | the equity | 405,329 |
+
+The sender is the SPV account's long-zero address `0x…a05e37`, which is `0.0.10509879`. The equity reads
+"Catenor One Demo SPV 001 (SYNTHETIC)", symbol `C1SPV001`, totalSupply **1000**: **Investor A 600, Investor B 400**,
+1 ℏ each. No dividend is recorded yet. HashScan shows both issuances SUCCESS, in blocks 40439213 and 40439263.
+

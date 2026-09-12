@@ -86,6 +86,9 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `60-after-privy-spv-policy-rules.png` | 60, after | SPV policy Rules view: under `eth_signTransaction`, `allow-ats-factory-hedera-testnet` + **the three equity-pinned rules**; exports denied; default deny (full JSON in `artifacts/privy/final-demo/clean-room-c1-202609121659/spv-policy-after-equity.json`) |
 | `61-terminal.png` | 61 | Investor A's stage 44 ALLOW decision (`decision:8c0a…53dd`, 600 units) + Sponsor `TOKENIZE_ASSET` → **`issueByPartition(600)`** to her private receiving binding, signed by the SPV Privy wallet: tx `0x5935…fa4e`, holder balance **600** |
 | `62-terminal.png` | 62 | Investor B's ALLOW decision (`decision:3000…78ef`, 400 units) → **`issueByPartition(400)`**: tx `0x9c6c…0d62`, holder balance **400** |
+| `61-after-hashscan-issue-a-tx.png` | 61, after | HashScan: Investor A's issuance, an Ethereum transaction to contract `0.0.10510175` from the SPV `0.0.10509879`: **SUCCESS**, block 40439213, fee 0.52 ℏ |
+| `62-after-hashscan-issue-b-tx.png` | 62, after | HashScan: Investor B's issuance, same contract and sender: **SUCCESS**, block 40439263, fee 0.46 ℏ |
+| `91-early-verify-hedera.png` | 91 (run early, read-only) | an independent check from public chain data: `deployEquity` + both issuances SUCCESS. Equity "Catenor One Demo SPV 001 (SYNTHETIC)", symbol `C1SPV001`, **totalSupply 1000, Investor A 600, Investor B 400**; no dividend yet |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
