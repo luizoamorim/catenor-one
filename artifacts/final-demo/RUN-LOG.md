@@ -83,7 +83,7 @@ The runner stays in SIMULATION until the workflow id is recorded with `--use-dep
 (`202 RELAYED`), pulled back (`200`) and re-authenticated locally. The `CATENOR_INTERNAL_API_TOKEN` sealed on Railway
 therefore equals the one the CRE secrets will carry.
 
-**C3 — `cre/secrets.sh --live` (17:3x UTC): 3 secrets in the Vault DON.** The command was
+**C3 — `cre/secrets.sh --live` (17:36 UTC): 3 secrets in the Vault DON.** The command was
 `cre secrets create secrets.yaml --secrets-auth browser -T production-settings`, the private-registry mode, authorized
 by the maintainer's CRE account in the browser. Created in `namespace=main`, owner
 `0x7075057f1589BAf347cB6dD6a993B1FC536B8a0a`:
