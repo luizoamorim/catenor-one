@@ -32,7 +32,7 @@ import {
   createPresentations,
   issueCredentials,
 } from './stages/investors.js';
-import { creConfigure } from './stages/cre.js';
+import { creCheckRelay, creConfigure } from './stages/cre.js';
 import { resetLocal, setupEnv } from './stages/setup.js';
 import {
   showCreExecution,
@@ -74,6 +74,7 @@ export const STAGES: readonly Stage[] = [
   verifyCatenor,
   verifyComplete,
   creConfigure,
+  creCheckRelay,
 ];
 
 function parseFlags(argv: readonly string[]): Flags {

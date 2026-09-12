@@ -2,12 +2,19 @@
 // Trust Domain (Bootstrap Configuration hash, the Trust Anchor's issuer key, the pinned investor policies), the HTTP
 // trigger's authorized key and the public callback URL — the same config the simulation uses, with
 // executionMode DEPLOYED. It never deploys: scripts/demo/cre/deploy.sh --live does, and only the maintainer runs it.
+import { createHmac } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Wallet } from 'ethers';
 import { CALLBACK_PATH } from '../../../../src/infrastructure/confidential-compute/cre-callback-receiver.js';
+import {
+  relayPullPath,
+  signRelayPull,
+  type RelayedDelivery,
+} from '../../../../src/infrastructure/confidential-compute/cre-callback-relay.js';
+import { authenticateCallback } from '../../../../src/infrastructure/confidential-compute/cre-channel.js';
 import { say, type Stage } from '../stage.js';
-import { WORKFLOWS, env, setRuntime, setState } from '../state.js';
+import { WORKFLOWS, env, need, setRuntime, setState } from '../state.js';
 
 export const DEPLOY_CONFIG = join(WORKFLOWS, 'identity-confidential/.deploy/config.json');
 
@@ -101,5 +108,86 @@ export const creConfigure: Stage = {
     };
     say('CRE deployment configuration', summary);
     return summary;
+  },
+};
+
+/**
+ * Checks, before any CRE execution, that the Railway relay holds the same channel secret K as this instance: posts one
+ * probe callback signed exactly like the TEE signs results (callback key from K), pulls it back with the relay key and
+ * re-authenticates it locally. Only status codes are printed; the probe is consumed by the pull.
+ */
+export const creCheckRelay: Stage = {
+  id: 'cre-check-relay',
+  title: 'Railway CRE relay — shared-secret check (no CRE execution)',
+  actor: 'Maintainer',
+  operation: 'none (one signed probe callback to the Railway relay, pulled straight back)',
+  changes: [
+    'nothing persistent: the probe is parked in the relay mailbox and consumed by the pull',
+  ],
+  sponsors: ['none (Railway API only)'],
+  mode: 'LOCAL',
+  expected:
+    'callback 202 RELAYED → pull 200 → re-authenticated locally: Railway and this instance share K',
+  async run(ctx) {
+    const base = need('DEMO_CRE_RELAY_URL', 'scripts/demo/cre/configure.sh --relay-url=https://…');
+    const keys = ctx.channelKeys;
+    const runId = `run:relay-check-${Date.now()}`;
+    const body = JSON.stringify({
+      v: 1,
+      operation: 'RELAY_CHECK',
+      runId,
+      sessionRef: 'relay-check',
+      mode: ctx.creMode,
+      status: 'ERROR',
+      code: 'RELAY_CHECK',
+    });
+    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const post = await fetch(new URL(CALLBACK_PATH, base), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-catenor-timestamp': timestamp,
+        'x-catenor-signature': createHmac('sha256', keys.cb)
+          .update(`${timestamp}.${body}`)
+          .digest('hex'),
+      },
+      body,
+    });
+    const postCode = ((await post.json().catch(() => ({}))) as { code?: string }).code;
+    const path = relayPullPath(runId);
+    const pullAt = new Date().toISOString();
+    const pull = await fetch(new URL(path, base), {
+      headers: {
+        'x-catenor-timestamp': pullAt,
+        'x-catenor-signature': signRelayPull(ctx.relayKey, pullAt, path),
+      },
+    });
+    let reAuthenticated = false;
+    if (pull.status === 200) {
+      const d = (await pull.json()) as RelayedDelivery;
+      reAuthenticated = authenticateCallback(
+        keys,
+        { timestamp: d.timestamp, signature: d.signature },
+        new Uint8Array(Buffer.from(d.body, 'base64')),
+        new Date(),
+      ).ok;
+    }
+    const ok = post.status === 202 && pull.status === 200 && reAuthenticated;
+    const out = {
+      relay: base,
+      callback: `${post.status} ${postCode ?? ''}`.trim(),
+      pull: pull.status,
+      reAuthenticatedLocally: reAuthenticated,
+      verdict: ok
+        ? 'OK — the Railway relay and this instance share the channel secret K'
+        : post.status === 401
+          ? 'MISMATCH — Railway CATENOR_INTERNAL_API_TOKEN ≠ workflows/.env CATENOR_INTERNAL_API_TOKEN_VAR'
+          : post.status === 503
+            ? 'RELAY NOT CONFIGURED on Railway (CATENOR_INTERNAL_API_TOKEN missing)'
+            : 'FAILED — see the codes above',
+    };
+    say('relay check', out);
+    if (!ok) process.exitCode = 1;
+    return out;
   },
 };

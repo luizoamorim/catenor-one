@@ -465,6 +465,23 @@ and the `production-settings` target, which uses the private registry.
 | inspect | `scripts/demo/cre/status.sh [uuid]` | `cre workflow get …`, `cre execution list identity-confidential-production`, `cre execution status/events/logs <uuid>` |
 | pause / delete | `scripts/demo/cre/pause.sh --live [--delete]` | `cre workflow pause|delete identity-confidential -T production-settings` |
 
+**Everything on the deployed workflow, admission included: the order.** The workflow config pins two values that
+exist only after certain stages. The Bootstrap Configuration hash comes from stage 10. The Trust Anchor's issuer key
+(`credentialRules`) comes from stage 11. So there are two deploys:
+
+1. Run `01` → `10`.
+2. `cre/configure.sh --relay-url=https://<railway-host>` (the config has no `credentialRules` yet), then
+   `cre/check-relay.sh`, which must show 202 → 200 → re-authenticated.
+3. `cre/secrets.sh --live` → `cre/deploy.sh --live` → `cre/activate.sh --live` →
+   `cre/configure.sh --workflow-id=<id> --use-deployed`.
+4. Stage `11` runs the admission in DEPLOYED mode. Its result arrives through the Railway relay.
+5. `cre/configure.sh`: the config now pins the Trust Anchor key. Then `cre/deploy.sh --live` → `cre/activate.sh --live`
+   → `cre/configure.sh --workflow-id=<new id>`.
+6. Stages `20` … `83`. Investor operations run DEPLOYED. The runner spaces gateway triggers ≥ 61 s apart (the
+   `every60s:1` limit), across stages too.
+
+Until the second deploy, investor operations fail closed with `CONFIG_INVALID`.
+
 Blockers, each with its smallest fix:
 
 1. **Confidential Workflows enrollment.** No CLI command shows it: `cre whoami` shows standard deploy access only.

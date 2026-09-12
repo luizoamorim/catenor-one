@@ -48,6 +48,7 @@ import {
   WORKFLOW_ENV,
   env,
   need,
+  setState,
   workflowSecret,
 } from './state.js';
 
@@ -152,6 +153,11 @@ export class Context {
     return deriveChannelKeys(this.internalToken);
   }
 
+  /** Key that authenticates this runner's pulls from the Railway relay (cre-callback-relay.ts). */
+  get relayKey() {
+    return deriveRelayKey(this.internalToken);
+  }
+
   get creMode(): 'SIMULATION' | 'DEPLOYED' {
     return env('DEMO_CRE_MODE') === 'DEPLOYED' ? 'DEPLOYED' : 'SIMULATION';
   }
@@ -232,7 +238,7 @@ export class Context {
       if (relayUrl) {
         this._relay = startRelayPoller({
           baseUrl: relayUrl,
-          relayKey: deriveRelayKey(this.internalToken),
+          relayKey: this.relayKey,
           keys,
           runIds: () => this.verifier.requested.map((r) => r.runId),
           deliver,
@@ -366,6 +372,24 @@ function allowlistedLogs(output: string): string[] {
   return [...output.matchAll(re)].map((m) => `${m[1]}${m[2]}`).slice(0, 40);
 }
 
+/** The deployed HTTP trigger accepts one execution per 60 s (`every60s:1`); keep a margin. */
+const DEPLOYED_TRIGGER_SPACING_MS = 61_000;
+
+/**
+ * DEPLOYED only: waits until DEPLOYED_TRIGGER_SPACING_MS have passed since the last gateway trigger of this instance
+ * (recorded in state.env, so separate stage processes are paced too).
+ */
+async function paceDeployedTrigger(): Promise<void> {
+  const last = Number(env('DEMO_CRE_LAST_TRIGGER_AT') || 0);
+  const wait = last + DEPLOYED_TRIGGER_SPACING_MS - Date.now();
+  if (wait > 0) {
+    console.log(
+      `  waiting ${Math.ceil(wait / 1000)} s — deployed CRE trigger rate limit (1 per 60 s)`,
+    );
+    await new Promise((r) => setTimeout(r, wait));
+  }
+}
+
 /** A stable verifier handle for the services, whose implementation (simulation or gateway) is plugged in later. */
 class VerifierSlot {
   impl?: CreSimulationConfidentialVerifier | CreGatewayConfidentialVerifier;
@@ -383,7 +407,11 @@ class VerifierSlot {
 
   async request(input: { operation: string; runId: string; context: unknown }) {
     if (!this.impl) throw new Error('confidential verifier not started');
-    const out = await this.impl.request(input as never);
+    const deployed = this.impl.mode === 'DEPLOYED';
+    if (deployed) await paceDeployedTrigger();
+    const out = await this.impl.request(input as never).finally(() => {
+      if (deployed) setState({ DEMO_CRE_LAST_TRIGGER_AT: String(Date.now()) });
+    });
     this.requested.push({
       operation: input.operation,
       runId: input.runId,
