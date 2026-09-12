@@ -154,3 +154,23 @@ documented causes are an invalid JWT, an unauthorized key, or the workflow not b
 carries the gateway's code and message, capped and without control characters. These messages name only public values;
 the request is never echoed. A test covers it. Attempt 2 creates a new session.
 
+**Attempt 2 (17:56 UTC): the gateway does not know the workflow.** A new candidate,
+`did:catenor:264c79583b82623b85e64d9e41a9454a`, went through the same steps, with key possession valid. The gateway then
+answered:
+
+> `-32600 Workflow not found. 'workflowID' 0x00e12517fc06c8984befaa63accbadb21b8c4abe529595fcf48542ba097ad250 is not a valid workflow ID`
+
+No execution was created and no Trust Anchor was admitted. Read-only checks afterwards:
+
+- `cre workflow list` shows the workflow `ACTIVE` in the private registry, with the same ID and owner.
+- `cre workflow get` shows the deployment `ACTIVE` and "Last executed: never".
+- A local `cre workflow simulate` with the **deployed config** and a junk payload initializes the workflow and registers
+  the HTTP trigger. It then fails closed as expected (`SEALED_CONTEXT_OPEN_FAILED`). The config is therefore not what
+  stops the workflow loading.
+- The request format matches Chainlink's "Triggering Deployed Workflows" page: the private-registry gateway, a
+  `workflowID` without `0x`, and a JWT with `alg: ETH`. The gateway parsed our ID, since its error echoes it.
+
+**Open question for Chainlink.** Why does the private-registry gateway not see a workflow that the registry reports as
+ACTIVE? Confidential Workflows is a private beta that needs enrollment through the Chainlink account team. The CLI
+deployed without complaint, but nothing shows whether this organization's Workflow DON loads confidential workflows.
+
