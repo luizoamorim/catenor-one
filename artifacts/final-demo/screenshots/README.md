@@ -56,6 +56,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `30-terminal.png` | 30 | SPV `did:catenor:bd78…5d44` + Privy EVM wallet `0x182F…9926`, created after the Sponsor's `TOKENIZE_ASSET` ALLOW; the execution-policy controls listed |
 | `30-after-privy-wallets.png` | 30, after | new **EVM** wallet `0x182…9926` (20:08 UTC): the SPV execution wallet. The Solana assertion keys stay separate |
 | `30-after-privy-policies.png` | 30, after | new EVM policy `catenor-one-spv-execution-4c875d44` (`cygll4bmgocqr05asp2w6f2s`, 1 wallet), next to `P_BOOTSTRAP` (1) and `P_ASSERT` (5) |
+| `30-after-privy-policy-spv-json.png` | 30, after | SPV policy JSON: `allow-ats-factory-hedera-testnet`, **`eth_signTransaction` ALLOW only if `chain_id` eq `296` AND `to` eq `0xd1F1…379d`** (ATS v8 Factory); DENY `exportPrivateKey`, `exportSeedPhrase`. This is the Privy control that bounds the SPV's execution key |
 | `30-after-privy-keys-and-quorums.png` | 30, after | **new, separate** SPV signer set: the management-owner key `nsnv8alo…` (owns the wallet and its policy) and the runtime quorum `…-spv-runtime` (signer for 1 wallet). The assertion and bootstrap entries are unchanged |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
