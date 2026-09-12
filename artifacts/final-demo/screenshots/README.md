@@ -95,6 +95,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `70-after-privy-policies.png` | 70, after | new EVM policy `catenor-one-distribution-agent-3d8dc074` (`p99xe36icsfvewrovm1mczwq`, 1 wallet), alongside the treasury, SPV, P_BOOTSTRAP and P_ASSERT (7) policies |
 | `70-after-privy-keys-and-quorums.png` | 70, after | a **new, separate** Agent signer set: owner key `blemb6kw…` (wallet + policy) and runtime quorum `…-agent-runtime`; the treasury has its own pair |
 | `70-after-privy-wallets.png` | 70, after | new EVM wallet `0x908…13E3` (the Agent's execution wallet) |
+| `70-after-privy-agent-policy-json.png` | 70, after | Agent policy JSON: `allow-distribution-payout-hedera`, `eth_signTransaction` ALLOW only if `chain_id` eq 296 **AND `to` in [Investor A, Investor B receiving wallets]** AND `value` lte `0x1158e460913d00000` (**20 HBAR**); both exports denied (JSON in `artifacts/privy/final-demo/clean-room-c1-202609121659/agent-policy.json`) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

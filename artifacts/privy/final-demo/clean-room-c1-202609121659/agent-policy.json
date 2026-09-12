@@ -1,0 +1,27 @@
+{
+  "id": "p99xe36icsfvewrovm1mczwq",
+  "version": "1.0",
+  "name": "catenor-one-distribution-agent-3d8dc074",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "fxxhjsvbzc7dl9xx9lhybkqz",
+      "name": "allow-distribution-payout-hedera",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        {
+          "field_source": "ethereum_transaction",
+          "field": "to",
+          "operator": "in",
+          "value": ["0x7de572532820B22040B561e68543419419b72473", "0xCfCa833A8e6b7651E44480b92822576BcB78Da73"]
+        },
+        { "field_source": "ethereum_transaction", "field": "value", "operator": "lte", "value": "0x1158e460913d00000" }
+      ]
+    },
+    { "id": "su9uq4lrxg8hgsusvgm3nv3q", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "nu05o2k3j0kinl728wimu2c9", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] }
+  ],
+  "_note": "Transcribed from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 70, final-demo instance c1-202609121659. 0x1158e460913d00000 = 20 HBAR (18-decimal weibar). The two addresses are the investors' receiving wallets. Public data only."
+}
