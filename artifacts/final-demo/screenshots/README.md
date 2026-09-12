@@ -113,6 +113,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `93-verify-catenor-audit.png` | 93 | Catenor re-verification from the signed documents (the DB is an index, not proof): **audit hash chain valid (79 events)**; Trust Anchor VALID; Sponsor relationship valid and 5 capabilities ALLOW; Agent relationship valid and delegated chain ALLOW; both credentials issuer-signed and ACTIVE |
 | `99-verify-complete-demo-stages.png` | 99 | **all 24 stages ran and are `ok: true`**, each with its mode: LOCAL, SPONSOR LIVE (non-spending), **CONFIDENTIAL (CRE)** ×4, TESTNET LIVE (spends HBAR) ×6 |
 | `99-verify-complete-demo-catenor.png` | 99 | the Catenor verification in the final summary: audit chain valid (79 events), Trust Anchor VALID, Sponsor and Agent chains ALLOW, credentials issuer-signed |
+| `99-after-cre-five-executions.png` | end of demo | CRE dashboard, `identity-confidential-production`: Active, Private, owner Catenor One, **5 executions, all Success, $0 spend**. The admission (`394f…4bd8`, deploy #1) plus credentials A/B, offering and distribution (deploy #2) |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
