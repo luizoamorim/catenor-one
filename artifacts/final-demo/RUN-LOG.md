@@ -719,3 +719,21 @@ by Privy:
 
 **"Agent policy exactly the approved boundary: true."**
 
+**Stage 93 — Catenor audit re-verification (22:57 UTC; local, read-only).** Signatures and chains are re-verified from
+the recorded signed documents; the database is an index, not proof.
+
+- **Audit hash chain:** **valid**, over **79 events** in 28 types. They include:
+  - `TRUST_ANCHOR_ADMITTED` 1, `CAPABILITY_GRANTED` 6, `CREDENTIAL_ISSUED` 2;
+  - `INVESTMENT_EXECUTED` 2 (of 4 `INVESTMENT_AUTHORIZED`; the dry runs authorize without executing);
+  - `DISTRIBUTION_REQUEST_DENIED` 3 (stage 70 before delegation, stage 71 with the relationship only, stage 82 Investor
+    A as requester);
+  - `DISTRIBUTION_PLAN_CREATED` 1 and `DISTRIBUTION_PAYOUT_EXECUTED` 1.
+
+  The counts include the three abandoned stage 11 attempts: `ADMISSION_REQUESTED` 4,
+  `CONFIDENTIAL_VERIFICATION_REQUESTED` 4, and `CONFIDENTIAL_EVIDENCE_VERIFIED` 1.
+- **Trust Anchor:** `TRUST_ANCHOR_VALID` true, no failed checks.
+- **Sponsor:** relationship valid; all five capabilities ALLOW.
+- **Agent:** relationship valid; the delegated `EXECUTE_DISTRIBUTION` chain is ALLOW.
+- **Credentials:** both investor credentials are issuer-signed by the Trust Anchor and **ACTIVE**. Bart's is still
+  valid, as the thesis requires.
+
