@@ -276,3 +276,13 @@ ORGANIZATION with a random DID and no PII. Its assertion method is `#assertion-k
 
 At this point the Sponsor is not a Trust Anchor and holds no capability.
 
+**Stage 21 — Sponsor authorization (20:01 UTC).** Signed by the root Trust Anchor through its Privy Ed25519 key
+(`eddsa-jcs-2022`):
+
+- **Relationship Credential:** `urn:uuid:697d1767-2ea8-45d8-b875-f13a00943cba`, the Sponsor is `AUTHORIZED_SPONSOR_IN`
+  `trust-domain:catenor-one-demo`. It is **valid**, and it grants nothing by itself (Relationship ≠ Capability).
+- **Five Capability grants** on `spv:catenor-demo-001`, all **ALLOW**: `TOKENIZE_ASSET`, `DEFINE_OFFERING_POLICY`,
+  `CREATE_AGENT`, `CREATE_DISTRIBUTION`, `DELEGATE_DISTRIBUTION_AUTHORITY`.
+- **Negative path:** the same capability on another resource → **DENY `CAPABILITY_MISSING`**. Authority is scoped to
+  the resource.
+
