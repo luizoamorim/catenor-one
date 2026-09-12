@@ -749,3 +749,40 @@ CP13 (2026-09-11): `apps/api/scripts/hedera/bootstrap-investor-accounts.ts` is o
 
 CP14 (2026-09-11): the live selective payout, 6 HBAR to Investor A from the Privy Distribution Agent wallet, tx `0x5db611642921708fc1fa88b78ed883acebd5d99316ede4481c141e076be42b88`. It was produced by the live Catenor-controlled plan (`artifacts/hedera/final-demo/selective-payout.md`). No new dependencies.
 
+## 28. 2026-09-12 — Clean-room demo runbook (prompt 2026-09-11-023)
+
+New dependencies (workflow only): `@noble/curves` 2.4.0 and `@scure/base` 2.4.0 (MIT), added to `workflows/identity-confidential` for Ed25519 / base58btc inside `handlerInTee`. They are the same versions the repository's domain packages already use (§22). No new API dependency.
+
+Original Catenor One code, written by Claude Code in the main session:
+
+- `packages/credentials/src/verifiable-credentials.ts`;
+- `packages/authority/src/{relationship,offering}.ts` and the delegation in `capability.ts`;
+- `packages/policy/src/investor-policies.ts`;
+- `workflows/identity-confidential/src/{credentials,investor-credentials}/`;
+- `apps/api/src/modules/{sponsor-authorization,investor-credentials}/`;
+- `apps/api/src/infrastructure/key-management/{privy-spv-wallet,signable-document}.ts`;
+- `apps/api/src/infrastructure/confidential-compute/cre-gateway-verifier.ts`;
+- `apps/api/scripts/demo/clean-room/`;
+- `scripts/demo/`;
+- `DEMO.md`.
+
+Specification sources read (no text or code copied):
+
+- the pinned Catenor Protocol (`credentials/01–04`, `authority/01–04`, DATA-MODEL-BASELINE §13–16);
+- W3C VC 2.0 / Data Integrity `eddsa-jcs-2022` (already the approved profile);
+- Chainlink "Triggering Deployed Workflows" for the gateway JSON-RPC + JWT format.
+
+The BUSL-1.1 reference `smartcontractkit/cre-sdk-typescript/packages/cre-http-trigger` (`create-jwt.ts`) was read only to confirm two details, the recovery-id encoding (0/1) and the sorted-key digest. No code was copied.
+
+`scripts/demo/cre/*.sh` were drafted by the `cre-engineer` subagent and rewritten in the main session. Every command was checked against the installed CRE CLI v1.33.0 `--help`.
+
+Live sponsor resources created by the non-spending clean-room run (instance `c1-202609120048`, Privy development app / Sumsub sandbox):
+
+- a fresh S001 signer infrastructure: two key quorums, P_ASSERT / P_BOOTSTRAP, the bootstrap wallet;
+- Ed25519 assertion wallets for the Trust Anchor and the Sponsor, plus investor holder keys;
+- SPV and Agent EVM wallets with their Catenor-created policies;
+- two investor receiving wallets;
+- synthetic Sumsub sandbox applicants.
+
+Owner keys are kept outside the repository. No Hedera transaction was sent.
+

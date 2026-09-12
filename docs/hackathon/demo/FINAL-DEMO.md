@@ -128,6 +128,11 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - Pre-seeding and funding the wallet is not Catenor authority.
   - The CP1 wallet with its standing policy and the rehearsal equity are a real rehearsal/checkpoint only.
   - The mechanism for attaching the new policy to the pre-seeded wallet is decided and probed at FD-2. Attaching a policy to an owned wallet needs the wallet owner's authorization, and the owner key is outside the runtime.
+  - **Clean room (prompt 023, 2026-09-12):**
+    - `30-create-spv.sh` creates the SPV Privy wallet AND its execution policy at runtime, after the Sponsor's TOKENIZE_ASSET ALLOW, from public values only (chain 296 ∧ ATS Factory; exports denied). This was run live on the Privy development app.
+    - The equity-pinned rules (issuance, grantRole, setDividend) are added after `deployEquity` by an owner-authorized step inside `60-tokenize-spv.sh --live`, run by the maintainer.
+    - The funding is testnet bootstrap (stage 50), not authority.
+    - Left unchecked until `60 --live` has run.
 - [x] FD-3 `feat(hedera)`: deployEquity signed by the Privy SPV wallet (live tx, maintainer-authorized).
   - LIVE 2026-09-11: tx `0x8265479f…5897`; ATS equity `0x7aeDA4b6B89dA392Efd88AD0Fcb075e12ab6a418`; 7.66 HBAR.
   - Evidence: `artifacts/hedera/final-demo/deploy-equity.md`.
@@ -143,6 +148,11 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - No generic mint/issuance API.
     - The rehearsal scripts stay as evidence/tests only.
     - The private Account Binding store now exists (CP7); investor receiving accounts are resolved from it.
+    - **Implemented in the clean room (prompt 023):** `61/62-investor-*-invest.sh` issue only after `authorizeInvestment` passes.
+      - It requires the investor's ALLOW offering Decision (VP + `policy:offering-eligibility:v1` evaluated inside CRE), unused, with the cumulative total ≤ 1,000.
+      - It also requires the Sponsor's TOKENIZE_ASSET grant.
+      - The recipient is the private binding; the units are exactly the Decision's.
+      - The authorization is verified in preflight. Left unchecked until the live issuance.
 - [x] FD-5 `feat(agent)`: AGENT subject, Agent wallet, narrower policy, `EXECUTE_DISTRIBUTION` Capability.
   - LIVE 2026-09-11: Agent `did:catenor:bb5870b9…20f3`, Privy wallet `0x5037…FC51`, policy `to ∈ {A, B} ∧ value ≤ 20 HBAR ∧ chain 296`.
   - The grant is issued by the ACTIVE Trust Anchor.
@@ -173,7 +183,19 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - Baseline: A 1 HBAR, B 1 HBAR, Agent nonce 2.
     - `preflight:payout` PASS; payout gas estimate 22,828 ≤ 30,000.
   - **DONE (CP14):** live payout 6 HBAR to A only; A 1 → 7, B 1 → 1 (see above).
-- [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline.
+- [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline. The UI replays the canonical clean-room flow (`DEMO.md`, `scripts/demo/`).
+- [ ] FD-10 `docs(demo)` + `feat(demo)`: reproducible clean-room runbook (prompt 2026-09-11-023).
+  - **Structurally complete 2026-09-12:** root `DEMO.md`; numbered `scripts/demo/NN-*.sh` over a stateful stage runner; `run-all.sh` (safe by default); CRE deployment scripts.
+  - Every non-spending stage ran from zero: Privy development app, Sumsub sandbox, CRE SIMULATION. Evidence: `artifacts/chainlink/final-demo/clean-room-confidential-run.md`.
+  - **Authority story upgraded:**
+    - Trust Anchor → Sponsor: relationship + five capabilities.
+    - Sponsor → SPV, offering and Agent.
+    - Agent: `AGENT_OF` + a delegated `EXECUTE_DISTRIBUTION`.
+  - **VC/VP:** Trust Anchor-issued investor VCs; holder-bound VPs verified inside `handlerInTee` (seven named checks).
+  - **The distribution is computed inside CRE** (`CONFIDENTIAL_DISTRIBUTION`): A PAY 6 / B HOLD 4.
+  - **OPEN:**
+    - the clean-room `--live` Hedera stages (funding, 60–63, 83);
+    - a REAL deployed Confidential Workflow (commands ready; needs the public callback URL, the secrets upload and the deploy — `DEMO.md` §15). Until then CRE stays SIMULATION.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 
 ## 10. Deferred (not built for the demo; open tasks stay open)

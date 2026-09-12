@@ -338,3 +338,21 @@ Checkpoint 7 (same day):
 
 Checkpoint 8 (same day): `hedera-engineer` researched the ATS dividend lifecycle read-only against the deployed token and the package sources; `privy-engineer` probed the lifecycle policy rules live on throwaway resources. The main session wrote the signer-boundary checks, the preflight and the maintainer script, and audited both reports; one preflight expectation was corrected against the known CP1 Factory rule.
 
+## 2026-09-12 — Clean-room runbook (prompt 2026-09-11-023)
+
+- **Main session.** Wrote the Catenor semantics and the code:
+  - VC/VP, relationships, delegation, offering;
+  - the in-TEE operations;
+  - the services and the stage runner;
+  - `DEMO.md`.
+
+  It also ran every non-spending stage live from zero and audited all subagent output.
+- **`cre-engineer`** (headless; deploy / activate / secrets / login / git writes and `.env` reads blocked). It
+  researched the current CLI commands and ran a throwaway simulation spike confirming Ed25519 verification inside
+  `handlerInTee`. It also drafted the deployment scripts.
+- **What the main session corrected** in that output:
+  - the secrets command: the private registry needs `cre secrets create <secrets.yaml> --secrets-auth browser`;
+  - the deploy command: it now uses a generated DEPLOYED config;
+  - the gateway invocation, which the subagent had marked UNCERTAIN: taken from the Chainlink specification.
+- **Maintainer.** Made the scope decisions and set the STOP gate before any new live broadcast.
+

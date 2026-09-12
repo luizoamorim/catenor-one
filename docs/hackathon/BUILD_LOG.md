@@ -1429,6 +1429,66 @@ Artifacts: `artifacts/hedera/final-demo/selective-payout.md`, `selective-payout.
 
 Commit: the `feat(distribution)` commit that contains this entry.
 
+## 2026-09-12 — Reproducible clean-room demo runbook (DEMO.md + scripts/demo)
+
+Goal: a maintainer or judge can go from a fresh environment through the whole Catenor One story without hidden state
+(prompt 2026-09-11-023). No protocol redesign; frozen S001 semantics and golden vectors unchanged.
+
+Work completed:
+
+- **Domain [REF-IMPL]:**
+  - W3C VC 2.0 / VP envelopes on `eddsa-jcs-2022` with seven named presentation checks;
+  - an issuer-signed credential status statement;
+  - an optional `authentication` holder key in DID Documents;
+  - Relationship Credentials: `AUTHORIZED_SPONSOR_IN`, `SPONSORED_BY`, `AGENT_OF` (`OFFICER_OF` is Human → Organization; the vocabulary is open);
+  - four new Sponsor actions and explicit delegability: `EXECUTE_DISTRIBUTION` is valid only under `CREATE_DISTRIBUTION` + `DELEGATE_DISTRIBUTION_AUTHORITY` from the ACTIVE Trust Anchor;
+  - a Sponsor-signed offering definition;
+  - `policy:offering-eligibility:v1` and `policy:distribution-eligibility:v2`, pinned by hash.
+- **CRE (`identity-confidential`):**
+  - `OFFERING_ELIGIBILITY` and `CONFIDENTIAL_DISTRIBUTION`, which verify the VP/VC/status, read the CURRENT Sumsub sandbox evidence, reconcile and apply the policy inside `handlerInTee`;
+  - the distribution computes the pro-rata shares AND PAY/HOLD in the TEE;
+  - Ed25519 runs in QuickJS (`@noble/curves` 2.4.0, simulation-confirmed by `cre-engineer`);
+  - the in-TEE verifier is parity-tested against the domain package.
+- **API:**
+  - Sponsor authorization and investor-credential services;
+  - a private `DocumentRecord` index (migration `20260911230000_clean_room_documents`);
+  - an SPV Privy wallet and execution policy created after the ALLOW (FD-2);
+  - investment authorization bound to the ALLOW offering Decision (FD-4 design);
+  - a CRE gateway verifier for a deployed workflow (JWT `alg: ETH`, written from the Chainlink spec).
+- **Scripts:**
+  - `scripts/demo/00…99-*.sh` + `run-all.sh` over a stateful TypeScript stage runner;
+  - generated values auto-written: public refs to `.catenor-demo/state.env`, runtime keys to `runtime.env` (0600), owner keys to `~/.catenor-one/clean-room/<instance>/` (0600);
+  - Hedera broadcasts only with `--live` plus a typed confirmation;
+  - CRE deployment scripts under `scripts/demo/cre/`.
+- **`DEMO.md`:** the canonical walkthrough (16 sections, judge matrix, "why each step exists").
+
+Validation:
+
+- `pnpm check` green: 416 unit tests (was 364), no boundary violation, secret scan clean.
+- `pnpm test:integration` 118/118, including a new end-to-end clean-room chain on PostgreSQL: the real workflow operations in process, behind the real sealed channel and authenticated callback.
+- **Live, non-spending, from zero (instance `c1-202609120048`):** every stage 00–83 and 90–99 without `--live`.
+  - Trust Anchor ACTIVE; Sponsor 5 × ALLOW.
+  - Offering in CRE: A ALLOW 600 / B ALLOW 400.
+  - Agent: DENY → DENY (relationship only) → ALLOW (delegated).
+  - B → RED; distribution in CRE: A PAY 6 / B HOLD 4 (B's VP 7/7 valid, reconciliation MISMATCH).
+  - Execution dry: A refused `INSUFFICIENT_AGENT_BALANCE` before Privy, B no transaction, 0 signature requests.
+  - Audit chain valid (51 events).
+- `91-verify-hedera.sh --rehearsal` re-verifies the 8 rehearsal transactions with no credentials.
+- `cre workflow build` compiles the new operations to WASM.
+
+Not done:
+
+- the clean-room `--live` Hedera stages (need testnet funding + authorization);
+- a REAL deployed Confidential Workflow (commands verified; blockers: public callback URL, secrets upload, deploy/activate — `DEMO.md` §15). CRE stays SIMULATION.
+
+AI assistance: Claude Code main session (Catenor semantics, services, scripts, docs); `cre-engineer` subagent (CRE CLI research, Ed25519-in-TEE simulation spike, draft deployment scripts — the draft `secrets` command was wrong for the private registry and was corrected against `cre secrets create --help`).
+
+Human review: pending (checkpoint report).
+
+Artifacts: `DEMO.md`, `artifacts/chainlink/final-demo/clean-room-confidential-run.md`, `docs/hackathon/plans/2026-09-11-008-clean-room-demo-runbook.md`, prompt `2026-09-11-023`.
+
+Commit: the `feat(authority)`, `feat(cre)` ×2, `feat(api)`, `feat(demo)`, `docs(demo)` and `docs(hackathon)` commits of this checkpoint.
+
 ## Entry template
 
 ```md
