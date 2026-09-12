@@ -691,3 +691,18 @@ and no signature or transaction for him ever existed**. Lisa received her 6 HBAR
 The executions from stage 42 on ran on workflow `0000e58d…25c8`. The CRE UUIDs come from `cre execution list`, and the
 runner IDs from the gateway's `workflow_execution_id`.
 
+**Stage 91 — independent Hedera verification (22:54 UTC; public chain data, no keys).** **Six transactions, all
+SUCCESS:**
+
+1. `deployEquity`;
+2. `issueByPartition` → A;
+3. `issueByPartition` → B;
+4. `grantRole(ROLE_CORPORATE_ACTION)`;
+5. `setDividend`;
+6. **the Agent payout → Investor A**, sent from the Agent account's long-zero address `0x…a06435` (21,000 gas).
+
+The equity `C1SPV001` has totalSupply 1000: **Investor A 600 units, 7.0 ℏ** (1 ℏ activation + the 6 ℏ payout);
+**Investor B 400 units, 1.0 ℏ**, nothing paid. Entitlements are dividend 1: A 6, B 4.
+
+On a public ledger this reads: **Bart is entitled to 4 and received 0; Lisa is entitled to 6 and received 6.**
+

@@ -108,6 +108,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `82-after-cre-execution-events.png` | 82, after | execution `fd2a…2d0b`: **Success**, 8 s, $0. Events: `trigger` 22:40:04, then **three `http-actions SendRequest`** at 22:40:16 (the current Sumsub evidence, read inside the TEE) |
 | `83-terminal.png` | 83 | the Agent executes exactly the TEE-approved plan: **Investor A (Lisa) PAY 6.0 HBAR**, tx `0x4781…ff24`, received 6.0. **Investor B (Bart) HOLD 4.0: `transactionConstructed: false`, `privySignatureRequested: false`**. Privy signature requests went to Lisa's address only; **investorBSignatureRequests: 0**; Agent nonce 0 → 1 |
 | `83-after-hashscan-payout-tx.png` | 83, after | HashScan: the payout, **SUCCESS**, block 40440606. **Agent account `0.0.10511413` → Lisa's account `0.0.10509881`: 6.00000000 ℏ** (fee 0.024 ℏ) |
+| `91-verify-hedera-final.png` | 91, final | **6 transactions SUCCESS** from public chain data: `deployEquity`, 2× `issueByPartition`, `grantRole`, `setDividend`, **Agent payout → Investor A** (21,000 gas). Holdings **A 600 / B 400**; balances **A 7.0 ℏ (1 + 6 paid) / B 1.0 ℏ (nothing paid)**; entitlements A 6 / B 4 |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
