@@ -101,6 +101,7 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `50b-terminal-agent-funding.png` | 50 (second run) | treasury → **Agent 12 HBAR** (`0x229a…c5a2`) and a 25 HBAR SPV top-up (`0xd118…638e`), both SUCCESS (TESTNET BOOTSTRAP FUNDING) |
 | `80-terminal.png` | 80 | Investor B (Bart Simpson): Sumsub sandbox review → **RED, `SANCTIONS`, FINAL**. His credential is **still ACTIVE and validly signed**, and his holdings are **still 400** (Hedera ATS, read-only). **Investor DID redacted** |
 | `80-after-sumsub-bart-red.png` | 80, after | Sumsub sandbox: **Bart Simpson Rejected, reject label Sanctions** (reviewed 22:29 UTC); **Lisa Simpson Approved**: one green, one red. **Applicant IDs redacted** |
+| `81-terminal.png` | 81 | SPV revenue event `revenue-event:a2400be4…2355`: **10 HBAR** for `spv:catenor-demo-001`, an audit event only; no funds move |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why

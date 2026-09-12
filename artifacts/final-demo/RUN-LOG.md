@@ -618,3 +618,10 @@ Sumsub dashboard now shows Bart Simpson **Rejected (Sanctions)** and Lisa Simpso
 Ownership does not mean current eligibility. Catenor re-checks eligibility confidentially at distribution time
 (stage 82).
 
+### Phase K — Confidential distribution and payment
+
+**Stage 81 — SPV revenue event (22:37 UTC).** The event is `revenue-event:a2400be4-05f9-4923-ba2d-011bb50b2355`,
+`REVENUE_RECEIVED` **10 HBAR** for `spv:catenor-demo-001`. It is an audit event only; **no funds move**. In
+production, the event would come from a property-management system, a bank webhook, a schedule or a reconciliation.
+The payout itself is paid from the Distribution Agent's wallet, which the treasury funded with 12 HBAR.
+
