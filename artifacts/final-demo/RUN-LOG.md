@@ -192,3 +192,25 @@ It was then triggered with the demo's JWT code:
 `DEMO_CRE_GATEWAY_URL`. The two stage 11 failures were therefore neither an enrollment problem nor a TEE problem. The
 same signed request had simply gone to a gateway that does not serve this organization's workflows.
 
+**Attempt 3 (19:18 UTC): ADMITTED on the deployed Confidential Workflow.** The first admission of the root Trust
+Anchor to run on a deployed CRE workflow:
+
+| Item | Value |
+|---|---|
+| Root Trust Anchor | `did:catenor:656d66dff9ce1db692786ee241bc3cab` (assertion method `#assertion-key-1`, a Privy Ed25519 wallet under `P_ASSERT`) |
+| Key possession | `possessionValid` and `purposeValid` true (Privy `signMessage`, `eddsa-jcs-2022`) |
+| CRE execution | `0x394f66228ed74f270e5917ba9401a78f36aea40366864cf89306936e74ce4bd8`, operation `TRUST_ANCHOR_ADMISSION`, mode **DEPLOYED**, workflow `00e12517…d250` |
+| Result path | the workflow's signed callback went to the Railway relay; the runner pulled it, re-authenticated it and delivered it: `EVIDENCE_RECEIVED` |
+| Facts (derived inside the TEE) | `ORGANIZATION_KYB_VERIFIED`, `ORGANIZATION_STATUS_VALID`, `ORGANIZATION_AML_CLEAR`, `AUTHORIZED_REPRESENTATIVE_VERIFIED`, `REPRESENTATIVE_AUTHORITY_CONFIRMED`, `EVIDENCE_FRESH`: all true, provenance `CONFIDENTIAL_VERIFICATION`. The company facts come from the SYNTHETIC MOCK; the representative facts come from the real Sumsub sandbox |
+| Evidence commitment | `0x032c3587582592487fde060e08ab3e3747e80b25cf7bc825ee6bdbc58cf31846` (COMMITMENT_ONLY: Catenor keeps no raw Sumsub response) |
+| Decision | `decision:4721cc3e-702a-42cc-95e1-60f34d66185a`, **ALLOW** |
+| Activation | bootstrap endorsement by the separate `P_BOOTSTRAP` key → ACTIVE → `TRUST_ANCHOR_VALID: true`, no failed checks |
+
+The DID is recorded as `DEMO_TRUST_ANCHOR_DID` in state. Its public key goes into the workflow's issuer rules in
+deploy #2.
+
+**Leftovers, which stay as they are:**
+
+- the abandoned attempt-1 and attempt-2 candidates, each with a Privy assertion wallet and a Sumsub sandbox applicant;
+- the control workflow `catenor-http-control`, to be deleted after the demo.
+

@@ -42,6 +42,8 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `C4-cre-deploy-terminal.png` | C4 | `identity-confidential-production` compiled and registered in the **private registry** (DON family `zone-a`): workflow ID `00e12517…d250`, status **Active** |
 | `11-before-cre-workflow.png` | 11, before | CRE dashboard, `identity-confidential-production`: **Active**, Private registry, owner Catenor One, registered 17:38 UTC, **0 executions** |
 | `11-before-sumsub-applicants.png` | 11, before | Sumsub sandbox applicants from **earlier runs**: the 2026-09-11 rehearsal (representative, Investor A Approved, Investor B Rejected/Sanctions) and the aborted instance's representative (16:10 UTC). This instance has none yet. **Applicant IDs redacted** |
+| `11-diag-cre-deployment-tab.png` | 11, diagnosis | CRE Deployments tab before the fix: `00e1…d250` **Active**, 0 success / 0 error, "No status message" |
+| `11-after-terminal.png` | 11, after | admission on the **deployed** workflow: `mode DEPLOYED`, `EVIDENCE_RECEIVED`, `policy:trust-anchor-admission:v1` **ALLOW**, `TRUST_ANCHOR_VALID: true` |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
