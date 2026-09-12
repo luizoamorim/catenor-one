@@ -54,6 +54,9 @@ Sumsub applicant IDs are private: they are cropped or blurred before a capture i
 | `21-terminal.png` | 21 | Relationship `AUTHORIZED_SPONSOR_IN` **valid** + five Capability grants on `spv:catenor-demo-001`, all **ALLOW**; the same capability on another resource → **DENY `CAPABILITY_MISSING`** |
 | `20-after-privy-keys-and-quorums.png` | 20, after | the assertion owner key and the `…-assertion` quorum now cover **5 wallets** (4 from the stage 11 attempts + the Sponsor's key); the bootstrap key and quorum still cover **only 1**. One owner and one runtime signer for all signMessage-only assertion keys, kept apart from the bootstrap key |
 | `30-terminal.png` | 30 | SPV `did:catenor:bd78…5d44` + Privy EVM wallet `0x182F…9926`, created after the Sponsor's `TOKENIZE_ASSET` ALLOW; the execution-policy controls listed |
+| `30-after-privy-wallets.png` | 30, after | new **EVM** wallet `0x182…9926` (20:08 UTC): the SPV execution wallet. The Solana assertion keys stay separate |
+| `30-after-privy-policies.png` | 30, after | new EVM policy `catenor-one-spv-execution-4c875d44` (`cygll4bmgocqr05asp2w6f2s`, 1 wallet), next to `P_BOOTSTRAP` (1) and `P_ASSERT` (5) |
+| `30-after-privy-keys-and-quorums.png` | 30, after | **new, separate** SPV signer set: the management-owner key `nsnv8alo…` (owns the wallet and its policy) and the runtime quorum `…-spv-runtime` (signer for 1 wallet). The assertion and bootstrap entries are unchanged |
 | `10-after-privy-keys-and-quorums.png` | 10, after | 2 management-owner keys and 2 runtime quorums (`…-assertion`, `…-bootstrap`, signer for 1 wallet) |
 
 ## What each stage created, and why
