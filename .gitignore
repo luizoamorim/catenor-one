@@ -23,3 +23,6 @@ artifacts/demo/
 
 # Clean-room demo state (public refs, runtime keys, private evidence) — local only, never committed
 .catenor-demo/
+
+# Raw, unreviewed demo screenshots — reviewed/renamed copies move to artifacts/final-demo/screenshots/
+artifacts/final-demo/screenshots/inbox/
