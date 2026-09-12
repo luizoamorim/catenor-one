@@ -47,6 +47,8 @@ Sumsub applicant IDs are private by design. They are cropped or blurred before a
 | `10-after-privy-wallets.png` | 10, after | one Solana (SVM) wallet `yhscbg09z11ofns1lxrb33qy` (address `2Z5uM…oh4j`), the Bootstrap Endorsement Key, balance $0 |
 | `10-after-privy-keys-and-quorums.png` | 10, after | two runtime key quorums (`catenor-one-clean-room-bootstrap`, `catenor-one-clean-room-assertion`) and two management-owner keys |
 | `10-after-privy-policies.png` | 10, after | `catenor-one-clean-room-P_BOOTSTRAP` (1 wallet) and `catenor-one-clean-room-P_ASSERT` (0 wallets for now) |
+| `10-after-privy-policy-p-bootstrap-json.png` | 10, after | `P_BOOTSTRAP` as JSON (`solana`): `allow-signMessage` ALLOW, `deny-exportPrivateKey` DENY, `deny-exportSeedPhrase` DENY — no rule allows signing a transaction |
+| `10-after-privy-policy-p-assert-json.png` | 10, after | `P_ASSERT` as JSON: the same three rules, for the Credential Assertion Key wallets |
 
 ## What each stage created, and why
 
