@@ -9,6 +9,19 @@ OUT = Path.home() / 'Movies/catenor-one-final-demo'
 FR, CL = OUT / 'frames', OUT / 'clips'
 W, H = 1920, 1080
 SF = '/System/Library/Fonts/SFNS.ttf'
+LOGOS = Path('/private/tmp/claude-501/-Users-luizamorim-ETHGLOBAL-ONLINE/5c6add74-1d8b-442b-ac3e-045ef49021cd/scratchpad/logos')
+CMD = {
+ '11-after-terminal.png': 'scripts/demo/11-admit-root-trust-anchor.sh',
+ '21-terminal.png': 'scripts/demo/21-trust-anchor-authorize-sponsor.sh',
+ '44-terminal.png': 'scripts/demo/44-check-offering-eligibility.sh',
+ '63-after-verify-hedera-entitlements.png': 'scripts/demo/91-verify-hedera.sh',
+ '70-terminal.png': 'scripts/demo/70-create-distribution-agent.sh',
+ '72-terminal.png': 'scripts/demo/72-sponsor-delegate-distribution-capability.sh',
+ '82-terminal.png': 'scripts/demo/82-run-confidential-distribution.sh',
+ '83-terminal.png': 'scripts/demo/83-execute-approved-distribution.sh --live',
+ '91-verify-hedera-final.png': 'scripts/demo/91-verify-hedera.sh',
+ '99-verify-complete-demo-stages.png': 'scripts/demo/99-verify-complete-demo.sh',
+}
 MONO = '/System/Library/Fonts/SFNSMono.ttf'
 
 def font(size, path=SF):
@@ -16,7 +29,7 @@ def font(size, path=SF):
 
 NARR = {
  1: "This is Catenor One, the first reference implementation of Catenor Protocol. Tokenized assets prove who holds them. They don't prove who may be paid today. We fix that.",
- 2: "Four layers. Catenor decides who has authority. A Chainlink Confidential Workflow checks private evidence inside a TEE. Privy policies bound what each wallet can sign. And Hedera's Asset Tokenization Studio runs the asset.",
+ 2: "Four technologies, each with one job. Catenor holds identity and scoped authority. Chainlink's Confidential Workflow reads private KYC evidence inside a TEE, and decides. Privy constrains which key can sign what: the Trust Anchor's signing keys, the SPV and Agent wallets, and the investors' receive-only wallets. And Hedera's Asset Tokenization Studio runs the asset, verifiable by anyone.",
  3: "Trust starts with admission. The representative's KYC, from the Sumsub sandbox, plus a mocked company check, is read inside our deployed Confidential Workflow. The secrets come from the Vault DON, the Sumsub calls happen in the enclave, and only facts and a commitment come out. The policy says ALLOW, a separate bootstrap key endorses, and the Trust Anchor is valid.",
  4: "The Trust Anchor grants the Sponsor five scoped capabilities. Outside that scope it's DENY. Only after TOKENIZE_ASSET is allowed does the SPV get a Privy wallet, and its policy can only sign on Hedera testnet, to the ATS Factory.",
  5: "Two investors, Lisa and Bart, pass KYC in the Sumsub sandbox. The TEE verifies their evidence, and the Trust Anchor issues W3C credentials. Their presentations are then checked confidentially against the offering policy: Lisa may buy 600 units, Bart 400.",
@@ -29,8 +42,10 @@ NARR = {
 
 # (block, source, seconds, crop box as fractions or None)
 SHOTS = [
- (1, 'card:title', 15, None),
- (2, 'card:layers', 20, None),
+ (1, 'card:logo', 5, None),
+ (1, 'logos/hero.png', 5, None),
+ (1, 'logos/thesis.png', 5, None),
+ (2, 'card:partners', 25, None),
  (3, '11-before-cre-workflow.png', 6, None),
  (3, '11-after-terminal.png', 9, None),
  (3, '11-after-cre-execution-events.png', 10, None),
@@ -68,6 +83,55 @@ def card(kind):
         d.text((145, 500), 'current eligibility.', font=font(150), fill=ink)
         d.text((150, 730), 'The first reference implementation of Catenor Protocol.', font=font(44), fill=muted)
         d.text((150, 880), 'Chainlink CRE  ·  Privy  ·  Hedera ATS', font=font(38), fill=blue)
+    elif kind == 'logo':
+        social = Image.open(LOGOS / 'catenor-social.png').convert('RGB')
+        im.paste(social.getpixel((8, 8)), (0, 0, W, H))
+        src = social.crop((170, 140, 1100, 418))
+        src = src.resize((int(src.width * 1.5), int(src.height * 1.5)), Image.LANCZOS)
+        im.paste(src, ((W - src.width) // 2, 200))
+        d.text((W // 2, 760), 'Catenor One', font=font(72), fill=ink, anchor='mm')
+        d.text((W // 2, 850), 'The first reference implementation of Catenor Protocol  ·  ETHOnline 2026', font=font(34), fill=muted, anchor='mm')
+    elif kind == 'partners':
+        d.text((120, 90), 'Four technologies. One job each.', font=font(72), fill=ink)
+        cols = [
+          ('catenor', 'Catenor', 'identity + scoped authority',
+           ['did:catenor canonical identity', 'W3C credentials & presentations', 'capabilities, delegation, policy', 'hash-chained audit']),
+          ('chainlink', 'Chainlink CRE', 'confidential, current eligibility',
+           ['deployed Confidential Workflow (TEE)', 'Vault DON secrets → Sumsub in the enclave', 'decides admission, eligibility, PAY/HOLD', 'only facts + commitments leave']),
+          ('privy', 'Privy', 'which key can sign what',
+           ['Trust Anchor & Sponsor keys: sign only', 'SPV wallet: ATS Factory + its equity', 'Agent wallet: only Lisa/Bart, ≤ 20 HBAR', 'investors: receive-only wallets']),
+          ('hedera', 'Hedera ATS', 'the asset lifecycle',
+           ['tokenized SPV equity on testnet', 'issuance, corporate-action role, dividend', 'payout to the eligible holder', 'verifiable on HashScan / Mirror Node']),
+        ]
+        x0, cw = 120, 420
+        for i, (key, name, role, bullets) in enumerate(cols):
+            x = x0 + i * cw
+            d.line((x, 230, x + cw - 40, 230), fill='#d2d2d7', width=2)
+            logo = None
+            if key == 'catenor':
+                logo = Image.open(LOGOS / 'catenor-social.png').convert('RGB').crop((180, 150, 405, 420))
+            elif key == 'chainlink':
+                logo = Image.open(ROOT / '.agents/skills/chainlink-cre-skill/assets/chainlink-icon.png').convert('RGBA')
+            elif key == 'hedera':
+                logo = Image.open(LOGOS / 'hedera.svg.png').convert('RGBA')
+            elif key == 'privy':
+                for cand in (Path.home() / 'Downloads/privy-logo.png', LOGOS / 'privy.png'):
+                    if cand.exists():
+                        logo = Image.open(cand).convert('RGBA'); break
+            if logo is not None:
+                logo.thumbnail((130, 130), Image.LANCZOS)
+                im.paste(logo, (x, 270), logo if logo.mode == 'RGBA' else None)
+            else:
+                d.rounded_rectangle((x, 270, x + 130, 400), 28, fill='#1d1d1f')
+                d.text((x + 65, 335), 'privy', font=font(40), fill='white', anchor='mm')
+            d.text((x, 440), name, font=font(46), fill=ink)
+            d.text((x, 505), role, font=font(28), fill='#0071e3')
+            y = 575
+            for b in bullets:
+                for j, line in enumerate(textwrap.wrap(b, 26)):
+                    d.text((x + (0 if j == 0 else 22), y), ('• ' if j == 0 else '') + line, font=font(27), fill=muted)
+                    y += 38
+                y += 14
     elif kind == 'layers':
         d.text((150, 130), 'Four layers', font=font(96), fill=ink)
         rows = [('Catenor', 'identity + scoped authority'),
@@ -92,19 +156,29 @@ def card(kind):
     return im
 
 def shot_frame(src, crop):
-    im = Image.open(SHOTS_DIR / src).convert('RGB')
+    path = LOGOS / src.split('/', 1)[1] if src.startswith('logos/') else SHOTS_DIR / src
+    im = Image.open(path).convert('RGB')
+    cmd = CMD.get(src)
     if crop:
         w, h = im.size
         im = im.crop((int(crop[0] * w), int(crop[1] * h), int(crop[2] * w), int(crop[3] * h)))
     dark = sum(ImageStat.Stat(im.convert('L')).mean) < 110
     bg = '#1e1f24' if dark else '#f5f5f7'
     canvas = Image.new('RGB', (W, H), bg)
-    maxw, maxh = W - 120, H - 80
+    maxw, maxh = W - 120, H - (170 if cmd else 80)
     im.thumbnail((maxw, maxh), Image.LANCZOS) if (im.width > maxw or im.height > maxh) else None
     if im.width < maxw and im.height < maxh:  # upscale small crops for legibility
         s = min(maxw / im.width, maxh / im.height)
         im = im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
-    canvas.paste(im, ((W - im.width) // 2, (H - im.height) // 2))
+    top = (H - im.height) // 2 + (45 if cmd else 0)
+    canvas.paste(im, ((W - im.width) // 2, top))
+    if cmd:
+        d = ImageDraw.Draw(canvas)
+        bx0, bx1 = (W - im.width) // 2, (W + im.width) // 2
+        d.rectangle((bx0, top - 78, bx1, top - 8), fill='#2b2d33')
+        for k, c in enumerate(('#ff5f57', '#febc2e', '#28c840')):
+            d.ellipse((bx0 + 22 + k * 30, top - 52, bx0 + 40 + k * 30, top - 34), fill=c)
+        d.text((bx0 + 130, top - 43), '$ ' + cmd, font=font(30, MONO), fill='#9ef0a8', anchor='lm')
     return canvas
 
 def guide(frame, block):
