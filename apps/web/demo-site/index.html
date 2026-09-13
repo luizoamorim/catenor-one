@@ -1,0 +1,1994 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catenor One — ETHOnline 2026</title>
+<meta name="description" content="Catenor One, ETHOnline 2026: identity persists, authority stays scoped. A full run on the deployed Chainlink CRE Confidential Workflow, Privy policy-bounded wallets and Hedera Asset Tokenization Studio on testnet. Possession ≠ current eligibility.">
+<meta name="theme-color" content="#ffffff">
+<style>
+:root{
+  --bg:#fff;--text:#1d1d1f;--muted:#6e6e73;--muted2:#86868b;--hair:#d2d2d7;--hair2:#e8e8ed;--soft:#f5f5f7;--soft2:#fbfbfd;
+  --blue:#0071e3;--green:#16883f;--red:#d70015;--ink:#000;--max:1280px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Monaco,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--text);overflow-x:clip;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration:none}
+a.link{color:var(--blue)}
+a.link:hover{text-decoration:underline}
+button{font:inherit;color:inherit}
+::selection{background:#d9ecff}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
+img{max-width:100%;display:block}
+code,.mono{font-family:var(--mono)}
+code{overflow-wrap:anywhere}
+.tbl code,.pill code{overflow-wrap:normal}
+.h{font-family:var(--mono);font-size:.92em;overflow-wrap:anywhere;word-break:break-word}
+.skip{position:absolute;left:-999px;top:8px;background:#000;color:#fff;padding:8px 14px;border-radius:8px;z-index:300}
+.skip:focus{left:12px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.78);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-bottom:1px solid rgba(0,0,0,.055)}
+.nav-inner{max-width:var(--max);height:52px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;letter-spacing:-.02em;white-space:nowrap}
+.mark{width:24px;height:24px;border-radius:50%;border:2px solid #1d1d1f;position:relative;flex:none}
+.mark:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;right:-3px;top:1px}
+.nav-links{display:flex;gap:28px;color:#424245;font-size:12px}
+.nav-links a:hover{color:#000}
+.nav-links .gh{color:var(--blue)}
+
+/* hero */
+.hero{min-height:88vh;display:grid;place-items:center;position:relative;overflow:hidden;border-bottom:1px solid var(--hair2)}
+.hero::before{content:"";position:absolute;inset:auto -18vw -34vh auto;width:74vw;height:74vw;border-radius:50%;
+  background:radial-gradient(circle at 40% 38%,rgba(0,113,227,.13),transparent 26%),radial-gradient(circle at 62% 55%,rgba(110,110,115,.11),transparent 28%),radial-gradient(circle at 48% 60%,rgba(255,255,255,.98),rgba(245,245,247,.72) 48%,rgba(255,255,255,0) 69%);
+  filter:blur(8px);pointer-events:none}
+.hero-inner{max-width:var(--max);width:100%;padding:100px 28px 72px;position:relative;z-index:1}
+.eyebrow{color:var(--muted);font-size:14px;font-weight:650;letter-spacing:.02em;margin-bottom:18px}
+h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;letter-spacing:-.075em;font-weight:700}
+.hero-copy{margin-top:42px;max-width:820px;font-size:clamp(22px,2.4vw,34px);line-height:1.15;letter-spacing:-.035em;color:#424245;font-weight:500}
+.hero-copy strong{color:#1d1d1f}
+.neq{font-weight:400;color:var(--muted2);padding:0 .08em}
+.roles{margin-top:40px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--hair);max-width:1100px}
+.role{padding:18px 20px 0 0;margin-right:20px;border-right:1px solid var(--hair2)}
+.role:last-child{border-right:0;margin-right:0}
+.role b{display:block;font-size:17px;letter-spacing:-.025em}
+.role span{display:block;margin-top:6px;font-size:14px;line-height:1.45;color:var(--muted)}
+.hero-actions{display:flex;flex-wrap:wrap;gap:24px;margin-top:38px;align-items:center}
+.hero-actions a{font-size:17px;color:var(--blue);font-weight:500}
+.hero-actions a:after{content:"\00a0›";font-size:22px}
+.stats{margin-top:56px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);max-width:1100px;background:rgba(255,255,255,.55)}
+.stat{padding:22px 22px 24px 0;border-right:1px solid var(--hair2);margin-right:22px}
+.stat:last-child{border-right:0;margin-right:0}
+.stat b{display:block;font-size:clamp(36px,4vw,54px);letter-spacing:-.06em;line-height:1;font-weight:700}
+.stat span{display:block;margin-top:8px;font-size:14px;color:var(--muted)}
+
+/* sections */
+.section{border-bottom:1px solid var(--hair2)}
+.wrap{max-width:var(--max);margin:0 auto;padding:132px 28px}
+.kicker{font-size:21px;font-weight:650;letter-spacing:-.025em;color:#1d1d1f}
+.display{margin-top:10px;font-size:clamp(44px,6vw,86px);line-height:.98;letter-spacing:-.06em;font-weight:700}
+.lead{max-width:820px;margin-top:26px;font-size:clamp(19px,2vw,24px);line-height:1.3;letter-spacing:-.025em;color:var(--muted)}
+.lead strong{color:var(--text);font-weight:600}
+.creed{margin-top:54px;display:flex;flex-wrap:wrap;gap:10px 34px;font-size:clamp(20px,2vw,26px);font-weight:650;letter-spacing:-.035em}
+.creed span{color:#1d1d1f}
+.creed span:nth-child(2n){color:var(--muted)}
+.cast{margin-top:76px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.cast-item{padding:26px 20px 28px;border-right:1px solid var(--hair2);min-width:0}
+.cast-item:last-child{border-right:0}
+.cast-num{font-size:12px;color:var(--muted2);margin-bottom:28px}
+.cast-name{font-size:19px;font-weight:650;letter-spacing:-.03em}
+.cast-alias{font-size:13px;color:var(--muted);margin-top:3px}
+.cast-role{margin-top:10px;font-size:14px;line-height:1.45;color:var(--muted)}
+.cast-meta{margin-top:20px;font:11.5px/1.6 var(--mono);color:var(--muted2);overflow-wrap:anywhere}
+.cast-meta b{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-size:12px;color:#424245;font-weight:600}
+
+/* story */
+.flow-section{background:var(--soft2)}
+.flow-wrap{max-width:var(--max);margin:0 auto;padding:120px 28px 54px}
+.flow-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:60px}
+.flow-head .lead{margin:0;max-width:560px}
+.story{max-width:var(--max);margin:0 auto;padding:0 28px 80px}
+.act{display:flex;align-items:baseline;gap:18px;padding:64px 0 18px;border-top:1px solid var(--hair)}
+.act b{white-space:nowrap;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);font-weight:600}
+.act span{font-size:15px;color:var(--muted)}
+.chapter{display:grid;grid-template-columns:110px minmax(0,1fr) 340px;gap:42px;align-items:start;border-top:1px solid var(--hair2);padding:84px 0}
+.act + .chapter{border-top:0;padding-top:40px}
+.chapter-index{padding-top:12px;font-size:14px;color:var(--muted2)}
+.chapter-index .stg{display:block;margin-top:8px;font-size:12px;color:var(--muted2)}
+.chapter-index .pill{margin-top:10px}
+.chapter-main{min-width:0}
+.chapter-main h3{margin:0;font-size:clamp(34px,4.2vw,64px);line-height:1.03;letter-spacing:-.055em;font-weight:680}
+.chapter-main p{max-width:780px;margin:22px 0 0;font-size:clamp(17px,1.6vw,21px);line-height:1.4;letter-spacing:-.018em;color:var(--muted)}
+.chapter-main p strong{color:var(--text);font-weight:600}
+.chapter-main ul.facts{max-width:780px;margin:20px 0 0;padding:0;list-style:none;border-top:1px solid var(--hair2)}
+.facts li{padding:11px 0;border-bottom:1px solid var(--hair2);font-size:15px;line-height:1.45;color:#424245;display:grid;grid-template-columns:170px minmax(0,1fr);gap:16px}
+.facts li > span:first-child{color:var(--muted2);font-size:13px;padding-top:1px}
+.formula{margin-top:34px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:17px;color:#424245}
+.formula .arrow{color:#aaa;font-size:22px}
+.formula .op{color:#aaa}
+.side-note{border-left:1px solid var(--hair);padding-left:24px;position:sticky;top:90px}
+.side-note .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2)}
+.side-note .value{margin-top:10px;font-size:19px;line-height:1.3;font-weight:650;letter-spacing:-.025em}
+.side-note .small{margin-top:11px;font-size:13px;line-height:1.55;color:var(--muted)}
+.side-note .label + .value + .small + .label{margin-top:26px}
+.side-note .sep{margin-top:24px}
+.state{margin-top:26px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.state b{font-size:clamp(32px,3.4vw,44px);letter-spacing:-.05em;line-height:1}
+.state span{font-size:15px;color:var(--muted)}
+.pay{color:var(--green)}
+.hold{color:var(--red)}
+.ownership{margin-top:34px;display:grid;grid-template-columns:3fr 2fr;height:14px;border-radius:999px;overflow:hidden;background:#e8e8ed;max-width:780px}
+.ownership div:first-child{background:#1d1d1f}
+.ownership div:last-child{background:#b8b8bd}
+.ownership-labels{display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--muted);max-width:780px}
+
+/* pills and tags */
+.pill{display:inline-block;font-size:10.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap;line-height:1.3}
+.p-cre{background:#1d1d1f;color:#fff}
+.p-net{background:#e3f4e8;color:#0f6b31}
+.p-live{background:#e8f1fc;color:#0058b0}
+.p-local{background:#efeff2;color:#515154}
+.p-mock{background:#fff3e0;color:#9a5b00}
+.p-sand{background:#f3ecfb;color:#6e2bb3}
+.tag{display:inline-block;font-weight:700;font-size:.82em;letter-spacing:.03em;padding:1px 7px;border-radius:6px}
+.allow{color:var(--green);background:#e9f6ee}
+.deny{color:var(--red);background:#fdecee}
+.okt{color:var(--green);font-weight:650}
+
+/* screenshots */
+.shots{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;max-width:820px}
+.shots.wide{max-width:none;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:26px 22px}
+.shot{margin:0;min-width:0}
+.shot button{display:block;width:100%;padding:0;border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:#f2f2f4;cursor:zoom-in;aspect-ratio:16/10;position:relative;transition:transform .25s ease,box-shadow .25s ease}
+.shot button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.09)}
+.shot img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.shot figcaption{margin-top:9px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.shot figcaption b{color:#424245;font-weight:600}
+
+/* private (black) */
+.private{background:#000;color:#f5f5f7}
+.private .wrap{padding-top:150px;padding-bottom:150px}
+.private .kicker,.private .display{color:#f5f5f7}
+.private .lead{color:#a1a1a6}
+.private .lead strong{color:#f5f5f7}
+.tee{margin-top:80px;border-top:1px solid #2c2c2e;border-bottom:1px solid #2c2c2e}
+.tee-row{display:grid;grid-template-columns:230px minmax(0,1fr) minmax(0,1fr);gap:36px;padding:28px 0;border-bottom:1px solid #242426;align-items:start}
+.tee-row:last-child{border-bottom:0}
+.tee-row .name{font-size:14px;color:#86868b}
+.tee-row .what{font-size:21px;letter-spacing:-.025em;line-height:1.3}
+.tee-row .why{font-size:15px;line-height:1.55;color:#a1a1a6}
+.tee-row code{color:#f5f5f7;font-size:.86em}
+.big-result{margin-top:92px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.result-block{padding-top:28px;border-top:1px solid #3a3a3c;min-width:0}
+.result-block .who{font-size:14px;color:#86868b}
+.result-block .decision{margin-top:9px;font-size:clamp(64px,9vw,128px);letter-spacing:-.07em;line-height:.9;font-weight:700}
+.private .pay{color:#30d158}
+.private .hold{color:#ff453a}
+.result-block .detail{margin-top:18px;font-size:17px;line-height:1.5;color:#a1a1a6}
+.result-block .detail .h{color:#d2d2d7}
+.result-block .then{margin-top:18px;padding-top:16px;border-top:1px solid #242426;font-size:15px;line-height:1.5;color:#f5f5f7}
+.private-foot{margin-top:70px;display:flex;flex-wrap:wrap;gap:12px 36px;font-size:13px;color:#86868b}
+.private-foot b{color:#d2d2d7;font-weight:600}
+
+/* evidence + tabs */
+.evidence{background:#fff}
+.tablist{margin-top:64px;display:flex;gap:4px;border-bottom:1px solid var(--hair);overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:50}
+.tablist::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;padding:16px 16px 14px;font-size:15px;font-weight:600;letter-spacing:-.015em;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0}
+.tab:hover{color:#1d1d1f}
+.tab[aria-selected="true"]{color:#1d1d1f;border-bottom-color:#1d1d1f}
+.tab:focus-visible{outline-offset:-4px;border-radius:8px}
+.tabpanel{padding-top:56px}
+.tabpanel:focus-visible{outline:none}
+.panel-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:end}
+.panel-head h3{margin:0;font-size:clamp(32px,3.6vw,52px);letter-spacing:-.05em;line-height:1.02;font-weight:700}
+.panel-head p{margin:0;font-size:17px;line-height:1.5;color:var(--muted)}
+.sub{margin:72px 0 0;font-size:24px;font-weight:650;letter-spacing:-.03em}
+.subp{margin:10px 0 0;max-width:820px;font-size:16px;line-height:1.55;color:var(--muted)}
+.numbers{margin-top:46px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.num{padding:22px 16px 22px 0;border-right:1px solid var(--hair2);margin-right:16px;min-width:0}
+.num:last-child{border-right:0;margin-right:0}
+.num b{display:block;font-size:clamp(30px,3vw,44px);letter-spacing:-.055em;line-height:1;font-weight:700}
+.num span{display:block;margin-top:8px;font-size:13px;line-height:1.4;color:var(--muted)}
+.tbl-wrap{margin-top:26px;overflow-x:auto;border-top:1px solid var(--hair);-webkit-overflow-scrolling:touch}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;line-height:1.45}
+.tbl th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);font-weight:600;padding:14px 16px 12px 0;border-bottom:1px solid var(--hair);white-space:nowrap}
+.tbl td{padding:13px 16px 13px 0;border-bottom:1px solid var(--hair2);vertical-align:top;color:#424245}
+.tbl td:last-child,.tbl th:last-child{padding-right:0}
+.tbl td.m{font-family:var(--mono);font-size:12.5px;color:#1d1d1f}
+.tbl td.nw{white-space:nowrap}
+.tbl td b{color:#1d1d1f}
+.tbl tr.hl td{background:#fbfbfd}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.card{border:1px solid var(--hair);border-radius:18px;padding:26px 26px 24px;background:#fff;min-width:0}
+.card.soft{background:var(--soft2);border-color:var(--hair2)}
+.card h4{margin:0;font-size:18px;letter-spacing:-.025em;font-weight:650}
+.card p{margin:10px 0 0;font-size:15px;line-height:1.55;color:var(--muted)}
+.card .n{font-size:12px;color:var(--muted2);margin-bottom:14px}
+.kv{margin:0;display:grid;grid-template-columns:200px minmax(0,1fr);border-top:1px solid var(--hair)}
+.kv dt,.kv dd{margin:0;padding:13px 0;border-bottom:1px solid var(--hair2);font-size:14px;line-height:1.5}
+.kv dt{color:var(--muted2);font-size:13px;padding-right:16px}
+.kv dd{color:#1d1d1f;min-width:0;overflow-wrap:anywhere}
+.list{margin:18px 0 0;padding:0;list-style:none;border-top:1px solid var(--hair2)}
+.list li{padding:14px 0;border-bottom:1px solid var(--hair2);font-size:15px;line-height:1.55;color:#424245}
+.list li b{color:#1d1d1f}
+.olist{counter-reset:o;margin:18px 0 0;padding:0;list-style:none}
+.olist li{counter-increment:o;position:relative;padding:14px 0 14px 44px;border-bottom:1px solid var(--hair2);font-size:15px;line-height:1.55;color:#424245}
+.olist li::before{content:counter(o,decimal-leading-zero);position:absolute;left:0;top:15px;font-size:12px;color:var(--muted2)}
+.olist li b{color:#1d1d1f}
+.note{margin-top:22px;padding:18px 20px;border-radius:14px;background:var(--soft);font-size:14px;line-height:1.55;color:#424245}
+.note b{color:#1d1d1f}
+.note.warn{background:#fff8ec}
+
+/* code */
+.code{margin:18px 0 0;background:var(--soft2);border:1px solid var(--hair2);border-radius:16px;padding:20px 22px;overflow:auto;max-height:560px;font:12.5px/1.65 var(--mono);color:#1d1d1f;tab-size:2}
+.code .k{color:#1d1d1f;font-weight:600}
+.code .s{color:#c41a16}
+.code .n{color:#1c00cf}
+.code .b{color:#9b2393}
+.code .p{color:#86868b}
+.code-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:40px;flex-wrap:wrap}
+.code-head b{font-size:16px;letter-spacing:-.02em}
+.code-head span{font:12px var(--mono);color:var(--muted2)}
+
+/* policy rule card */
+.rule{margin-top:26px;border:1px solid var(--hair);border-radius:22px;padding:30px;background:linear-gradient(180deg,#fff,#fbfbfd)}
+.rule-top{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:baseline}
+.rule-top .rn{font:600 15px var(--mono)}
+.rule-top .rm{font-size:13px;color:var(--muted)}
+.conds{margin-top:22px;display:flex;flex-wrap:wrap;align-items:stretch;gap:12px}
+.cond{flex:1 1 200px;border:1px solid var(--hair2);border-radius:14px;padding:16px 18px;background:#fff;min-width:0}
+.cond .f{font:12px var(--mono);color:var(--muted2)}
+.cond .v{margin-top:6px;font-size:21px;font-weight:650;letter-spacing:-.03em;line-height:1.25}
+.cond .v small{display:block;font:11.5px/1.5 var(--mono);color:var(--muted);font-weight:400;letter-spacing:0;margin-top:4px;overflow-wrap:anywhere}
+.and{align-self:center;font-size:20px;color:var(--muted2);flex:none}
+.rule-deny{margin-top:16px;font-size:13px;color:var(--muted)}
+
+/* chain */
+.chain{margin-top:30px;display:grid;grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr) 60px minmax(0,1fr);align-items:stretch}
+.node{border:1px solid var(--hair);border-radius:18px;padding:20px;background:#fff;min-width:0}
+.node .t{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2)}
+.node .nm{margin-top:8px;font-size:20px;font-weight:650;letter-spacing:-.03em}
+.node .d{margin-top:8px;font:11.5px var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.node ul{margin:14px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.5;color:#424245}
+.node li{padding:6px 0;border-top:1px solid var(--hair2)}
+.node li code{font-size:11.5px}
+.link-arrow{display:grid;place-items:center;font-size:26px;color:#aaa}
+
+/* bars */
+.bars{margin-top:24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px;border-top:1px solid var(--hair)}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 34px 90px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hair2);font:12px var(--mono);color:#424245}
+.bar .c{text-align:right;font-weight:650;color:#1d1d1f}
+.bar .t{height:6px;border-radius:9px;background:#e8e8ed;overflow:hidden}
+.bar .t i{display:block;height:100%;background:#1d1d1f;border-radius:9px}
+.bar.hi .t i{background:var(--red)}
+.bar .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* mirror node */
+.evidence-list{margin-top:30px;border-top:1px solid var(--hair)}
+.e-row{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:30px;padding:20px 0;border-bottom:1px solid var(--hair2);align-items:center}
+.e-system{font-size:16px;font-weight:650}
+.e-proof{font-size:15px;color:#424245}
+.e-ref{font:12px/1.4 var(--mono);color:var(--muted);text-align:right;overflow-wrap:anywhere}
+.e-ref a{color:var(--blue)}
+.real{color:var(--green)}
+.dep{color:#1d1d1f}
+@media(max-width:980px){.e-row{grid-template-columns:1fr;gap:6px}.e-ref{text-align:left}}
+.mn-btn{appearance:none;border:1px solid var(--hair);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--blue);cursor:pointer;white-space:nowrap}
+.mn-btn:hover{border-color:var(--blue)}
+.mn-btn[disabled]{color:var(--muted2);cursor:progress}
+.mn-out{margin-top:8px;font:11.5px/1.6 var(--mono);color:#424245;white-space:normal}
+.mn-out:empty{display:none}
+.mn-out .okt{font-family:var(--mono)}
+.mn-out .bad{color:var(--red);font-weight:650}
+.mn-out .err{color:#9a5b00;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-size:13px}
+.bal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:22px}
+.bal .card b.big{display:block;font-size:34px;letter-spacing:-.05em;margin-top:6px}
+
+/* study */
+.study{background:var(--soft)}
+.qa{margin-top:64px;border-top:1px solid var(--hair)}
+.qa details{border-bottom:1px solid var(--hair)}
+.qa summary{cursor:pointer;list-style:none;padding:28px 0;font-size:clamp(19px,2vw,24px);font-weight:600;letter-spacing:-.03em;display:flex;justify-content:space-between;gap:20px}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary:after{content:"+";color:var(--muted2);font-weight:400}
+.qa details[open] summary:after{content:"−"}
+.qa p{margin:-4px 0 28px;max-width:880px;font-size:17px;line-height:1.6;color:var(--muted)}
+.qa p strong{color:var(--text);font-weight:600}
+
+/* footer */
+.foot{border-top:1px solid var(--hair2);background:#fff}
+.foot-inner{max-width:var(--max);margin:0 auto;padding:56px 28px 40px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:40px}
+.foot h5{margin:0 0 14px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);font-weight:600}
+.foot ul{margin:0;padding:0;list-style:none;font-size:14px;line-height:2}
+.foot a{color:var(--blue)}
+.foot a:hover{text-decoration:underline}
+.foot .honest{font-size:13px;line-height:1.6;color:var(--muted)}
+.foot-bottom{max-width:var(--max);margin:0 auto;padding:18px 28px 32px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--muted2);border-top:1px solid var(--hair2)}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;grid-template-rows:1fr auto;padding:56px 64px 22px;gap:14px}
+.lb figure{margin:0;min-height:0;display:grid;place-items:center}
+.lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;background:#111}
+.lb .cap{max-width:980px;margin:0 auto;color:#d2d2d7;font-size:14px;line-height:1.5;text-align:center}
+.lb .cap b{color:#fff}
+.lb .cap .cnt{display:block;margin-top:4px;font-size:12px;color:#86868b}
+.lb-btn{position:absolute;appearance:none;border:0;background:rgba(255,255,255,.14);color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:22px;line-height:42px;text-align:center}
+.lb-btn:hover{background:rgba(255,255,255,.26)}
+.lb-close{top:12px;right:14px}
+.lb-prev{left:12px;top:50%;margin-top:-21px}
+.lb-next{right:12px;top:50%;margin-top:-21px}
+
+@media(max-width:1180px){
+  .cast{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cast-item:nth-child(3n){border-right:0}
+  .cast-item:nth-child(-n+3){border-bottom:1px solid var(--hair2)}
+  .numbers{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .num:nth-child(3n){border-right:0;margin-right:0}
+  .num:nth-child(-n+3){border-bottom:1px solid var(--hair2)}
+  .chapter{grid-template-columns:90px minmax(0,1fr) 280px;gap:32px}
+}
+@media(max-width:980px){
+  .roles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .role:nth-child(2n){border-right:0;margin-right:0}
+  .chapter{grid-template-columns:64px minmax(0,1fr)}
+  .side-note{grid-column:2;position:static}
+  .flow-head,.panel-head,.grid2{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  .big-result{grid-template-columns:1fr}
+  .tee-row{grid-template-columns:1fr;gap:10px}
+  .chain{grid-template-columns:1fr}
+  .link-arrow{height:44px;transform:rotate(90deg)}
+  .bars{grid-template-columns:1fr}
+  .foot-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:650px){
+  .nav-links{gap:16px}
+  .nav-inner,.hero-inner,.wrap,.flow-wrap,.story,.foot-inner,.foot-bottom{padding-left:18px;padding-right:18px}
+  .hero{min-height:auto}
+  .hero-inner{padding-top:72px}
+  .roles{grid-template-columns:1fr}
+  .role{border-right:0;margin-right:0;padding-right:0}
+  .stats{grid-template-columns:1fr}
+  .stat{border-right:0;margin-right:0;border-bottom:1px solid var(--hair2)}
+  .stat:last-child{border-bottom:0}
+  .wrap{padding-top:90px;padding-bottom:90px}
+  .private .wrap{padding-top:100px;padding-bottom:100px}
+  .cast{grid-template-columns:1fr}
+  .cast-item{border-right:0;border-bottom:1px solid var(--hair2)}
+  .numbers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .num{border-right:0!important;margin-right:0;border-bottom:1px solid var(--hair2)}
+  .chapter{grid-template-columns:1fr;padding:60px 0;gap:18px}
+  .chapter-index{padding:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .chapter-index .stg,.chapter-index .pill{margin-top:0}
+  .side-note{grid-column:auto}
+  .facts li{grid-template-columns:1fr;gap:2px}
+  .kv{grid-template-columns:1fr}
+  .kv dt{border-bottom:0;padding-bottom:0}
+  .bal{grid-template-columns:1fr}
+  .foot-inner{grid-template-columns:1fr}
+  .lb{padding:56px 10px 16px}
+  .lb-prev,.lb-next{top:auto;bottom:14px}
+}
+@media(max-width:420px){.nav-links{gap:14px}.nav-links .opt{display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.shot button{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#flow">Skip to the demo</a>
+
+<nav class="nav" aria-label="Primary">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span><span>Catenor One</span></a>
+    <div class="nav-links">
+      <a href="#flow">Demo</a>
+      <a href="#evidence">Evidence</a>
+      <a class="opt" href="#study">Study</a>
+      <a class="gh" href="https://github.com/luizoamorim/catenor-one" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div class="eyebrow">ETHOnline 2026 · Catenor One · the first reference implementation of Catenor Protocol</div>
+    <h1>Identity persists.<br>Authority stays scoped.</h1>
+    <div class="hero-copy">
+      Holding an asset does not make you eligible to be paid today.
+      <strong>Possession <span class="neq">≠</span> current eligibility.</strong>
+    </div>
+    <div class="roles">
+      <div class="role"><b>Catenor</b><span>decides identity and authority.</span></div>
+      <div class="role"><b>Chainlink CRE</b><span>evaluates private, current state inside a TEE.</span></div>
+      <div class="role"><b>Privy</b><span>constrains what each key can sign.</span></div>
+      <div class="role"><b>Hedera ATS</b><span>executes the asset lifecycle.</span></div>
+    </div>
+    <div class="hero-actions">
+      <a href="#flow">Walk through the run</a>
+      <a href="#evidence">Inspect the evidence</a>
+      <a href="#tee">See the TEE decision</a>
+    </div>
+    <div class="stats" aria-label="Headline results">
+      <div class="stat"><b>24/24</b><span>stages verified <code>ok: true</code></span></div>
+      <div class="stat"><b>5</b><span>executions on the <strong>deployed</strong> CRE Confidential Workflow</span></div>
+      <div class="stat"><b>6</b><span>Hedera testnet transactions, all SUCCESS</span></div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<section class="section">
+  <div class="wrap">
+    <div class="kicker">The thesis</div>
+    <div class="display">Entitled to 4.<br>Paid 0.</div>
+    <div class="lead">
+      Investor B was sanctioned <em>after</em> he invested. He still holds <strong>400 units</strong>, a dividend
+      entitlement of <strong>4</strong> and a validly signed, <strong>ACTIVE</strong> credential. The deployed
+      Chainlink Confidential Workflow read today’s evidence inside its TEE and decided he is not eligible today:
+      <strong>HOLD 4 — no transaction, no signature request.</strong> Investor A was paid <strong>6 HBAR</strong>
+      on Hedera testnet.
+    </div>
+    <div class="creed" aria-label="Core thesis">
+      <span>Wallets are accounts.</span><span>Credentials are claims.</span><span>Authority is scoped.</span><span>Identity persists.</span>
+    </div>
+
+    <div class="cast">
+      <div class="cast-item">
+        <div class="cast-num">01</div>
+        <div class="cast-name">Trust Anchor</div>
+        <div class="cast-role">Root of trust for <code>trust-domain:catenor-one-demo</code>. Admitted on the deployed CRE workflow.</div>
+        <div class="cast-meta" title="did:catenor:656d66dff9ce1db692786ee241bc3cab">did:catenor:656d…3cab</div>
+      </div>
+      <div class="cast-item">
+        <div class="cast-num">02</div>
+        <div class="cast-name">Sponsor</div>
+        <div class="cast-role">An organization with five scoped capabilities on <code>spv:catenor-demo-001</code>.</div>
+        <div class="cast-meta" title="did:catenor:5b87cad5d25e94dbf62f4443cf85761d">did:catenor:5b87…761d</div>
+      </div>
+      <div class="cast-item">
+        <div class="cast-num">03</div>
+        <div class="cast-name">SPV 001</div>
+        <div class="cast-role">“Catenor One Demo SPV 001”, a synthetic real-estate SPV. Its units are equity interests, not a deed.</div>
+        <div class="cast-meta" title="did:catenor:bd7856964b7ab1cce73a0e9c4c875d44">did:catenor:bd78…5d44<br>0x182F…9926 · 0.0.10509879</div>
+      </div>
+      <div class="cast-item">
+        <div class="cast-num">04</div>
+        <div class="cast-name">Investor A</div>
+        <div class="cast-alias">“Lisa Simpson” · fictional, Sumsub sandbox</div>
+        <div class="cast-role">Eligible when she invested, and still eligible at distribution time.</div>
+        <div class="cast-meta"><b>600 units · 60%</b><br>0x7de5…2473 · 0.0.10509881</div>
+      </div>
+      <div class="cast-item">
+        <div class="cast-num">05</div>
+        <div class="cast-name">Investor B</div>
+        <div class="cast-alias">“Bart Simpson” · fictional, Sumsub sandbox</div>
+        <div class="cast-role">Eligible when he invested. Sanctioned afterwards. Still owns his units.</div>
+        <div class="cast-meta"><b>400 units · 40%</b><br>0xCfCa…Da73 · 0.0.10509882</div>
+      </div>
+      <div class="cast-item">
+        <div class="cast-num">06</div>
+        <div class="cast-name">Distribution Agent</div>
+        <div class="cast-role">Its own identity and wallet. Pays only after a delegated <code>EXECUTE_DISTRIBUTION</code>.</div>
+        <div class="cast-meta" title="did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074">did:catenor:9b25…c074<br>0x9089…13E3 · 0.0.10511413</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flow" class="flow-section" aria-labelledby="flow-title">
+  <div class="flow-wrap">
+    <div class="flow-head">
+      <div>
+        <div class="kicker">The demo</div>
+        <div class="display" id="flow-title">One continuous run. Sixteen decisions.</div>
+      </div>
+      <div class="lead">
+        Instance <code>c1-202609121659</code>, 2026-09-12, 16:59 → 22:59 UTC. The maintainer ran every stage by hand,
+        one at a time, from an empty Privy app and an empty database to a paid distribution. Each chapter shows one
+        protocol decision, who made it, and which system executed it.
+      </div>
+    </div>
+  </div>
+
+  <div class="story">
+
+    <!-- ACT I -->
+    <div class="act"><b>Act I</b><span>Trust is admitted, not assumed</span></div>
+
+    <article class="chapter" id="ch-01">
+      <div class="chapter-index">01 / 16<span class="stg">Stage 10 · 17:08 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>Before anyone is trusted, the rules are pinned.</h3>
+        <p>
+          The Privy app starts with no wallets, no key quorums and no policies. Stage 10 creates the signer
+          infrastructure for the Trust Domain: a <strong>Bootstrap Endorsement Key</strong> (Solana wallet
+          <span class="h">HKQY5…nVEk</span>) under <code>P_BOOTSTRAP</code>, the <code>P_ASSERT</code> policy for
+          credential-assertion keys, two runtime quorums and two management-owner keys that never leave the
+          maintainer’s machine. The acceptance rules are then hashed into the <strong>Bootstrap Configuration</strong>,
+          which becomes the input to the first CRE deploy.
+        </p>
+        <ul class="facts">
+          <li><span>Trust Domain</span><span><code>trust-domain:catenor-one-demo</code></span></li>
+          <li><span>Admission policy</span><span><code>policy:trust-anchor-admission:v1</code></span></li>
+          <li><span>Policies</span><span><code>P_BOOTSTRAP</code> <span class="h">vzww22mkxmtn4f333fdqpse7</span> · <code>P_ASSERT</code> <span class="h">e8d0ndsssfq6rr7p2im0ptt4</span> — allow <code>signMessage</code>; deny <code>exportPrivateKey</code> and <code>exportSeedPhrase</code></span></li>
+          <li><span>Bootstrap Configuration</span><span class="h">0x88314d8bae7f81ff33c8192124f7870a4f27586beba74e9772b735a3af007fff</span></li>
+        </ul>
+        <div class="formula">
+          <span>Trust Domain</span><span class="arrow">→</span><span>admission policy</span><span class="arrow">→</span><span>hash <code>0x8831…7fff</code></span><span class="arrow">→</span><span>CRE deploy #1</span>
+        </div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 10 output"><img src="assets/10-after-terminal.jpg" alt="Terminal output of stage 10: signer infrastructure created live and the Bootstrap Configuration hash" width="1800" height="363" loading="lazy" decoding="async"></button><figcaption><b>Stage 10.</b> Signer infrastructure CREATED LIVE; Bootstrap Configuration hash <code>0x88314d8b…7fff</code>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Credential Assertion Key ≠ Financial Execution Key</div>
+        <div class="small">Assertion and bootstrap keys can sign messages only. They can never be exported or sign a transaction.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-02">
+      <div class="chapter-index">02 / 16<span class="stg">Stage 11 · 19:18 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-main">
+        <h3>The root Trust Anchor is admitted inside a TEE.</h3>
+        <p>
+          The candidate organization gets a random <code>did:catenor</code> and a Privy Ed25519 assertion key, and
+          proves it holds the key. Then the <strong>deployed</strong> Confidential Workflow opens the sealed context,
+          fetches its Vault DON secrets and makes <strong>two Sumsub sandbox calls</strong> from inside the enclave.
+          Six facts come out, all true, plus a commitment. Catenor keeps no raw Sumsub response. The admission policy
+          says <span class="tag allow">ALLOW</span>, the separate <code>P_BOOTSTRAP</code> key endorses, and the
+          Trust Anchor becomes <strong>ACTIVE</strong>: <code>TRUST_ANCHOR_VALID: true</code>.
+        </p>
+        <ul class="facts">
+          <li><span>Trust Anchor</span><span class="h">did:catenor:656d66dff9ce1db692786ee241bc3cab</span></li>
+          <li><span>CRE execution</span><span><span class="h">0x394f66228ed74f270e5917ba9401a78f36aea40366864cf89306936e74ce4bd8</span> · <code>TRUST_ANCHOR_ADMISSION</code> · 8 s</span></li>
+          <li><span>Facts (in the TEE)</span><span><code>ORGANIZATION_KYB_VERIFIED</code> · <code>ORGANIZATION_STATUS_VALID</code> · <code>ORGANIZATION_AML_CLEAR</code> · <code>AUTHORIZED_REPRESENTATIVE_VERIFIED</code> · <code>REPRESENTATIVE_AUTHORITY_CONFIRMED</code> · <code>EVIDENCE_FRESH</code></span></li>
+          <li><span>Evidence commitment</span><span><span class="h">0x032c3587582592487fde060e08ab3e3747e80b25cf7bc825ee6bdbc58cf31846</span> (COMMITMENT_ONLY)</span></li>
+          <li><span>Decision</span><span><code>decision:4721cc3e-702a-42cc-95e1-60f34d66185a</code> · <span class="tag allow">ALLOW</span></span></li>
+        </ul>
+        <div class="formula">
+          <span>Sumsub sandbox + synthetic company mock</span><span class="arrow">→</span><span><code>handlerInTee</code></span><span class="arrow">→</span><span>6 facts + commitment</span><span class="arrow">→</span><span>ALLOW</span><span class="arrow">→</span><span>endorsement</span><span class="arrow">→</span><span>ACTIVE</span>
+        </div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: CRE workflow before stage 11"><img src="assets/11-before-cre-workflow.jpg" alt="CRE dashboard showing identity-confidential-production Active in the private registry with zero executions" width="1800" height="1006" loading="lazy" decoding="async"></button><figcaption><b>Before.</b> <code>identity-confidential-production</code>: Active, private registry, <b>0 executions</b>.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: CRE execution events for the admission"><img src="assets/11-after-cre-execution-events.jpg" alt="CRE execution 394f…4bd8: Success, 8 seconds, a trigger event then two http-actions SendRequest events" width="1800" height="993" loading="lazy" decoding="async"></button><figcaption><b>After.</b> Execution <code>394f…4bd8</code>: Success, 8 s, $0. <code>trigger</code>, then <b>two <code>http-actions SendRequest</code></b> from inside the TEE.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 11 output"><img src="assets/11-after-terminal.jpg" alt="Terminal output of stage 11: mode DEPLOYED, EVIDENCE_RECEIVED, policy ALLOW, TRUST_ANCHOR_VALID true" width="1800" height="878" loading="lazy" decoding="async"></button><figcaption><b>Stage 11.</b> <code>mode DEPLOYED</code>, <code>EVIDENCE_RECEIVED</code>, <b>ALLOW</b>, <code>TRUST_ANCHOR_VALID: true</code>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Trust Anchor authority comes from Admission.</div>
+        <div class="small">Not from a database flag. The company facts come from a SYNTHETIC MOCK; the representative facts from the real Sumsub sandbox.</div>
+        <div class="label sep">It took four attempts</div>
+        <div class="small">Attempts 1–3 were refused by the documented gateway. None created an execution or consumed the set-once root. <a class="link" href="#ev-runlog">Run log ›</a></div>
+      </aside>
+    </article>
+
+    <!-- ACT II -->
+    <div class="act"><b>Act II</b><span>Scoped authority, then an asset</span></div>
+
+    <article class="chapter" id="ch-03">
+      <div class="chapter-index">03 / 16<span class="stg">Stages 20–21 · 19:58–20:01 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>The Trust Anchor authorizes the Sponsor.</h3>
+        <p>
+          The Sponsor is an organization with a random DID and no PII. At first it holds no capability. The Trust
+          Anchor signs a <strong>Relationship Credential</strong> (<code>AUTHORIZED_SPONSOR_IN</code> the Trust Domain),
+          which grants nothing by itself, and <strong>five Capability grants</strong> on
+          <code>spv:catenor-demo-001</code>, all ALLOW. The same capability on another resource is
+          <span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code>.
+        </p>
+        <div class="formula">
+          <span>Trust Anchor</span><span class="arrow">→</span><span>Sponsor</span><span class="arrow">→</span>
+          <code>TOKENIZE_ASSET</code><code>DEFINE_OFFERING_POLICY</code><code>CREATE_AGENT</code><code>CREATE_DISTRIBUTION</code><code>DELEGATE_DISTRIBUTION_AUTHORITY</code>
+        </div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 21 output"><img src="assets/21-terminal.jpg" alt="Terminal output of stage 21: relationship valid, five capability grants ALLOW, and one DENY CAPABILITY_MISSING on another resource" width="1800" height="1706" loading="lazy" decoding="async"></button><figcaption><b>Stage 21.</b> <code>AUTHORIZED_SPONSOR_IN</code> valid + five grants <b>ALLOW</b>; another resource → <b>DENY <code>CAPABILITY_MISSING</code></b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Relationship ≠ Capability</div>
+        <div class="small">Knowing who someone acts for never grants execution authority by itself. Authority is scoped to the resource.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-04">
+      <div class="chapter-index">04 / 16<span class="stg">Stage 30 · 20:08 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>The SPV exists only after <code>TOKENIZE_ASSET</code> says ALLOW.</h3>
+        <p>
+          Catenor evaluated the Sponsor’s <code>TOKENIZE_ASSET</code> on <code>spv:catenor-demo-001</code>. Only then
+          were the SPV subject, its Privy EVM execution wallet and its execution policy created. The policy is owned by
+          a management-owner key outside the runtime, so the runtime signer cannot change it. It allows
+          <code>eth_signTransaction</code> only on chain 296 and only to the ATS v8 Factory. Everything else is denied.
+        </p>
+        <ul class="facts">
+          <li><span>SPV</span><span class="h">did:catenor:bd7856964b7ab1cce73a0e9c4c875d44</span></li>
+          <li><span>Execution wallet</span><span class="h">0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926</span></li>
+          <li><span>Policy</span><span><code>catenor-one-spv-execution-4c875d44</code> · <span class="h">cygll4bmgocqr05asp2w6f2s</span></span></li>
+          <li><span>Also created</span><span>a private <code>SPV_EXECUTION</code> Account Binding, and SPV <code>SPONSORED_BY</code> Sponsor</span></li>
+        </ul>
+        <div class="formula">
+          <span>Catenor capability</span><span class="op">decides whether</span><span>the SPV may exist</span><span class="arrow">·</span><span>Privy policy</span><span class="op">bounds what</span><span>its wallet may sign</span>
+        </div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 30 output"><img src="assets/30-terminal.jpg" alt="Terminal output of stage 30: SPV DID and Privy EVM wallet created after TOKENIZE_ASSET ALLOW" width="1800" height="687" loading="lazy" decoding="async"></button><figcaption><b>Stage 30.</b> SPV <code>did:catenor:bd78…5d44</code> + wallet <code>0x182F…9926</code>, created after the ALLOW.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: SPV policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy dashboard policy JSON: eth_signTransaction allowed only if chain_id equals 296 and to equals the ATS v8 Factory; exports denied" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Privy.</b> <code>eth_signTransaction</code> ALLOW only if <code>chain_id</code> eq 296 AND <code>to</code> eq the ATS v8 Factory.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Policy Decision ≠ Execution Authorization</div>
+        <div class="small">The wallet is bound to the SPV subject privately. It never becomes the subject.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-05">
+      <div class="chapter-index">05 / 16<span class="stg">Stage 31 · 20:22 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>The offering pins who may invest — by hash.</h3>
+        <p>
+          The Sponsor signs <code>offering:ab27ec9a-cd89-4b5b-92ea-bef19fbd9f9f</code>: <strong>1,000
+          equity-interest units</strong> in “Catenor One Demo SPV 001”. Eligibility is
+          <code>policy:offering-eligibility:v1</code>, pinned by hash. It requires four facts, and accepts one
+          credential type. The signature is checked against the Sponsor’s <code>DEFINE_OFFERING_POLICY</code> grant:
+          <span class="tag allow">ALLOW</span>.
+        </p>
+        <ul class="facts">
+          <li><span>Policy hash</span><span class="h">0xa3326b33a0932b68c140a477334160a1585a75d4ccc824e0c89aa68d57dd51a2</span></li>
+          <li><span>Requires</span><span><code>INVESTOR_PRESENTATION_VALID</code> · <code>INVESTOR_IDENTITY_VERIFIED</code> · <code>INVESTOR_AML_CLEAR</code> · <code>EVIDENCE_FRESH</code></span></li>
+          <li><span>Accepted credential</span><span><code>CatenorInvestorEligibilityCredential</code></span></li>
+        </ul>
+        <div class="state"><b>1,000</b><span>tokenized equity-interest units on offer</span></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 31 output"><img src="assets/31-terminal.jpg" alt="Terminal output of stage 31: offering signed by the Sponsor, policy pinned by hash, verified ALLOW" width="1800" height="821" loading="lazy" decoding="async"></button><figcaption><b>Stage 31.</b> Offering <code>ab27ec9a…</code>, policy pinned by hash <code>0xa3326b33…51a2</code>, verified <b>ALLOW</b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">What is tokenized</div>
+        <div class="value">Equity interests in a synthetic SPV.</div>
+        <div class="small">Not a land deed. The policy is fixed by hash, so nobody can quietly change who qualifies.</div>
+      </aside>
+    </article>
+
+    <!-- ACT III -->
+    <div class="act"><b>Act III</b><span>Investors, credentials, confidential eligibility</span></div>
+
+    <article class="chapter" id="ch-06">
+      <div class="chapter-index">06 / 16<span class="stg">Stages 40–41 · 20:26–20:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span></div>
+      <div class="chapter-main">
+        <h3>Two investors onboard. Both green.</h3>
+        <p>
+          “Lisa Simpson” and “Bart Simpson” are fictional Sumsub <strong>sandbox</strong> applicants, both forced
+          GREEN (Approved). Each gets a random <code>did:catenor</code> with no PII, an Ed25519 <strong>holder
+          key</strong> that signs presentations and never money, and a <strong>receive-only</strong> Privy wallet: an
+          owner key, no signer, no policy. The link from DID to wallet is a <strong>private</strong> Account Binding,
+          never published in the DID Document. There is no CRE call here, by design: the evidence is read only inside
+          the TEE.
+        </p>
+        <ul class="facts">
+          <li><span>Investor A (Lisa)</span><span class="h">0x7de572532820B22040B561e68543419419b72473</span></li>
+          <li><span>Investor B (Bart)</span><span class="h">0xCfCa833A8e6b7651E44480b92822576BcB78Da73</span></li>
+        </ul>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: Sumsub sandbox both approved"><img src="assets/44-after-sumsub-both-green.jpg" alt="Sumsub sandbox applicant list: Bart Simpson and Lisa Simpson both Approved, applicant IDs redacted" width="1800" height="431" loading="lazy" decoding="async"></button><figcaption><b>Sumsub sandbox.</b> Bart and Lisa both <b>Approved</b> (level <code>id-only</code>). Applicant IDs redacted.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Wallet / Account ≠ Canonical Subject</div>
+        <div class="small">Financial Account Bindings are private by default. Investor DIDs are not published here either.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-07">
+      <div class="chapter-index">07 / 16<span class="stg">Stages 42–43 · 20:34–20:41 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-main">
+        <h3>Credentials are issued only after the TEE has looked.</h3>
+        <p>
+          Two <code>INVESTOR_ELIGIBILITY</code> runs on the deployed workflow read each investor’s <strong>current</strong>
+          Sumsub sandbox review behind the binding gate. Only after identity, AML and freshness came back true did the
+          Trust Anchor sign a W3C VC 2.0 <code>CatenorInvestorEligibilityCredential</code> (<code>eddsa-jcs-2022</code>),
+          valid from 2026-09-12 to 2026-12-11, with no PII. In stage 43 each investor signed a Verifiable Presentation
+          with the holder key; both pass <strong>7/7 checks</strong>, and a replay with another challenge fails
+          <code>HOLDER_PROOF_VALID</code>.
+        </p>
+        <ul class="facts">
+          <li><span>Investor A run</span><span class="h">0xe66a410799c33f710fa19baefa09ea49f0d2f89aaced4266390d14cdee320b8f</span></li>
+          <li><span>Investor B run</span><span class="h">0x61485b72ad43bd2a63d466fdb7778d02d49a5dec4206979171aa68a15df064f8</span></li>
+          <li><span>Pacing</span><span>the runner waited 44 s between triggers: the deployed rate limit is 1 per 60 s</span></li>
+        </ul>
+        <div class="formula">
+          <span>current Sumsub review</span><span class="arrow">→</span><span>TEE facts + commitment</span><span class="arrow">→</span><span>VC by the Trust Anchor</span><span class="arrow">→</span><span>VP by the holder</span>
+        </div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: CRE executions after stage 42"><img src="assets/42-after-cre-executions.jpg" alt="CRE dashboard: three successful executions, zero unsuccessful" width="1800" height="1149" loading="lazy" decoding="async"></button><figcaption><b>CRE.</b> <b>3 successful, 0 unsuccessful.</b> New: <code>e66a41…0b8f</code> and <code>61485b…64f8</code>, about 63 s apart.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Provider evidence is not the decision.</div>
+        <div class="small">Evidence becomes a signed Catenor credential; the credential becomes a presentation; the policy evaluates the presentation with current state.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-08">
+      <div class="chapter-index">08 / 16<span class="stg">Stage 44 · 20:45 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-main">
+        <h3>Offering eligibility, decided in the enclave.</h3>
+        <p>
+          <strong>One</strong> sealed <code>OFFERING_ELIGIBILITY</code> run covers both investors. Inside
+          <code>handlerInTee</code> the workflow checked the holder proof, the VC signature, the pinned issuer key, the
+          subject, the validity window and the status, then the <strong>current</strong> Sumsub evidence and its
+          reconciliation with the credential, then <code>policy:offering-eligibility:v1</code>. Only minimized
+          conclusions left the TEE.
+        </p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th scope="col">Investor</th><th scope="col">Units</th><th scope="col">Decision</th><th scope="col">Decision ref</th><th scope="col">Checks</th></tr></thead>
+            <tbody>
+              <tr><td><b>A · Lisa</b></td><td>600</td><td><span class="tag allow">ALLOW</span></td><td class="m">decision:8c0a84a1-d53f-4c2b-94f8-f88787ab53dd</td><td>7/7 · CONSISTENT</td></tr>
+              <tr><td><b>B · Bart</b></td><td>400</td><td><span class="tag allow">ALLOW</span></td><td class="m">decision:3000f2f5-0376-446f-b9b9-bbffdd8078ef</td><td>7/7 · CONSISTENT</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="facts">
+          <li><span>CRE execution</span><span><span class="h">0xfecb527d3d0133d4fd23a4c29a36b7998a1dc379c137a65175d72f4272464715</span> · 8 s</span></li>
+          <li><span>Run commitment</span><span class="h">0x83db064bab91f7dfd86dfd0309cbfe6f5d68f568116554fa2b21715b92599beb</span></li>
+        </ul>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 44 output"><img src="assets/44-terminal.jpg" alt="Terminal output of stage 44: Investor A ALLOW 600 and Investor B ALLOW 400 with traces and presentation checks; investor DIDs redacted" width="1800" height="2174" loading="lazy" decoding="async"></button><figcaption><b>Stage 44.</b> <b>A ALLOW 600 · B ALLOW 400</b>, four requirements TRUE, 7/7 checks. Investor DIDs redacted.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: CRE execution logs"><img src="assets/44-after-cre-execution-logs.jpg" alt="CRE Logs tab for execution fecb…4715 showing the same non-sensitive markers from several DON nodes" width="1800" height="1830" loading="lazy" decoding="async"></button><figcaption><b>Logs tab.</b> Every DON node emits only safe markers: <code>secrets_fetched</code>, <code>offering_evaluated status=OK</code>, <code>handler_completed status=DELIVERED</code>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Minimum necessary verified fact.</div>
+        <div class="small">Observed: TEE user logs are visible per node on the deployed platform. The workflow logs only non-sensitive markers, and Catenor does not claim logs stay in the enclave.</div>
+      </aside>
+    </article>
+
+    <!-- ACT IV -->
+    <div class="act"><b>Act IV</b><span>The asset goes live on Hedera</span></div>
+
+    <article class="chapter" id="ch-09">
+      <div class="chapter-index">09 / 16<span class="stg">Stages 50–62 · 20:55–21:57 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-main">
+        <h3>The SPV equity is deployed and issued — exactly 600 and 400.</h3>
+        <p>
+          A Privy testnet treasury, funded once from the faucet, activated the wallets. Then the Sponsor’s
+          <code>TOKENIZE_ASSET</code> grant was re-evaluated and the SPV’s Privy wallet sent <code>deployEquity</code> to
+          the ATS v8 Factory. Each issuance was bound to that investor’s TEE-backed ALLOW decision from stage 44 —
+          unused, within the offering total, and <strong>consumed</strong> on use. No generic mint.
+        </p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th scope="col">Call</th><th scope="col">Transaction</th><th scope="col">Result</th></tr></thead>
+            <tbody>
+              <tr><td><code>deployEquity</code> → Factory</td><td class="m">0x2396…c570</td><td><span class="okt">SUCCESS</span> · 6,898,334 gas · fee 7.864 ℏ</td></tr>
+              <tr><td><code>issueByPartition</code> → A, 600</td><td class="m">0x5935…fa4e</td><td><span class="okt">SUCCESS</span> · balance 600</td></tr>
+              <tr><td><code>issueByPartition</code> → B, 400</td><td class="m">0x9c6c…0d62</td><td><span class="okt">SUCCESS</span> · balance 400</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="facts">
+          <li><span>ATS equity</span><span><span class="h">0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC</span> · contract 0.0.10510175 · <code>C1SPV001</code></span></li>
+          <li><span>Read-back</span><span><code>totalSupply()</code> 1000 · <code>decimals()</code> 0 · A 600 · B 400</span></li>
+        </ul>
+        <div class="ownership" aria-hidden="true"><div></div><div></div></div>
+        <div class="ownership-labels"><span>Investor A · 600 · 60%</span><span>Investor B · 400 · 40%</span></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: HashScan deployEquity transaction"><img src="assets/60-after-hashscan-deploy-tx.jpg" alt="HashScan: the deployEquity transaction, SUCCESS in block 40438071, fee 7.864 hbar paid by the SPV account" width="1800" height="1454" loading="lazy" decoding="async"></button><figcaption><b>HashScan.</b> <code>deployEquity</code>: <b>SUCCESS</b>, 21:14:07 UTC, block 40438071; fee 7.864 ℏ from SPV <code>0.0.10509879</code>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Execution layer</div>
+        <div class="value">Hedera ATS executes. It does not decide identity.</div>
+        <div class="small">The amount issued is exactly the one the TEE-backed decision approved, and the decision is consumed.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-10">
+      <div class="chapter-index">10 / 16<span class="stg">Stage 63 · 22:05 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-main">
+        <h3>A dividend is set. ATS computes who is entitled.</h3>
+        <p>
+          The SPV wallet sends <code>grantRole(ROLE_CORPORATE_ACTION, SPV)</code> and then <code>setDividend</code>
+          (amount 1, decimals 2), each allowed only by its equity-pinned policy rule. ATS computes entitlements by
+          ownership only. <strong>No funds move.</strong> Who is actually <em>paid</em> is decided later, by Catenor,
+          in the TEE.
+        </p>
+        <ul class="facts">
+          <li><span><code>grantRole</code></span><span><span class="h">0x726032ce…9f94</span> · 179,949 gas</span></li>
+          <li><span><code>setDividend</code></span><span><span class="h">0xaac4a085…f865</span> · 532,107 gas · record date 22:07:10 UTC · execution 22:10:10 UTC</span></li>
+        </ul>
+        <div class="formula"><span>10 HBAR</span><span class="arrow">→</span><span>A = 6</span><span class="op">+</span><span>B = 4</span><span class="op">(ownership only)</span></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 63 output"><img src="assets/63-terminal.jpg" alt="Terminal output of stage 63: grantRole and setDividend confirmed; entitlements A 6 and B 4" width="1800" height="943" loading="lazy" decoding="async"></button><figcaption><b>Stage 63.</b> <code>grantRole</code> + <code>setDividend</code> confirmed; entitlements A 600 → 6, B 400 → 4.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: Hedera entitlements re-check"><img src="assets/63-after-verify-hedera-entitlements.jpg" alt="Read-only Hedera verification after the record date: five transactions SUCCESS and dividend 1 entitlements A 6, B 4" width="1800" height="2069" loading="lazy" decoding="async"></button><figcaption><b>Read-only re-check, 22:08 UTC.</b> 5 transactions SUCCESS; <b>dividend 1: A 6, B 4</b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Entitlement ≠ Eligibility</div>
+        <div class="small">The ledger records what each holder is owed. A later compliance hold does not erase it.</div>
+      </aside>
+    </article>
+
+    <!-- ACT V -->
+    <div class="act"><b>Act V</b><span>An Agent earns its authority</span></div>
+
+    <article class="chapter" id="ch-11">
+      <div class="chapter-index">11 / 16<span class="stg">Stage 70 · 22:10 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>The Agent has a wallet. It has no authority: DENY.</h3>
+        <p>
+          The Sponsor’s <code>CREATE_AGENT</code> is ALLOW. The Distribution Agent gets its own identity, its own Privy EVM
+          wallet bound privately (<code>AGENT_EXECUTION</code>), its own signer set, and a policy narrower than the
+          SPV’s: chain 296, <strong>only to the two investor receiving wallets</strong>, <strong>≤ 20 HBAR</strong>. Then
+          it asks to run a distribution before any delegation:
+          <span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code>.
+        </p>
+        <ul class="facts">
+          <li><span>Agent</span><span class="h">did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074</span></li>
+          <li><span>Wallet</span><span class="h">0x90894535F5f35271f2d4112179BF2b4e887913E3</span></li>
+          <li><span>Policy</span><span><code>catenor-one-distribution-agent-3d8dc074</code> · <span class="h">p99xe36icsfvewrovm1mczwq</span></span></li>
+        </ul>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 70 output"><img src="assets/70-terminal.jpg" alt="Terminal output of stage 70: Agent created with its Privy wallet; distribution request before delegation DENY CAPABILITY_MISSING" width="1800" height="907" loading="lazy" decoding="async"></button><figcaption><b>Stage 70.</b> Agent + wallet created; request before delegation → <b>DENY <code>CAPABILITY_MISSING</code></b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Created ≠ authorized.</div>
+        <div class="small">An Agent never inherits the Sponsor’s authority. It must be delegated, explicitly.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-12">
+      <div class="chapter-index">12 / 16<span class="stg">Stage 71 · 22:19 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>A relationship alone: still DENY.</h3>
+        <p>
+          The Sponsor signs a Relationship Credential, <code>urn:uuid:87eb74d1-4314-49bc-bb4c-8ad6d3cb6794</code>: Agent
+          <code>AGENT_OF</code> Sponsor. It is <strong>valid</strong>. The Agent asks again with only the relationship:
+          <span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code>.
+        </p>
+        <div class="formula"><span>Agent</span><span class="arrow">→</span><code>AGENT_OF</code><span class="arrow">→</span><span>Sponsor</span><span class="op">=</span><span class="hold">no capability</span></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 71 output"><img src="assets/71-terminal.jpg" alt="Terminal output of stage 71: relationship AGENT_OF valid; request with only the relationship still DENY CAPABILITY_MISSING" width="1800" height="558" loading="lazy" decoding="async"></button><figcaption><b>Stage 71.</b> <code>AGENT_OF</code> <b>valid</b>; request with only the relationship → <b>still DENY</b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Relationship ≠ Capability</div>
+        <div class="small">The <code>AGENT_OF</code> predicate is [REF-IMPL]: the protocol’s predicate vocabulary is an open design item.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-13">
+      <div class="chapter-index">13 / 16<span class="stg">Stage 72 · 22:20 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-main">
+        <h3>Delegated <code>EXECUTE_DISTRIBUTION</code>: ALLOW.</h3>
+        <p>
+          Before signing, Catenor checked three things: the action is explicitly delegable, and the Sponsor holds both
+          <code>CREATE_DISTRIBUTION</code> and <code>DELEGATE_DISTRIBUTION_AUTHORITY</code> on the same resource from
+          the ACTIVE Trust Anchor. The Sponsor then signed grant <code>capability-grant:7bd93930-e21c-4f78-86fd-8f8c9aa46156</code>
+          for 20 days, inside its own 30. The chain Trust Anchor → Sponsor → Agent evaluates
+          <span class="tag allow">ALLOW</span>. The Sponsor then tried to delegate <code>TOKENIZE_ASSET</code>: refused
+          <code>ACTION_NOT_DELEGABLE</code>, no signature requested. Investor A presenting the Agent’s grant:
+          <span class="tag deny">DENY</span> <code>SUBJECT_MISMATCH</code>.
+        </p>
+        <div class="formula"><span>Trust Anchor</span><span class="arrow">→</span><span>Sponsor <small>(until 2026-10-12)</small></span><span class="arrow">→</span><span>Agent <small>(until 2026-10-02)</small></span><span class="arrow">→</span><code>EXECUTE_DISTRIBUTION</code></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 72 output"><img src="assets/72-terminal.jpg" alt="Terminal output of stage 72: delegated EXECUTE_DISTRIBUTION authority chain ALLOW; TOKENIZE_ASSET delegation refused ACTION_NOT_DELEGABLE; SUBJECT_MISMATCH" width="1800" height="1224" loading="lazy" decoding="async"></button><figcaption><b>Stage 72.</b> Chain <b>ALLOW</b>; <code>TOKENIZE_ASSET</code> → <b>refused <code>ACTION_NOT_DELEGABLE</code></b>; wrong holder → <b>DENY <code>SUBJECT_MISMATCH</code></b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Delegated authority ≤ delegator authority</div>
+        <div class="small">Delegability must be explicit. None of this uses the CRE, by design: authority is public-key-verifiable and has no sensitive input.</div>
+      </aside>
+    </article>
+
+    <!-- ACT VI -->
+    <div class="act"><b>Act VI</b><span>The world changes. The payout follows the present.</span></div>
+
+    <article class="chapter" id="ch-14">
+      <div class="chapter-index">14 / 16<span class="stg">Stage 80 · 22:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span></div>
+      <div class="chapter-main">
+        <h3>Bart is sanctioned. Nothing else changes.</h3>
+        <p>
+          Catenor did nothing here: the <strong>current external evidence</strong> changed. The operator set Investor B’s
+          Sumsub sandbox review to <strong>RED, reject label <code>SANCTIONS</code>, FINAL</strong>. He still holds
+          <strong>400 units</strong> on Hedera ATS and his entitlement of 4. His credential
+          <code>urn:uuid:9c25804e-…4530</code> is <strong>still ACTIVE and validly signed</strong>.
+        </p>
+        <div class="state"><b>400</b><span>units still owned by Investor B</span></div>
+        <div class="state"><b>ACTIVE</b><span>his credential, still validly signed</span></div>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: Sumsub Bart rejected"><img src="assets/80-after-sumsub-bart-red.jpg" alt="Sumsub sandbox: Bart Simpson Rejected with reject label Sanctions; Lisa Simpson Approved; applicant IDs redacted" width="1800" height="508" loading="lazy" decoding="async"></button><figcaption><b>Sumsub sandbox.</b> Bart <b>Rejected (Sanctions)</b>, Lisa <b>Approved</b>. Applicant IDs redacted.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 80 output"><img src="assets/80-terminal.jpg" alt="Terminal output of stage 80: review RED SANCTIONS; credential still ACTIVE; holdings still 400; investor DID redacted" width="1800" height="966" loading="lazy" decoding="async"></button><figcaption><b>Stage 80.</b> Review RED; credential <b>still ACTIVE</b>; holdings <b>still 400</b>. Investor DID redacted.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Signature validity ≠ current eligibility</div>
+        <div class="small">A valid signature proves who issued a claim and that it was not altered. It does not prove the claim is still true today.</div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-15">
+      <div class="chapter-index">15 / 16<span class="stg">Stages 81–82 · 22:37–22:40 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-main">
+        <h3>The TEE re-checks today. PAY 6. HOLD 4.</h3>
+        <p>
+          A 10 HBAR revenue event is recorded for the SPV (<code>revenue-event:a2400be4…2355</code>, an audit event; no
+          funds move). Investor A asking to run the distribution is <span class="tag deny">DENY</span>
+          <code>CAPABILITY_MISSING</code>: only the Agent holds the delegated capability. Then <strong>one</strong>
+          sealed <code>CONFIDENTIAL_DISTRIBUTION</code> run on the deployed workflow, with three Sumsub calls from inside
+          the TEE, verifies each VP, VC and status statement, reads the <strong>current</strong> evidence, reconciles
+          it, applies <code>policy:distribution-eligibility:v2</code> and computes 10 HBAR × units / 1000.
+        </p>
+        <div class="state"><b class="pay">PAY 6</b><span>Investor A · all TRUE · CONSISTENT</span></div>
+        <div class="state"><b class="hold">HOLD 4</b><span>Investor B · VP 7/7 valid, but identity FALSE, AML FALSE · MISMATCH · <code>FINAL</code>, <code>SANCTIONS</code></span></div>
+        <ul class="facts">
+          <li><span>CRE execution</span><span><span class="h">0xfd2a96fb91bb4be494fd1f65a3e01ebd0e4da49d07520854cb38e2eb76e82d0b</span> · 8 s</span></li>
+          <li><span>Plan</span><span><code>distribution-plan:034ffe82-92e3-4e16-a6ff-6ed21562e4a5</code> · <code>executed: false</code></span></li>
+        </ul>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 82 output"><img src="assets/82-terminal.jpg" alt="Terminal output of stage 82: the confidential distribution plan computed in CRE DEPLOYED, Investor A PAY 6 and Investor B HOLD 4 with reason codes FINAL and SANCTIONS" width="1620" height="2324" loading="lazy" decoding="async"></button><figcaption><b>Stage 82.</b> <b>A ALLOW → PAY 6</b>; <b>B DENY → HOLD 4</b>; authority chain Trust Anchor → Sponsor → Agent; <code>executed: false</code>.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: CRE execution events for the distribution"><img src="assets/82-after-cre-execution-events.jpg" alt="CRE execution fd2a…2d0b: Success, 8 seconds, a trigger then three http-actions SendRequest events" width="1800" height="1150" loading="lazy" decoding="async"></button><figcaption><b>CRE.</b> Execution <code>fd2a…2d0b</code>: Success, 8 s, $0. <code>trigger</code>, then <b>three <code>SendRequest</code></b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Possession ≠ current eligibility</div>
+        <div class="small">Bart’s presentation is still cryptographically valid, yet he is not eligible today. <a class="link" href="#tee">Inside the TEE ›</a></div>
+      </aside>
+    </article>
+
+    <article class="chapter" id="ch-16">
+      <div class="chapter-index">16 / 16<span class="stg">Stage 83 · 22:45 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-main">
+        <h3>One signature. One payout. Zero for Bart.</h3>
+        <p>
+          The approved plan goes through the Catenor signer boundary, then the Agent’s Privy policy, then a Hedera
+          transfer. The transfer goes to Lisa’s privately bound account, with empty calldata, on chain 296. For Bart,
+          <strong>no transaction is built and no Privy signature is ever requested.</strong>
+        </p>
+        <div class="state"><b class="pay">+6 HBAR</b><span>Investor A · tx <span class="h">0x4781…ff24</span> · block 40440606</span></div>
+        <div class="state"><b class="hold">HOLD 4</b><span>Investor B · <code>transactionConstructed: false</code> · <code>investorBSignatureRequests: 0</code></span></div>
+        <ul class="facts">
+          <li><span>Transfer</span><span>Agent <code>0.0.10511413</code> → Lisa <code>0.0.10509881</code>: 6.00000000 ℏ (fee 0.024 ℏ)</span></li>
+          <li><span>Agent nonce</span><span>0 → 1: exactly one transaction was sent</span></li>
+        </ul>
+        <div class="shots">
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 83 output"><img src="assets/83-terminal.jpg" alt="Terminal output of stage 83: Investor A paid 6.0 HBAR; Investor B held, no transaction constructed and no Privy signature requested" width="1800" height="1227" loading="lazy" decoding="async"></button><figcaption><b>Stage 83.</b> <b>A PAY 6.0</b>, received; <b>B HOLD 4.0</b>: <code>privySignatureRequested: false</code>; Agent nonce 0 → 1.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: HashScan payout"><img src="assets/83-after-hashscan-payout-tx.jpg" alt="HashScan: payout transaction SUCCESS in block 40440606, Agent account to Lisa's account, 6 hbar" width="1800" height="1903" loading="lazy" decoding="async"></button><figcaption><b>HashScan.</b> <b>SUCCESS</b>, block 40440606: <code>0.0.10511413</code> → <code>0.0.10509881</code>, <b>6.00000000 ℏ</b>.</figcaption></figure>
+        </div>
+      </div>
+      <aside class="side-note">
+        <div class="label">Invariant</div>
+        <div class="value">Policy Decision ≠ Execution Authorization</div>
+        <div class="small">Catenor decides whether to pay. Privy bounds what the key can sign (<code>to</code> ∈ {A, B}, ≤ 20 HBAR). Hedera executes only what both allow.</div>
+      </aside>
+    </article>
+
+  </div>
+</section>
+
+<section class="private" id="tee" aria-labelledby="tee-title">
+  <div class="wrap">
+    <div class="kicker">Chainlink CRE Confidential · deployed</div>
+    <div class="display" id="tee-title">Private in.<br>Minimum out.</div>
+    <div class="lead">
+      The distribution decision runs inside the <strong>deployed</strong> Confidential Workflow
+      <code>identity-confidential-production</code>, in <code>handlerInTee</code>. Sensitive evidence stays in the
+      enclave. What leaves is the executable conclusion and the commitments that let Catenor check it.
+    </div>
+
+    <div class="tee">
+      <div class="tee-row">
+        <div class="name">Confidential input</div>
+        <div class="what">VPs · VCs · issuer-signed status · <em>current</em> Sumsub sandbox evidence · holdings</div>
+        <div class="why">The sealed context opens only inside the TEE. The Sumsub credentials come from the Vault DON
+          (<code>SUMSUB_APP_TOKEN</code>, <code>SUMSUB_SECRET_KEY</code>; names only). Holdings were read from Hedera ATS
+          <code>0xf37A…7ABC</code> with <code>balanceOf</code>.</div>
+      </div>
+      <div class="tee-row">
+        <div class="name">Computation</div>
+        <div class="what">Verify → read current evidence → reconcile → <code>policy:distribution-eligibility:v2</code> → 10 HBAR × units / 1000</div>
+        <div class="why">The workflow owns the whole distribution decision — pro-rata shares <em>and</em> PAY/HOLD — not an
+          isolated eligibility check. Three <code>http-actions SendRequest</code> calls, 8 seconds, 0 credits.</div>
+      </div>
+      <div class="tee-row">
+        <div class="name">Minimized output</div>
+        <div class="what">Decisions · requirement statuses · check results · reconciliation class · coarse reason codes · commitments</div>
+        <div class="why">A signed callback reaches the Railway relay. Catenor verifies the HMAC, the commitment, the
+          arithmetic and the holder set, then records one protocol Decision per holder.</div>
+      </div>
+      <div class="tee-row">
+        <div class="name">Never leaves</div>
+        <div class="what">No Sumsub response, name, document or applicant data.</div>
+        <div class="why">Honest caveat: the coarse reason codes <code>FINAL</code> and <code>SANCTIONS</code> do reach
+          Catenor, and this page does not claim otherwise.</div>
+      </div>
+    </div>
+
+    <div class="big-result">
+      <div class="result-block">
+        <div class="who">Investor A · Lisa · 600 units</div>
+        <div class="decision pay">PAY 6</div>
+        <div class="detail">ALLOW · every requirement TRUE · 7/7 presentation checks · reconciliation CONSISTENT · no reason codes<br>
+          commitment <span class="h">0x37df46f9…76db98</span></div>
+        <div class="then">Then on Hedera: 6.00000000 ℏ from the Agent, tx <span class="h">0x4781…ff24</span>, SUCCESS.</div>
+      </div>
+      <div class="result-block">
+        <div class="who">Investor B · Bart · 400 units</div>
+        <div class="decision hold">HOLD 4</div>
+        <div class="detail">DENY · holds the asset, presentation valid 7/7 — but <code>INVESTOR_IDENTITY_VERIFIED=FALSE</code>,
+          <code>INVESTOR_AML_CLEAR=FALSE</code> · MISMATCH · <code>FINAL</code>, <code>SANCTIONS</code><br>
+          commitment <span class="h">0x17b39d3e…4e8cf</span></div>
+        <div class="then">Then on Hedera: nothing. No transaction built. Zero signature requests.</div>
+      </div>
+    </div>
+
+    <div class="private-foot">
+      <span><b>Execution</b> <span class="h">0xfd2a…2d0b</span></span>
+      <span><b>CRE UUID</b> <span class="h">a623ebaa-0fb5-48eb-ad70-c65f95f079ee</span></span>
+      <span><b>Window</b> 22:40:08–22:40:16 UTC</span>
+      <span><b>Evidence commitment</b> <span class="h">0x824b…6405</span></span>
+      <span><b>Plan</b> pay 6.0 · hold 4.0</span>
+    </div>
+  </div>
+</section>
+
+<section id="evidence" class="section evidence" aria-labelledby="evidence-title">
+  <div class="wrap">
+    <div class="kicker">Judge evidence</div>
+    <div class="display" id="evidence-title">Verify every system independently.</div>
+    <div class="lead">
+      Public references, not just screenshots: HashScan links and a live Mirror Node check for every Hedera
+      transaction, CRE execution IDs from both the gateway and the platform, Privy wallet and policy IDs, and the
+      Catenor audit re-verification. Everything here is public-safe: no investor DID, no applicant ID, no VC or VP, no
+      key or secret.
+    </div>
+
+    <div class="tablist" role="tablist" aria-label="Evidence by system">
+      <button class="tab" role="tab" id="tab-overview" aria-controls="ev-overview" aria-selected="true" tabindex="0">Overview</button>
+      <button class="tab" role="tab" id="tab-cre" aria-controls="ev-cre" aria-selected="false" tabindex="-1">Chainlink CRE</button>
+      <button class="tab" role="tab" id="tab-privy" aria-controls="ev-privy" aria-selected="false" tabindex="-1">Privy</button>
+      <button class="tab" role="tab" id="tab-hedera" aria-controls="ev-hedera" aria-selected="false" tabindex="-1">Hedera</button>
+      <button class="tab" role="tab" id="tab-catenor" aria-controls="ev-catenor" aria-selected="false" tabindex="-1">Catenor</button>
+      <button class="tab" role="tab" id="tab-runlog" aria-controls="ev-runlog" aria-selected="false" tabindex="-1">Run log</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="tabpanel" role="tabpanel" id="ev-overview" aria-labelledby="tab-overview" tabindex="0">
+      <div class="panel-head">
+        <h3>24 of 24 stages. Every one <code>ok: true</code>.</h3>
+        <p>Stage 99 (22:59 UTC, read-only) summarized every stage record and re-ran the Catenor verification. From
+          <code>01-setup-env</code> at 16:59 UTC to <code>83-execute-approved-distribution</code> at 22:45 UTC.</p>
+      </div>
+      <div class="numbers">
+        <div class="num"><b>24/24</b><span>stages ran and are <code>ok</code></span></div>
+        <div class="num"><b>5</b><span>DEPLOYED CRE executions, all SUCCESS</span></div>
+        <div class="num"><b>6</b><span>Hedera testnet transactions, all SUCCESS</span></div>
+        <div class="num"><b>79</b><span>audit events, hash chain valid</span></div>
+        <div class="num"><b>3</b><span><code>DISTRIBUTION_REQUEST_DENIED</code> events</span></div>
+        <div class="num"><b class="hold">0</b><span>signature requests for Investor B</span></div>
+      </div>
+
+      <h4 class="sub">Stage record</h4>
+      <p class="subp">Modes: <span class="pill p-local">Local</span> 2 · <span class="pill p-live">Sponsor live (non-spending)</span> 12 ·
+        <span class="pill p-cre">Confidential (CRE) · deployed</span> 4 · <span class="pill p-net">Testnet live (spends HBAR)</span> 6.
+        Stages 11 and 60 show their successful re-run; stage 50 ran twice and shows its second run (the Agent funding).</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">#</th><th scope="col">Stage</th><th scope="col">Mode</th><th scope="col">Ran</th><th scope="col">OK</th><th scope="col">At (UTC)</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td class="m">01-setup-env</td><td><span class="pill p-local">Local</span></td><td>true</td><td class="okt">true</td><td class="nw">16:59:49</td></tr>
+            <tr><td>1</td><td class="m">10-create-trust-domain</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">17:08:13</td></tr>
+            <tr class="hl"><td>2</td><td class="m">11-admit-root-trust-anchor</td><td><span class="pill p-cre">CRE · deployed</span></td><td>true</td><td class="okt">true</td><td class="nw">19:18:13</td></tr>
+            <tr><td>3</td><td class="m">20-create-sponsor</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">19:58:44</td></tr>
+            <tr><td>4</td><td class="m">21-trust-anchor-authorize-sponsor</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:00:46</td></tr>
+            <tr><td>5</td><td class="m">30-create-spv</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:08:04</td></tr>
+            <tr><td>6</td><td class="m">31-create-offering-policy</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:21:58</td></tr>
+            <tr><td>7</td><td class="m">40-create-investor-a</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:26:02</td></tr>
+            <tr><td>8</td><td class="m">41-create-investor-b</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:29:06</td></tr>
+            <tr class="hl"><td>9</td><td class="m">42-create-investor-credentials</td><td><span class="pill p-cre">CRE · deployed</span></td><td>true</td><td class="okt">true</td><td class="nw">20:34:29</td></tr>
+            <tr><td>10</td><td class="m">43-create-investor-presentations</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">20:41:06</td></tr>
+            <tr class="hl"><td>11</td><td class="m">44-check-offering-eligibility</td><td><span class="pill p-cre">CRE · deployed</span></td><td>true</td><td class="okt">true</td><td class="nw">20:44:56</td></tr>
+            <tr><td>12</td><td class="m">50-fund-testnet-wallets</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:25:45</td></tr>
+            <tr><td>13</td><td class="m">60-tokenize-spv</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">21:25:41</td></tr>
+            <tr><td>14</td><td class="m">61-investor-a-invest</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">21:54:50</td></tr>
+            <tr><td>15</td><td class="m">62-investor-b-invest</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">21:56:24</td></tr>
+            <tr><td>16</td><td class="m">63-create-dividend</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:05:10</td></tr>
+            <tr><td>17</td><td class="m">70-create-distribution-agent</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:10:52</td></tr>
+            <tr><td>18</td><td class="m">71-sponsor-establish-agent-relationship</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:18:58</td></tr>
+            <tr><td>19</td><td class="m">72-sponsor-delegate-distribution-capability</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:19:50</td></tr>
+            <tr><td>20</td><td class="m">80-invalidate-investor-b</td><td><span class="pill p-live">Sponsor live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:29:47</td></tr>
+            <tr><td>21</td><td class="m">81-trigger-revenue</td><td><span class="pill p-local">Local</span></td><td>true</td><td class="okt">true</td><td class="nw">22:37:40</td></tr>
+            <tr class="hl"><td>22</td><td class="m">82-run-confidential-distribution</td><td><span class="pill p-cre">CRE · deployed</span></td><td>true</td><td class="okt">true</td><td class="nw">22:39:44</td></tr>
+            <tr><td>23</td><td class="m">83-execute-approved-distribution</td><td><span class="pill p-net">Testnet live</span></td><td>true</td><td class="okt">true</td><td class="nw">22:45:05</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Key public references</h4>
+      <div class="evidence-list">
+        <div class="e-row"><div class="e-system">Chainlink CRE <span class="dep">· DEPLOYED</span></div><div class="e-proof">Confidential distribution · A PAY 6 / B HOLD 4</div><div class="e-ref">0xfd2a96fb…2d0b</div></div>
+        <div class="e-row"><div class="e-system">Chainlink CRE <span class="dep">· DEPLOYED</span></div><div class="e-proof">Root Trust Anchor admission · ALLOW</div><div class="e-ref">0x394f6622…4bd8</div></div>
+        <div class="e-row"><div class="e-system">Hedera ATS <span class="real">· TESTNET</span></div><div class="e-proof">Equity deployment · <code>deployEquity</code></div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570" rel="noopener">0x2396ad88…c570 ↗</a></div></div>
+        <div class="e-row"><div class="e-system">Hedera ATS <span class="real">· TESTNET</span></div><div class="e-proof">Issuance · Investor A 600 / Investor B 400</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e" rel="noopener">0x59359ae9…fa4e ↗</a><br><a href="https://hashscan.io/testnet/transaction/0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62" rel="noopener">0x9c6c4cb2…0d62 ↗</a></div></div>
+        <div class="e-row"><div class="e-system">Hedera <span class="real">· TESTNET</span></div><div class="e-proof">Approved payout · Investor A · 6 HBAR</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24" rel="noopener">0x4781f6ef…ff24 ↗</a></div></div>
+        <div class="e-row"><div class="e-system">Privy <span class="real">· REAL dev app</span></div><div class="e-proof">SPV execution wallet · policy <code>cygll4bmgocqr05asp2w6f2s</code></div><div class="e-ref">0x182F8c7D…9926</div></div>
+        <div class="e-row"><div class="e-system">Privy <span class="real">· REAL dev app</span></div><div class="e-proof">Distribution Agent wallet · policy <code>p99xe36icsfvewrovm1mczwq</code></div><div class="e-ref">0x90894535…13E3</div></div>
+        <div class="e-row"><div class="e-system">Catenor</div><div class="e-proof">Audit hash chain valid · 79 events · Trust Anchor VALID</div><div class="e-ref">scripts/demo/93-verify-catenor-audit.sh</div></div>
+      </div>
+      <div class="shots wide">
+        <figure class="shot"><button type="button" data-lb data-group="overview" aria-label="Enlarge screenshot: stage 99 stage table"><img src="assets/99-verify-complete-demo-stages.jpg" alt="Stage 99 output: a table of all 24 stages, each ran true and ok true, with its mode and time" width="1800" height="1071" loading="lazy" decoding="async"></button><figcaption><b>Stage 99.</b> All 24 stages ran and are <code>ok: true</code>, each with its mode.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="overview" aria-label="Enlarge screenshot: five CRE executions"><img src="assets/99-after-cre-five-executions.jpg" alt="CRE dashboard at the end of the demo: identity-confidential-production with five executions, all Success, zero spend" width="1800" height="954" loading="lazy" decoding="async"></button><figcaption><b>End of demo.</b> <code>identity-confidential-production</code>: <b>5 executions, all Success, $0</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="overview" aria-label="Enlarge screenshot: final Hedera verification"><img src="assets/91-verify-hedera-final.jpg" alt="Stage 91 output: six transactions SUCCESS from public chain data; holdings A 600 and B 400; balances A 7.0 and B 1.0 hbar" width="1800" height="2118" loading="lazy" decoding="async"></button><figcaption><b>Stage 91.</b> <b>6 transactions SUCCESS</b>; A 600 units / 7.0 ℏ, B 400 units / 1.0 ℏ.</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- CHAINLINK CRE -->
+    <div class="tabpanel" role="tabpanel" id="ev-cre" aria-labelledby="tab-cre" tabindex="0">
+      <div class="panel-head">
+        <h3>The deployed Confidential Workflow.</h3>
+        <p><b>Label: DEPLOYED.</b> This is the deployed workflow on Chainlink’s private registry, not
+          <code>cre workflow simulate</code>. Five executions, all SUCCESS, about 8 s each, 0 credits used.</p>
+      </div>
+
+      <h4 class="sub">Workflow facts</h4>
+      <dl class="kv" style="margin-top:22px">
+        <dt>Name</dt><dd><code>identity-confidential-production</code> (CRE project <code>workflows/</code>, target <code>production-settings</code>)</dd>
+        <dt>Handler</dt><dd><code>cre.handlerInTee(httpTrigger, onHttpTrigger, [{ tee: 'nitro', regions: ['us-west-2'] }])</code>, routing five operations: admission, investor eligibility, credential, offering and distribution</dd>
+        <dt>Registry / DON family</dt><dd><code>private</code> (Chainlink-hosted) / <code>zone-a</code></dd>
+        <dt>Owner</dt><dd class="h">0x7075057f1589BAf347cB6dD6a993B1FC536B8a0a</dd>
+        <dt>Deploy #1 · 17:38 UTC</dt><dd>ID <span class="h">00e12517fc06c8984befaa63accbadb21b8c4abe529595fcf48542ba097ad250</span><br>binary <span class="h">9902db587a3878b07ad03d599cb9c781f7c77b8ea440b168d8c42fd18b3fb9fb</span><br>config <span class="h">7cb69b7b82f6d8a0701ba39b15cc915d6ea3b4ca746c84fd3a805188c38098f8</span> — pins the Bootstrap Configuration hash; no issuer rules yet</dd>
+        <dt>Deploy #2 · 19:36 UTC</dt><dd>ID <span class="h">0000e58d50da8eaf29fb4212c236f374d11d7eb2452502c3bad0afe74d3f25c8</span><br><b>same binary</b> <span class="h">9902db58…</span>, new config <span class="h">e7703b193460430b4767b89d44caea2620eda5b3c844deee69f9db9436207d1d</span> adding <code>credentialRules</code>. The CLI updated the workflow in place</dd>
+        <dt>Pinned in deploy #2</dt><dd>credential type <code>CatenorInvestorEligibilityCredential</code>; the only accepted issuer <span class="h">did:catenor:656d66dff9ce1db692786ee241bc3cab#assertion-key-1</span>, public key <span class="h">z6MknrBa8Vbrsz5YCoBhgmV54ALJP9p1YSocpeBvgzBgJVXq</span>; status at most 600 s old; <code>policy:offering-eligibility:v1</code> and <code>policy:distribution-eligibility:v2</code></dd>
+        <dt>Vault DON secrets</dt><dd><code>CATENOR_INTERNAL_API_TOKEN</code> · <code>SUMSUB_APP_TOKEN</code> · <code>SUMSUB_SECRET_KEY</code> (namespace <code>main</code>; names only, no value was printed)</dd>
+        <dt>Trigger</dt><dd>HTTP trigger with one authorized EVM key <span class="h">0x18487BeFE194528cf429f5889BAE3aCbdA104a6c</span>, called as JSON-RPC <code>workflows.execute</code> with an <code>alg: ETH</code> JWT</dd>
+        <dt>Gateway</dt><dd><span class="h">https://01.gateway.zone-a.cre.chain.link</span></dd>
+        <dt>Result path</dt><dd>callback to the Railway relay <span class="h">https://catenor-one-production.up.railway.app/v1/internal/cre/identity-confidential/results</span>; the local runner pulls each HMAC-authenticated result, re-authenticates it and delivers it</dd>
+        <dt>Uploaded configs</dt><dd>public data only: the callback URL, the hashes, the evidence-acceptance rules, the issuer key and the trigger address</dd>
+      </dl>
+
+      <h4 class="sub">The five executions</h4>
+      <p class="subp">Execution IDs come from two places: the gateway’s <code>workflow_execution_id</code> and the platform’s <code>cre execution list</code>. From stage 42 on they ran on deploy #2.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Stage</th><th scope="col">Operation</th><th scope="col">Gateway execution ID</th><th scope="col">CRE UUID</th><th scope="col">Window (UTC)</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr><td>11</td><td class="m">TRUST_ANCHOR_ADMISSION</td><td class="m">0x394f66228ed74f270e5917ba9401a78f36aea40366864cf89306936e74ce4bd8</td><td class="m">579f70e6-2fe3-48fc-8314-5facefbe9eb1</td><td class="nw">19:18:37–19:18:45</td><td><span class="tag allow">ALLOW</span> 6 facts · commitment <code>0x032c…1846</code></td></tr>
+            <tr><td>42</td><td class="m">INVESTOR_ELIGIBILITY (A)</td><td class="m">0xe66a410799c33f710fa19baefa09ea49f0d2f89aaced4266390d14cdee320b8f</td><td class="m">3529711c-121f-4aa6-b708-d531c53f5077</td><td class="nw">20:34:36–20:34:45</td><td>identity ✓ · AML ✓ · fresh ✓</td></tr>
+            <tr><td>42</td><td class="m">INVESTOR_ELIGIBILITY (B)</td><td class="m">0x61485b72ad43bd2a63d466fdb7778d02d49a5dec4206979171aa68a15df064f8</td><td class="m">5a85768b-1a2e-426c-8089-c8bc11e2922a</td><td class="nw">20:35:39–20:35:47</td><td>identity ✓ · AML ✓ · fresh ✓</td></tr>
+            <tr><td>44</td><td class="m">OFFERING_ELIGIBILITY</td><td class="m">0xfecb527d3d0133d4fd23a4c29a36b7998a1dc379c137a65175d72f4272464715</td><td class="m">b6c4ff63-cd01-4d32-958d-c5aabb3bfc11</td><td class="nw">20:45:11–20:45:19</td><td>A <span class="tag allow">ALLOW</span> 600 · B <span class="tag allow">ALLOW</span> 400</td></tr>
+            <tr class="hl"><td>82</td><td class="m">CONFIDENTIAL_DISTRIBUTION</td><td class="m">0xfd2a96fb91bb4be494fd1f65a3e01ebd0e4da49d07520854cb38e2eb76e82d0b</td><td class="m">a623ebaa-0fb5-48eb-ad70-c65f95f079ee</td><td class="nw">22:40:08–22:40:16</td><td>A <b class="pay">PAY 6</b> · B <b class="hold">HOLD 4</b> (<code>FINAL</code>, <code>SANCTIONS</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid2" style="margin-top:72px">
+        <div>
+          <h4 class="sub" style="margin-top:0">What leaves the TEE</h4>
+          <ul class="list">
+            <li><b>Decisions</b> and requirement statuses.</li>
+            <li><b>Check results</b>: the seven presentation checks.</li>
+            <li><b>Reconciliation class</b>: CONSISTENT or MISMATCH.</li>
+            <li><b>Coarse reason codes</b>: <code>FINAL</code>, <code>SANCTIONS</code>.</li>
+            <li><b>Commitments</b> over the evidence and each decision.</li>
+            <li><b>Never</b>: a Sumsub response, a name, a document or applicant data.</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="sub" style="margin-top:0">What this evidence does not claim</h4>
+          <ul class="list">
+            <li><b>No independent attestation check.</b> Catenor did not verify an enclave attestation itself; TEE placement is the CRE platform’s <code>handlerInTee</code> guarantee.</li>
+            <li><b><code>reportFromDon</code> is not implemented.</b> Offchain report verification is a P1 item.</li>
+            <li><b>Sandbox and mock evidence.</b> The company KYB is a SYNTHETIC MOCK; the investors are synthetic Sumsub <b>sandbox</b> applicants. Nothing ran on mainnet.</li>
+            <li><b>Logs are not claimed to stay in the enclave.</b> They are visible per node; only safe markers are logged.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4 class="sub">Findings for Chainlink, reported as observed</h4>
+      <ol class="olist">
+        <li><b>The gateway URL.</b> The docs’ private-registry gateway <code>https://01.enterprise-gateway.zone-a.cre.chain.link/</code> answered <code>-32600 Workflow not found</code> for two ACTIVE private-registry workflows — the confidential one and a minimal non-TEE control workflow, <code>catenor-http-control</code> (<code>0038de78…a66f</code>). <code>https://01.gateway.zone-a.cre.chain.link</code>, the only gateway URL embedded in CRE CLI v1.33.0, accepted the same signed request at once (HTTP 200, <code>ACCEPTED</code>).</li>
+        <li><b>User logs are visible.</b> The simulator banner says user logs “will not be visible, and will not leave the TEE”. On the deployed platform the Logs tab shows them from several DON nodes (Node 1, 2, 4, 5, 8, 9…). The workflow logs only non-sensitive markers through <code>safe-log</code>.</li>
+        <li><b>Several callbacks per execution.</b> Each node’s copy calls back. The relay keeps the first authenticated result per run and answers <code>409 LATE_OR_DUPLICATE_RESULT</code> to the rest.</li>
+        <li><b>Secrets.</b> <code>cre secrets create</code> parses <code>CRE_ETH_PRIVATE_KEY</code> from the <code>.env</code> it is given, even with <code>--secrets-auth browser</code>; the template’s non-hex placeholder fails with <code>invalid hex character 'Y'</code>.</li>
+        <li><b>Enrollment.</b> The first Confidential Workflow deploy on this account needed no extra enrollment step.</li>
+      </ol>
+
+      <h4 class="sub">Screenshots</h4>
+      <div class="shots wide">
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: CRE secrets"><img src="assets/C3-cre-secrets-terminal.jpg" alt="Terminal: three secrets created in the Vault DON, names only" width="1800" height="533" loading="lazy" decoding="async"></button><figcaption><b>C3.</b> 3 secrets created in the Vault DON (<code>namespace=main</code>). Only names are shown.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: CRE deploy #1"><img src="assets/C4-cre-deploy-terminal.jpg" alt="Terminal: identity-confidential-production compiled and registered in the private registry, status Active" width="1800" height="1029" loading="lazy" decoding="async"></button><figcaption><b>C4 · deploy #1.</b> Registered in the <b>private registry</b> (<code>zone-a</code>): <code>00e12517…d250</code>, <b>Active</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: CRE deploy #2"><img src="assets/E2-cre-redeploy-terminal.jpg" alt="Terminal: deploy #2 with the same binary hash, a new config and new workflow ID, Active" width="1800" height="1834" loading="lazy" decoding="async"></button><figcaption><b>E2 · deploy #2.</b> <b>Same binary</b> <code>9902db58…</code>, new config <code>e7703b19…</code>; new ID <code>0000e58d…25c8</code>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: CRE workflow before any execution"><img src="assets/11-before-cre-workflow.jpg" alt="CRE dashboard before stage 11: Active, private registry, zero executions" width="1800" height="1006" loading="lazy" decoding="async"></button><figcaption><b>Before stage 11.</b> Active, private, owner Catenor One, <b>0 executions</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: admission execution events"><img src="assets/11-after-cre-execution-events.jpg" alt="CRE execution events for the admission: trigger and two SendRequest" width="1800" height="993" loading="lazy" decoding="async"></button><figcaption><b>Stage 11.</b> <code>394f…4bd8</code>: trigger + <b>two <code>SendRequest</code></b> to the Sumsub sandbox.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: execution logs"><img src="assets/44-after-cre-execution-logs.jpg" alt="CRE logs tab: the same safe markers from several DON nodes" width="1800" height="1830" loading="lazy" decoding="async"></button><figcaption><b>Stage 44 · Logs.</b> Only non-sensitive markers, from every node.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: distribution execution events"><img src="assets/82-after-cre-execution-events.jpg" alt="CRE execution events for the distribution: trigger and three SendRequest" width="1800" height="1150" loading="lazy" decoding="async"></button><figcaption><b>Stage 82.</b> <code>fd2a…2d0b</code>: trigger + <b>three <code>SendRequest</code></b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="cre" aria-label="Enlarge screenshot: five executions"><img src="assets/99-after-cre-five-executions.jpg" alt="CRE dashboard: five executions, all Success, zero spend" width="1800" height="954" loading="lazy" decoding="async"></button><figcaption><b>End of demo.</b> <b>5 executions, all Success, $0 spend.</b></figcaption></figure>
+      </div>
+    </div>
+
+    <!-- PRIVY -->
+    <div class="tabpanel" role="tabpanel" id="ev-privy" aria-labelledby="tab-privy" tabindex="0">
+      <div class="panel-head">
+        <h3>Catenor decides whether. Privy bounds what.</h3>
+        <p>Development app <code>catenor-one-ethonline-2026</code>, created empty for this run. Every execution wallet has its
+          own management-owner key, kept on the maintainer’s machine and never in the runtime, and its own runtime signer: a
+          1-of-1 key quorum, override-scoped to the wallet’s policy. The runtime can request signatures; it cannot change a policy.</p>
+      </div>
+
+      <h4 class="sub">Wallets and policies</h4>
+      <p class="subp">Read back live in stage 92 and checked against the dashboard. Everything not listed is denied; exports are denied everywhere.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Wallet</th><th scope="col">Chain</th><th scope="col">Policy</th><th scope="col">What it allows</th></tr></thead>
+          <tbody>
+            <tr><td><b>Bootstrap Endorsement Key</b><br><span class="h">HKQY5…nVEk</span></td><td>Solana (Ed25519)</td><td class="m">P_BOOTSTRAP<br>vzww22mkxmtn4f333fdqpse7</td><td><code>signMessage</code> only. Endorses the root Trust Anchor after an ALLOW; its own owner and runtime quorum</td></tr>
+            <tr><td><b>Assertion keys</b><br>Trust Anchor <span class="h">9PvXY…PGkT</span>, Sponsor <span class="h">GLHPd…oTdX</span>, investor holder keys, 3 abandoned stage 11 attempts</td><td>Solana (Ed25519)</td><td class="m">P_ASSERT<br>e8d0ndsssfq6rr7p2im0ptt4<br>(7 wallets)</td><td><code>signMessage</code> only: credentials, grants, presentations. <b>Never a financial key</b></td></tr>
+            <tr class="hl"><td><b>SPV</b><br><span class="h">0x182F…9926</span></td><td>EVM</td><td class="m">catenor-one-spv-execution-4c875d44<br>cygll4bmgocqr05asp2w6f2s</td><td><code>eth_signTransaction</code> on chain 296 to the ATS v8 Factory; after <code>deployEquity</code>, three owner-added rules pinned to equity <span class="h">0xf37A…7ABC</span></td></tr>
+            <tr class="hl"><td><b>Distribution Agent</b><br><span class="h">0x9089…13E3</span></td><td>EVM</td><td class="m">catenor-one-distribution-agent-3d8dc074<br>p99xe36icsfvewrovm1mczwq</td><td><code>eth_signTransaction</code> on chain 296 <b>only to Investor A’s or B’s receiving wallet, value ≤ 20 HBAR</b></td></tr>
+            <tr><td><b>Testnet treasury</b><br><span class="h">0x49e9…5210</span></td><td>EVM</td><td class="m">catenor-one-clean-room-testnet-treasury<br>zqr5ynnrd3mi6o9snqq8ex8g</td><td>chain 296 transfers ≤ 30 HBAR. Bootstrap funding only</td></tr>
+            <tr><td><b>Investor A / Investor B</b><br><span class="h">0x7de5…2473</span> · <span class="h">0xCfCa…Da73</span></td><td>EVM</td><td>none</td><td><b>Receive-only</b>: an owner key, no signer, no policy. Catenor cannot sign for them</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">The Agent’s boundary, rule by rule</h4>
+      <p class="subp">Stage 92 read-back: <b>“Agent policy exactly the approved boundary: true.”</b></p>
+      <div class="rule">
+        <div class="rule-top"><span class="pill p-net">Allow</span><span class="rn">allow-distribution-payout-hedera</span><span class="rm">method <code>eth_signTransaction</code> · rule <code>fxxhjsvbzc7dl9xx9lhybkqz</code></span></div>
+        <div class="conds">
+          <div class="cond"><div class="f">chain_id eq</div><div class="v">296<small>Hedera testnet</small></div></div>
+          <div class="and" aria-label="and">∧</div>
+          <div class="cond"><div class="f">to in</div><div class="v">{ Investor A, Investor B }<small>0x7de572532820B22040B561e68543419419b72473<br>0xCfCa833A8e6b7651E44480b92822576BcB78Da73</small></div></div>
+          <div class="and" aria-label="and">∧</div>
+          <div class="cond"><div class="f">value lte</div><div class="v">20 HBAR<small>0x1158e460913d00000 (18-decimal weibar)</small></div></div>
+        </div>
+        <div class="rule-deny"><span class="tag deny">DENY</span> <code>exportPrivateKey</code> · <span class="tag deny">DENY</span> <code>exportSeedPhrase</code> · everything else denied by default: no ATS contract, no SPV wallet, no other chain.</div>
+      </div>
+
+      <h4 class="sub">The SPV policy after the equity existed</h4>
+      <p class="subp">The factory rule came first. After <code>deployEquity</code>, the SPV management-owner key (outside the runtime) added three rules, each pinned to the new equity. Six rules in all.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Rule</th><th scope="col">Action</th><th scope="col">Conditions</th></tr></thead>
+          <tbody>
+            <tr><td class="m">allow-ats-factory-hedera-testnet</td><td><span class="tag allow">ALLOW</span></td><td><code>chain_id</code> = 296 ∧ <code>to</code> = ATS v8 Factory <span class="h">0xd1F118A40f3b02883D35909eF2517e7EDd78379d</span></td></tr>
+            <tr><td class="m">allow-issueByPartition-equity</td><td><span class="tag allow">ALLOW</span></td><td>chain 296 ∧ <code>to</code> = equity ∧ function <code>issueByPartition</code> ∧ partition = <span class="h">0x…01</span> (default)</td></tr>
+            <tr><td class="m">allow-grantRole-corporate-action-to-spv</td><td><span class="tag allow">ALLOW</span></td><td>chain 296 ∧ <code>to</code> = equity ∧ function <code>grantRole</code> ∧ <code>_role</code> = <span class="h">0xa1acfc49…55cd</span> ∧ <code>_account</code> = SPV <span class="h">0x182F…9926</span></td></tr>
+            <tr><td class="m">allow-setDividend-equity</td><td><span class="tag allow">ALLOW</span></td><td>chain 296 ∧ <code>to</code> = equity ∧ function <code>setDividend</code></td></tr>
+            <tr><td class="m">deny-exportPrivateKey</td><td><span class="tag deny">DENY</span></td><td>—</td></tr>
+            <tr><td class="m">deny-exportSeedPhrase</td><td><span class="tag deny">DENY</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid2" style="margin-top:72px">
+        <div>
+          <h4 class="sub" style="margin-top:0">Controls in action</h4>
+          <ul class="list">
+            <li><b>Created only after authorization.</b> The SPV wallet and policy exist only because <code>TOKENIZE_ASSET</code> was ALLOW; the Agent’s, under <code>CREATE_AGENT</code>.</li>
+            <li><b>Still not authorized.</b> Before delegation, and with the relationship alone, the Agent’s requests were DENY <code>CAPABILITY_MISSING</code>.</li>
+            <li><b>Every signature fit one rule.</b> Each Hedera transaction was dry-signed first (signature discarded), then signed live under exactly one rule: five by the SPV, the payout by the Agent.</li>
+            <li><b>The HOLD holder got nothing.</b> No transaction built for Investor B, no Privy signature requested: <code>investorBSignatureRequests: 0</code>, Agent nonce 0 → 1.</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="sub" style="margin-top:0">Separate signer sets</h4>
+          <ul class="list">
+            <li><b>Bootstrap</b>: its own owner key and runtime quorum <code>…-bootstrap</code>, signer for one wallet only.</li>
+            <li><b>Assertion keys</b>: one owner and the <code>…-assertion</code> quorum for the signMessage-only Ed25519 keys.</li>
+            <li><b>SPV</b>: a new, separate management-owner key and runtime quorum <code>…-spv-runtime</code>.</li>
+            <li><b>Agent</b>: a new, separate owner key and runtime quorum <code>…-agent-runtime</code>. The treasury has its own pair.</li>
+            <li><b>Investors</b>: one owner key per receiving wallet, no signer, no policy.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4 class="sub">Stage 92 read-back, as stored by Privy</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Wallet</th><th scope="col">Owner</th><th scope="col">Additional signer</th><th scope="col">Policy (owner matches the wallet)</th><th scope="col">Rules</th></tr></thead>
+          <tbody>
+            <tr><td>SPV <span class="h">0x182F…9926</span></td><td>set</td><td>1, override-scoped</td><td class="m">catenor-one-spv-execution-4c875d44</td><td>Factory (chain ∧ to); DENY both exports; issueByPartition (chain ∧ to ∧ function ∧ partition); grantRole (chain ∧ to ∧ function ∧ role ∧ account); setDividend (chain ∧ to ∧ function)</td></tr>
+            <tr><td>Agent <span class="h">0x9089…13E3</span></td><td>set</td><td>1, override-scoped</td><td class="m">catenor-one-distribution-agent-3d8dc074</td><td>ALLOW <code>eth_signTransaction</code> [chain ∧ to ∈ ∧ value ≤]; DENY both exports</td></tr>
+            <tr><td>Treasury <span class="h">0x49e9…5210</span></td><td>set</td><td>1, override-scoped</td><td class="m">catenor-one-clean-room-testnet-treasury</td><td>ALLOW [chain ∧ value ≤]; DENY both exports</td></tr>
+            <tr><td>Investor A <span class="h">0x7de5…2473</span></td><td>set</td><td><b>none</b></td><td><b>none</b></td><td>receive-only</td></tr>
+            <tr><td>Investor B <span class="h">0xCfCa…Da73</span></td><td>set</td><td><b>none</b></td><td><b>none</b></td><td>receive-only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-head"><b>agent-policy.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
+<pre class="code" data-json tabindex="0" aria-label="Agent policy JSON">{
+  "id": "p99xe36icsfvewrovm1mczwq",
+  "version": "1.0",
+  "name": "catenor-one-distribution-agent-3d8dc074",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "fxxhjsvbzc7dl9xx9lhybkqz",
+      "name": "allow-distribution-payout-hedera",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        {
+          "field_source": "ethereum_transaction",
+          "field": "to",
+          "operator": "in",
+          "value": ["0x7de572532820B22040B561e68543419419b72473", "0xCfCa833A8e6b7651E44480b92822576BcB78Da73"]
+        },
+        { "field_source": "ethereum_transaction", "field": "value", "operator": "lte", "value": "0x1158e460913d00000" }
+      ]
+    },
+    { "id": "su9uq4lrxg8hgsusvgm3nv3q", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "nu05o2k3j0kinl728wimu2c9", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] }
+  ],
+  "_note": "Transcribed from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 70, final-demo instance c1-202609121659. 0x1158e460913d00000 = 20 HBAR (18-decimal weibar). The two addresses are the investors' receiving wallets. Public data only."
+}</pre>
+
+      <div class="code-head"><b>spv-policy-after-equity.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
+<pre class="code" data-json tabindex="0" aria-label="SPV policy JSON after the equity rules">{
+  "id": "cygll4bmgocqr05asp2w6f2s",
+  "version": "1.0",
+  "name": "catenor-one-spv-execution-4c875d44",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "t01al94fattl6okgua0jwpd0",
+      "name": "allow-ats-factory-hedera-testnet",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xd1F118A40f3b02883D35909eF2517e7EDd78379d" }
+      ]
+    },
+    { "id": "nfob7nm7jo55mjuj3bbxq6ii", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "ub7kylldhvex9z8iq08imioj", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] },
+    {
+      "id": "r6bo3tyjsl1glf3vwimo3m0g",
+      "name": "allow-setDividend-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "setDividend", "abi": "[setDividend((uint256 recordDate,uint256 executionDate,uint256 amount,uint8 amountDecimals) newDividend) returns (uint256 dividendId_)]" }
+      ]
+    },
+    {
+      "id": "snvx2odgylm68pz4x14hn3uc",
+      "name": "allow-issueByPartition-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "issueByPartition", "abi": "[issueByPartition((bytes32 partition,address tokenHolder,uint256 value,bytes data) _issueData)]" },
+        { "field_source": "ethereum_calldata", "field": "issueByPartition._issueData.partition", "operator": "eq", "value": "0x0000000000000000000000000000000000000000000000000000000000000001", "abi": "(same issueByPartition ABI)" }
+      ]
+    },
+    {
+      "id": "myjpkp43eogob04pvjjmg20x",
+      "name": "allow-grantRole-corporate-action-to-spv",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "grantRole", "abi": "[grantRole(bytes32 _role,address _account) returns (bool success_)]" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._role", "operator": "eq", "value": "0xa1acfc499025c99f55059195e6276f639d34a18aad7b8121b9192b7f438c55cd", "abi": "(same grantRole ABI)" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._account", "operator": "eq", "value": "0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926", "abi": "(same grantRole ABI)" }
+      ]
+    }
+  ],
+  "_note": "Copied by the maintainer from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 60, final-demo instance c1-202609121659. The full ABI arrays of the calldata conditions are abbreviated here to their signatures; everything else is verbatim. Public data only."
+}</pre>
+
+      <div class="note warn"><b>Limitation.</b> The Privy dashboard shows these wallets at <code>$0.00</code> and lists none of their
+        transactions: Privy’s balance lookup does not cover Hedera (chain 296), and Privy only signed — the runner broadcast
+        the transactions. The money side is on HashScan (see the Hedera tab).</div>
+
+      <h4 class="sub">Screenshots</h4>
+      <div class="shots wide">
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy SPV policy JSON after stage 30: factory rule and export denials" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Stage 30.</b> SPV policy: <code>eth_signTransaction</code> ALLOW only if chain 296 AND <code>to</code> = ATS v8 Factory.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV policy rules"><img src="assets/60-after-privy-spv-policy-rules.jpg" alt="Privy SPV policy rules view after stage 60: factory rule plus three equity-pinned rules, exports denied" width="1800" height="1641" loading="lazy" decoding="async"></button><figcaption><b>Stage 60.</b> Factory rule + <b>the three equity-pinned rules</b>; exports denied; default deny.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Agent policy JSON"><img src="assets/70-after-privy-agent-policy-json.jpg" alt="Privy Agent policy JSON: chain 296, to in the two investor wallets, value at most 20 HBAR" width="1800" height="2233" loading="lazy" decoding="async"></button><figcaption><b>Stage 70.</b> Agent policy: chain 296 <b>AND <code>to</code> in [A, B]</b> AND <code>value</code> ≤ 20 HBAR.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Privy verification"><img src="assets/92-verify-privy.jpg" alt="Stage 92 output: each execution wallet has exactly one Catenor-created policy and an override-scoped runtime signer; investor wallets have no signer and no policy" width="1800" height="2525" loading="lazy" decoding="async"></button><figcaption><b>Stage 92.</b> One policy per execution wallet; override-scoped signers; <b>Agent policy exactly the approved boundary: true</b>.</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- HEDERA -->
+    <div class="tabpanel" role="tabpanel" id="ev-hedera" aria-labelledby="tab-hedera" tabindex="0">
+      <div class="panel-head">
+        <h3>Six transactions. All SUCCESS. Check them live.</h3>
+        <p>Hedera <b>testnet</b> (chain 296), Asset Tokenization Studio v8 through the official Factory. Every transaction was
+          confirmed by the maintainer after a dry run that simulated the exact call and got a Privy dry signature. The buttons
+          below query the public Mirror Node from your browser.</p>
+      </div>
+
+      <h4 class="sub">Accounts</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Role</th><th scope="col">EVM address</th><th scope="col">Hedera ID</th><th scope="col">Signer</th></tr></thead>
+          <tbody>
+            <tr><td><b>SPV execution wallet</b></td><td class="m">0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509879" rel="noopener">0.0.10509879 ↗</a></td><td>Privy, <code>catenor-one-spv-execution-4c875d44</code></td></tr>
+            <tr><td><b>Distribution Agent wallet</b></td><td class="m">0x90894535F5f35271f2d4112179BF2b4e887913E3</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10511413" rel="noopener">0.0.10511413 ↗</a></td><td>Privy, <code>catenor-one-distribution-agent-3d8dc074</code></td></tr>
+            <tr><td><b>Investor A receiving wallet</b></td><td class="m">0x7de572532820B22040B561e68543419419b72473</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509881" rel="noopener">0.0.10509881 ↗</a></td><td>receive-only</td></tr>
+            <tr><td><b>Investor B receiving wallet</b></td><td class="m">0xCfCa833A8e6b7651E44480b92822576BcB78Da73</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509882" rel="noopener">0.0.10509882 ↗</a></td><td>receive-only</td></tr>
+            <tr><td><b>Testnet treasury</b> (funding only)</td><td class="m">0x49e969483fEd8b2419D60EcB23D34C89af2E5210</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509855" rel="noopener">0.0.10509855 ↗</a></td><td>Privy, chain 296, ≤ 30 HBAR</td></tr>
+            <tr class="hl"><td><b>ATS equity</b> “Catenor One Demo SPV 001 (SYNTHETIC)”, <code>C1SPV001</code></td><td class="m">0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/contract/0.0.10510175" rel="noopener">0.0.10510175 ↗</a></td><td>—</td></tr>
+            <tr><td><b>ATS v8 Factory</b></td><td class="m">0xd1F118A40f3b02883D35909eF2517e7EDd78379d</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/contract/0.0.9213391" rel="noopener">0.0.9213391 ↗</a></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">The asset lifecycle, each step gated by Catenor</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">#</th><th scope="col">Transaction</th><th scope="col">Catenor gate</th><th scope="col">Signer (Privy rule)</th><th scope="col">Hash</th><th scope="col">Recorded result</th><th scope="col">Live check</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><code>deployEquity</code> (Factory)</td><td>Sponsor <code>TOKENIZE_ASSET</code> → ALLOW</td><td>SPV · <code>allow-ats-factory-hedera-testnet</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570" rel="noopener">0x2396ad88…c570 ↗</a></td><td><span class="okt">SUCCESS</span> · 6,898,334 gas · 7.86 ℏ fee</td><td><button type="button" class="mn-btn" data-hash="0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>2</td><td><code>issueByPartition</code> → A, <b>600</b></td><td>A’s <code>SUBSCRIBE_OFFERING</code> ALLOW from the deployed CRE (stage 44)</td><td>SPV · <code>allow-issueByPartition-equity</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e" rel="noopener">0x59359ae9…fa4e ↗</a></td><td><span class="okt">SUCCESS</span> · 456,629 gas</td><td><button type="button" class="mn-btn" data-hash="0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>3</td><td><code>issueByPartition</code> → B, <b>400</b></td><td>B’s ALLOW decision, the same way</td><td>SPV · same rule</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62" rel="noopener">0x9c6c4cb2…0d62 ↗</a></td><td><span class="okt">SUCCESS</span> · 405,329 gas</td><td><button type="button" class="mn-btn" data-hash="0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>4</td><td><code>grantRole(ROLE_CORPORATE_ACTION, SPV)</code></td><td>—</td><td>SPV · <code>allow-grantRole-corporate-action-to-spv</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x726032ce12d343d9ced3933035e2a55833f527dd2de128c90d776139818d9f94" rel="noopener">0x726032ce…9f94 ↗</a></td><td><span class="okt">SUCCESS</span> · 179,949 gas</td><td><button type="button" class="mn-btn" data-hash="0x726032ce12d343d9ced3933035e2a55833f527dd2de128c90d776139818d9f94">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>5</td><td><code>setDividend(amount 1, decimals 2)</code></td><td>—</td><td>SPV · <code>allow-setDividend-equity</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0xaac4a085a3c9c2532c315ecb641028bb35525cb338b628715505aac3cd3ef865" rel="noopener">0xaac4a085…f865 ↗</a></td><td><span class="okt">SUCCESS</span> · 532,107 gas · entitlements A 6, B 4</td><td><button type="button" class="mn-btn" data-hash="0xaac4a085a3c9c2532c315ecb641028bb35525cb338b628715505aac3cd3ef865">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr class="hl"><td>6</td><td><b>payout</b> → A, <b>6 HBAR</b></td><td>Agent’s delegated <code>EXECUTE_DISTRIBUTION</code> <b>and</b> the TEE plan: A PAY 6</td><td>Agent · <code>allow-distribution-payout-hedera</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24" rel="noopener">0x4781f6ef…ff24 ↗</a></td><td><span class="okt">SUCCESS</span> · 21,000 gas · <code>0.0.10511413</code> → <code>0.0.10509881</code> 6.00000000 ℏ</td><td><button type="button" class="mn-btn" data-hash="0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>—</td><td>payout → B</td><td>TEE plan: <b class="hold">HOLD 4</b> (RED / SANCTIONS)</td><td>—</td><td><b>none</b>: no transaction built, no signature requested</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Final state · stage 91, 22:54 UTC</h4>
+      <div class="grid3" style="margin-top:24px">
+        <div class="card"><div class="n">Investor A · Lisa</div><h4 style="font-size:40px;letter-spacing:-.05em">600 units</h4><p><b class="pay">7.0 ℏ</b> = 1 ℏ activation + 6 ℏ payout. Entitled to 6, received 6.</p></div>
+        <div class="card"><div class="n">Investor B · Bart</div><h4 style="font-size:40px;letter-spacing:-.05em">400 units</h4><p><b class="hold">1.0 ℏ</b> = 1 ℏ activation. Entitled to 4, received 0.</p></div>
+        <div class="card soft"><div class="n">Equity C1SPV001</div><h4 style="font-size:40px;letter-spacing:-.05em">1000</h4><p>totalSupply, decimals 0. Dividend 1 entitlements: A 6, B 4.</p></div>
+      </div>
+      <div class="note"><b>Check the balances live.</b> This reads the Mirror Node now, so it can differ from the run’s final state if these testnet accounts have moved since.
+        <div style="margin-top:12px"><button type="button" class="mn-btn" id="bal-btn">Check live balances</button></div>
+        <div class="bal" id="bal-out" aria-live="polite"></div>
+      </div>
+
+      <h4 class="sub">Bootstrap funding</h4>
+      <p class="subp">Testnet gas and account activation, not a distribution. The Privy treasury received 100 ℏ from the portal faucet, then sent:</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">To</th><th scope="col">ℏ</th><th scope="col">Transaction</th><th scope="col">Live check</th></tr></thead>
+          <tbody>
+            <tr><td>SPV</td><td>25</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0xa2b789128e5fd40ff8ad2b7815ca3c26c24a3e17cfca848345f0af46650b7f08" rel="noopener">0xa2b78912…7f08 ↗</a></td><td><button type="button" class="mn-btn" data-hash="0xa2b789128e5fd40ff8ad2b7815ca3c26c24a3e17cfca848345f0af46650b7f08">Check</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>Investor A (activation)</td><td>1</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x79829109bd42301ea5a4dab455c9e4b6d539d1c93865f4e52cf7f4430b760060" rel="noopener">0x79829109…0060 ↗</a></td><td><button type="button" class="mn-btn" data-hash="0x79829109bd42301ea5a4dab455c9e4b6d539d1c93865f4e52cf7f4430b760060">Check</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>Investor B (activation)</td><td>1</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0xeb370383f7ed074da4c6fd61eaa0b4d6782a2483e7dcda7ffda2423999406c4f" rel="noopener">0xeb370383…6c4f ↗</a></td><td><button type="button" class="mn-btn" data-hash="0xeb370383f7ed074da4c6fd61eaa0b4d6782a2483e7dcda7ffda2423999406c4f">Check</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>Distribution Agent</td><td>12</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x229a0682afe9e2c2b9e920d28733307d1c3d0da56c2a14bcd4a083310d4fc5a2" rel="noopener">0x229a0682…c5a2 ↗</a></td><td><button type="button" class="mn-btn" data-hash="0x229a0682afe9e2c2b9e920d28733307d1c3d0da56c2a14bcd4a083310d4fc5a2">Check</button><div class="mn-out" aria-live="polite"></div></td></tr>
+            <tr><td>SPV (unneeded top-up)</td><td>25</td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0xd1180ca8d1707100be6f8af25a2316190c57c717db5fb645b5a9aec7d894638e" rel="noopener">0xd1180ca8…638e ↗</a></td><td><button type="button" class="mn-btn" data-hash="0xd1180ca8d1707100be6f8af25a2316190c57c717db5fb645b5a9aec7d894638e">Check</button><div class="mn-out" aria-live="polite"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Prize fit: “Tokenization of Anything”</h4>
+      <ul class="list">
+        <li><b>Asset Tokenization Studio</b> v8 contracts through the official Factory. <b>Issuance:</b> <code>issueByPartition</code> ×2. <b>Configuration:</b> the corporate-action role and the dividend. <b>Lifecycle:</b> the dividend entitlement plus the distribution.</li>
+        <li><b>Deployed and demonstrated on Hedera testnet</b>, verifiable on HashScan.</li>
+        <li><b>An ineligible holder is visibly blocked:</b> entitled to 4, received 0.</li>
+      </ul>
+
+      <h4 class="sub">Screenshots</h4>
+      <div class="shots wide">
+        <figure class="shot"><button type="button" data-lb data-group="hedera" aria-label="Enlarge screenshot: deployEquity on HashScan"><img src="assets/60-after-hashscan-deploy-tx.jpg" alt="HashScan deployEquity transaction SUCCESS" width="1800" height="1454" loading="lazy" decoding="async"></button><figcaption><b>Stage 60.</b> <code>deployEquity</code>: SUCCESS, block 40438071, fee 7.864 ℏ.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="hedera" aria-label="Enlarge screenshot: entitlements"><img src="assets/63-after-verify-hedera-entitlements.jpg" alt="Read-only Hedera verification: dividend 1 entitlements A 6 and B 4" width="1800" height="2069" loading="lazy" decoding="async"></button><figcaption><b>Stage 63.</b> Entitlements, dividend 1: <b>A 6, B 4</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="hedera" aria-label="Enlarge screenshot: payout on HashScan"><img src="assets/83-after-hashscan-payout-tx.jpg" alt="HashScan payout transaction SUCCESS, 6 hbar to Investor A" width="1800" height="1903" loading="lazy" decoding="async"></button><figcaption><b>Stage 83.</b> Payout: <code>0.0.10511413</code> → <code>0.0.10509881</code>, <b>6.00000000 ℏ</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="hedera" aria-label="Enlarge screenshot: final Hedera verification"><img src="assets/91-verify-hedera-final.jpg" alt="Stage 91: six transactions SUCCESS, final holdings and balances" width="1800" height="2118" loading="lazy" decoding="async"></button><figcaption><b>Stage 91.</b> 6 transactions SUCCESS; A 7.0 ℏ, B 1.0 ℏ; entitlements A 6 / B 4.</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- CATENOR -->
+    <div class="tabpanel" role="tabpanel" id="ev-catenor" aria-labelledby="tab-catenor" tabindex="0">
+      <div class="panel-head">
+        <h3>Re-verified from signed documents.</h3>
+        <p>Stage 93 (22:57 UTC, local, read-only) re-verifies signatures and chains from the recorded signed documents.
+          The operational database is an index, not proof.</p>
+      </div>
+
+      <div class="grid3" style="margin-top:46px">
+        <div class="card"><div class="n">Audit hash chain</div><h4 style="font-size:34px;letter-spacing:-.05em" class="pay">valid</h4><p><b>79 events</b> in 28 types, append-only.</p></div>
+        <div class="card"><div class="n">Trust Anchor</div><h4 style="font-size:34px;letter-spacing:-.05em" class="pay">VALID</h4><p><code>TRUST_ANCHOR_VALID: true</code>, no failed checks. <span class="h">did:catenor:656d…3cab</span></p></div>
+        <div class="card"><div class="n">Investor credentials</div><h4 style="font-size:34px;letter-spacing:-.05em">2 × ACTIVE</h4><p>Both issuer-signed by the Trust Anchor. Bart’s is still valid, as the thesis requires.</p></div>
+      </div>
+
+      <h4 class="sub">Audit events by type</h4>
+      <p class="subp">The counts include the three abandoned stage 11 attempts (<code>ADMISSION_REQUESTED</code> 4,
+        <code>CONFIDENTIAL_VERIFICATION_REQUESTED</code> 4, <code>CONFIDENTIAL_EVIDENCE_VERIFIED</code> 1).
+        <code>INVESTMENT_EXECUTED</code> is 2 of 4 <code>INVESTMENT_AUTHORIZED</code>: the dry runs authorize without executing.</p>
+      <div class="bars" id="bars" data-events='[["SUBJECT_CREATED",9],["ADMISSION_REQUESTED",4],["PROVIDER_REFERENCES_ATTACHED",6],["KEY_ADDED",7],["DID_DOCUMENT_CREATED",7],["KEY_POSSESSION_VERIFIED",4],["CONFIDENTIAL_VERIFICATION_REQUESTED",4],["CONFIDENTIAL_EVIDENCE_VERIFIED",1],["POLICY_EVALUATED",1],["BOOTSTRAP_ENDORSEMENT_CREATED",1],["TRUST_ANCHOR_ADMITTED",1],["RELATIONSHIP_ESTABLISHED",3],["CAPABILITY_GRANTED",6],["SPV_EXECUTION_WALLET_PROVISIONED",1],["OFFERING_DEFINED",1],["ACCOUNT_BINDING_CREATED",2],["CREDENTIAL_ISSUED",2],["OFFERING_ELIGIBILITY_EVALUATED",2],["ASSET_ACTION_AUTHORIZED",1],["ASSET_ACTION_EXECUTED",1],["INVESTMENT_AUTHORIZED",4],["INVESTMENT_EXECUTED",2],["AGENT_EXECUTION_WALLET_PROVISIONED",1],["DISTRIBUTION_REQUEST_DENIED",3],["REVENUE_RECEIVED",1],["DISTRIBUTION_ELIGIBILITY_EVALUATED",2],["DISTRIBUTION_PLAN_CREATED",1],["DISTRIBUTION_PAYOUT_EXECUTED",1]]'>
+        <noscript><p>79 events in 28 types; see the stage 93 screenshot below.</p></noscript>
+      </div>
+
+      <h4 class="sub">The authority chain</h4>
+      <p class="subp">Relationships, capabilities and delegation are public-key-verifiable authority with no sensitive input, so none of this runs in the CRE, by design.</p>
+      <div class="chain">
+        <div class="node"><div class="t">Root Trust Anchor</div><div class="nm">Admitted · ACTIVE</div><div class="d">did:catenor:656d66dff9ce1db692786ee241bc3cab</div>
+          <ul><li>Authority from Admission on the deployed CRE workflow</li><li>Issues the investor credentials</li></ul></div>
+        <div class="link-arrow" aria-hidden="true">→</div>
+        <div class="node"><div class="t">Sponsor</div><div class="nm">5 capabilities · ALLOW</div><div class="d">did:catenor:5b87cad5d25e94dbf62f4443cf85761d</div>
+          <ul><li><code>AUTHORIZED_SPONSOR_IN</code> · valid</li><li><code>TOKENIZE_ASSET</code> · <code>DEFINE_OFFERING_POLICY</code> · <code>CREATE_AGENT</code> · <code>CREATE_DISTRIBUTION</code> · <code>DELEGATE_DISTRIBUTION_AUTHORITY</code></li></ul></div>
+        <div class="link-arrow" aria-hidden="true">→</div>
+        <div class="node"><div class="t">Distribution Agent</div><div class="nm">Delegated chain · ALLOW</div><div class="d">did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074</div>
+          <ul><li><code>AGENT_OF</code> Sponsor · valid</li><li><code>EXECUTE_DISTRIBUTION</code> on <code>spv:catenor-demo-001</code></li></ul></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Grant</th><th scope="col">Issuer → subject</th><th scope="col">Action</th><th scope="col">Resource</th><th scope="col">Valid until (UTC)</th></tr></thead>
+          <tbody>
+            <tr><td class="m">capability-grant:34fd209d-32af-43f5-a3f5-37acbae12c14</td><td>Trust Anchor → Sponsor</td><td class="m">CREATE_DISTRIBUTION</td><td class="m">spv:catenor-demo-001</td><td class="nw">2026-10-12 20:00:46</td></tr>
+            <tr><td class="m">capability-grant:e250671b-c958-434b-a536-5dc3a01fe996</td><td>Trust Anchor → Sponsor</td><td class="m">DELEGATE_DISTRIBUTION_AUTHORITY</td><td class="m">spv:catenor-demo-001</td><td class="nw">2026-10-12 20:00:46</td></tr>
+            <tr class="hl"><td class="m">capability-grant:7bd93930-e21c-4f78-86fd-8f8c9aa46156</td><td>Sponsor → Agent</td><td class="m">EXECUTE_DISTRIBUTION</td><td class="m">spv:catenor-demo-001</td><td class="nw">2026-10-02 22:19:50</td></tr>
+            <tr><td class="m">capability-grant:1984657d-ecab-403e-850f-67f5f29d3cc6</td><td>Trust Anchor → Sponsor</td><td class="m">TOKENIZE_ASSET</td><td class="m">spv:catenor-demo-001</td><td>— (used for stages 60–62)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="subp" style="margin-top:14px">The Agent’s grant runs 20 days, inside the Sponsor’s 30: delegated authority stays within the delegator’s authority.</p>
+
+      <h4 class="sub">Every refusal in the run</h4>
+      <p class="subp">Three of them are <code>DISTRIBUTION_REQUEST_DENIED</code> audit events. The rest are refusals at the authority, presentation or signer boundary.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Stage</th><th scope="col">Who asked for what</th><th scope="col">Result</th><th scope="col">Invariant</th></tr></thead>
+          <tbody>
+            <tr><td>21</td><td>Sponsor, a granted capability on <b>another resource</b></td><td><span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code></td><td>Authority is scoped to the resource</td></tr>
+            <tr><td>43</td><td>Replay of a presentation with <b>another challenge</b></td><td><code>HOLDER_PROOF_VALID</code> false</td><td>Presentations are bound to a challenge and a domain</td></tr>
+            <tr class="hl"><td>70</td><td>Agent runs a distribution <b>before any delegation</b></td><td><span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code> · audit event</td><td>Created ≠ authorized</td></tr>
+            <tr class="hl"><td>71</td><td>Agent with <b>only the relationship</b></td><td><span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code> · audit event</td><td>Relationship ≠ Capability</td></tr>
+            <tr><td>72</td><td>Sponsor delegates <code>TOKENIZE_ASSET</code></td><td>refused <code>ACTION_NOT_DELEGABLE</code>, no signature requested</td><td>Delegability must be explicit</td></tr>
+            <tr><td>72</td><td>Investor A presents the Agent’s grant</td><td><span class="tag deny">DENY</span> <code>SUBJECT_MISMATCH</code></td><td>A grant belongs to its subject</td></tr>
+            <tr class="hl"><td>82</td><td>Investor A requests the distribution</td><td><span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code> · audit event</td><td>Only the delegated Agent may distribute</td></tr>
+            <tr><td>82</td><td>Investor B, eligibility at distribution time (in the TEE)</td><td><span class="tag deny">DENY</span> → <b class="hold">HOLD 4</b> · <code>FINAL</code>, <code>SANCTIONS</code></td><td>Signature validity ≠ current eligibility</td></tr>
+            <tr><td>83</td><td>Payout to Investor B</td><td>no transaction constructed · 0 signature requests</td><td>Policy Decision ≠ Execution Authorization</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Verify it yourself</h4>
+      <p class="subp">From the repository root. All read-only.</p>
+      <ol class="olist">
+        <li><code>scripts/demo/90-show-cre-execution.sh</code> — the CRE executions: the local sanitized records against the CRE platform’s own execution list.</li>
+        <li><code>scripts/demo/91-verify-hedera.sh</code> — <b>public chain data, no keys</b>: the JSON-RPC relay and the Mirror Node. Anyone can run it.</li>
+        <li><code>scripts/demo/92-verify-privy.sh</code> — Privy <code>wallets().get</code> / <code>policies().get</code> read-back. <b>Needs the Privy app credentials.</b></li>
+        <li><code>scripts/demo/93-verify-catenor-audit.sh</code> — re-verifies the audit hash chain, the Trust Anchor, the authority chains and the credentials from the recorded signed documents (the run records stay local and git-ignored).</li>
+        <li><code>scripts/demo/99-verify-complete-demo.sh</code> — every stage record plus the Catenor verification, in one summary.</li>
+      </ol>
+
+      <h4 class="sub">Screenshots</h4>
+      <div class="shots wide">
+        <figure class="shot"><button type="button" data-lb data-group="catenor" aria-label="Enlarge screenshot: Catenor audit verification"><img src="assets/93-verify-catenor-audit.jpg" alt="Stage 93 output: audit chain valid with 79 events, event type counts, Trust Anchor valid, Sponsor capabilities ALLOW, Agent authority chain ALLOW, both credentials ACTIVE" width="1430" height="2652" loading="lazy" decoding="async"></button><figcaption><b>Stage 93.</b> Audit hash chain <b>valid (79 events)</b>; Trust Anchor VALID; Sponsor and Agent chains ALLOW; credentials ACTIVE.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="catenor" aria-label="Enlarge screenshot: complete demo verification"><img src="assets/99-verify-complete-demo-stages.jpg" alt="Stage 99 output: all 24 stages ok" width="1800" height="1071" loading="lazy" decoding="async"></button><figcaption><b>Stage 99.</b> All 24 stages <code>ok: true</code>; the Catenor verification passes.</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- RUN LOG -->
+    <div class="tabpanel" role="tabpanel" id="ev-runlog" aria-labelledby="tab-runlog" tabindex="0">
+      <div class="panel-head">
+        <h3>What went wrong, and how it was fixed.</h3>
+        <p>None of these consumed a set-once state or duplicated an on-chain action. The full stage records stay local and
+          git-ignored; the public, reviewed record is <code>artifacts/final-demo/RUN-LOG.md</code>.</p>
+      </div>
+
+      <h4 class="sub">The day, in phases (UTC)</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Time</th><th scope="col">Phase</th><th scope="col">Outcome</th></tr></thead>
+          <tbody>
+            <tr><td class="nw">16:59</td><td>A · Local preparation</td><td>Instance <code>c1-202609121659</code>; Railway PostgreSQL with 0 Catenor rows, 5 migrations</td></tr>
+            <tr><td class="nw">17:08</td><td>Stage 10 · Trust Domain bootstrap</td><td>Signer infrastructure; Bootstrap Configuration hash</td></tr>
+            <tr><td class="nw">17:24–17:45</td><td>C · CRE deploy #1</td><td>Relay check OK; 3 Vault DON secrets; workflow Active; runner in <code>DEPLOYED</code> mode</td></tr>
+            <tr><td class="nw">17:50–19:18</td><td>Stage 11 · Admission</td><td>Attempts 1–3 refused at the gateway; control workflow at about 18:15; attempt 4 <b>ADMITTED</b></td></tr>
+            <tr><td class="nw">19:33–19:38</td><td>E · CRE deploy #2</td><td>Trust Anchor key pinned; same binary, new config, new ID</td></tr>
+            <tr><td class="nw">19:58–20:22</td><td>F · Sponsor, SPV, offering</td><td>No spending</td></tr>
+            <tr><td class="nw">20:26–20:45</td><td>G · Investors</td><td>Onboarding, credentials, presentations, offering eligibility</td></tr>
+            <tr><td class="nw">20:55–22:08</td><td>H · Hedera ATS</td><td>Funding, tokenization, issuance, dividend</td></tr>
+            <tr><td class="nw">22:10–22:28</td><td>I · Distribution Agent</td><td>DENY → DENY → ALLOW; Agent funded with 12 HBAR</td></tr>
+            <tr><td class="nw">22:29</td><td>J · Investor B becomes ineligible</td><td>Sumsub sandbox RED, <code>SANCTIONS</code>, FINAL</td></tr>
+            <tr><td class="nw">22:37–22:45</td><td>K · Confidential distribution and payment</td><td>PAY 6 / HOLD 4; one payout</td></tr>
+            <tr><td class="nw">22:53–22:59</td><td>L · Verification</td><td>Stages 90, 91, 92, 93, 99</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Incidents</h4>
+      <ol class="olist">
+        <li><b>Stage 11, attempts 1–3: the documented gateway does not serve this organization.</b> Attempt 1 got
+          <code>CRE gateway HTTP 400</code> with no detail; the verifier now surfaces the gateway’s code and message. Attempt 2
+          got <code>-32600 Workflow not found</code>, although <code>cre workflow list</code> showed the workflow ACTIVE. A
+          minimal non-confidential control workflow (<code>catenor-http-control</code>, <code>0038de78…a66f</code>) isolated
+          the cause: the same signed request failed on the documented enterprise gateway and was
+          <b>ACCEPTED</b> on <code>https://01.gateway.zone-a.cre.chain.link</code>. The verifier’s default gateway changed
+          (overridable with <code>DEMO_CRE_GATEWAY_URL</code>). Attempt 3 ran while the fix was still being written. Attempt 4
+          was admitted. No attempt created an execution or consumed the set-once root.</li>
+        <li><b><code>secrets.sh</code> failed on the <code>CRE_ETH_PRIVATE_KEY</code> placeholder.</b> The CLI parses that
+          key from the <code>.env</code> it is given, even in browser mode: <code>invalid hex character 'Y'</code>. Fixed with
+          a fresh random, <b>unfunded</b> key, written without printing it. It is not linked to the account and is not the
+          trigger key.</li>
+        <li><b>Stage 60 recorded the asset reference instead of the address</b>, after a successful <code>deployEquity</code>,
+          and failed with <code>invalid equity or SPV address</code>. The runner now records the checksummed address and the
+          reference separately, and never redeploys an existing equity. The 21:25 UTC re-run reported “already deployed …
+          no new deployment” and completed the owner-authorized SPV policy extension. The equity was not deployed twice.</li>
+        <li><b>A transient CLI account error</b> after deploy #2 (“unable to retrieve organization info… try again in a few
+          minutes”). A re-run a few minutes later was clean; deployed triggers do not depend on the CLI session.</li>
+        <li><b>An unneeded 25 HBAR SPV top-up</b> in the second funding run: the script tops up any wallet below its
+          suggested amount. Accepted to save time; it is testnet HBAR and the SPV had no further transactions.</li>
+        <li><b>An earlier instance was stopped.</b> <code>c1-202609121438</code> was stopped after stage 11 because its
+          admission ran on CRE simulation. The final run restarted on a new Privy app so that the admission also ran on the
+          deployed workflow.</li>
+      </ol>
+
+      <h4 class="sub">The gateway control experiment</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Gateway</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr><td class="m">https://01.enterprise-gateway.zone-a.cre.chain.link/ <span style="font-family:inherit;color:var(--muted)">(documented for the private registry)</span></td><td>HTTP 400 <code>-32600 Workflow not found</code>, twice, including about 5 min after the deploy</td></tr>
+            <tr><td class="m">https://01.gateway.zone-a.cre.chain.link <span style="font-family:inherit;color:var(--muted)">(embedded in CRE CLI v1.33.0)</span></td><td><b class="pay">HTTP 200, ACCEPTED</b> · execution <span class="h">0xf85c571f52d9605e711f3ab37ef64dbd53af6aac67cf14245b1125e880e660b6</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="sub">Honest labels</h4>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">System</th><th scope="col">Label</th><th scope="col">What that means here</th></tr></thead>
+          <tbody>
+            <tr><td><b>Chainlink CRE</b></td><td><span class="pill p-cre">Deployed</span></td><td>The Confidential Workflow <code>identity-confidential-production</code> on the Chainlink-hosted private registry, admission included. Not <code>cre workflow simulate</code></td></tr>
+            <tr><td><b>Privy</b></td><td><span class="pill p-live">Real development app</span></td><td>New app <code>catenor-one-ethonline-2026</code>: real server wallets, policies and key quorums in a development environment</td></tr>
+            <tr><td><b>Sumsub</b></td><td><span class="pill p-sand">Sandbox</span></td><td>Synthetic applicants, level <code>id-only</code>; reviews set by the operator. “Lisa Simpson” and “Bart Simpson” are fictional</td></tr>
+            <tr><td><b>Company KYB</b></td><td><span class="pill p-mock">Synthetic mock</span></td><td>Used only for the root Trust Anchor admission</td></tr>
+            <tr><td><b>Hedera</b></td><td><span class="pill p-net">Testnet</span></td><td>Chain 296. HBAR came from the portal faucet. Nothing ran on mainnet</td></tr>
+            <tr><td><b>Railway</b></td><td><span class="pill p-local">API + relay</span></td><td><code>catenor-one-production.up.railway.app</code>: API and CRE relay only, inert. Its Postgres holds the demo’s operational state</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><b>Still open after the run:</b> <code>reportFromDon</code> / offchain report verification (P1), and deleting the
+        control workflow <code>catenor-http-control</code>.</div>
+    </div>
+
+  </div>
+</section>
+
+<section id="study" class="study" aria-labelledby="study-title">
+  <div class="wrap">
+    <div class="kicker">Study notes</div>
+    <div class="display" id="study-title">Explain it simply.</div>
+    <div class="lead">Short, honest answers for judges — and for anyone rehearsing the pitch.</div>
+
+    <div class="qa">
+      <details open>
+        <summary>Why does Catenor need a canonical identity?</summary>
+        <p>Because wallets, providers and execution accounts change. The subject persists: a random <code>did:catenor</code> with no PII, and wallets attached to it through private Account Bindings. In this run every actor — the Trust Anchor, the Sponsor, the SPV, each investor, the Agent — has its own DID, and none of them <em>is</em> its wallet.</p>
+      </details>
+      <details>
+        <summary>Why separate Relationship from Capability?</summary>
+        <p>A relationship answers who someone acts for. A capability answers what they may do, on which resource, until when. The run shows it twice: the Agent’s <code>AGENT_OF</code> relationship was valid and its request was still <strong>DENY <code>CAPABILITY_MISSING</code></strong>; only the delegated <code>EXECUTE_DISTRIBUTION</code> grant made it ALLOW.</p>
+      </details>
+      <details>
+        <summary>What is actually being tokenized?</summary>
+        <p>1,000 equity-interest units in “Catenor One Demo SPV 001”, a <strong>synthetic</strong> real-estate SPV, deployed as an ATS equity (<code>C1SPV001</code>) on Hedera testnet. The demo does not claim that a land deed is represented by the token.</p>
+      </details>
+      <details>
+        <summary>Why does Bart still hold 400 units?</summary>
+        <p>Because ownership and current payment eligibility are different things. Bart was eligible when he invested — the TEE said ALLOW 400 — and the units were issued. A later sanction does not silently erase ownership or his dividend entitlement of 4. It changes whether he may be <strong>paid today</strong>, and that is decided confidentially at distribution time: HOLD 4.</p>
+      </details>
+      <details>
+        <summary>Why Privy if Catenor already handles authority?</summary>
+        <p>Catenor gives the semantic decision: this Agent may distribute for this SPV, and this holder is PAY. Privy constrains what a specific key can physically sign, whatever the application asks: the Agent’s key can only send on chain 296, to Lisa’s or Bart’s receiving wallet, up to 20 HBAR. Two independent fences. <strong>Policy Decision ≠ Execution Authorization.</strong></p>
+      </details>
+      <details>
+        <summary>What exactly happens inside CRE?</summary>
+        <p>In <code>handlerInTee</code> the deployed workflow opens a sealed context, fetches Sumsub credentials from the Vault DON, calls the Sumsub sandbox, verifies each VP, VC and issuer-signed status statement against the pinned Trust Anchor key, reconciles the current evidence with the credential, applies the pinned policy and — for the distribution — computes 10 HBAR × units / 1000 and PAY or HOLD per holder. Five operations, five DEPLOYED executions, about 8 s each.</p>
+      </details>
+      <details>
+        <summary>What exactly leaves the TEE?</summary>
+        <p>Decisions, requirement statuses, the seven check results, the reconciliation class, <strong>coarse reason codes</strong> (<code>FINAL</code>, <code>SANCTIONS</code>) and commitments. No Sumsub response, name, document or applicant data. Two honest caveats: the reason codes do reach Catenor, and on the deployed platform the workflow’s user logs are visible per node — which is why it logs only non-sensitive markers.</p>
+      </details>
+      <details>
+        <summary>Why is the tokenization not in CRE?</summary>
+        <p>Because it has no private input. Deploying the equity, issuing units and setting a dividend are public actions on Hedera, gated by public-key-verifiable authority (the Sponsor’s <code>TOKENIZE_ASSET</code> grant from the admitted Trust Anchor). The TEE is used where private, <em>current</em> evidence is involved: the admission, the credentials, offering eligibility and the distribution. The issuance amounts are still bound to TEE-backed decisions: 600 and 400 are exactly what the stage 44 run approved.</p>
+      </details>
+      <details>
+        <summary>Why was the workflow deployed twice?</summary>
+        <p>Deploy #1 carried the Bootstrap Configuration hash for the admission. The Trust Anchor’s key did not exist until that admission, so deploy #2 pinned it as the only accepted credential issuer. Same binary (<code>9902db58…</code>), new config, updated in place; the execution history survived.</p>
+      </details>
+      <details>
+        <summary>Why does Bart get no signature request, rather than a refused one?</summary>
+        <p>Because a HOLD holder never reaches the executor. The Catenor signer boundary builds a transfer only for a PAY holder, to that holder’s privately bound account, for exactly the plan amount. Privy’s policy is a second fence that was never needed for Bart: <code>investorBSignatureRequests: 0</code>, and the Agent’s nonce went from 0 to 1.</p>
+      </details>
+      <details>
+        <summary>Is this production?</summary>
+        <p>No, and the page says so everywhere. The CRE workflow is really <strong>deployed</strong> on Chainlink’s private registry, and the Privy wallets and policies are real — in a <strong>development</strong> app. The investors are synthetic Sumsub <strong>sandbox</strong> applicants with fictional names, the company KYB is a <strong>synthetic mock</strong>, and the asset lives on Hedera <strong>testnet</strong>. Catenor did not independently verify an enclave attestation, and <code>reportFromDon</code> verification is not implemented yet.</p>
+      </details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <div>
+      <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span><span>Catenor One</span></a>
+      <p class="honest" style="margin-top:16px">The first reference implementation of Catenor Protocol, built for ETHOnline 2026.
+        Wallets are accounts. Credentials are claims. Authority is scoped. Identity persists.</p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <ul>
+        <li><a href="https://github.com/luizoamorim/catenor-one" rel="noopener">GitHub · catenor-one</a></li>
+        <li><a href="https://catenor.xyz" rel="noopener">Catenor Protocol · catenor.xyz</a></li>
+        <li><a href="https://catenor-one-production.up.railway.app/v1/health" rel="noopener">Railway API health</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Honesty</h5>
+      <p class="honest">Sumsub <b>sandbox</b> with synthetic applicants (the names are fictional). Company KYB is a
+        <b>synthetic mock</b>. Hedera <b>testnet</b>. Privy <b>development</b> app. Chainlink CRE <b>deployed</b>
+        Confidential Workflow. This page shows only public-safe data: no investor DID, applicant ID, VC, VP, key or secret.</p>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>Catenor One · ETHOnline 2026 · instance c1-202609121659 · 2026-09-12</span>
+    <span>Identity. Authority. Confidential policy. Verifiable execution.</span>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Screenshot viewer" hidden>
+  <button type="button" class="lb-btn lb-close" id="lb-close" aria-label="Close">×</button>
+  <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Previous screenshot">‹</button>
+  <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Next screenshot">›</button>
+  <figure id="lb-fig"><img id="lb-img" src="data:," alt=""></figure>
+  <div class="cap" id="lb-cap"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- tabs ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var panels = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+  var tablist = document.querySelector('.tablist');
+  var nav = document.querySelector('.nav');
+
+  function scrollToPanel(i){
+    var top = panels[i].getBoundingClientRect().top + window.pageYOffset - (nav ? nav.offsetHeight : 0) - tablist.offsetHeight - 8;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+  function select(i, opts){
+    opts = opts || {};
+    tabs.forEach(function(t, j){
+      var on = j === i;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      panels[j].hidden = !on;
+    });
+    if (opts.focus) tabs[i].focus();
+    if (opts.hash && history.replaceState) history.replaceState(null, '', '#' + panels[i].id);
+    if (opts.scroll) scrollToPanel(i);
+    else if (opts.hash) {
+      var r = panels[i].getBoundingClientRect();
+      if (r.top < tablist.getBoundingClientRect().bottom - 2) scrollToPanel(i);
+    }
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ select(i, { hash: true }); });
+    t.addEventListener('keydown', function(e){
+      var n = null;
+      if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = tabs.length - 1;
+      if (n !== null) { e.preventDefault(); select(n, { focus: true, hash: true }); }
+    });
+  });
+  function indexForHash(h){
+    var id = (h || '').replace(/^#/, '');
+    for (var i = 0; i < panels.length; i++) if (panels[i].id === id) return i;
+    return -1;
+  }
+  var initial = indexForHash(location.hash);
+  select(initial >= 0 ? initial : 0);
+  if (initial >= 0) setTimeout(function(){ scrollToPanel(initial); }, 60);
+  window.addEventListener('hashchange', function(){
+    var i = indexForHash(location.hash);
+    if (i >= 0) select(i, { scroll: true });
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href^="#ev-"]');
+    if (!a) return;
+    var i = indexForHash(a.getAttribute('href'));
+    if (i < 0) return;
+    e.preventDefault();
+    select(i, { hash: true, scroll: true });
+  });
+
+  /* ---------- JSON highlighting ---------- */
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  Array.prototype.forEach.call(document.querySelectorAll('pre[data-json]'), function(pre){
+    var src = pre.textContent, out = '', last = 0, m;
+    var re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)|([{}\[\],])/g;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += m[2] ? '<span class="k">' + esc(m[1]) + '</span><span class="p">' + esc(m[2]) + '</span>' : '<span class="s">' + esc(m[1]) + '</span>';
+      else if (m[3]) out += '<span class="b">' + m[3] + '</span>';
+      else if (m[4]) out += '<span class="n">' + m[4] + '</span>';
+      else out += '<span class="p">' + esc(m[5]) + '</span>';
+      last = re.lastIndex;
+    }
+    out += esc(src.slice(last));
+    pre.innerHTML = out;
+  });
+
+  /* ---------- audit event bars ---------- */
+  var bars = document.getElementById('bars');
+  if (bars) {
+    try {
+      var ev = JSON.parse(bars.getAttribute('data-events'));
+      var max = ev.reduce(function(a, e){ return Math.max(a, e[1]); }, 1);
+      bars.innerHTML = '';
+      ev.forEach(function(e){
+        var row = document.createElement('div');
+        row.className = 'bar' + (e[0] === 'DISTRIBUTION_REQUEST_DENIED' ? ' hi' : '');
+        row.innerHTML = '<span class="l" title="' + esc(e[0]) + '">' + esc(e[0]) + '</span><span class="c">' + e[1] + '</span><span class="t" aria-hidden="true"><i style="width:' + (e[1] / max * 100).toFixed(1) + '%"></i></span>';
+        bars.appendChild(row);
+      });
+    } catch (err) { /* leave the noscript text */ }
+  }
+
+  /* ---------- Hedera Mirror Node ---------- */
+  var MIRROR = 'https://testnet.mirrornode.hedera.com/api/v1/';
+  var KNOWN = {
+    '10509879': 'SPV', '10511413': 'Distribution Agent', '10509881': 'Investor A', '10509882': 'Investor B',
+    '10509855': 'Treasury', '10510175': 'ATS equity', '9213391': 'ATS v8 Factory',
+    '0x182f8c7ddbda1b5f295893e2c4f6d55abbdb9926': 'SPV', '0x90894535f5f35271f2d4112179bf2b4e887913e3': 'Distribution Agent',
+    '0x7de572532820b22040b561e68543419419b72473': 'Investor A', '0xcfca833a8e6b7651e44480b92822576bcb78da73': 'Investor B',
+    '0x49e969483fed8b2419d60ecb23d34c89af2e5210': 'Treasury', '0xf37a91c3ac757ac5f14e4b8bc92d4b1001d97abc': 'ATS equity',
+    '0xd1f118a40f3b02883d35909ef2517e7edd78379d': 'ATS v8 Factory'
+  };
+  function describeAddr(a){
+    if (!a || typeof a !== 'string') return '—';
+    var s = a.toLowerCase(), label = KNOWN[s], extra = '';
+    if (/^0x0{24}[0-9a-f]{16}$/.test(s)) {
+      var num = parseInt(s.slice(-16), 16);
+      if (isFinite(num)) { extra = ' = 0.0.' + num; label = label || KNOWN[String(num)]; }
+    }
+    return a + extra + (label ? ' (' + label + ')' : '');
+  }
+  function fetchJson(url){
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 12000);
+    return fetch(url, { headers: { 'Accept': 'application/json' }, signal: ctl ? ctl.signal : undefined, mode: 'cors' })
+      .then(function(r){ clearTimeout(timer); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
+            function(e){ clearTimeout(timer); throw e; });
+  }
+  function line(out, label, value, cls){
+    var d = document.createElement('div');
+    var b = document.createElement('span'); b.textContent = label + ': ';
+    var v = document.createElement('span'); v.textContent = value; if (cls) v.className = cls;
+    d.appendChild(b); d.appendChild(v); out.appendChild(d);
+  }
+  function fail(out, hash, e){
+    out.innerHTML = '';
+    var s = document.createElement('span'); s.className = 'err';
+    s.appendChild(document.createTextNode('Could not read the Mirror Node from this browser (' + (e && e.name === 'AbortError' ? 'timeout' : (e && e.message) || 'network or CORS error') + '). '));
+    var a = document.createElement('a'); a.className = 'link'; a.rel = 'noopener';
+    a.href = 'https://hashscan.io/testnet/transaction/' + hash; a.textContent = 'Open it on HashScan ↗';
+    s.appendChild(a); out.appendChild(s);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.mn-btn[data-hash]'), function(btn){
+    btn.addEventListener('click', function(){
+      var hash = btn.getAttribute('data-hash'), out = btn.nextElementSibling, label = btn.textContent;
+      if (!/^0x[0-9a-fA-F]{64}$/.test(hash)) return;
+      btn.disabled = true; btn.textContent = 'Checking…'; out.textContent = '';
+      fetchJson(MIRROR + 'contracts/results/' + hash).then(function(d){
+        out.innerHTML = '';
+        var ok = d.result === 'SUCCESS';
+        line(out, 'result', d.result || '—', ok ? 'okt' : 'bad');
+        if (d.status != null) line(out, 'status', String(d.status));
+        if (d.gas_used != null) line(out, 'gas_used', Number(d.gas_used).toLocaleString('en-US'));
+        line(out, 'from', describeAddr(d.from));
+        line(out, 'to', describeAddr(d.to));
+        if (d.block_number != null) line(out, 'block', String(d.block_number));
+        if (d.timestamp) {
+          var t = parseFloat(d.timestamp);
+          if (isFinite(t)) line(out, 'consensus', new Date(t * 1000).toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC'));
+        }
+      }).catch(function(e){ fail(out, hash, e); }).then(function(){ btn.disabled = false; btn.textContent = label; });
+    });
+  });
+  var balBtn = document.getElementById('bal-btn'), balOut = document.getElementById('bal-out');
+  if (balBtn) balBtn.addEventListener('click', function(){
+    var accts = [['0.0.10509881', 'Investor A · Lisa', '7.0 ℏ at the end of the run'], ['0.0.10509882', 'Investor B · Bart', '1.0 ℏ at the end of the run']];
+    balBtn.disabled = true; balBtn.textContent = 'Checking…'; balOut.innerHTML = '';
+    Promise.all(accts.map(function(a){
+      return fetchJson(MIRROR + 'accounts/' + a[0]).then(function(d){ return { a: a, d: d }; }, function(e){ return { a: a, e: e }; });
+    })).then(function(res){
+      res.forEach(function(r){
+        var c = document.createElement('div'); c.className = 'card';
+        var n = document.createElement('div'); n.className = 'n'; n.textContent = r.a[1] + ' · ' + r.a[0]; c.appendChild(n);
+        var b = document.createElement('b'); b.className = 'big';
+        var p = document.createElement('p');
+        if (r.d && r.d.balance && typeof r.d.balance.balance === 'number') {
+          b.textContent = (r.d.balance.balance / 1e8).toFixed(8).replace(/0+$/, '').replace(/\.$/, '.0') + ' ℏ';
+          p.textContent = 'Live now. Recorded: ' + r.a[2] + '.';
+        } else {
+          b.textContent = '—';
+          p.textContent = 'Could not read the Mirror Node (' + ((r.e && r.e.message) || 'unexpected response') + '). ';
+          var a = document.createElement('a'); a.className = 'link'; a.rel = 'noopener';
+          a.href = 'https://hashscan.io/testnet/account/' + r.a[0]; a.textContent = 'HashScan ↗';
+          p.appendChild(a);
+        }
+        c.appendChild(b); c.appendChild(p); balOut.appendChild(c);
+      });
+    }).then(function(){ balBtn.disabled = false; balBtn.textContent = 'Check again'; });
+  });
+
+  /* ---------- lightbox ---------- */
+  var lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img'), lbCap = document.getElementById('lb-cap');
+  var lbClose = document.getElementById('lb-close'), lbPrev = document.getElementById('lb-prev'), lbNext = document.getElementById('lb-next');
+  var triggers = Array.prototype.slice.call(document.querySelectorAll('[data-lb]'));
+  var group = [], idx = 0, lastFocus = null;
+  function show(){
+    var btn = group[idx], img = btn.querySelector('img'), fc = btn.parentNode.querySelector('figcaption');
+    lbImg.src = img.getAttribute('src'); lbImg.alt = img.alt;
+    lbCap.innerHTML = (fc ? fc.innerHTML : esc(img.alt)) + (group.length > 1 ? '<span class="cnt">' + (idx + 1) + ' / ' + group.length + ' · ← → to browse · Esc to close</span>' : '<span class="cnt">Esc to close</span>');
+    lbPrev.hidden = lbNext.hidden = group.length < 2;
+  }
+  function open(btn){
+    var g = btn.getAttribute('data-group');
+    group = triggers.filter(function(t){ return t.getAttribute('data-group') === g; });
+    idx = Math.max(0, group.indexOf(btn));
+    lastFocus = btn; show(); lb.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    lbClose.focus();
+  }
+  function close(){
+    lb.hidden = true; lbImg.src = 'data:,';
+    document.documentElement.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  }
+  function step(d){ idx = (idx + d + group.length) % group.length; show(); }
+  triggers.forEach(function(t){ t.addEventListener('click', function(){ open(t); }); });
+  lbClose.addEventListener('click', close);
+  lbPrev.addEventListener('click', function(){ step(-1); });
+  lbNext.addEventListener('click', function(){ step(1); });
+  lb.addEventListener('click', function(e){ if (e.target === lb || e.target.id === 'lb-fig') close(); });
+  document.addEventListener('keydown', function(e){
+    if (lb.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowRight' && group.length > 1) step(1);
+    else if (e.key === 'ArrowLeft' && group.length > 1) step(-1);
+    else if (e.key === 'Tab') {
+      var f = [lbClose, lbPrev, lbNext].filter(function(b){ return !b.hidden; });
+      var k = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>
