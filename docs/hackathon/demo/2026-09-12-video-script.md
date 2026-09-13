@@ -24,7 +24,7 @@ IDs stay redacted.
 
 ## Shot list and narration
 
-About 470 words, roughly 140 per minute.
+About 370 words: roughly 2:50 of speech at a calm pace, plus pauses on the key shots.
 
 | # | Time | Shot (screenshot or card) | Narration (maintainer, English) |
 |---|---|---|---|
