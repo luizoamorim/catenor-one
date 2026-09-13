@@ -1664,6 +1664,12 @@ Work completed:
   - the REAL / SANDBOX / MOCK labels, how to run and verify, provenance, and what is not done.
 - **`DEMO.md` §11 and §15** now say the CRE workflow is DEPLOYED instead of "NOT deployed".
 - **Submission checklist:** the two README items are ticked.
+- **Simulation-era records.** Their evidence labels were **not** changed: those runs really were SIMULATION. Instead:
+  - the older CRE, Hedera and Privy artifacts that said "B1 open" or "not deployed" now open with a "superseded"
+    note that links to the deployed run; "B1 is open" now reads "was open at the time";
+  - the living status docs now say DEPLOYED: `FINAL-DEMO.md` (§4 labels, the prize mapping, FD-10 closed), `DEMO.md`
+    (the run-all note, the judge matrix, the §15 blockers), and the S001 PLAN B1 and TASKS T0.2 notes;
+  - prompts, spikes and dated BUILD_LOG entries are historical records and stay as written.
 
 Both YouTube videos (the submission demo and the technical walkthrough) are linked from the README.
 

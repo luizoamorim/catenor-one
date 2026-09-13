@@ -1,5 +1,7 @@
 # Clean-room run — confidential offering eligibility and confidential distribution (CRE SIMULATION)
 
+**Historical record, superseded.** This run used `cre workflow simulate`, and its SIMULATION label is accurate. The final demo (2026-09-12, instance `c1-202609121659`) ran every confidential operation on the **deployed** Confidential Workflow: see [`deployed-run-c1-202609121659.md`](deployed-run-c1-202609121659.md). Anything below about enrollment (B1) or deployment being open describes the state on this record's date.
+
 **Date:** 2026-09-12 (UTC) · **Instance:** `c1-202609120048` · **Prompt:** `docs/hackathon/prompts/2026-09-11-023-reproducible-demo-runbook.md`  
 **Label:** Chainlink CRE **SIMULATION** (`cre workflow simulate`, `handlerInTee`, production-like limits). This is **not**
 a deployed Confidential Workflow; see `DEMO.md` §15.  

@@ -8,7 +8,7 @@
 Catenor decides identity + authority.
 Privy constrains wallet execution.
 Hedera ATS executes only after a Catenor ALLOW.
-Chainlink CRE evaluates private evidence (SIMULATION until B1).
+Chainlink CRE evaluates private evidence inside the deployed Confidential Workflow.
 ```
 
 ## 1. Cast and wallets
@@ -65,7 +65,8 @@ Investor B's ineligibility: the preferred source is a current **representative R
 | Label | What |
 |---|---|
 | **REAL** | PostgreSQL; Privy (wallets, policies, signing); Sumsub **sandbox** representative; Hedera **testnet** transactions once broadcast |
-| **SIMULATION** | Chainlink CRE Confidential workflow (`cre workflow simulate`) while B1 enrollment is open. Never "deployed TEE" or "production TEE". |
+| **DEPLOYED** | Chainlink CRE Confidential Workflow `identity-confidential-production` (private registry) in the final run `c1-202609121659`: 5 executions, all SUCCESS. |
+| **SIMULATION** | The earlier checkpoints (2026-09-11) and the first clean room (`c1-202609120048`) used `cre workflow simulate`, and their evidence keeps that label. |
 | **MOCK** | Company/KYB evidence: SYNTHETIC MOCK (Hybrid Demo Profile) |
 | **DRY RUN** | The blind distribution. It sends nothing. |
 
@@ -80,7 +81,7 @@ TRUST (Trust Anchor ACTIVE, Sponsor Capability) → TOKENIZATION (authorization 
 | Sponsor | Target | Demo evidence |
 |---|---|---|
 | Privy | Best B2B financial product; Best financial flow | Authority-derived provisioning of SPV/Agent wallets and policies; policy-constrained signing; separate custody; DENY → no signature |
-| Chainlink | Confidential Workflow | `identity-confidential` `handlerInTee`, private Sumsub response → minimized facts → ALLOW/DENY (SIMULATION) |
+| Chainlink | Confidential Workflow | `identity-confidential` `handlerInTee`, private Sumsub response → minimized facts → ALLOW/DENY; PAY/HOLD computed in the TEE. DEPLOYED in the final run (5 executions) |
 | Hedera | Tokenization of Anything | ATS `deployEquity` + `issueByPartition` on testnet from a Privy wallet; distribution action for A only |
 
 `hedera-hackathon-submission-validator` is run before submission. Unrelated prizes are not pursued.
@@ -157,7 +158,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
   - LIVE 2026-09-11: Agent `did:catenor:bb5870b9…20f3`, Privy wallet `0x5037…FC51`, policy `to ∈ {A, B} ∧ value ≤ 20 HBAR ∧ chain 296`.
   - The grant is issued by the ACTIVE Trust Anchor.
   - Evidence: `artifacts/privy/final-demo/cp7-distribution-agent.md`.
-- [x] FD-6 `feat(cre)`: real Sumsub sandbox evidence through CRE `handlerInTee` (SIMULATION) in the final path (A GREEN, B RED).
+- [x] FD-6 `feat(cre)`: real Sumsub sandbox evidence through CRE `handlerInTee` (SIMULATION at this checkpoint; the final run used the deployed workflow) in the final path (A GREEN, B RED).
   - The new `INVESTOR_ELIGIBILITY` operation of `identity-confidential` gives A CONSISTENT and B MISMATCH (SANCTIONS, FINAL).
   - The S001 representative already used the real sandbox; the mock Sumsub server is not used in the demo.
   - Evidence: `artifacts/chainlink/final-demo/investor-eligibility-simulation.md`.
@@ -184,7 +185,7 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - `preflight:payout` PASS; payout gas estimate 22,828 ≤ 30,000.
   - **DONE (CP14):** live payout 6 HBAR to A only; A 1 → 7, B 1 → 1 (see above).
 - [ ] FD-8 `feat(web)`: guided demo and Judge Inspector timeline. The UI replays the canonical clean-room flow (`DEMO.md`, `scripts/demo/`).
-- [ ] FD-10 `docs(demo)` + `feat(demo)`: reproducible clean-room runbook (prompt 2026-09-11-023).
+- [x] FD-10 `docs(demo)` + `feat(demo)`: reproducible clean-room runbook (prompt 2026-09-11-023).
   - **Structurally complete 2026-09-12:** root `DEMO.md`; numbered `scripts/demo/NN-*.sh` over a stateful stage runner; `run-all.sh` (safe by default); CRE deployment scripts.
   - Every non-spending stage ran from zero: Privy development app, Sumsub sandbox, CRE SIMULATION. Evidence: `artifacts/chainlink/final-demo/clean-room-confidential-run.md`.
   - **Authority story upgraded:**
@@ -193,9 +194,9 @@ The raw-key `HederaAtsTestnetExecutor` stays as dev/test infrastructure. A Privy
     - Agent: `AGENT_OF` + a delegated `EXECUTE_DISTRIBUTION`.
   - **VC/VP:** Trust Anchor-issued investor VCs; holder-bound VPs verified inside `handlerInTee` (seven named checks).
   - **The distribution is computed inside CRE** (`CONFIDENTIAL_DISTRIBUTION`): A PAY 6 / B HOLD 4.
-  - **OPEN:**
-    - the clean-room `--live` Hedera stages (funding, 60–63, 83);
-    - a REAL deployed Confidential Workflow (commands ready; needs the public callback URL, the secrets upload and the deploy — `DEMO.md` §15). Until then CRE stays SIMULATION.
+  - **Closed 2026-09-12 by the final run `c1-202609121659`:**
+    - the clean-room `--live` Hedera stages (funding, 60–63, 83): 6 testnet transactions, all SUCCESS;
+    - the deployed Confidential Workflow (`identity-confidential-production`, private registry): 5 executions, all SUCCESS. Evidence: `artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md`.
 - [ ] FD-9 `docs(hackathon)`: evidence, README, submission validator, video.
 
 ## 10. Deferred (not built for the demo; open tasks stay open)

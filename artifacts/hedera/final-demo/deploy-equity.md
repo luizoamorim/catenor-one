@@ -1,11 +1,13 @@
 # Final demo — LIVE Hedera ATS `deployEquity` signed by the Privy SPV wallet, after a Catenor ALLOW
 
+**Rehearsal record (2026-09-11), superseded by the final run.** At this date Chainlink CRE ran in SIMULATION. The final demo (2026-09-12, instance `c1-202609121659`) used the **deployed** Confidential Workflow and a new equity: see [`clean-room-c1-202609121659.md`](clean-room-c1-202609121659.md).
+
 **Date:** 2026-09-11 (consensus timestamp `1789145624.531106104`)  
 **Evidence class:** REAL Hedera **Testnet** transaction (chain 296). This is the one live transaction the maintainer authorized; no issuance has been done yet.  
 **Run:** `pnpm demo:s001 --hedera-live`
 
 - REAL: PostgreSQL, Privy development app, Sumsub **sandbox** representative.
-- SIMULATION: Chainlink CRE (`cre workflow simulate`; B1 is open).
+- SIMULATION: Chainlink CRE (`cre workflow simulate`; B1 was open at the time).
 - MOCK: company evidence (SYNTHETIC MOCK).
 
 **Re-verify from public data:** `pnpm --filter @catenor-one/api verify:ats 0x8265479fc7236b7b092899b49cfaf0d8d1ecb05e7ce2ff69aeda587e4ad75897`. Output: `deploy-equity.verify.json`.

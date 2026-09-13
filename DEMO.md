@@ -224,7 +224,7 @@ scripts/demo/run-all.sh               # the whole walkthrough, SAFE: no Hedera b
 
 `run-all.sh` without `--live`:
 
-- creates Privy development-app resources, Sumsub **sandbox** applicants and runs CRE simulations, all non-spending;
+- creates Privy development-app resources, Sumsub **sandbox** applicants and runs the CRE operations (simulated locally, or on the deployed workflow once configured, §15), all non-spending;
 - runs every Hedera stage as a READ-ONLY preflight;
 - stops at the first failing stage.
 
@@ -422,11 +422,11 @@ A reset is **local only**. It cannot and does not pretend to revert:
 | 00 prerequisites | tools | Hedera relay / Mirror Node (read) | 0 | no | console |
 | 01 setup | Docker, Privy + Sumsub credentials | local | 0 | local DB, env files | `runs/01-*` |
 | 10 trust domain | Privy | Privy dev app | 0 | Privy (quorums, policies, wallet) | bootstrap config + hash |
-| 11 Trust Anchor | Privy, Sumsub, CRE CLI | Privy, Sumsub sandbox, CRE simulate | 0 | Privy wallet, Sumsub applicant, local DB | Decision, endorsement, CRE run |
+| 11 Trust Anchor | Privy, Sumsub, CRE CLI | Privy, Sumsub sandbox, CRE (deployed, or simulate) | 0 | Privy wallet, Sumsub applicant, local DB | Decision, endorsement, CRE run |
 | 20–21 Sponsor | Privy | Privy | 0 | Privy wallet, local DB | relationship + 5 grants |
 | 30–31 SPV, offering | Privy | Privy | 0 | Privy wallet + policy, local DB | SPV wallet controls, signed offering |
 | 40–41 investors | Privy, Sumsub | Privy, Sumsub sandbox | 0 | Privy wallets, Sumsub applicants | DIDs, bindings (private) |
-| 42–44 VC / VP / offering | Privy, Sumsub, CRE CLI | Sumsub sandbox, CRE simulate | 0 | local DB | VCs, 7-check VPs, Decisions |
+| 42–44 VC / VP / offering | Privy, Sumsub, CRE CLI | Sumsub sandbox, CRE (deployed, or simulate) | 0 | local DB | VCs, 7-check VPs, Decisions |
 | 50 funding | faucet or treasury | Hedera Testnet | ≈ 39 HBAR moved (fees ≈ 1.4 for 2 activations) | yes (`--live`) | transfer receipts |
 | 60 tokenize | funded SPV | Hedera Testnet | ≈ 7.7 HBAR | yes (`--live`) | deploy tx, equity |
 | 61–62 invest | equity | Hedera Testnet | ≈ 0.5 HBAR each | yes (`--live`) | issuance txs |
@@ -434,7 +434,7 @@ A reset is **local only**. It cannot and does not pretend to revert:
 | 70–72 Agent | Privy | Privy | 0 | Privy wallet + policy, local DB | authority chain |
 | 80 B → RED | Sumsub | Sumsub sandbox | 0 | Sumsub review | review RED |
 | 81 revenue | — | local | 0 | local DB | revenue event |
-| 82 distribution | Privy, Sumsub, CRE CLI | Sumsub sandbox, CRE simulate | 0 | local DB | TEE plan, Decisions |
+| 82 distribution | Privy, Sumsub, CRE CLI | Sumsub sandbox, CRE (deployed, or simulate) | 0 | local DB | TEE plan, Decisions |
 | 83 execute | funded Agent | Privy, Hedera Testnet | 6 HBAR + ≈ 0.024 fee | yes (`--live`) | payout tx; 0 requests for B |
 | 90–99 verify | — / Privy | read-only | 0 | no | console + records |
 | 91 `--rehearsal` | **nothing** | Hedera public read | 0 | no | 8 SUCCESS txs, holdings |
@@ -488,19 +488,18 @@ exist only after certain stages. The Bootstrap Configuration hash comes from sta
 
 Until the second deploy, investor operations fail closed with `CONFIG_INVALID`.
 
-Blockers, each with its smallest fix:
+The blockers met on the way, all resolved by the final run:
 
 1. **Confidential Workflows enrollment.** No CLI command shows it: `cre whoami` shows standard deploy access only.
-   Chainlink's docs say enrollment is separate. The maintainer has stated access is now granted; the first
-   `deploy.sh --live` confirms it.
+   The first `deploy.sh --live` worked on 2026-09-12; no extra enrollment step was needed.
 2. **Public callback URL.** The DON must reach Catenor. Preferred: the Railway API (`docs/deployment/RAILWAY.md`)
    authenticates the callback and relays it to the stages, which pull their own results:
    `configure.sh --relay-url=https://<railway-host>`. Fallback: `ngrok http 8787` (or any HTTPS tunnel) to the local
    receiver while stages run, then `configure.sh --callback-url=https://…`.
 3. **Secrets upload.** `secrets.sh --live` (browser auth, private registry).
 4. **Rate limit.** The deployed HTTP trigger is limited to `every60s:1`, so space the confidential stages ≥ 60 s apart.
-5. **Handler logs.** TEE handler logs are not exported in production. The Catenor callback record (90) is the
-   judge-facing result.
+5. **Handler logs.** On the deployed platform the Logs tab shows the workflow's user logs from several DON nodes, so
+   the workflow logs only safe markers. The Catenor callback record (90) is the judge-facing result.
 
 ---
 

@@ -1,9 +1,11 @@
 # Final demo CP7 — Chainlink CRE Confidential Workflow `INVESTOR_ELIGIBILITY` (SIMULATION, REAL Sumsub sandbox)
 
+**Historical record, superseded.** This run used `cre workflow simulate`, and its SIMULATION label is accurate. The final demo (2026-09-12, instance `c1-202609121659`) ran every confidential operation on the **deployed** Confidential Workflow: see [`deployed-run-c1-202609121659.md`](deployed-run-c1-202609121659.md). Anything below about enrollment (B1) or deployment being open describes the state on this record's date.
+
 **Date:** 2026-09-11  
 **Evidence class:** **SIMULATION**. `cre workflow simulate` of `workflows/identity-confidential` (`handlerInTee`), driven by the Catenor API during `pnpm demo:s001 --distribution`.
 
-- This is **not** a deployed or production TEE. Confidential Workflows deployment enrollment (B1) is still open.
+- This is **not** a deployed or production TEE. Confidential Workflows deployment enrollment (B1) was still open at the time.
 - The provider calls inside the handler went to the **REAL Sumsub sandbox** (`https://api.sumsub.com`, synthetic applicants). The mock Sumsub server was **not** used.
 - Company/KYB evidence is not part of this operation; in S001 it remains SYNTHETIC MOCK.
 

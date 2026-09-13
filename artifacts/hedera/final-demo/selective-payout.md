@@ -1,5 +1,7 @@
 # Final demo — LIVE selective controlled distribution: Investor A paid 6 HBAR, Investor B HELD
 
+**Rehearsal record (2026-09-11), superseded by the final run.** At this date Chainlink CRE ran in SIMULATION. The final demo (2026-09-12, instance `c1-202609121659`) used the **deployed** Confidential Workflow and a new equity: see [`clean-room-c1-202609121659.md`](clean-room-c1-202609121659.md).
+
 **Date:** 2026-09-11 (consensus timestamp `1789163937.118711104`)  
 **Authorization:** the maintainer authorized exactly this one payout (prompt `2026-09-11-022`).  
 **Command:** `pnpm demo:s001 --distribution --agent-payout-live`, one run, one broadcast, no retry. Output: `selective-payout.json`.
@@ -7,7 +9,7 @@
 | Label | What |
 |---|---|
 | **REAL** | PostgreSQL; Privy (Agent wallet, policy, runtime-signer signature); **Sumsub SANDBOX** investor applicants (A current review GREEN, B RED `SANCTIONS`/`FINAL`); Hedera **Testnet** |
-| **SIMULATION** | Chainlink CRE Confidential Workflow `identity-confidential` `INVESTOR_ELIGIBILITY` (`handlerInTee`, `cre workflow simulate`). **Not** a deployed or production TEE (B1 open). |
+| **SIMULATION** | Chainlink CRE Confidential Workflow `identity-confidential` `INVESTOR_ELIGIBILITY` (`handlerInTee`, `cre workflow simulate`). **Not** a deployed or production TEE (B1 was open at the time). |
 | **MOCK** | Company/KYB evidence, used only in the S001 admission (SYNTHETIC MOCK, Hybrid Demo Profile) |
 
 ## The live Catenor-controlled plan (recomputed in this run)

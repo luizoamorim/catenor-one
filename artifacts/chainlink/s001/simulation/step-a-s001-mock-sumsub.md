@@ -1,5 +1,7 @@
 # S001 — Step A: trust-anchor-admission through `cre workflow simulate` (MOCK Sumsub server)
 
+**Historical record, superseded.** This run used `cre workflow simulate`, and its SIMULATION label is accurate. The final demo (2026-09-12, instance `c1-202609121659`) ran every confidential operation on the **deployed** Confidential Workflow: see [`../../final-demo/deployed-run-c1-202609121659.md`](../../final-demo/deployed-run-c1-202609121659.md). Anything below about enrollment (B1) or deployment being open describes the state on this record's date.
+
 **Date:** 2026-09-11 · **Evidence class:** SIMULATION — `cre workflow simulate` (CRE CLI v1.33.0, `@chainlink/cre-sdk` 1.18.0),
 production-like limits file. **The simulator is not a TEE; nothing here is evidence of a deployed Confidential Workflow (B1).**
 **Representative data came from a local MOCK Sumsub server (synthetic applicant); company evidence is the SYNTHETIC MOCK fixture.**

@@ -1,5 +1,7 @@
 # Final demo CP10 — Selective Distribution Agent payout: signer boundary + preflight (NOTHING BROADCAST)
 
+**Rehearsal record (2026-09-11), superseded by the final run.** At this date Chainlink CRE ran in SIMULATION. The final demo (2026-09-12, instance `c1-202609121659`) used the **deployed** Confidential Workflow and a new equity: see [`clean-room-c1-202609121659/README.md`](clean-room-c1-202609121659/README.md).
+
 **Date:** 2026-09-11  
 **Evidence class:**
 
