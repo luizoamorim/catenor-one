@@ -41,6 +41,8 @@ code{overflow-wrap:anywhere}
 .brand{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;letter-spacing:-.02em;white-space:nowrap}
 .mark{width:24px;height:24px;border-radius:50%;border:2px solid #1d1d1f;position:relative;flex:none}
 .mark:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;right:-3px;top:1px}
+@media(max-width:520px){.nav-links a:not(.sim):not(.gh){display:none}}
+.nav-links .sim{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:var(--blue);color:#fff !important;font-weight:600;letter-spacing:.01em}.nav-links .sim:hover{background:#0077ed}.nav-links .sim svg{width:9px;height:9px}
 .nav-links{display:flex;gap:28px;color:#424245;font-size:12px;white-space:nowrap}
 .nav-links a:hover{color:#000}
 .nav-links .gh{color:var(--blue)}
@@ -449,7 +451,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
   <div class="nav-inner">
     <a class="brand" href="index.html" title="Catenor One home"><span class="mark" aria-hidden="true"></span><span>Catenor One</span></a>
     <div class="nav-links">
-      <a class="gh" href="console.html">‹ Console</a>
+      <a class="sim" href="console.html" title="Click through a replay of the recorded run — the results are real" aria-label="Simulate: replay the recorded demo run"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z" fill="currentColor"/></svg>Simulate</a>
       <a class="opt" href="#flow">Demo</a>
       <a href="#evidence">Evidence</a>
       <a class="opt" href="#study">Study</a>

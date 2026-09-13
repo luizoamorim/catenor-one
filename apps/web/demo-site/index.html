@@ -51,6 +51,8 @@ code{font-family:var(--mono);font-size:.9em;overflow-wrap:anywhere}
 .nav-inner{max-width:var(--max);height:52px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:650;letter-spacing:-.02em;white-space:nowrap}
 .brand img{width:19px;height:22px;object-fit:contain}
+@media(max-width:520px){.nav-links a:not(.sim):not(.gh){display:none}}
+.nav-links .sim{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:var(--blue);color:#fff !important;font-weight:600;letter-spacing:.01em}.nav-links .sim:hover{background:#0077ed}.nav-links .sim svg{width:9px;height:9px}
 .nav-links{display:flex;gap:28px;color:#424245;font-size:12px;white-space:nowrap}
 .nav-links a:hover{color:#000}
 .nav-links .gh{color:var(--blue)}
@@ -247,7 +249,7 @@ h1{margin:0;font-size:clamp(44px,5.9vw,86px);line-height:.96;letter-spacing:-.05
   <div class="nav-inner">
     <a class="brand" href="index.html" aria-label="Catenor One home"><img src="assets/logos/catenor-mark.png" width="95" height="112" alt=""><span>Catenor One</span></a>
     <div class="nav-links">
-      <a href="console.html">Replay</a>
+      <a class="sim" href="console.html" title="Click through a replay of the recorded run — the results are real" aria-label="Simulate: replay the recorded demo run"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0l9 5-9 5z" fill="currentColor"/></svg>Simulate</a>
       <a href="history.html#evidence">Evidence</a>
       <a class="opt" href="#videos">Videos</a>
       <a class="gh" href="https://github.com/luizoamorim/catenor-one" rel="noopener">GitHub</a>
