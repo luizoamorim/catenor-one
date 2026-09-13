@@ -217,13 +217,6 @@ implementation repository on 2026-09-09. The work is recorded in small commits a
 
 Arc was explored early as a USDC settlement rail and replaced by Hedera ATS on 2026-09-10.
 
-## Not done yet
-
-- `reportFromDon` / offchain verification of the CRE report.
-- Subject Continuity across identity providers (planned S002).
-- A live product UI: the console replays the recorded run; the actions ran through the scripts.
-- The operator login gate (the admission is operator-initiated).
-
 ## License
 
 [Apache-2.0](LICENSE)
