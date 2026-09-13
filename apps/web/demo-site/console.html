@@ -1,0 +1,1878 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catenor One Console · replay of run c1-202609121659</title>
+<meta name="description" content="Catenor One console, ETHOnline 2026: a clickable replay of the recorded run c1-202609121659. Results are real, actions are replayed, every Hedera transaction can be verified on-chain.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="assets/logos/catenor-mark.png">
+<style>
+:root{
+  --bg:#fff;--text:#1d1d1f;--muted:#6e6e73;--muted2:#86868b;--hair:#d2d2d7;--hair2:#e8e8ed;--soft:#f5f5f7;--soft2:#fbfbfd;
+  --blue:#0071e3;--green:#16883f;--red:#d70015;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Monaco,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  --side:280px;--top:56px;--log:158px;--ctl:410px;
+  --fg:#1d1d1f;--fg2:#424245;--fg3:#6e6e73;--fg4:#86868b;--line:#d2d2d7;--line2:#e8e8ed;--card:#fff;--card2:#fbfbfd;
+  /* sponsor identity: one accent per system, used for every chip, card stripe and callout */
+  --c-cat:#1d1d1f;--c-cre:#375bd2;--c-tee:#1f3d99;--c-privy:#6d35e8;--c-hed:#0a7a7e;--c-sum:#a8245a;
+  --t-cat:#f0f0f2;--t-cre:#edf1fc;--t-privy:#f3eefe;--t-hed:#e4f4f4;--t-sum:#fbedf3;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+::selection{background:#d9ecff}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+code,.mono{font-family:var(--mono)}
+code{font-size:.9em;overflow-wrap:anywhere}
+img{max-width:100%;display:block}
+.h{font-family:var(--mono);font-size:.92em;overflow-wrap:anywhere;word-break:break-word}
+.cp{cursor:copy;border-radius:4px;transition:background .15s}
+.cp:hover{background:rgba(0,113,227,.1)}
+.skip{position:absolute;left:-999px;top:8px;background:#000;color:#fff;padding:8px 14px;border-radius:8px;z-index:300}
+.skip:focus{left:12px}
+
+/* ---------- app frame ---------- */
+.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);grid-template-rows:var(--top) minmax(0,1fr);height:100vh;height:100dvh}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:0 20px;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-bottom:1px solid rgba(0,0,0,.07);z-index:30;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:650;letter-spacing:-.02em;white-space:nowrap}
+.mark{width:24px;height:24px;border-radius:50%;border:2px solid #1d1d1f;position:relative;flex:none}
+.mark:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;right:-3px;top:1px}
+.brand .app-n{color:var(--muted2);font-weight:500;padding-left:10px;border-left:1px solid var(--hair)}
+.badge{flex:1;min-width:0;display:flex;justify-content:center}
+.badge-in{display:inline-flex;align-items:center;gap:10px;max-width:100%;padding:6px 14px 6px 8px;border-radius:999px;background:var(--soft);border:1px solid var(--hair2);font-size:12.5px;color:#424245;line-height:1.3}
+.badge-in .rp{flex:none;display:inline-flex;align-items:center;gap:6px;background:#1d1d1f;color:#fff;font-size:10px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
+.badge-in .rp i{width:6px;height:6px;border-radius:50%;background:#ff453a;animation:pulse 1.8s ease-in-out infinite}
+.badge-in .bt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge-in code{font-size:11.5px;color:#1d1d1f}
+.badge-in a{color:var(--blue);font-weight:600}
+.top-r{display:flex;align-items:center;gap:10px;flex:none}
+.tlink{font-size:13px;color:var(--blue);font-weight:500;white-space:nowrap}
+.tlink:hover{text-decoration:underline}
+.rst{appearance:none;border:1px solid var(--hair);background:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.rst:hover{border-color:#1d1d1f}
+.rst.arm{background:var(--red);border-color:var(--red);color:#fff}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ---------- sidebar ---------- */
+.side{grid-row:2;background:var(--soft2);border-right:1px solid var(--hair2);display:flex;flex-direction:column;min-height:0;overflow:auto}
+.side-h{padding:22px 22px 10px}
+.side-h .k{font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+.side-h .pr{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.side-h .pr b{font-size:22px;letter-spacing:-.04em}
+.side-h .pr span{font-size:12px;color:var(--muted)}
+.bar{margin-top:10px;height:4px;border-radius:9px;background:var(--hair2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#1d1d1f;border-radius:9px;transition:width .5s ease}
+.steps{list-style:none;margin:0;padding:6px 12px 12px;position:relative}
+.steps li{position:relative}
+.steps li:not(:last-child):after{content:"";position:absolute;left:25px;top:40px;bottom:-6px;width:1.5px;background:var(--hair2);z-index:0}
+.st{position:relative;z-index:1;display:grid;grid-template-columns:28px minmax(0,1fr) 16px;gap:12px;align-items:center;width:100%;text-align:left;padding:9px 10px;margin:1px 0;border-radius:12px;border:0;background:none;cursor:pointer;transition:background .2s}
+.st:hover{background:rgba(0,0,0,.035)}
+.st .n{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--hair);background:#fff;display:grid;place-items:center;font-size:11.5px;font-weight:650;color:var(--muted);transition:all .25s}
+.st .t{display:block;font-size:14px;font-weight:600;letter-spacing:-.012em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st .s{display:block;font-size:11.5px;color:var(--muted2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st .x{font-size:11px;color:var(--muted2);text-align:right}
+.st .dts{display:inline-flex;gap:3px;margin-right:6px;vertical-align:0}
+.st .dts i{width:7px;height:7px;border-radius:50%}
+.st.cur{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.06)}
+.st.cur .n{background:#1d1d1f;border-color:#1d1d1f;color:#fff}
+.st.done .n{background:var(--green);border-color:var(--green);color:#fff}
+.st.lock{cursor:not-allowed}
+.st.lock .t,.st.lock .s,.st.lock .n{opacity:.45}
+.legend{margin-top:auto;padding:16px 22px 20px;border-top:1px solid var(--hair2)}
+.legend .k{font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.legend ul{list-style:none;margin:0;padding:0}
+.legend li{margin:0 0 7px}
+.kbd-h{margin-top:12px;font-size:11.5px;color:var(--muted2);line-height:1.6}
+kbd{font:600 10.5px var(--sans);border:1px solid var(--hair);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:#fff;color:#424245}
+
+/* reality labels */
+.rl{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#424245;border:1px solid var(--hair2);background:#fff;border-radius:999px;padding:2px 9px 2px 3px;cursor:help;white-space:nowrap;line-height:1.5}
+.rl b{font-size:9.5px;font-weight:700;letter-spacing:.07em;padding:2px 7px;border-radius:999px}
+.p-cre{background:var(--c-cre);color:#fff}
+.p-privy{background:var(--c-privy);color:#fff}
+.p-hed{background:var(--c-hed);color:#fff}
+.p-net{background:#e3f4e8;color:#0f6b31}
+.p-live{background:#e8f1fc;color:#0058b0}
+.p-local{background:#efeff2;color:#515154}
+.p-mock{background:#fff3e0;color:#9a5b00}
+.p-sand{background:var(--c-sum);color:#fff}
+.tip{position:fixed;z-index:600;max-width:300px;background:#1d1d1f;color:#f5f5f7;font-size:12.5px;line-height:1.5;padding:10px 12px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.tip.on{opacity:1;transform:none}
+.tip b{color:#fff}
+
+/* ---------- main ---------- */
+.main{grid-row:2;display:grid;grid-template-rows:minmax(0,1fr) var(--log);min-width:0;min-height:0}
+.main.logmin{grid-template-rows:minmax(0,1fr) 40px}
+.stage{
+  --fg:#1d1d1f;--fg2:#424245;--fg3:#6e6e73;--fg4:#86868b;--line:#d2d2d7;--line2:#e8e8ed;--cv:#f5f5f7;--card:#fff;--card2:#fbfbfd;--ok:#16883f;--no:#d70015;--okbg:#e9f6ee;--nobg:#fdecee;
+  min-height:0;display:grid;grid-template-columns:var(--ctl) minmax(0,1fr);gap:32px;padding:28px 32px 24px;background:var(--bg);color:var(--fg);transition:background .4s,color .4s}
+.stage.dark{--fg:#f5f5f7;--fg2:#d2d2d7;--fg3:#a1a1a6;--fg4:#86868b;--line:#3a3a3c;--line2:#2c2c2e;--cv:#0b0b0c;--card:#161617;--card2:#1c1c1e;--ok:#30d158;--no:#ff453a;--okbg:rgba(48,209,88,.14);--nobg:rgba(255,69,58,.14);background:#000}
+.ctl{min-height:0;overflow:auto;padding:4px 6px 20px 2px;scrollbar-width:thin}
+.canvas{position:relative;min-height:0;overflow:auto;background:var(--cv);border-radius:24px;padding:20px;scroll-behavior:smooth;scrollbar-width:thin;transition:background .4s}
+.fade{animation:fadein .35s ease both}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* control column */
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:12px;color:var(--fg4);font-weight:600;letter-spacing:.02em}
+.meta .sn{color:var(--fg);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+.role{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--fg2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 4px;background:var(--card)}
+.role b{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;background:var(--fg);color:var(--bg);padding:3px 8px;border-radius:999px}
+.stage.dark .role b{background:#f5f5f7;color:#000}
+.ttl{margin:14px 0 0;font-size:40px;line-height:1.02;letter-spacing:-.055em;font-weight:700}
+.lede{margin:12px 0 0;font-size:16.5px;line-height:1.42;letter-spacing:-.012em;color:var(--fg3)}
+.reals{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+.stage.dark .rl{background:#161617;border-color:#2c2c2e;color:#d2d2d7}
+.acts{margin-top:22px;display:flex;flex-direction:column;gap:8px}
+.acts .grp{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4);margin:10px 0 0}
+.act{appearance:none;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:46px;padding:0 18px;border-radius:14px;border:1px solid transparent;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;text-align:left;transition:background .2s,border-color .2s,color .2s,transform .12s}
+.act:active{transform:scale(.99)}
+.act .am{font-size:11.5px;font-weight:500;opacity:.78;white-space:nowrap}
+.act.pri{background:var(--blue);color:#fff}
+.act.pri:not([disabled]):hover{background:#0077ed}
+.act.neg{background:var(--card);color:var(--no);border-color:var(--line);min-height:40px;font-size:14px}
+.act.neg:not([disabled]):hover{border-color:var(--no)}
+.act.sec{background:var(--card);color:var(--blue);border-color:var(--line)}
+.act.sec:not([disabled]):hover{border-color:var(--blue)}
+.act[disabled]{cursor:not-allowed;background:var(--card2);color:var(--fg4);border-color:var(--line2)}
+.act.did{background:var(--okbg);color:var(--ok);border-color:transparent;cursor:default}
+.act.did.negd{background:var(--nobg);color:var(--no)}
+.act.run{background:var(--blue);color:#fff;cursor:progress}
+.act .kb{font:600 10.5px var(--sans);border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:1px 5px;margin-left:8px}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .7s linear infinite;display:inline-block;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.navb{margin-top:16px;display:flex;gap:8px;align-items:center}
+.nx{appearance:none;flex:1;min-height:44px;border-radius:999px;border:0;background:#1d1d1f;color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;padding:0 18px}
+.stage.dark .nx{background:#f5f5f7;color:#000}
+.nx[disabled],.stage.dark .nx[disabled]{background:var(--line2);color:var(--fg4);cursor:not-allowed}
+.bk{appearance:none;min-height:44px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--fg2);font-size:14px;font-weight:600;padding:0 16px;cursor:pointer}
+.bk[disabled]{opacity:.4;cursor:not-allowed}
+.inv{margin-top:22px;border-left:2px solid var(--fg);padding:2px 0 2px 14px}
+.inv .k{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4)}
+.inv .v{margin-top:5px;font-size:17px;font-weight:650;letter-spacing:-.025em;line-height:1.25}
+.inv .s{margin-top:5px;font-size:13px;line-height:1.5;color:var(--fg3)}
+.proofs{margin-top:22px}
+.proofs .k{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4);margin-bottom:8px}
+.thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.thumb{appearance:none;padding:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#f2f2f4;cursor:zoom-in;aspect-ratio:16/10;transition:transform .2s,box-shadow .2s}
+.thumb:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.note{margin-top:18px;font-size:12.5px;line-height:1.5;color:var(--fg3);background:var(--card2);border:1px solid var(--line2);border-radius:12px;padding:10px 12px}
+.note b{color:var(--fg)}
+
+/* canvas: idle, blocks */
+.idle{height:100%;min-height:320px;display:grid;place-items:center;text-align:center;padding:30px}
+.idle .big{font-size:140px;font-weight:700;letter-spacing:-.07em;line-height:.9;color:var(--line2)}
+.idle .t1{margin-top:12px;font-size:22px;font-weight:650;letter-spacing:-.03em}
+.idle .t2{margin-top:8px;font-size:14.5px;color:var(--fg3);max-width:520px;line-height:1.5}
+.idle .t3{margin-top:16px;font-size:12px;color:var(--fg4)}
+.idle.sm{height:auto;min-height:0;padding:18px 20px 22px}
+.idle.sm .big{font-size:64px}
+.idle.sm .t1{margin-top:6px;font-size:19px}
+
+/* first appearance of a sponsor: what it is · why we use it */
+.intro{margin-bottom:14px;animation:fadein .35s ease both}
+.intro-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:0 2px 10px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4)}
+.intro-h b{color:var(--fg)}
+.intro-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.spc{--acc:var(--c-cat);--tint:var(--t-cat);min-width:0;border:1px solid var(--line2);border-top:4px solid var(--acc);border-radius:16px;padding:14px 18px 16px;background:linear-gradient(180deg,var(--tint),var(--card) 62%)}
+.spc.k-privy{--acc:var(--c-privy);--tint:var(--t-privy)}
+.spc.k-cre{--acc:var(--c-cre);--tint:var(--t-cre)}
+.spc.k-hedera{--acc:var(--c-hed);--tint:var(--t-hed)}
+.spc-t{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.spc-n{display:inline-flex;align-items:center;gap:9px;font-size:22px;font-weight:700;letter-spacing:-.035em;color:var(--acc)}
+.spc-lg{width:24px;height:24px;object-fit:contain;flex:none}
+.spc-lg.sq{border-radius:6px}
+.spc-f{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.spc-k{margin-top:10px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4)}
+.spc p{margin:3px 0 0;font-size:13.5px;line-height:1.45;color:var(--fg2)}
+.spc ul{margin:4px 0 0;padding:0;list-style:none}
+.spc li{position:relative;padding:3px 0 3px 14px;font-size:13px;line-height:1.4;color:var(--fg2)}
+.spc li:before{content:"";position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--acc)}
+.spc b{color:var(--fg);font-weight:650}
+.blk{background:var(--card);border:1px solid var(--line2);border-radius:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.03);animation:fadein .3s ease both}
+.bh{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 18px}
+.bh-t{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left;cursor:pointer;font-size:15px;font-weight:650;letter-spacing:-.015em;color:var(--fg)}
+.bh-t .chev{flex:none;width:18px;color:var(--fg4);transition:transform .2s;font-size:15px;line-height:1}
+.blk.col .bh-t .chev{transform:rotate(-90deg)}
+.bh-t .ng{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--no)}
+.bh-t .sum{font-size:12.5px;font-weight:500;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-m{flex:none;font-size:11.5px;color:var(--fg4);white-space:nowrap}
+.bb{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:22px;padding:4px 18px 18px;border-top:1px solid var(--line2);padding-top:14px}
+.blk.col .bb{display:none}
+.blk.solo .bb{grid-template-columns:1fr}
+.tag{display:inline-block;font-weight:700;font-size:11.5px;letter-spacing:.03em;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.allow{color:var(--ok);background:var(--okbg)}
+.deny{color:var(--no);background:var(--nobg)}
+.neutral{color:var(--fg2);background:var(--line2)}
+
+/* pipeline */
+.pipe{list-style:none;margin:0;padding:0;min-width:0}
+.ps{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr);gap:11px;padding:5px 0 5px}
+.ps:not(:last-child):before{content:"";position:absolute;left:9.5px;top:27px;bottom:-4px;width:1.5px;background:var(--line2)}
+.ps .ic{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px;transition:background .2s,border-color .2s}
+.ps.run .ic{border-color:var(--line2);border-top-color:var(--blue);animation:spin .7s linear infinite}
+.ps.ok .ic{background:var(--ok);border-color:var(--ok)}
+.ps.ok .ic:after{content:"✓"}
+.ps.deny .ic{background:var(--no);border-color:var(--no)}
+.ps.deny .ic:after{content:"×";font-size:14px;line-height:1}
+.ps.info .ic{background:var(--fg4);border-color:var(--fg4)}
+.ps.info .ic:after{content:"i";font-family:Georgia,serif;font-style:italic}
+.ps .pl{font-size:13px;font-weight:600;line-height:1.35;color:var(--fg);letter-spacing:-.005em}
+.ps.wait .pl{color:var(--fg4);font-weight:500}
+.ps.run .pl{color:var(--blue)}
+.stage.dark .ps.run .pl{color:#64d2ff}
+.ps .dt{font:10.5px/1.45 var(--mono);color:var(--fg3);margin-top:2px;overflow-wrap:anywhere}
+.ps.wait .dt,.ps.run .dt{display:none}
+.ps.deny .dt{color:var(--no)}
+/* sponsor chips: the same name and accent wherever a system acts */
+.sys{display:inline-flex;align-items:center;gap:4px;font:700 10px/1 var(--sans);letter-spacing:.01em;padding:3px 7px 3px 6px;border-radius:6px;margin-right:6px;vertical-align:1px;white-space:nowrap;color:#fff;background:var(--c-cat)}
+.sys:before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
+.s-cat{background:var(--c-cat);color:#fff}
+.stage.dark .s-cat{background:#f5f5f7;color:#000}
+.s-privy{background:var(--c-privy)}
+.s-cre{background:var(--c-cre)}
+.s-tee{background:var(--c-tee)}
+.s-tee:before{background:#30d158;opacity:1}
+.s-sumsub{background:var(--c-sum)}
+.s-hedera{background:var(--c-hed)}
+.s-mock{background:#fff3e0;color:#9a5b00}
+.s-live{background:#e8f1fc;color:#0058b0}
+.bys{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px}
+.bys .sys{margin-right:0;font-size:9.5px}
+.byk{font-size:10px;font-weight:600;color:var(--fg4);letter-spacing:.02em}
+.byk + .sys{margin-left:1px}
+.sys + .byk{margin-left:3px}
+.rkr{display:flex;justify-content:space-between;align-items:center;gap:6px 10px;flex-wrap:wrap}
+.by-cat{box-shadow:inset 3px 0 0 var(--c-cat)}
+.stage.dark .by-cat{box-shadow:inset 3px 0 0 #f5f5f7}
+.by-privy{box-shadow:inset 3px 0 0 var(--c-privy)}
+.by-cre{box-shadow:inset 3px 0 0 var(--c-cre)}
+.by-tee{box-shadow:inset 3px 0 0 var(--c-tee)}
+.by-hedera{box-shadow:inset 3px 0 0 var(--c-hed)}
+.by-sumsub{box-shadow:inset 3px 0 0 var(--c-sum)}
+.ppol{display:inline-flex;align-items:stretch;border:1px solid rgba(109,53,232,.45);background:var(--t-privy);color:var(--fg);border-radius:6px;overflow:hidden;vertical-align:1px;max-width:100%}
+.ppol b{flex:none;display:flex;align-items:center;font:700 9px/1 var(--sans);letter-spacing:.05em;text-transform:uppercase;background:var(--c-privy);color:#fff;padding:2px 6px}
+.ppol span{padding:1px 6px;font-family:var(--mono);font-size:.95em;overflow-wrap:anywhere;min-width:0}
+.stage.dark .ppol{background:rgba(109,53,232,.22);border-color:rgba(170,130,255,.55)}
+.tee-h{font:700 9.5px/1.3 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--c-cre);padding:8px 0 2px 31px}
+.stage.dark .tee-h{color:#8fa8f0}
+.ps.tee{margin-left:0;background:linear-gradient(90deg,rgba(48,209,88,.07),transparent 80%);border-radius:8px}
+.ps.tee .pl{padding-right:4px}
+.pace{display:none;margin-top:6px;height:4px;border-radius:9px;background:var(--line2);overflow:hidden}
+.ps.run .pace{display:block}
+.pace i{display:block;height:100%;width:0;background:var(--blue);animation:pace var(--ms,1s) linear forwards}
+.pacetx{display:none;font:11px/1.5 var(--mono);color:var(--blue);margin-top:4px}
+.ps.run .pacetx{display:block}
+@keyframes pace{to{width:100%}}
+
+/* results */
+.res{min-width:0}
+.res.in > *{animation:rise .45s ease both}
+.res.in > *:nth-child(2){animation-delay:.08s}.res.in > *:nth-child(3){animation-delay:.16s}.res.in > *:nth-child(4){animation-delay:.24s}.res.in > *:nth-child(5){animation-delay:.32s}.res.in > *:nth-child(6){animation-delay:.4s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.res-wait{height:100%;min-height:180px;display:grid;place-items:center;border:1.5px dashed var(--line);border-radius:14px;font-size:13px;color:var(--fg4);background:linear-gradient(90deg,transparent 0%,var(--line2) 50%,transparent 100%) 0 0/200% 100%;animation:shim 1.6s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:-100% 0}}
+.res > * + *{margin-top:12px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rc{background:var(--card2);border:1px solid var(--line2);border-radius:14px;padding:14px 16px;min-width:0}
+.rc.hl{background:var(--card);border-color:var(--line)}
+.rk{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--fg4)}
+.rv{margin-top:6px;font-size:18px;font-weight:650;letter-spacing:-.025em;line-height:1.25;overflow-wrap:anywhere}
+.rv.h,.rv .h{font-size:13px;font-weight:500;letter-spacing:0;line-height:1.5}
+.rs{margin-top:6px;font-size:12.5px;line-height:1.5;color:var(--fg3);overflow-wrap:anywhere}
+.rs b{color:var(--fg)}
+.huge{font-size:52px;font-weight:700;letter-spacing:-.06em;line-height:.95}
+.okc{color:var(--ok)}
+.noc{color:var(--no)}
+.kvs{margin:8px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 14px;font-size:12.5px;line-height:1.5}
+.kvs dt{color:var(--fg4);padding:4px 0;border-top:1px solid var(--line2);white-space:nowrap}
+.kvs dd{margin:0;padding:4px 0;border-top:1px solid var(--line2);color:var(--fg);overflow-wrap:anywhere;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:11px/1.4 var(--mono);background:var(--card);border:1px solid var(--line2);border-radius:8px;padding:4px 8px;color:var(--fg)}
+.chip .y{color:var(--ok);font-weight:700;font-family:var(--sans)}
+.chip .n0{color:var(--no);font-weight:700;font-family:var(--sans)}
+.chip.bad{border-color:rgba(215,0,21,.3);background:var(--nobg)}
+.caprow{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.capl{font-size:12px;color:var(--fg3)}
+.dtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px 12px;flex-wrap:wrap}
+.denyres{border:1px solid rgba(215,0,21,.22);background:var(--nobg);border-radius:16px;padding:18px 20px}
+.denyres .huge{color:var(--no)}
+.denyres .dcode{font:600 15px var(--mono);color:var(--no);margin-top:6px}
+.denyres p{margin:10px 0 0;font-size:13.5px;line-height:1.5;color:var(--fg2)}
+.allowres{border:1px solid rgba(22,136,63,.22);background:var(--okbg);border-radius:16px;padding:18px 20px}
+.allowres .huge{color:var(--ok)}
+.caps{list-style:none;margin:8px 0 0;padding:0}
+.caps li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line2);font-size:13px}
+.caps li code{font-size:12px;font-weight:600;color:var(--fg)}
+.caps li .r{font:11px var(--mono);color:var(--fg3)}
+.facts2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+
+/* investors */
+.inv-c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;min-width:0}
+.inv-h{display:flex;align-items:center;gap:12px}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px;color:#fff;flex:none}
+.av.a{background:linear-gradient(135deg,#ffb340,#ff7a00)}
+.av.b{background:linear-gradient(135deg,#5ac8fa,#0071e3)}
+.inv-h .nm{font-size:16px;font-weight:650;letter-spacing:-.02em}
+.inv-h .al{font-size:11.5px;color:var(--fg4)}
+.st-pill{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.g-green{background:var(--okbg);color:var(--ok)}
+.g-red{background:var(--nobg);color:var(--no)}
+.units{margin-top:10px;font-size:30px;font-weight:700;letter-spacing:-.05em}
+.units small{font-size:13px;font-weight:500;color:var(--fg3);letter-spacing:0;margin-left:6px}
+
+/* ownership */
+.own{display:grid;height:12px;border-radius:999px;overflow:hidden;background:var(--line2);margin-top:10px}
+.own div:first-child{background:#ff9f0a}
+.own div:last-child{background:#0a84ff}
+.own-l{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--fg3)}
+
+/* transactions */
+.txr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:10px 0;border-top:1px solid var(--line2)}
+.txr:first-child{border-top:0}
+.txn{font-size:13.5px;font-weight:600}
+.txm{font-size:12px;color:var(--fg3);margin-top:2px}
+.txh{font-size:12px;margin-top:3px}
+.txa{display:flex;gap:8px;align-items:center;justify-self:end}
+.lnk{font-size:12.5px;color:var(--blue);font-weight:600;white-space:nowrap}
+.stage.dark .lnk{color:#64d2ff}
+.lnk:hover{text-decoration:underline}
+.vbtn{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;white-space:nowrap}
+.stage.dark .vbtn{color:#64d2ff}
+.vbtn:hover{border-color:var(--blue)}
+.vbtn[disabled]{color:var(--fg4);cursor:progress}
+.vout{grid-column:1/-1;font:11px/1.6 var(--mono);color:var(--fg2)}
+.vout:empty{display:none}
+.vout .ok{color:var(--ok);font-weight:700}
+.vout .bad{color:var(--no);font-weight:700}
+.vout .err{font-family:var(--sans);font-size:12.5px;color:#9a5b00}
+.stage.dark .vout .err{color:#ffd60a}
+
+/* policy viewer */
+.pv{border:1.5px solid var(--c-privy);border-radius:16px;background:var(--card);overflow:hidden;box-shadow:0 0 0 4px var(--t-privy)}
+.pv-band{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;padding:9px 14px;background:var(--t-privy);border-bottom:1px solid rgba(109,53,232,.22);font-size:13px;color:var(--c-privy)}
+.pv-band b{font-weight:700;letter-spacing:-.01em}
+.pv-band .pv-n{color:#1d1d1f}
+.pv-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.pv-n{font:600 13px var(--mono);overflow-wrap:anywhere}
+.pv-i{font-size:11.5px;color:var(--fg3);margin-top:2px}
+.seg{display:inline-flex;background:var(--line2);border-radius:9px;padding:2px;flex:none}
+.seg button{appearance:none;border:0;background:none;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--fg3);cursor:pointer}
+.seg button.on{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pv-rules{padding:4px 14px 12px;box-shadow:inset 3px 0 0 var(--c-privy)}
+.pv-rk{padding:8px 0 2px;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--c-privy)}
+.rule{padding:10px 0;border-top:1px solid var(--line2)}
+.pv-rk + .rule{border-top:0}
+.rule.later{opacity:.42}
+.rule.fresh{background:linear-gradient(90deg,rgba(109,53,232,.08),transparent);margin:0 -14px;padding:10px 14px}
+.rule-t{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px}
+.rule-t .rn{font:600 12px var(--mono)}
+.rule-t .rm{color:var(--fg4);font-size:11.5px}
+.rule-t .lt{font-size:10.5px;font-weight:600;color:var(--c-privy)}
+.conds{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;margin-top:8px}
+.cond{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;background:var(--card2);min-width:0}
+.cond .v{font-size:13px;font-weight:650;letter-spacing:-.01em}
+.cond .f{font:10.5px/1.4 var(--mono);color:var(--fg4);overflow-wrap:anywhere;margin-top:1px}
+.and{align-self:center;color:var(--fg4);font-size:14px}
+.code{margin:0;background:var(--card2);padding:14px 16px;overflow:auto;max-height:340px;font:11.5px/1.6 var(--mono);color:var(--fg);tab-size:2;white-space:pre}
+.code .k{font-weight:600}
+.code .s{color:#c41a16}
+.code .n{color:#1c00cf}
+.code .b{color:#9b2393}
+.code .p{color:var(--fg4)}
+.stage.dark .code .s{color:#ff8170}
+.stage.dark .code .n{color:#d9c97c}
+.pv-f{padding:8px 14px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--fg3)}
+
+/* authority chain */
+.chain{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr);align-items:stretch}
+.node{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card);min-width:0}
+.node .t{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--fg4)}
+.node .nm{margin-top:4px;font-size:15px;font-weight:650;letter-spacing:-.02em}
+.node .d{margin-top:4px;font:10.5px/1.5 var(--mono);color:var(--fg3);overflow-wrap:anywhere}
+.node.on{border-color:var(--ok);box-shadow:0 0 0 3px var(--okbg)}
+.arr{display:grid;place-items:center;color:var(--fg4);font-size:18px}
+
+/* distribution reveal */
+.reveal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rvb{border-radius:18px;padding:18px 20px;border:1px solid var(--line2);background:var(--card2);min-width:0}
+.rvb .who{font-size:12.5px;color:var(--fg3)}
+.rvb .dec{margin-top:6px;font-size:76px;font-weight:700;letter-spacing:-.07em;line-height:.9}
+.rvb.pay .dec{color:var(--ok)}
+.rvb.hold .dec{color:var(--no)}
+.rvb .tr{margin-top:12px;font-size:12.5px;line-height:1.55;color:var(--fg2)}
+.rvb .then{margin-top:12px;padding-top:10px;border-top:1px solid var(--line2);font-size:13px;line-height:1.5;color:var(--fg)}
+.res.in .rvb .dec{animation:pop .6s cubic-bezier(.2,.9,.3,1.2) both}
+.res.in .rvb.hold .dec{animation-delay:.25s}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.foot-k{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11.5px;color:var(--fg3)}
+.foot-k b{color:var(--fg2);font-weight:600}
+
+/* done banner */
+.nextbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px 14px 20px;border-radius:16px;background:var(--card);border:1px solid var(--line2);animation:fadein .35s ease both}
+.nextbar .l{font-size:14px;font-weight:600;color:var(--ok)}
+.nextbar .l span{color:var(--fg3);font-weight:500}
+.nextbar button{appearance:none;border:0;background:#1d1d1f;color:#fff;border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer}
+.stage.dark .nextbar button{background:#f5f5f7;color:#000}
+
+/* dashboard (step 10) */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--card);border:1px solid var(--line2);border-radius:18px;overflow:hidden}
+.kpi{padding:16px 18px;border-right:1px solid var(--line2);min-width:0}
+.kpi:last-child{border-right:0}
+.kpi b{display:block;font-size:34px;letter-spacing:-.055em;line-height:1;font-weight:700}
+.kpi > span:not(.bys){display:block;margin-top:6px;font-size:12px;line-height:1.35;color:var(--fg3)}
+.kpi .bys{margin-top:8px}
+.dash{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px;align-items:start}
+.pan{background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:14px 18px;min-width:0}
+.pan + .pan{margin-top:14px}
+.pan-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.pan-h > b{font-size:15px;letter-spacing:-.02em}
+.pan-h > span:not(.bys){font-size:11.5px;color:var(--fg4)}
+.crer{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line2);font-size:12.5px}
+.crer:first-of-type{border-top:0}
+.crer .sg{font-weight:700;color:var(--fg3)}
+.crer .op{font:600 11.5px var(--mono);overflow-wrap:anywhere}
+.crer .id{font-size:11px;color:var(--fg3);margin-top:2px}
+.crer .rr{text-align:right;font-size:12px;white-space:nowrap}
+.aud{list-style:none;margin:6px 0 0;padding:0}
+.aud li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line2);font-size:12.5px}
+.aud li:first-child{border-top:0}
+.bals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.balc{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;background:var(--card2)}
+.balc .n{font-size:11.5px;color:var(--fg4)}
+.balc b{display:block;font-size:24px;letter-spacing:-.04em;margin-top:4px}
+.balc p{margin:4px 0 0;font-size:11.5px;color:var(--fg3);line-height:1.45}
+.histlink{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:14px;padding:18px 22px;border-radius:18px;background:#1d1d1f;color:#fff}
+.histlink b{font-size:20px;letter-spacing:-.03em}
+.histlink small{display:block;margin-top:2px;font-size:13px;color:#a1a1a6}
+.histlink em{font-style:normal;font-size:22px}
+
+/* ---------- activity log ---------- */
+.log{display:flex;flex-direction:column;min-height:0;border-top:1px solid var(--hair2);background:#fff;transition:background .4s}
+.log-h{flex:none;display:flex;align-items:center;gap:12px;height:40px;padding:0 20px;border-bottom:1px solid var(--hair2)}
+.log-h b{font-size:12.5px;letter-spacing:-.01em}
+.log-h .c{font-size:11px;font-weight:700;background:var(--soft);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.log-h .lg-note{font-size:11.5px;color:var(--muted2)}
+.log-h .tg{margin-left:auto;appearance:none;border:0;background:none;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px}
+.log-h .tg:hover{background:var(--soft)}
+.log-l{flex:1;min-height:0;overflow:auto;padding:4px 0 8px;scroll-behavior:smooth}
+.lg{display:grid;grid-template-columns:78px 128px minmax(0,1fr);gap:12px;align-items:baseline;padding:4px 20px;font-size:12.5px;line-height:1.45;color:#424245}
+.lg .tm{font:11.5px var(--mono);color:var(--muted2)}
+.lg .sy{justify-self:start}
+.lg .ms{overflow-wrap:anywhere}
+.lg.ok .ms:before{content:"✓ ";color:var(--green);font-weight:700}
+.lg.deny .ms:before{content:"✕ ";color:var(--red);font-weight:700}
+.lg.warn .ms:before{content:"! ";color:#9a5b00;font-weight:700}
+.lg.new{animation:flash 1.4s ease}
+@keyframes flash{from{background:#e8f1fc}to{background:transparent}}
+.log-empty{padding:14px 20px;font-size:12.5px;color:var(--muted2)}
+.main.dark .log{background:#0b0b0c;border-top-color:#2c2c2e}
+.main.dark .log-h{border-bottom-color:#2c2c2e}
+.main.dark .log-h b{color:#f5f5f7}
+.main.dark .log-h .c{background:#1c1c1e;color:#a1a1a6}
+.main.dark .lg{color:#d2d2d7}
+.main.dark .lg.new{animation:flashd 1.4s ease}
+.main.dark .log .s-cat{background:#f5f5f7;color:#000}
+@keyframes flashd{from{background:#1c2a3a}to{background:transparent}}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,10px);background:#1d1d1f;color:#fff;font-size:13px;padding:8px 14px;border-radius:999px;opacity:0;transition:opacity .2s,transform .2s;z-index:700;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* lightbox (from history.html) */
+.lb{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;grid-template-rows:1fr auto;padding:56px 64px 22px;gap:14px}
+.lb figure{margin:0;min-height:0;display:grid;place-items:center}
+.lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;background:#111}
+.lb .cap{max-width:980px;margin:0 auto;color:#d2d2d7;font-size:14px;line-height:1.5;text-align:center}
+.lb .cap .cnt{display:block;margin-top:4px;font-size:12px;color:#86868b}
+.lb-btn{position:absolute;appearance:none;border:0;background:rgba(255,255,255,.14);color:#fff;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:22px;line-height:42px;text-align:center}
+.lb-btn:hover{background:rgba(255,255,255,.26)}
+.lb-close{top:12px;right:14px}
+.lb-prev{left:12px;top:50%;margin-top:-21px}
+.lb-next{right:12px;top:50%;margin-top:-21px}
+
+/* ---------- responsive ---------- */
+@media(max-width:1600px){:root{--ctl:370px;--side:264px}.ttl{font-size:36px}}
+@media(max-width:1280px){
+  :root{--ctl:330px;--side:236px}
+  .bb{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(3){border-right:0}
+  .kpi:nth-child(-n+3){border-bottom:1px solid var(--line2)}
+  .dash{grid-template-columns:1fr}
+  .badge-in .bt .opt{display:none}
+}
+@media(max-width:1280px) and (min-width:1001px){
+  /* three narrow result columns: stack the Privy policy chip instead of breaking its name mid-word */
+  .g3 .ppol{flex-wrap:wrap}
+  .g3 .ppol b{flex-basis:100%;padding:3px 6px}
+}
+@media(max-width:1000px){
+  body{overflow:auto;overflow-x:hidden}
+  .app{display:block;height:auto}
+  .top{position:sticky;top:0;flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px 12px}
+  .badge{order:3;flex-basis:100%;justify-content:flex-start}
+  .badge-in{border-radius:12px;align-items:flex-start}
+  .badge-in .bt{white-space:normal}
+  .top-r{margin-left:auto}
+  .top-r .tlink{display:none}
+  .side{display:block;overflow:visible;border-right:0;border-bottom:1px solid var(--hair2)}
+  .side-h{padding:14px 16px 4px}
+  .steps{display:flex;gap:6px;overflow-x:auto;padding:8px 16px 12px;scroll-snap-type:x proximity;scrollbar-width:none}
+  .steps::-webkit-scrollbar{display:none}
+  .steps li{flex:none;scroll-snap-align:start}
+  .steps li:after{display:none}
+  .st{grid-template-columns:26px auto;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--hair2);background:#fff;border-radius:999px}
+  .st .n{width:26px;height:26px}
+  .st .s,.st .x{display:none}
+  .side .legend{display:none}
+  .main{display:block}
+  .stage{display:block;padding:20px 16px}
+  .ctl,.canvas{overflow:visible}
+  .canvas{margin-top:22px;padding:12px;border-radius:18px}
+  .ttl{font-size:32px}
+  .log{height:auto}
+  .log-l{max-height:300px}
+  .legend-m{display:block!important}
+  .g3{grid-template-columns:1fr}
+  .reveal{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .g2,.facts2,.bals{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{border-right:0!important;border-bottom:1px solid var(--line2)}
+  .chain{grid-template-columns:1fr}
+  .arr{height:26px;transform:rotate(90deg)}
+  .bh{flex-wrap:wrap}
+  .bh-m{width:100%;padding-left:28px}
+  .bh-t .sum{display:none}
+  .txr{grid-template-columns:1fr}
+  .txa{justify-self:start}
+  .lg{grid-template-columns:62px minmax(0,1fr);padding:5px 16px}
+  .lg .sy{display:none}
+  .rvb .dec{font-size:60px}
+  .idle .big{font-size:96px}
+  .histlink{flex-direction:column;align-items:flex-start}
+  .brand .app-n{display:none}
+  .lb{padding:56px 10px 16px}
+  .lb-prev,.lb-next{top:auto;bottom:14px}
+}
+.legend-m{display:none;padding:18px 16px 28px;border-top:1px solid var(--hair2)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the console</a>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="index.html" aria-label="Catenor One home" title="Catenor One home"><span class="mark" aria-hidden="true"></span><span>Catenor One</span><span class="app-n">Console</span></a>
+    <div class="badge">
+      <div class="badge-in" id="badge">
+        <span class="rp"><i></i>REPLAY</span>
+        <span class="bt">Replay of the recorded run <code>c1-202609121659</code> · results are real, actions are replayed<span class="opt"> ·</span> <a href="#step-10" data-go="9">verify on-chain</a></span>
+      </div>
+    </div>
+    <div class="top-r">
+      <a class="tlink" href="history.html">Run history &amp; evidence</a>
+      <button type="button" class="rst" id="reset">Reset replay</button>
+    </div>
+  </header>
+
+  <nav class="side" aria-label="Journey">
+    <div class="side-h">
+      <div class="k">Journey</div>
+      <div class="pr"><b id="prog-n">0 / 10</b><span id="prog-s">steps complete</span></div>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+    <ol class="steps" id="steps"></ol>
+    <div class="legend" id="legend"></div>
+  </nav>
+
+  <main class="main" id="main">
+    <div class="stage" id="stage" tabindex="-1">
+      <div class="ctl" id="ctl"></div>
+      <div class="canvas" id="canvas" aria-live="polite"></div>
+    </div>
+    <section class="log" aria-label="Activity log">
+      <div class="log-h">
+        <b>Activity</b><span class="c" id="log-c">0</span>
+        <span class="lg-note">times are from the recorded run, UTC · “live” = checked now</span>
+        <button type="button" class="tg" id="log-tg" aria-expanded="true">Hide</button>
+      </div>
+      <div class="log-l" id="log-l" role="log"></div>
+    </section>
+    <div class="legend-m" id="legend-m"></div>
+  </main>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="toast" id="toast" aria-live="polite"></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Screenshot viewer" hidden>
+  <button type="button" class="lb-btn lb-close" id="lb-close" aria-label="Close">×</button>
+  <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Previous screenshot">‹</button>
+  <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Next screenshot">›</button>
+  <figure id="lb-fig"><img id="lb-img" src="data:," alt=""></figure>
+  <div class="cap" id="lb-cap"></div>
+</div>
+
+<!-- Verbatim copies of artifacts/privy/final-demo/clean-room-c1-202609121659/*.json (public data only) -->
+<script type="application/json" id="json-spv">
+{
+  "id": "cygll4bmgocqr05asp2w6f2s",
+  "version": "1.0",
+  "name": "catenor-one-spv-execution-4c875d44",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "t01al94fattl6okgua0jwpd0",
+      "name": "allow-ats-factory-hedera-testnet",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xd1F118A40f3b02883D35909eF2517e7EDd78379d" }
+      ]
+    },
+    { "id": "nfob7nm7jo55mjuj3bbxq6ii", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "ub7kylldhvex9z8iq08imioj", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] },
+    {
+      "id": "r6bo3tyjsl1glf3vwimo3m0g",
+      "name": "allow-setDividend-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "setDividend", "abi": "[setDividend((uint256 recordDate,uint256 executionDate,uint256 amount,uint8 amountDecimals) newDividend) returns (uint256 dividendId_)]" }
+      ]
+    },
+    {
+      "id": "snvx2odgylm68pz4x14hn3uc",
+      "name": "allow-issueByPartition-equity",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "issueByPartition", "abi": "[issueByPartition((bytes32 partition,address tokenHolder,uint256 value,bytes data) _issueData)]" },
+        { "field_source": "ethereum_calldata", "field": "issueByPartition._issueData.partition", "operator": "eq", "value": "0x0000000000000000000000000000000000000000000000000000000000000001", "abi": "(same issueByPartition ABI)" }
+      ]
+    },
+    {
+      "id": "myjpkp43eogob04pvjjmg20x",
+      "name": "allow-grantRole-corporate-action-to-spv",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        { "field_source": "ethereum_transaction", "field": "to", "operator": "eq", "value": "0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC" },
+        { "field_source": "ethereum_calldata", "field": "function_name", "operator": "eq", "value": "grantRole", "abi": "[grantRole(bytes32 _role,address _account) returns (bool success_)]" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._role", "operator": "eq", "value": "0xa1acfc499025c99f55059195e6276f639d34a18aad7b8121b9192b7f438c55cd", "abi": "(same grantRole ABI)" },
+        { "field_source": "ethereum_calldata", "field": "grantRole._account", "operator": "eq", "value": "0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926", "abi": "(same grantRole ABI)" }
+      ]
+    }
+  ],
+  "_note": "Copied by the maintainer from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 60, final-demo instance c1-202609121659. The full ABI arrays of the calldata conditions are abbreviated here to their signatures; everything else is verbatim. Public data only."
+}
+</script>
+<script type="application/json" id="json-agent">
+{
+  "id": "p99xe36icsfvewrovm1mczwq",
+  "version": "1.0",
+  "name": "catenor-one-distribution-agent-3d8dc074",
+  "chain_type": "ethereum",
+  "rules": [
+    {
+      "id": "fxxhjsvbzc7dl9xx9lhybkqz",
+      "name": "allow-distribution-payout-hedera",
+      "method": "eth_signTransaction",
+      "action": "ALLOW",
+      "conditions": [
+        { "field_source": "ethereum_transaction", "field": "chain_id", "operator": "eq", "value": "296" },
+        {
+          "field_source": "ethereum_transaction",
+          "field": "to",
+          "operator": "in",
+          "value": ["0x7de572532820B22040B561e68543419419b72473", "0xCfCa833A8e6b7651E44480b92822576BcB78Da73"]
+        },
+        { "field_source": "ethereum_transaction", "field": "value", "operator": "lte", "value": "0x1158e460913d00000" }
+      ]
+    },
+    { "id": "su9uq4lrxg8hgsusvgm3nv3q", "name": "deny-exportPrivateKey", "method": "exportPrivateKey", "action": "DENY", "conditions": [] },
+    { "id": "nu05o2k3j0kinl728wimu2c9", "name": "deny-exportSeedPhrase", "method": "exportSeedPhrase", "action": "DENY", "conditions": [] }
+  ],
+  "_note": "Transcribed from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 70, final-demo instance c1-202609121659. 0x1158e460913d00000 = 20 HBAR (18-decimal weibar). The two addresses are the investors' receiving wallets. Public data only."
+}
+</script>
+
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   Data. Every value below comes from the committed run record:
+   artifacts/final-demo/RUN-LOG.md, artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md,
+   artifacts/hedera/final-demo/clean-room-c1-202609121659.md,
+   artifacts/privy/final-demo/clean-room-c1-202609121659/ and history.html.
+   Organization/agent DIDs only; investor DIDs, applicant IDs, binding refs, VCs/VPs, keys: never.
+   ===================================================================== */
+var D = {
+  ta: 'did:catenor:656d66dff9ce1db692786ee241bc3cab',
+  sponsor: 'did:catenor:5b87cad5d25e94dbf62f4443cf85761d',
+  spv: 'did:catenor:bd7856964b7ab1cce73a0e9c4c875d44',
+  agent: 'did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074',
+  wf1: '00e12517fc06c8984befaa63accbadb21b8c4abe529595fcf48542ba097ad250',
+  wf2: '0000e58d50da8eaf29fb4212c236f374d11d7eb2452502c3bad0afe74d3f25c8',
+  ex: {
+    adm: '0x394f66228ed74f270e5917ba9401a78f36aea40366864cf89306936e74ce4bd8',
+    a: '0xe66a410799c33f710fa19baefa09ea49f0d2f89aaced4266390d14cdee320b8f',
+    b: '0x61485b72ad43bd2a63d466fdb7778d02d49a5dec4206979171aa68a15df064f8',
+    off: '0xfecb527d3d0133d4fd23a4c29a36b7998a1dc379c137a65175d72f4272464715',
+    dist: '0xfd2a96fb91bb4be494fd1f65a3e01ebd0e4da49d07520854cb38e2eb76e82d0b'
+  },
+  uuid: {
+    adm: '579f70e6-2fe3-48fc-8314-5facefbe9eb1', a: '3529711c-121f-4aa6-b708-d531c53f5077',
+    b: '5a85768b-1a2e-426c-8089-c8bc11e2922a', off: 'b6c4ff63-cd01-4d32-958d-c5aabb3bfc11',
+    dist: 'a623ebaa-0fb5-48eb-ad70-c65f95f079ee'
+  },
+  tx: {
+    deploy: '0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570',
+    issA: '0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e',
+    issB: '0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62',
+    role: '0x726032ce12d343d9ced3933035e2a55833f527dd2de128c90d776139818d9f94',
+    div: '0xaac4a085a3c9c2532c315ecb641028bb35525cb338b628715505aac3cd3ef865',
+    pay: '0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24'
+  },
+  fund: {
+    spv: '0xa2b789128e5fd40ff8ad2b7815ca3c26c24a3e17cfca848345f0af46650b7f08',
+    a: '0x79829109bd42301ea5a4dab455c9e4b6d539d1c93865f4e52cf7f4430b760060',
+    b: '0xeb370383f7ed074da4c6fd61eaa0b4d6782a2483e7dcda7ffda2423999406c4f',
+    agent: '0x229a0682afe9e2c2b9e920d28733307d1c3d0da56c2a14bcd4a083310d4fc5a2'
+  },
+  w: {
+    spv: '0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926', agent: '0x90894535F5f35271f2d4112179BF2b4e887913E3',
+    a: '0x7de572532820B22040B561e68543419419b72473', b: '0xCfCa833A8e6b7651E44480b92822576BcB78Da73',
+    treasury: '0x49e969483fEd8b2419D60EcB23D34C89af2E5210', equity: '0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC',
+    factory: '0xd1F118A40f3b02883D35909eF2517e7EDd78379d'
+  },
+  acct: { spv: '0.0.10509879', agent: '0.0.10511413', a: '0.0.10509881', b: '0.0.10509882', treasury: '0.0.10509855', equity: '0.0.10510175', factory: '0.0.9213391' },
+  bootHash: '0x88314d8bae7f81ff33c8192124f7870a4f27586beba74e9772b735a3af007fff',
+  admCommit: '0x032c3587582592487fde060e08ab3e3747e80b25cf7bc825ee6bdbc58cf31846',
+  admDecision: 'decision:4721cc3e-702a-42cc-95e1-60f34d66185a',
+  offering: 'offering:ab27ec9a-cd89-4b5b-92ea-bef19fbd9f9f',
+  offPolicyHash: '0xa3326b33a0932b68c140a477334160a1585a75d4ccc824e0c89aa68d57dd51a2',
+  decA: 'decision:8c0a84a1-d53f-4c2b-94f8-f88787ab53dd', decB: 'decision:3000f2f5-0376-446f-b9b9-bbffdd8078ef',
+  commitA: '0xfb4c06ba260790febb51433bfc39df2c91189e9393e8d8522e8cd5c6a5e105a2',
+  commitB: '0xf0ebd2f5cf0bcdde1f79426ca494116a553333e0e6460a60315558b15072afee',
+  offCommit: '0x83db064bab91f7dfd86dfd0309cbfe6f5d68f568116554fa2b21715b92599beb',
+  relSponsor: 'urn:uuid:697d1767-2ea8-45d8-b875-f13a00943cba',
+  relAgent: 'urn:uuid:87eb74d1-4314-49bc-bb4c-8ad6d3cb6794',
+  gTok: 'capability-grant:1984657d-ecab-403e-850f-67f5f29d3cc6',
+  gCreate: 'capability-grant:34fd209d-32af-43f5-a3f5-37acbae12c14',
+  gDeleg: 'capability-grant:e250671b-c958-434b-a536-5dc3a01fe996',
+  gExec: 'capability-grant:7bd93930-e21c-4f78-86fd-8f8c9aa46156',
+  revenue: 'revenue-event:a2400be4-05f9-4923-ba2d-011bb50b2355',
+  plan: 'distribution-plan:034ffe82-92e3-4e16-a6ff-6ed21562e4a5',
+  distCommit: '0x824b99fd7ef80d1f79c2140b8947a55412eb4a9b51309e49439596c8218e6405',
+  payCommitA: '0x37df46f932c3699bdb089234238e8624911b0b00d38d7bb1f33ca8f3ba76db98',
+  holdCommitB: '0x17b39d3e150434749e75e8510accff82d190b18745bba540824d307e1024e8cf'
+};
+
+var REAL = {
+  cre: ['DEPLOYED', 'Chainlink CRE', 'p-cre', '<b>Chainlink CRE · DEPLOYED.</b> The Confidential Workflow identity-confidential-production on the Chainlink-hosted private registry (zone-a), running in handlerInTee. Not cre workflow simulate. 5 executions, all SUCCESS.'],
+  privy: ['REAL', 'Privy dev app', 'p-privy', '<b>Privy · REAL development app.</b> catenor-one-ethonline-2026, created empty for this run: real server wallets, Privy policies and key quorums, in a development environment.'],
+  sandbox: ['SANDBOX', 'Sumsub', 'p-sand', '<b>Sumsub · SANDBOX.</b> Level id-only. “Lisa Simpson” and “Bart Simpson” are fictional synthetic applicants; reviews are set by the operator.'],
+  mock: ['SYNTHETIC MOCK', 'company KYB', 'p-mock', '<b>Company KYB · SYNTHETIC MOCK.</b> Used only for the root Trust Anchor admission. The representative facts came from the real Sumsub sandbox.'],
+  testnet: ['TESTNET', 'Hedera ATS', 'p-hed', '<b>Hedera ATS · TESTNET.</b> Chain 296, Asset Tokenization Studio v8 through the official Factory. HBAR came from the portal faucet. Nothing ran on mainnet.']
+};
+
+/* Sponsor chips (one name + accent per system) and the first-appearance callouts */
+var SYS = {
+  CAT: ['cat', 'Catenor'], PRIVY: ['privy', 'Privy'], CRE: ['cre', 'Chainlink CRE'], TEE: ['tee', 'Chainlink CRE · TEE'],
+  SUMSUB: ['sumsub', 'Sumsub · SANDBOX'], HEDERA: ['hedera', 'Hedera ATS']
+};
+var SPONSOR = {
+  CAT: { name: 'Catenor', logo: 'catenor-mark.png', what: 'The identity and authority layer: canonical identity (<code>did:catenor</code>), W3C credentials, scoped capabilities and delegation, policy decisions, and a hash-chained audit.',
+    why: '<ul><li>Every actor gets its own identity, and a wallet is only an account bound to it.</li><li>Every action needs explicit, scoped authority; delegation can never exceed the delegator.</li><li>Decisions land in a hash-chained audit that anyone can re-verify (79 events, valid).</li></ul>' },
+  PRIVY: { name: 'Privy', logo: 'privy.svg', what: 'Server wallets whose <b>Privy policies</b> constrain which key can sign what.',
+    why: '<ul><li><b>Trust Anchor &amp; Sponsor signature wallets</b>: message signing only, never money.</li><li><b>SPV wallet</b>: the ATS Factory and its own equity only.</li><li><b>Distribution Agent wallet</b>: only Lisa or Bart, ≤ 20 HBAR.</li><li><b>Investor wallets</b>: receive-only.</li><li>Owner keys stay outside the runtime; the runtime signer cannot change a policy.</li></ul>' },
+  CRE: { name: 'Chainlink CRE', logo: 'chainlink.png', sq: 1, what: 'A <b>deployed</b> Confidential Workflow. Its secrets come from the Vault DON, and its Sumsub sandbox calls run inside the TEE.',
+    why: '<p>It decides admission, credential issuance, offering eligibility and PAY/HOLD on private, current evidence. Only facts and commitments leave the enclave.</p>' },
+  HEDERA: { name: 'Hedera ATS', logo: 'hedera.svg', what: 'Asset Tokenization Studio on testnet: the tokenized SPV equity lifecycle — <code>deployEquity</code>, <code>issueByPartition</code>, the corporate-action role, dividend entitlements — and the payout.',
+    why: '<p>Execution is public: every transaction can be verified on HashScan and the Mirror Node.</p>' }
+};
+
+var IMG = {
+  '10-after-terminal': [1800, 363, 'Stage 10: signer infrastructure created live; Bootstrap Configuration hash 0x88314d8b…7fff.'],
+  'C4-cre-deploy-terminal': [1800, 1029, 'C4 · CRE deploy #1: registered in the private registry (zone-a), 00e12517…d250, Active.'],
+  '11-before-cre-workflow': [1800, 1006, 'Before stage 11: identity-confidential-production Active in the private registry, 0 executions.'],
+  '11-after-cre-execution-events': [1800, 993, 'Execution 394f…4bd8: Success, 8 s, $0 — trigger, then two http-actions SendRequest from inside the TEE.'],
+  '11-after-terminal': [1800, 878, 'Stage 11: mode DEPLOYED, EVIDENCE_RECEIVED, ALLOW, TRUST_ANCHOR_VALID: true.'],
+  'E2-cre-redeploy-terminal': [1800, 1834, 'E2 · CRE deploy #2: same binary 9902db58…, new config e7703b19…, new ID 0000e58d…25c8.'],
+  '21-terminal': [1800, 1706, 'Stage 21: AUTHORIZED_SPONSOR_IN valid + five grants ALLOW; another resource → DENY CAPABILITY_MISSING.'],
+  '30-terminal': [1800, 687, 'Stage 30: SPV did:catenor:bd78…5d44 + wallet 0x182F…9926, created after the ALLOW.'],
+  '30-after-privy-policy-spv-json': [1800, 1621, 'Privy policy of the SPV wallet, stage 30: eth_signTransaction ALLOW only if chain_id eq 296 AND to eq the ATS v8 Factory.'],
+  '31-terminal': [1800, 821, 'Stage 31: offering ab27ec9a…, policy pinned by hash 0xa3326b33…51a2, verified ALLOW.'],
+  '44-after-sumsub-both-green': [1800, 431, 'Sumsub sandbox: Bart and Lisa both Approved (level id-only). Applicant IDs redacted.'],
+  '42-after-cre-executions': [1800, 1149, 'CRE: 3 successful, 0 unsuccessful. New: e66a41…0b8f and 61485b…64f8, about 63 s apart.'],
+  '44-terminal': [1800, 2174, 'Stage 44: A ALLOW 600 · B ALLOW 400, four requirements TRUE, 7/7 checks. Investor DIDs redacted.'],
+  '44-after-cre-execution-logs': [1800, 1830, 'CRE Logs tab: every DON node emits only safe markers (secrets_fetched, offering_evaluated status=OK, handler_completed status=DELIVERED).'],
+  '60-after-hashscan-deploy-tx': [1800, 1454, 'HashScan: deployEquity SUCCESS, 21:14:07 UTC, block 40438071; fee 7.864 ℏ from SPV 0.0.10509879.'],
+  '60-after-privy-spv-policy-rules': [1800, 1641, 'Privy policy of the SPV wallet, stage 60: the factory rule + the three equity-pinned rules; exports denied; default deny.'],
+  '63-terminal': [1800, 943, 'Stage 63: grantRole + setDividend confirmed; entitlements A 600 → 6, B 400 → 4.'],
+  '63-after-verify-hedera-entitlements': [1800, 2069, 'Read-only re-check, 22:08 UTC: 5 transactions SUCCESS; dividend 1: A 6, B 4.'],
+  '70-terminal': [1800, 907, 'Stage 70: Agent + wallet created; request before delegation → DENY CAPABILITY_MISSING.'],
+  '70-after-privy-agent-policy-json': [1800, 2233, 'Privy policy of the Distribution Agent wallet, stage 70: chain 296 AND to in [A, B] AND value ≤ 20 HBAR.'],
+  '71-terminal': [1800, 558, 'Stage 71: AGENT_OF valid; request with only the relationship → still DENY.'],
+  '72-terminal': [1800, 1224, 'Stage 72: chain ALLOW; TOKENIZE_ASSET → refused ACTION_NOT_DELEGABLE; wrong holder → DENY SUBJECT_MISMATCH.'],
+  '80-after-sumsub-bart-red': [1800, 508, 'Sumsub sandbox: Bart Rejected (Sanctions), Lisa Approved. Applicant IDs redacted.'],
+  '80-terminal': [1800, 966, 'Stage 80: review RED; credential still ACTIVE; holdings still 400. Investor DID redacted.'],
+  '82-terminal': [1620, 2324, 'Stage 82: A ALLOW → PAY 6; B DENY → HOLD 4; authority chain Trust Anchor → Sponsor → Agent; executed: false.'],
+  '82-after-cre-execution-events': [1800, 1150, 'CRE: execution fd2a…2d0b, Success, 8 s, $0 — trigger, then three SendRequest.'],
+  '83-terminal': [1800, 1227, 'Stage 83: A PAY 6.0 received; B HOLD 4.0, no Privy signature requested; Agent nonce 0 → 1.'],
+  '83-after-hashscan-payout-tx': [1800, 1903, 'HashScan: SUCCESS, block 40440606: 0.0.10511413 → 0.0.10509881, 6.00000000 ℏ.'],
+  '99-verify-complete-demo-stages': [1800, 1071, 'Stage 99: all 24 stages ran and are ok: true, each with its mode.'],
+  '99-after-cre-five-executions': [1800, 954, 'End of demo: identity-confidential-production, 5 executions, all Success, $0.'],
+  '91-verify-hedera-final': [1800, 2118, 'Stage 91: 6 transactions SUCCESS; A 600 units / 7.0 ℏ, B 400 units / 1.0 ℏ.'],
+  '92-verify-privy': [1800, 2525, 'Stage 92: one Privy policy per execution wallet, override-scoped signers; “Agent policy exactly the approved boundary: true”.'],
+  '93-verify-catenor-audit': [1430, 2652, 'Stage 93: audit hash chain valid (79 events); Trust Anchor VALID; Sponsor and Agent chains ALLOW; credentials ACTIVE.']
+};
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function hx(h, a, b){ a = a || 4; b = b || 4; return h.slice(0, 2 + a) + '…' + h.slice(-b); }
+function sdid(d){ var id = d.split(':').pop(); return 'did:catenor:' + id.slice(0, 4) + '…' + id.slice(-4); }
+function H(full, short){ return '<span class="h cp" data-copy="' + esc(full) + '" title="' + esc(full) + ' · click to copy">' + esc(short || full) + '</span>'; }
+function T(k){ return '<span class="tag ' + (k === 'DENY' || k === 'HOLD' ? 'deny' : 'allow') + '">' + k + '</span>'; }
+function sys(s){ var x = SYS[s] || [String(s).toLowerCase(), s]; return '<span class="sys s-' + x[0] + '">' + x[1] + '</span>'; }
+/* “by” chips: which system did it (who = list of SYS keys) */
+function by(who, lead){ return '<span class="bys"><span class="byk">' + (lead || 'by') + '</span>' + who.map(sys).join('') + '</span>'; }
+function byCls(who){ return who && who.length ? ' by-' + (SYS[who[0]] || [''])[0] : ''; }
+/* a Privy policy, always labeled as one */
+function PP(name){ return '<span class="ppol"><b>Privy policy</b><span>' + name + '</span></span>'; }
+function rl(k){ var r = REAL[k]; return '<span class="rl" tabindex="0" data-tip="' + esc(r[3]) + '"><b class="' + r[2] + '">' + r[0] + '</b>' + r[1] + '</span>'; }
+function rc(k, v, s, cls, who){
+  return '<div class="rc' + (cls ? ' ' + cls : '') + byCls(who) + '"><div class="rkr"><div class="rk">' + k + '</div>' + (who ? by(who) : '') + '</div><div class="rv">' + v + '</div>' + (s ? '<div class="rs">' + s + '</div>' : '') + '</div>';
+}
+function caprow(title, capl, who){ return '<div class="caprow"><span class="rk">' + title + '</span>' + (who ? by(who) : '') + (capl ? '<span class="capl">' + capl + '</span>' : '') + '</div>'; }
+function hs(hash){ return 'https://hashscan.io/testnet/transaction/' + hash; }
+function txRow(label, hash, meta, signer){
+  var who = '<span class="bys"><span class="byk">signed by</span>' + sys(signer || 'PRIVY') + '<span class="byk">executed on</span>' + sys('HEDERA') + '</span>';
+  return '<div class="txr"><div><div class="txn">' + label + '</div><div class="txm">' + meta + '</div><div class="txh">' + H(hash, hx(hash, 8, 6)) + '</div><div class="txm">' + who + '</div></div>' +
+    '<div class="txa"><a class="lnk" href="' + hs(hash) + '" target="_blank" rel="noopener">HashScan ↗</a><button type="button" class="vbtn" data-verify="' + hash + '">Verify live</button></div><div class="vout" aria-live="polite"></div></div>';
+}
+function denyRes(code, text, extra, who){ return '<div class="denyres"><div class="dtop"><div class="huge">DENY</div>' + by(who || ['CAT']) + '</div><div class="dcode">' + code + '</div><p>' + text + '</p>' + (extra || '') + '</div>'; }
+function introHTML(keys){
+  return '<section class="intro" aria-label="First appearance: what it is and why we use it"><div class="intro-h"><b>First appearance</b><span>what it is · why we use it</span></div><div class="intro-g">' +
+    keys.map(function(k){ var s = SPONSOR[k]; return '<article class="spc k-' + SYS[k][0] + '"><div class="spc-t"><span class="spc-n">' + (s.logo ? '<img class="spc-lg' + (s.sq ? ' sq' : '') + '" src="assets/logos/' + s.logo + '" width="24" height="24" alt="">' : '') + s.name + '</span><span class="spc-f">First appearance</span></div>' +
+      '<div class="spc-k">What it is</div><p>' + s.what + '</p><div class="spc-k">Why we use it</div>' + s.why + '</article>'; }).join('') + '</div></section>';
+}
+function chk(t, bad){ return '<span class="chip' + (bad ? ' bad' : '') + '">' + (bad ? '<span class="n0">✕</span>' : '<span class="y">✓</span>') + t + '</span>'; }
+function hl(src){
+  var out = '', last = 0, m, re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)|([{}\[\],])/g;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    if (m[1]) out += m[2] ? '<span class="k">' + esc(m[1]) + '</span><span class="p">' + esc(m[2]) + '</span>' : '<span class="s">' + esc(m[1]) + '</span>';
+    else if (m[3]) out += '<span class="b">' + m[3] + '</span>';
+    else if (m[4]) out += '<span class="n">' + m[4] + '</span>';
+    else out += '<span class="p">' + esc(m[5]) + '</span>';
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+/* ---------- Privy policy viewer ---------- */
+var ADDR = {};
+ADDR[D.w.factory.toLowerCase()] = 'ATS v8 Factory';
+ADDR[D.w.equity.toLowerCase()] = 'ATS equity C1SPV001';
+ADDR[D.w.spv.toLowerCase()] = 'SPV wallet';
+function cond(c){
+  var f = c.field, v = c.value, op = c.operator;
+  if (f === 'chain_id') return ['chain_id = ' + v, 'Hedera testnet'];
+  if (f === 'to' && op === 'eq') return ['to = ' + (ADDR[String(v).toLowerCase()] || v), v];
+  if (f === 'to' && op === 'in') return ['to ∈ { Investor A, Investor B }', v.join(' · ')];
+  if (f === 'value' && op === 'lte') return ['value ≤ 20 HBAR', v + ' weibar'];
+  if (f === 'function_name') return ['function = ' + v + '()', 'ethereum_calldata'];
+  if (/partition$/.test(f)) return ['partition = default', hx(v, 4, 4)];
+  if (/_role$/.test(f)) return ['_role = ROLE_CORPORATE_ACTION', hx(v, 8, 4)];
+  if (/_account$/.test(f)) return ['_account = SPV wallet', v];
+  return [f + ' ' + op + ' ' + v, ''];
+}
+function policyView(jsonId, opt){
+  opt = opt || {};
+  var raw = document.getElementById(jsonId).textContent.trim(), p = JSON.parse(raw);
+  var rules = p.rules.filter(function(r){ return !opt.only || opt.only.indexOf(r.id) >= 0; }).map(function(r){
+    var later = opt.later && opt.later.indexOf(r.id) >= 0, fresh = opt.fresh && opt.fresh.indexOf(r.id) >= 0;
+    var cs = r.conditions.map(function(c){ var x = cond(c); return '<div class="cond"><div class="v">' + esc(x[0]) + '</div><div class="f">' + esc(x[1]) + '</div></div>'; }).join('<span class="and" aria-label="and">∧</span>');
+    return '<div class="rule' + (later ? ' later' : '') + (fresh ? ' fresh' : '') + '"><div class="rule-t">' + T(r.action) + '<span class="rn">' + esc(r.name) + '</span><span class="rm">' + esc(r.method) + '</span>' +
+      (later ? '<span class="lt">added after deployEquity · stage 60</span>' : '') + (fresh ? '<span class="lt">new · owner-authorized</span>' : '') + '</div>' +
+      (cs ? '<div class="conds">' + cs + '</div>' : '') + '</div>';
+  }).join('');
+  return '<div class="pv" role="group" aria-label="Privy policy ' + esc(p.name) + '"><div class="pv-band">' + sys('PRIVY') + '<b>Privy policy</b><span aria-hidden="true">·</span><span class="pv-n mono">' + esc(p.name) + '</span></div>' +
+    '<div class="pv-h"><div class="pv-i">Privy policy ID ' + H(p.id) + ' · ' + esc(p.chain_type) + ' · enforced by Privy on every signature request · everything else denied by default</div>' +
+    '<div class="seg" role="group" aria-label="Privy policy view"><button type="button" class="on" data-pvmode="rules" aria-pressed="true">Rules</button><button type="button" data-pvmode="json" aria-pressed="false">JSON</button></div></div>' +
+    '<div class="pv-rules"><div class="pv-rk">Privy policy rules</div>' + rules + '</div><pre class="code pv-json" hidden tabindex="0" aria-label="Privy policy JSON">' + hl(raw) + '</pre>' +
+    '<div class="pv-f">' + (opt.foot || 'artifacts/privy/final-demo/clean-room-c1-202609121659/' + (jsonId === 'json-spv' ? 'spv-policy-after-equity.json' : 'agent-policy.json')) + '</div></div>';
+}
+var SPV_LATER = ['r6bo3tyjsl1glf3vwimo3m0g', 'snvx2odgylm68pz4x14hn3uc', 'myjpkp43eogob04pvjjmg20x'];
+
+/* =====================================================================
+   The journey. Each action replays recorded sub-steps, then shows the recorded result.
+   pipe row: s = system, t = title, d = recorded detail, k = ok|deny|info, tee = inside handlerInTee,
+             log = [time, message, kind] or a list of them (times are recorded UTC).
+   ===================================================================== */
+function invCard(who, o){
+  var A = who === 'a';
+  return '<div class="inv-c"><div class="inv-h"><span class="av ' + who + '" aria-hidden="true">' + (A ? 'L' : 'B') + '</span><div><div class="nm">' + (A ? 'Lisa Simpson' : 'Bart Simpson') +
+    '</div><div class="al">Investor ' + (A ? 'A' : 'B') + ' · fictional · Sumsub sandbox</div></div><span class="st-pill ' + (o.red ? 'g-red' : 'g-green') + '">' + (o.red ? 'RED · SANCTIONS' : 'GREEN · Approved') + '</span></div>' +
+    (o.by ? '<div class="rs">' + by(o.by) + '</div>' : '') + (o.body || '') + '</div>';
+}
+function kvs(rows){ return '<dl class="kvs">' + rows.map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>'; }
+
+var STEPS = [];
+
+/* 1 · Trust Domain ------------------------------------------------------ */
+STEPS.push({
+  id: 'domain', name: 'Trust Domain', sub: 'Stage 10 · Privy', when: 'Stage 10 · 17:08 UTC', who: ['CAT', 'PRIVY', 'CRE'], intro: ['CAT', 'PRIVY', 'CRE'],
+  role: 'Operator', roleNote: '· Trust Domain bootstrap',
+  title: 'Pin the rules before anyone is trusted.',
+  lede: 'An empty Privy app gets its signer infrastructure. The admission rules are hashed into a Bootstrap Configuration that the deployed CRE workflow pins.',
+  real: ['privy', 'cre'],
+  inv: ['Invariant', 'Credential Assertion Key ≠ Financial Execution Key', 'Assertion and bootstrap keys can only sign messages. They can never be exported or sign a transaction.'],
+  proofs: ['10-after-terminal', 'C4-cre-deploy-terminal'],
+  actions: [{
+    id: 'create', label: 'Create Trust Domain', did: 'Trust Domain created', am: '~3 s', req: true,
+    rec: 'stage 10 · 17:08 UTC', out: T('CREATED'), sum: 'trust-domain:catenor-one-demo · hash 0x8831…7fff',
+    pipe: [
+      { s: 'CAT', t: 'Create the Trust Domain', d: 'trust-domain:catenor-one-demo · admission policy policy:trust-anchor-admission:v1', log: ['17:08:13', 'Stage 10 · Trust Domain trust-domain:catenor-one-demo'] },
+      { s: 'PRIVY', t: 'Register 2 management-owner keys', d: 'by public key only · the private keys stay on the maintainer’s machine', log: ['17:08', '2 management-owner keys registered by public key (private keys stay outside the runtime)'] },
+      { s: 'PRIVY', t: 'Create 2 runtime quorums', d: '…-bootstrap eucmxca0yokwgp9xr68plx6m · …-assertion px0qht07z0tbilnqqfcb3o2n' },
+      { s: 'PRIVY', t: 'Create Privy policies P_BOOTSTRAP and P_ASSERT', d: PP('P_BOOTSTRAP vzww22mkxmtn4f333fdqpse7') + ' ' + PP('P_ASSERT e8d0ndsssfq6rr7p2im0ptt4') + ' · allow signMessage, deny exports', log: ['17:08', 'Privy policies P_BOOTSTRAP and P_ASSERT: signMessage only, exports denied'] },
+      { s: 'PRIVY', t: 'Create the Bootstrap Endorsement Key', d: 'Privy signature wallet (message signing only) HKQY5…nVEk · frpd7k5nwsurmsabp3n9bsao · under ' + PP('P_BOOTSTRAP'), log: ['17:08', 'Bootstrap Endorsement Key HKQY5…nVEk: Privy signature wallet (message signing only) under Privy policy P_BOOTSTRAP'] },
+      { s: 'CAT', t: 'Hash the Bootstrap Configuration', d: '0x88314d8b…af007fff', log: ['17:08', 'Bootstrap Configuration hash 0x8831…7fff', 'ok'] },
+      { s: 'CRE', t: 'Pin the hash into CRE deploy #1', d: 'identity-confidential-production · private registry · 00e12517…d250 · Active', log: [['17:36', '3 Vault DON secrets created: CATENOR_INTERNAL_API_TOKEN, SUMSUB_APP_TOKEN, SUMSUB_SECRET_KEY (names only)', '', 'CRE'], ['17:38:56', 'CRE deploy #1 00e12517…d250 ACTIVE · Bootstrap Configuration hash pinned', 'ok']] }
+    ],
+    result: function(){
+      var col = function(t, rows){ return '<div class="rc by-privy"><div class="rkr"><div class="rk">' + t + '</div>' + by(['PRIVY']) + '</div>' + kvs(rows) + '</div>'; };
+      return '<div class="g2">' +
+        rc('Trust Domain', '<span class="mono" style="font-size:15px">trust-domain:catenor-one-demo</span>', 'Admission policy (Catenor) <code>policy:trust-anchor-admission:v1</code>', 'hl', ['CAT']) +
+        rc('Bootstrap Configuration hash', H(D.bootHash), 'Pinned into CRE deploy #1 · workflow ' + H(D.wf1, hx('0x' + D.wf1, 4, 4).slice(2)) + ' · 17:38 UTC · Active', 'hl', ['CAT', 'CRE']) +
+        '</div>' + caprow('Privy signer infrastructure · development app catenor-one-ethonline-2026', '2 owner keys + 2 runtime quorums · separate signer sets', ['PRIVY']) + '<div class="g2">' +
+        col('Bootstrap endorsement', [['Owner key', 'outside the runtime'], ['Runtime quorum', '…-bootstrap ' + H('eucmxca0yokwgp9xr68plx6m')], ['Privy policy', PP('P_BOOTSTRAP') + ' ' + H('vzww22mkxmtn4f333fdqpse7')], ['Wallet', 'Privy signature wallet (message signing only) <span class="h">HKQY5…nVEk</span> · ' + H('frpd7k5nwsurmsabp3n9bsao')], ['May sign', 'messages only · exports denied']]) +
+        col('Credential assertion keys', [['Owner key', 'outside the runtime'], ['Runtime quorum', '…-assertion ' + H('px0qht07z0tbilnqqfcb3o2n')], ['Privy policy', PP('P_ASSERT') + ' ' + H('e8d0ndsssfq6rr7p2im0ptt4')], ['Wallets', 'one Privy signature wallet (message signing only) per subject, from step 2 on'], ['May sign', 'credentials, grants, presentations · never money']]) +
+        '</div>';
+    }
+  }]
+});
+
+/* 2 · Trust Anchor ------------------------------------------------------ */
+STEPS.push({
+  id: 'anchor', name: 'Trust Anchor', sub: 'Stage 11 · CRE', when: 'Stage 11 · 19:18 UTC', who: ['CAT', 'CRE', 'PRIVY'],
+  role: 'Candidate organization', roleNote: '→ root Trust Anchor',
+  title: 'Admit the root Trust Anchor, inside a TEE.',
+  lede: 'Evidence is checked inside the deployed Chainlink Confidential Workflow. Only facts and a commitment come out. Catenor decides, endorses and activates.',
+  real: ['cre', 'sandbox', 'mock', 'privy'],
+  inv: ['Invariant', 'Trust Anchor authority comes from Admission.', 'Not from a database flag. Company facts come from a SYNTHETIC MOCK; the representative facts from the real Sumsub sandbox.'],
+  note: '<b>It took four attempts.</b> Attempts 1–3 were refused by the documented enterprise gateway (“Workflow not found”). None created an execution or consumed the set-once root. A control workflow isolated the cause.',
+  proofs: ['11-before-cre-workflow', '11-after-cre-execution-events', '11-after-terminal', 'E2-cre-redeploy-terminal'],
+  actions: [{
+    id: 'admit', label: 'Admit Trust Anchor', did: 'Trust Anchor admitted', am: '~4 s', req: true,
+    rec: 'stage 11 · 19:18:37–45 UTC', out: T('ALLOW') + ' ' + T('ACTIVE'), sum: sdid(D.ta) + ' · TRUST_ANCHOR_VALID',
+    pipe: [
+      { s: 'CAT', t: 'Create the DID', d: sdid(D.ta) + ' · random, no PII · #assertion-key-1', log: ['19:18:13', 'Stage 11 (attempt 4) · candidate ' + sdid(D.ta) + ' with a Privy signature wallet as its assertion key'] },
+      { s: 'PRIVY', t: 'Its assertion key: a Privy signature wallet', d: 'message signing only · 9PvXY…PGkT · under ' + PP('P_ASSERT') },
+      { s: 'CAT', t: 'Key possession proof', d: 'Privy signMessage · eddsa-jcs-2022 · possessionValid ✓ · purposeValid ✓', log: ['19:18', 'Key possession verified · possessionValid ✓ purposeValid ✓', 'ok'] },
+      { s: 'CRE', t: 'Triggering deployed Chainlink CRE Confidential Workflow', d: 'workflows.execute · JWT alg ETH · 01.gateway.zone-a.cre.chain.link · workflow 00e12517…d250', log: ['19:18:37', 'TRUST_ANCHOR_ADMISSION on the deployed workflow · execution 0x394f…4bd8'] },
+      { s: 'TEE', tee: 1, t: 'Vault DON secrets fetched in TEE', d: 'SUMSUB_APP_TOKEN · SUMSUB_SECRET_KEY · CATENOR_INTERNAL_API_TOKEN (names only) · sealed context opened' },
+      { s: 'TEE', tee: 1, t: 'Sumsub sandbox checks inside the enclave', d: '2 × http-actions SendRequest (representative) + the synthetic company mock', log: ['19:18', 'Inside the TEE: 2 Sumsub sandbox calls + synthetic company mock'] },
+      { s: 'TEE', tee: 1, t: 'Facts + commitment', d: '6 facts, all true · commitment 0x032c…1846 · COMMITMENT_ONLY', log: ['19:18:45', 'Execution SUCCESS · 8 s · 0 credits · 6 facts true', 'ok'] },
+      { s: 'CAT', t: 'Signed callback verified', d: 'Railway relay → runner re-authenticates (HMAC) → EVIDENCE_RECEIVED' },
+      { s: 'CAT', t: 'Admission policy ALLOW', d: 'Catenor policy policy:trust-anchor-admission:v1 · decision:4721cc3e…185a', log: ['19:18', 'policy:trust-anchor-admission:v1 → ALLOW', 'ok'] },
+      { s: 'PRIVY', t: 'Bootstrap endorsement', d: 'the separate Privy signature wallet HKQY5…nVEk, under ' + PP('P_BOOTSTRAP') + ', endorses the admission' },
+      { s: 'CAT', t: 'ACTIVE · TRUST_ANCHOR_VALID', d: 'root Trust Anchor of trust-domain:catenor-one-demo · no failed checks', log: [['19:18', 'Root Trust Anchor ACTIVE · TRUST_ANCHOR_VALID: true', 'ok'], ['19:36:04', 'CRE deploy #2 0000e58d…25c8 · same binary · Trust Anchor key pinned as the only credential issuer', '', 'CRE']] }
+    ],
+    result: function(){
+      var facts = ['ORGANIZATION_KYB_VERIFIED', 'ORGANIZATION_STATUS_VALID', 'ORGANIZATION_AML_CLEAR', 'AUTHORIZED_REPRESENTATIVE_VERIFIED', 'REPRESENTATIVE_AUTHORITY_CONFIRMED', 'EVIDENCE_FRESH'];
+      return '<div class="g3">' +
+        rc('Root Trust Anchor', '<span class="okc">ACTIVE</span>', H(D.ta) + '<br><code>TRUST_ANCHOR_VALID: true</code> · no failed checks', 'hl', ['CAT']) +
+        rc('Deployed CRE execution', '<span class="okc">SUCCESS</span> · 8 s', H(D.ex.adm, hx(D.ex.adm, 8, 6)) + '<br>CRE UUID ' + H(D.uuid.adm) + '<br>workflow ' + H(D.wf1, '00e12517…d250') + ' · 0 credits', 'hl', ['CRE']) +
+        rc('Decision', T('ALLOW'), 'Catenor policy <code>policy:trust-anchor-admission:v1</code><br>' + H(D.admDecision, 'decision:4721cc3e…185a') + '<br>then endorsed by the Privy signature wallet under ' + PP('P_BOOTSTRAP'), 'hl', ['CAT', 'PRIVY']) +
+        '</div><div class="rc by-tee">' + caprow('Facts derived inside the TEE · provenance CONFIDENTIAL_VERIFICATION', 'company ← synthetic mock · representative ← Sumsub sandbox', ['TEE', 'SUMSUB']) + '<div class="facts2">' +
+        facts.map(function(f){ return chk(f); }).join('') + '</div></div>' +
+        '<div class="rc by-cre"><div class="rkr"><div class="rk">Evidence commitment · COMMITMENT_ONLY</div>' + by(['CRE']) + '</div><div class="rv h">' + H(D.admCommit) + '</div><div class="rs">Catenor keeps no raw Sumsub response. What left the enclave: facts, statuses and this commitment.</div></div>';
+    }
+  }]
+});
+
+/* 3 · Sponsor ----------------------------------------------------------- */
+var CAPS = ['TOKENIZE_ASSET', 'DEFINE_OFFERING_POLICY', 'CREATE_AGENT', 'CREATE_DISTRIBUTION', 'DELEGATE_DISTRIBUTION_AUTHORITY'];
+STEPS.push({
+  id: 'sponsor', name: 'Sponsor', sub: 'Stages 20–21 · Catenor', when: 'Stages 20–21 · 19:58–20:01 UTC', who: ['CAT', 'PRIVY'],
+  role: 'Trust Anchor', roleNote: '→ Sponsor',
+  title: 'Authorize the Sponsor. Scoped, not blanket.',
+  lede: 'A relationship says who the Sponsor is. Five capability grants say exactly what it may do, and on which resource.',
+  real: ['privy'],
+  inv: ['Invariant', 'Relationship ≠ Capability', 'Knowing who someone acts for never grants authority by itself. Authority is scoped to the resource.'],
+  proofs: ['21-terminal'],
+  actions: [{
+    id: 'auth', label: 'Authorize Sponsor', did: 'Sponsor authorized', am: '~3 s', req: true,
+    rec: 'stages 20–21 · 19:58–20:01 UTC', out: T('5 × ALLOW'), sum: sdid(D.sponsor) + ' · 5 capabilities',
+    pipe: [
+      { s: 'CAT', t: 'Create the Sponsor subject', d: sdid(D.sponsor) + ' · ORGANIZATION · random, no PII · holds no capability yet', log: ['19:58:44', 'Stage 20 · Sponsor ' + sdid(D.sponsor) + ' created'] },
+      { s: 'PRIVY', t: 'Provision its assertion key', d: 'Privy signature wallet (message signing only) GLHPd…oTdX · o2kjl90on5veciqodvlppp2u · signMessage only' },
+      { s: 'CAT', t: 'Trust Anchor signs a Relationship Credential', d: 'AUTHORIZED_SPONSOR_IN trust-domain:catenor-one-demo · valid · grants nothing by itself', log: ['20:00:46', 'Relationship AUTHORIZED_SPONSOR_IN · valid (grants nothing by itself)'] },
+      { s: 'CAT', t: 'Trust Anchor signs 5 Capability grants', d: 'on spv:catenor-demo-001 · signed with its Privy signature key · eddsa-jcs-2022' },
+      { s: 'CAT', t: 'Evaluate each grant', d: '5 × ALLOW', log: ['20:00:46', '5 capability grants on spv:catenor-demo-001 → 5 × ALLOW', 'ok'] }
+    ],
+    result: function(){
+      return '<div class="g2">' +
+        rc('Sponsor', 'ORGANIZATION', H(D.sponsor) + '<br>assertion <code>#assertion-key-1</code> · Privy signature wallet (message signing only) <span class="h">GLHPd…oTdX</span>', 'hl', ['CAT', 'PRIVY']) +
+        rc('Relationship Credential', '<span class="okc">valid</span> · grants nothing', '<code>AUTHORIZED_SPONSOR_IN</code> <code>trust-domain:catenor-one-demo</code><br>' + H(D.relSponsor, 'urn:uuid:697d1767…3cba'), 'hl', ['CAT']) +
+        '</div><div class="rc by-cat">' + caprow('Capability grants · issuer: the root Trust Anchor', 'resource <code>spv:catenor-demo-001</code>', ['CAT']) + '<ul class="caps">' +
+        CAPS.map(function(c){ return '<li><code>' + c + '</code><span class="r">spv:catenor-demo-001</span>' + T('ALLOW') + '</li>'; }).join('') + '</ul></div>';
+    }
+  }, {
+    id: 'other', neg: true, label: 'Use capability on another resource', did: 'DENY shown', am: 'negative', needs: ['auth'],
+    rec: 'stage 21 · 20:01 UTC', out: T('DENY'), sum: 'CAPABILITY_MISSING',
+    pipe: [
+      { s: 'CAT', t: 'Sponsor presents a granted capability', d: 'for a resource other than spv:catenor-demo-001' },
+      { s: 'CAT', t: 'Match the grant’s resource to the request', d: 'granted resource ≠ requested resource', k: 'deny', log: ['20:01', 'A granted capability used on another resource → DENY CAPABILITY_MISSING', 'deny'] }
+    ],
+    result: function(){ return denyRes('CAPABILITY_MISSING', 'The grant is valid, but only for <code>spv:catenor-demo-001</code>. Authority is scoped to the resource; it does not travel.'); }
+  }]
+});
+
+/* 4 · SPV & Offering ---------------------------------------------------- */
+STEPS.push({
+  id: 'spv', name: 'SPV & Offering', sub: 'Stages 30–31 · Privy', when: 'Stages 30–31 · 20:08–20:22 UTC', who: ['CAT', 'PRIVY'],
+  role: 'Sponsor', roleNote: '· uses its grants',
+  title: 'The SPV exists only after ALLOW.',
+  lede: 'Catenor’s capability decides whether the SPV may exist. The Privy policy then bounds what its wallet may sign.',
+  real: ['privy'],
+  inv: ['Invariant', 'Policy Decision ≠ Execution Authorization', 'The wallet is bound to the SPV subject privately. It never becomes the subject.'],
+  proofs: ['30-terminal', '30-after-privy-policy-spv-json', '31-terminal'],
+  actions: [{
+    id: 'create', label: 'Create SPV', did: 'SPV created', am: 'needs TOKENIZE_ASSET ALLOW', req: true,
+    rec: 'stage 30 · 20:08 UTC', out: T('ALLOW') + ' ' + T('CREATED'), sum: sdid(D.spv) + ' · wallet 0x182F…9926',
+    pipe: [
+      { s: 'CAT', t: 'Evaluate the Sponsor’s TOKENIZE_ASSET', d: 'on spv:catenor-demo-001 · capability-grant:1984657d…3cc6 → ALLOW', log: ['20:08:04', 'Stage 30 · Sponsor TOKENIZE_ASSET on spv:catenor-demo-001 → ALLOW', 'ok'] },
+      { s: 'CAT', t: 'Create the SPV subject', d: sdid(D.spv) + ' · “Catenor One Demo SPV 001”, a synthetic real-estate SPV' },
+      { s: 'PRIVY', t: 'Create its EVM execution wallet', d: '0x182F…9926 · its own owner key and runtime quorum …-spv-runtime', log: ['20:08', 'SPV execution wallet 0x182F…9926 (Privy EVM, own signer set)'] },
+      { s: 'PRIVY', t: 'Create its Privy policy', d: PP('catenor-one-spv-execution-4c875d44') + ' · owned by a key outside the runtime · chain 296 ∧ to = ATS v8 Factory', log: ['20:08', 'Privy policy catenor-one-spv-execution-4c875d44: chain 296 ∧ to = ATS v8 Factory; exports denied'] },
+      { s: 'CAT', t: 'Bind and relate', d: 'private SPV_EXECUTION Account Binding · SPV SPONSORED_BY Sponsor' }
+    ],
+    result: function(){
+      return '<div class="g2">' +
+        rc('SPV · Catenor One Demo SPV 001', 'ORGANIZATION', H(D.spv) + '<br>a synthetic real-estate SPV · <code>SPONSORED_BY</code> Sponsor', 'hl', ['CAT']) +
+        rc('Execution wallet · Privy EVM', H(D.w.spv, hx(D.w.spv, 4, 4)), 'private <code>SPV_EXECUTION</code> binding · 0 HBAR until stage 50<br>runtime signer cannot change its Privy policy', 'hl', ['PRIVY']) +
+        '</div>' + policyView('json-spv', { later: SPV_LATER, foot: 'Rules view shows the Privy policy as created in stage 30; dimmed rules were added after deployEquity. JSON = spv-policy-after-equity.json, copied from the Privy dashboard.' });
+    }
+  }, {
+    id: 'offer', label: 'Define offering', did: 'Offering defined', am: '~2 s', req: true, needs: ['create'],
+    rec: 'stage 31 · 20:22 UTC', out: T('ALLOW'), sum: '1,000 units · policy pinned by hash',
+    pipe: [
+      { s: 'CAT', t: 'Sponsor signs the offering', d: D.offering + ' · 1,000 equity-interest units', log: ['20:21:58', 'Stage 31 · offering ab27ec9a… · 1,000 equity-interest units'] },
+      { s: 'CAT', t: 'Pin the eligibility policy by hash', d: 'policy:offering-eligibility:v1 · 0xa3326b33…51a2 · accepts CatenorInvestorEligibilityCredential' },
+      { s: 'CAT', t: 'Verify against DEFINE_OFFERING_POLICY', d: 'Sponsor assertion key · grant → ALLOW', log: ['20:22', 'Offering verified against DEFINE_OFFERING_POLICY → ALLOW', 'ok'] }
+    ],
+    result: function(){
+      return '<div class="g2"><div class="rc hl by-cat"><div class="rkr"><div class="rk">Offering</div>' + by(['CAT']) + '</div><div class="huge" style="margin-top:8px">1,000</div><div class="rs">equity-interest units in “Catenor One Demo SPV 001” — not a land deed<br>' + H(D.offering, 'offering:ab27ec9a…9f9f') + '</div></div>' +
+        rc('Eligibility policy (Catenor) · pinned by hash', '<code>policy:offering-eligibility:v1</code>', H(D.offPolicyHash) + '<br>accepted credential <code>CatenorInvestorEligibilityCredential</code>', 'hl', ['CAT']) +
+        '</div><div class="rc by-cat">' + caprow('Every investor must prove, at decision time', 'signed by the Sponsor · checked against <code>DEFINE_OFFERING_POLICY</code> ' + T('ALLOW'), ['CAT']) + '<div class="facts2">' +
+        ['INVESTOR_PRESENTATION_VALID', 'INVESTOR_IDENTITY_VERIFIED', 'INVESTOR_AML_CLEAR', 'EVIDENCE_FRESH'].map(function(f){ return '<span class="chip">' + f + '</span>'; }).join('') + '</div></div>';
+    }
+  }]
+});
+
+/* 5 · Investors --------------------------------------------------------- */
+function invBody(who, o){
+  var A = who === 'a', w = A ? D.w.a : D.w.b;
+  var rows = [['Wallet', H(w, hx(w, 4, 4)) + ' · Privy, receive-only'], ['Holder key', 'Privy signature wallet (message signing only) · signs VPs, never money'], ['Binding', 'private · not in the DID Document']];
+  if (o.cred) rows.push(['Credential', 'VC by the Trust Anchor · <span class="okc">ACTIVE</span>']);
+  if (o.elig) rows.push(['Offering decision', T('ALLOW') + ' <b>' + (A ? '600' : '400') + ' units</b> · ' + H(A ? D.decA : D.decB, (A ? D.decA : D.decB).slice(0, 18) + '…')]);
+  return kvs(rows);
+}
+STEPS.push({
+  id: 'investors', name: 'Investors', sub: 'Stages 40–44 · CRE', when: 'Stages 40–44 · 20:26–20:45 UTC', who: ['CAT', 'PRIVY', 'CRE', 'SUMSUB'],
+  role: 'Investors', roleNote: '· the Trust Anchor issues',
+  title: 'Two investors. Credentials only after the TEE looks.',
+  lede: 'Lisa and Bart onboard with receive-only wallets. The deployed workflow reads their current Sumsub sandbox reviews, then decides offering eligibility.',
+  real: ['sandbox', 'cre', 'privy'],
+  inv: ['Invariant', 'Wallet / Account ≠ Canonical Subject', 'Each investor has a random did:catenor with no PII. The DID-to-wallet link is a private Account Binding, so investor DIDs are not shown here.'],
+  proofs: ['44-after-sumsub-both-green', '42-after-cre-executions', '44-terminal', '44-after-cre-execution-logs'],
+  actions: [{
+    id: 'onboard', label: 'Onboard Lisa & Bart', did: 'Both onboarded', am: '~3 s', req: true,
+    rec: 'stages 40–41 · 20:26–20:29 UTC', out: T('GREEN'), sum: 'receive-only wallets · holder keys',
+    pipe: [
+      { s: 'CAT', t: 'Lisa: a random did:catenor', d: 'no PII · not shown here, by design', log: ['20:26:02', 'Stage 40 · Investor A “Lisa Simpson” (Sumsub sandbox) onboarded'] },
+      { s: 'PRIVY', t: 'Receive-only wallet + holder key', d: '0x7de5…2473 · owner key, no signer, no Privy policy · holder key: a Privy signature wallet (message signing only)' },
+      { s: 'SUMSUB', t: 'Sandbox review: GREEN', d: 'Approved · level id-only · set by the operator' },
+      { s: 'CAT', t: 'Bart: the same', d: '0xCfCa…Da73 · GREEN, Approved', log: ['20:29:06', 'Stage 41 · Investor B “Bart Simpson” (Sumsub sandbox) onboarded · both GREEN', 'ok'] },
+      { s: 'CAT', t: 'Private Account Bindings', d: 'did:catenor → eip155:296:<wallet> · no CRE call here, by design' }
+    ],
+    result: function(){
+      return '<div class="g2">' + invCard('a', { by: ['CAT', 'PRIVY', 'SUMSUB'], body: invBody('a', {}) }) + invCard('b', { by: ['CAT', 'PRIVY', 'SUMSUB'], body: invBody('b', {}) }) + '</div>' +
+        '<div class="rs">No CRE call at onboarding: this only creates the objects. The evidence is read inside the TEE in the next action. The Sumsub applicant’s <code>externalUserId</code> is a private reference, never the DID.</div>';
+    }
+  }, {
+    id: 'cred', label: 'Issue credentials (CRE)', did: 'Credentials issued', am: '2 deployed executions', req: true, needs: ['onboard'],
+    rec: 'stage 42 · 20:34–20:35 UTC', out: T('2 × ACTIVE'), sum: '0xe66a…0b8f · 0x6148…64f8',
+    pipe: [
+      { s: 'CRE', t: 'Trigger INVESTOR_ELIGIBILITY · Lisa', d: 'deployed workflow 0000e58d…25c8 · execution 0xe66a…0b8f', log: ['20:34:36', 'INVESTOR_ELIGIBILITY (A) · execution 0xe66a…0b8f'] },
+      { s: 'TEE', tee: 1, t: 'Read her current review behind the binding gate', d: 'identity ✓ · AML ✓ · fresh ✓ · commitment 0xfb4c…05a2', log: ['20:34:45', 'SUCCESS · identity ✓ AML ✓ fresh ✓', 'ok'] },
+      { s: 'CRE', t: 'Deployed rate limit: 1 trigger / 60 s', d: 'the runner waited 44 s · executions ~63 s apart · fast-forwarded here', k: 'info', pace: 1, ms: 1300 },
+      { s: 'CRE', t: 'Trigger INVESTOR_ELIGIBILITY · Bart', d: 'execution 0x6148…64f8', log: ['20:35:39', 'INVESTOR_ELIGIBILITY (B) · execution 0x6148…64f8'] },
+      { s: 'TEE', tee: 1, t: 'Read his current review', d: 'identity ✓ · AML ✓ · fresh ✓ · commitment 0xf0eb…afee', log: ['20:35:47', 'SUCCESS · identity ✓ AML ✓ fresh ✓', 'ok'] },
+      { s: 'CAT', t: 'Trust Anchor signs 2 credentials', d: 'W3C VC 2.0 · eddsa-jcs-2022 · #assertion-key-1 · no PII · valid 2026-09-12 → 2026-12-11', log: ['20:35', '2 × CatenorInvestorEligibilityCredential issued by the Trust Anchor (status ACTIVE)', 'ok'] }
+    ],
+    result: function(){
+      var ex = function(n, e, u, w, c){ return '<div class="rc hl by-cre"><div class="rkr"><div class="rk">' + n + '</div>' + by(['CRE']) + '</div><div class="rv"><span class="okc">SUCCESS</span> · 8 s</div><div class="rs">' + H(e, hx(e, 8, 6)) + '<br>CRE UUID ' + H(u) + '<br>' + w + ' UTC</div><div class="chips">' + chk('identity') + chk('AML') + chk('fresh') + '</div><div class="rs">commitment ' + H(c, hx(c, 4, 4)) + '</div></div>'; };
+      return '<div class="g2">' + ex('Lisa · deployed execution', D.ex.a, D.uuid.a, '20:34:36–20:34:45', D.commitA) + ex('Bart · deployed execution', D.ex.b, D.uuid.b, '20:35:39–20:35:47', D.commitB) + '</div>' +
+        '<div class="rc by-cat">' + caprow('Issued by the root Trust Anchor · 2 credentials', 'pacing: the deployed trigger is rate-limited to 1 per 60 s', ['CAT']) +
+        kvs([['Type', '<code>CatenorInvestorEligibilityCredential</code> · W3C VC 2.0 · <code>eddsa-jcs-2022</code>'], ['Issuer', H(D.ta, sdid(D.ta)) + ' <code>#assertion-key-1</code> — the only issuer pinned in CRE deploy #2'], ['Validity', '2026-09-12 → 2026-12-11 · issuer-signed status statement: ACTIVE'], ['Contents', 'no PII · not displayed here']]) + '</div>';
+    }
+  }, {
+    id: 'replay', neg: true, label: 'Replay a presentation', did: 'Replay rejected', am: 'negative', needs: ['cred'],
+    rec: 'stage 43 · 20:41 UTC', out: T('DENY'), sum: 'HOLDER_PROOF_VALID false',
+    pipe: [
+      { s: 'CAT', t: 'Re-send a signed presentation', d: 'same VP, a different verifier challenge' },
+      { s: 'CAT', t: 'Check the holder proof', d: 'HOLDER_PROOF_VALID = false', k: 'deny', log: ['20:41', 'Presentation replayed with another challenge → HOLDER_PROOF_VALID false', 'deny'] }
+    ],
+    result: function(){ return denyRes('HOLDER_PROOF_VALID = false', 'Each presentation is bound to a verifier challenge and to the domain <code>' + D.offering + '</code>. A replay with another challenge fails.'); }
+  }, {
+    id: 'elig', label: 'Check offering eligibility (CRE)', did: 'Both eligible', am: '1 deployed execution', req: true, needs: ['cred'],
+    rec: 'stages 43–44 · 20:41–20:45 UTC', out: T('ALLOW 600') + ' ' + T('ALLOW 400'), sum: '0xfecb…4715',
+    pipe: [
+      { s: 'CAT', t: 'Holders sign presentations', d: 'holder keys · fresh challenge · domain offering:ab27ec9a… · 7/7 checks each', log: ['20:41:06', 'Stage 43 · 2 VPs signed with holder keys · 7/7 checks · status ACTIVE', 'ok'] },
+      { s: 'CRE', t: 'One sealed OFFERING_ELIGIBILITY run', d: 'execution 0xfecb…4715 · covers both investors', log: ['20:45:11', 'OFFERING_ELIGIBILITY · execution 0xfecb…4715'] },
+      { s: 'TEE', tee: 1, t: 'Verify each VP', d: 'holder proof · VC signature · pinned issuer key · subject · validity window · status' },
+      { s: 'TEE', tee: 1, t: 'Read current Sumsub evidence, reconcile', d: 'credential vs current · provider: CONSISTENT for both' },
+      { s: 'TEE', tee: 1, t: 'Apply policy:offering-eligibility:v1', d: '4 requirements TRUE for both · run commitment 0x83db…9beb', log: ['20:45:19', 'SUCCESS · 8 s · only minimized conclusions left the TEE', 'ok'] },
+      { s: 'CAT', t: 'Record one Decision per investor', d: 'SUBSCRIBE_OFFERING on spv:catenor-demo-001 · A 600 · B 400', log: ['20:45', 'Lisa ALLOW 600 · Bart ALLOW 400 (SUBSCRIBE_OFFERING)', 'ok'] }
+    ],
+    result: function(){
+      return '<div class="g2">' + invCard('a', { by: ['TEE', 'CAT'], body: '<div class="units">ALLOW 600<small>units</small></div>' + invBody('a', { cred: 1, elig: 1 }) }) + invCard('b', { by: ['TEE', 'CAT'], body: '<div class="units">ALLOW 400<small>units</small></div>' + invBody('b', { cred: 1, elig: 1 }) }) + '</div>' +
+        '<div class="rc by-tee">' + caprow('Checked inside the TEE for both · execution ' + H(D.ex.off, hx(D.ex.off, 4, 4)) + ' · 20:45:11–19', 'reconciliation CONSISTENT · no reason codes', ['TEE', 'SUMSUB']) + '<div class="chips">' +
+        ['PRESENTATION_WELL_FORMED', 'HOLDER_PROOF_VALID', 'CREDENTIAL_SIGNATURE_VALID', 'ISSUER_AUTHORIZED', 'SUBJECT_IS_HOLDER', 'WITHIN_VALIDITY_WINDOW', 'STATUS_ACTIVE'].map(function(c){ return chk(c); }).join('') +
+        '</div><div class="rs">run commitment ' + H(D.offCommit, hx(D.offCommit, 6, 4)) + ' · CRE UUID ' + H(D.uuid.off) + '</div></div>';
+    }
+  }]
+});
+
+/* 6 · Hedera ATS -------------------------------------------------------- */
+STEPS.push({
+  id: 'hedera', name: 'Hedera ATS', sub: 'Stages 50–63 · Hedera', when: 'Stages 50–63 · 20:55–22:08 UTC', who: ['HEDERA', 'PRIVY', 'CAT'], intro: ['HEDERA'],
+  role: 'Sponsor', roleNote: '· the SPV’s Privy wallet signs',
+  title: 'Tokenize on Hedera. Exactly 600 and 400.',
+  lede: 'Asset Tokenization Studio on testnet. Each transaction runs only after a Catenor authorization, a dry run and a Privy dry signature.',
+  real: ['testnet', 'privy'],
+  inv: ['Execution layer', 'Hedera ATS executes. It does not decide identity.', 'Issued amounts are exactly the TEE-backed decisions, and each decision is consumed. ATS then computes entitlements by ownership only.'],
+  proofs: ['60-after-hashscan-deploy-tx', '60-after-privy-spv-policy-rules', '63-terminal', '63-after-verify-hedera-entitlements'],
+  actions: [{
+    id: 'tokenize', label: 'Tokenize', did: 'Equity deployed', am: 'deployEquity', req: true,
+    rec: 'stages 50–60 · 20:55–21:25 UTC', out: T('SUCCESS'), sum: 'C1SPV001 · 0xf37A…7ABC',
+    pipe: [
+      { s: 'HEDERA', t: 'Testnet bootstrap funding · not a distribution', d: 'Privy treasury (100 ℏ from the faucet) → SPV 25 ℏ · A 1 ℏ · B 1 ℏ (activation)', log: ['20:57', 'Stage 50 · treasury → SPV 25 ℏ, Investor A 1 ℏ, Investor B 1 ℏ (testnet activation, not a distribution)'] },
+      { s: 'CAT', t: 'TOKENIZE_ASSET → ALLOW', d: 'capability-grant:1984657d…3cc6 from the admitted Trust Anchor', log: ['21:13', 'Stage 60 · Sponsor TOKENIZE_ASSET → ALLOW', 'ok'] },
+      { s: 'PRIVY', t: 'Dry run + dry signature', d: 'exact deployEquity simulated · 7.40M gas est. · 15M limit · signature discarded' },
+      { s: 'PRIVY', t: 'SPV wallet signs', d: PP('catenor-one-spv-execution-4c875d44') + ' rule allow-ats-factory-hedera-testnet · chain 296 ∧ to = Factory' },
+      { s: 'HEDERA', t: 'deployEquity → ATS v8 Factory', d: '0x2396…c570 · SUCCESS · block 40438071 · 6,898,334 gas · fee 7.864 ℏ', log: ['21:14:07', 'deployEquity SUCCESS · block 40438071 · fee 7.864 ℏ', 'ok'] },
+      { s: 'HEDERA', t: 'Equity C1SPV001', d: '0xf37A…7ABC · contract 0.0.10510175 · the address the preflight predicted' },
+      { s: 'PRIVY', t: 'Owner key adds 3 equity-pinned Privy policy rules', d: 'issueByPartition · grantRole · setDividend · no HBAR spent', log: ['21:25:41', 'SPV Privy policy extended by the owner key: 3 equity-pinned rules (no HBAR)'] }
+    ],
+    result: function(){
+      return '<div class="g2">' +
+        rc('ATS equity · Catenor One Demo SPV 001 (SYNTHETIC)', '<code style="font-size:18px">C1SPV001</code>', H(D.w.equity) + '<br>contract <a class="lnk" href="https://hashscan.io/testnet/contract/0.0.10510175" target="_blank" rel="noopener">0.0.10510175 ↗</a> · via ATS v8 Factory 0.0.9213391', 'hl', ['HEDERA']) +
+        rc('Catenor gate', T('ALLOW') + ' <code style="font-size:13px">TOKENIZE_ASSET</code>', H(D.gTok, 'capability-grant:1984657d…3cc6') + '<br>dry run → Privy dry signature (discarded) → live', 'hl', ['CAT']) +
+        '</div><div class="rc by-hedera">' + txRow('<code>deployEquity</code> → ATS v8 Factory', D.tx.deploy, 'SPV Privy wallet · SUCCESS · 6,898,334 gas · fee 7.864 ℏ · block 40438071') + '</div>' +
+        policyView('json-spv', { only: SPV_LATER, fresh: SPV_LATER, foot: 'Privy policy rules added by the SPV management-owner key (outside the runtime) after deployEquity, each pinned to the new equity.' });
+    }
+  }, {
+    id: 'invest', label: 'Invest', did: 'Issued 600 / 400', am: 'issueByPartition ×2', req: true, needs: ['tokenize'],
+    rec: 'stages 61–62 · 21:55–21:57 UTC', out: T('SUCCESS'), sum: 'A 600 · B 400 · totalSupply 1000',
+    pipe: [
+      { s: 'CAT', t: 'Lisa’s TEE-backed decision', d: 'decision:8c0a84a1… ALLOW · unused · within the offering', log: ['21:54:50', 'Stage 61 · Investor A decision ALLOW, unused, within the offering → authorized', 'ok'] },
+      { s: 'PRIVY', t: 'Dry run + dry signature', d: '485,034 gas est. · Privy policy rule allow-issueByPartition-equity' },
+      { s: 'HEDERA', t: 'issueByPartition → Lisa, 600', d: '0x5935…fa4e · SUCCESS · 456,629 gas · decision consumed', log: ['21:55', 'issueByPartition 600 → 0x7de5…2473 SUCCESS', 'ok'] },
+      { s: 'CAT', t: 'Bart’s TEE-backed decision', d: 'decision:3000f2f5… ALLOW 400', log: ['21:56:24', 'Stage 62 · Investor B decision ALLOW → authorized', 'ok'] },
+      { s: 'HEDERA', t: 'issueByPartition → Bart, 400', d: '0x9c6c…0d62 · SUCCESS · 405,329 gas', log: ['21:57', 'issueByPartition 400 → 0xCfCa…Da73 SUCCESS', 'ok'] },
+      { s: 'HEDERA', t: 'Read-back', d: 'totalSupply() 1000 · decimals() 0 · A 600 · B 400' }
+    ],
+    result: function(){
+      return '<div class="rc by-hedera">' + txRow('<code>issueByPartition</code> → Lisa · <b>600</b>', D.tx.issA, 'bound to ' + D.decA.slice(0, 18) + '… · 456,629 gas · default partition') +
+        txRow('<code>issueByPartition</code> → Bart · <b>400</b>', D.tx.issB, 'bound to ' + D.decB.slice(0, 18) + '… · 405,329 gas') + '</div>' +
+        '<div class="rc by-hedera">' + caprow('On-chain read-back · equity 0xf37A…7ABC', 'no generic mint: exactly the approved units', ['HEDERA']) +
+        '<div class="own" style="grid-template-columns:3fr 2fr" aria-hidden="true"><div></div><div></div></div><div class="own-l"><span>Lisa · 600 · 60%</span><span>totalSupply 1000</span><span>Bart · 400 · 40%</span></div></div>';
+    }
+  }, {
+    id: 'div', label: 'Set dividend', did: 'Dividend set', am: 'grantRole + setDividend', req: true, needs: ['invest'],
+    rec: 'stage 63 · 22:05 UTC', out: T('SUCCESS'), sum: 'entitlements A 6 · B 4',
+    pipe: [
+      { s: 'PRIVY', t: 'SPV signs grantRole', d: 'Privy policy rule allow-grantRole-corporate-action-to-spv · role and account pinned' },
+      { s: 'HEDERA', t: 'grantRole(ROLE_CORPORATE_ACTION, SPV)', d: '0x7260…9f94 · SUCCESS · 179,949 gas', log: ['22:05:10', 'Stage 63 · grantRole(ROLE_CORPORATE_ACTION, SPV) SUCCESS', 'ok'] },
+      { s: 'HEDERA', t: 'setDividend(amount 1, decimals 2)', d: '0xaac4…f865 · SUCCESS · 532,107 gas · record 22:07:10 · execution 22:10:10 UTC', log: ['22:05', 'setDividend SUCCESS · record date 22:07:10 · execution 22:10:10', 'ok'] },
+      { s: 'HEDERA', t: 'ATS computes entitlements', d: 'by ownership only · A 600 → 6 · B 400 → 4 · no funds move', log: ['22:08', 'Read-only re-check after the record date: dividend 1 entitlements A 6, B 4'] }
+    ],
+    result: function(){
+      return '<div class="rc by-hedera">' + txRow('<code>grantRole(ROLE_CORPORATE_ACTION, SPV)</code>', D.tx.role, '179,949 gas · SPV Privy wallet') +
+        txRow('<code>setDividend</code>(amount 1, decimals 2)', D.tx.div, '532,107 gas · record 22:07:10 · execution 22:10:10 UTC') + '</div>' +
+        '<div class="g2">' + rc('Lisa · entitlement', '<span class="huge">6</span>', '600 units → 6 · dividend 1', 'hl', ['HEDERA']) + rc('Bart · entitlement', '<span class="huge">4</span>', '400 units → 4 · dividend 1', 'hl', ['HEDERA']) + '</div>' +
+        '<div class="rs"><b>No funds move.</b> ATS records who is <em>entitled</em>, by ownership. Who is actually <em>paid</em> is decided later by Catenor, inside the TEE.</div>';
+    }
+  }]
+});
+
+/* 7 · Distribution Agent ------------------------------------------------ */
+function chainHTML(on){
+  return caprow('Authority chain · Trust Anchor → Sponsor → Agent', on ? 'ALLOW' : 'no capability at the end of the chain', ['CAT']) + '<div class="chain">' +
+    '<div class="node' + (on ? ' on' : '') + '"><div class="t">Root Trust Anchor</div><div class="nm">Admitted · ACTIVE</div><div class="d">' + sdid(D.ta) + '<br>CREATE_DISTRIBUTION · DELEGATE_DISTRIBUTION_AUTHORITY → Sponsor</div></div><div class="arr" aria-hidden="true">→</div>' +
+    '<div class="node' + (on ? ' on' : '') + '"><div class="t">Sponsor</div><div class="nm">5 capabilities</div><div class="d">' + sdid(D.sponsor) + '<br>grants until 2026-10-12</div></div><div class="arr" aria-hidden="true">→</div>' +
+    '<div class="node' + (on ? ' on' : '') + '"><div class="t">Distribution Agent</div><div class="nm">' + (on ? 'EXECUTE_DISTRIBUTION' : 'no capability') + '</div><div class="d">' + sdid(D.agent) + '<br>' + (on ? 'delegated · until 2026-10-02' : 'AGENT_OF Sponsor only') + '</div></div></div>';
+}
+STEPS.push({
+  id: 'agent', name: 'Distribution Agent', sub: 'Stages 70–72 · Privy', when: 'Stages 70–72 · 22:10–22:20 UTC', who: ['CAT', 'PRIVY'],
+  role: 'Sponsor', roleNote: '→ Distribution Agent',
+  title: 'An Agent earns its authority.',
+  lede: 'The Agent gets its own identity and a narrow wallet. Being created is not being authorized, and a relationship is not a capability.',
+  real: ['privy'],
+  inv: ['Invariant', 'Delegated authority ≤ delegator authority', 'Delegability must be explicit. None of this uses the CRE, by design: authority is public-key-verifiable and has no sensitive input.'],
+  proofs: ['70-terminal', '70-after-privy-agent-policy-json', '71-terminal', '72-terminal'],
+  actions: [{
+    id: 'create', label: 'Create Agent', did: 'Agent created', am: 'under CREATE_AGENT', req: true,
+    rec: 'stage 70 · 22:10 UTC', out: T('ALLOW') + ' ' + T('CREATED'), sum: sdid(D.agent) + ' · wallet 0x9089…13E3',
+    pipe: [
+      { s: 'CAT', t: 'Sponsor’s CREATE_AGENT → ALLOW', d: 'on spv:catenor-demo-001', log: ['22:10:52', 'Stage 70 · Sponsor CREATE_AGENT → ALLOW', 'ok'] },
+      { s: 'CAT', t: 'Create the Agent subject', d: sdid(D.agent) + ' · its own identity' },
+      { s: 'PRIVY', t: 'Its own EVM wallet and signer set', d: '0x9089…13E3 · owner key outside the runtime · quorum …-agent-runtime · bound privately (AGENT_EXECUTION)' },
+      { s: 'PRIVY', t: 'A narrower Privy policy than the SPV’s', d: PP('catenor-one-distribution-agent-3d8dc074') + ' · chain 296 ∧ to ∈ {A, B} ∧ value ≤ 20 HBAR', log: ['22:10', 'Agent wallet 0x9089…13E3 · Privy policy: to ∈ {A, B}, value ≤ 20 HBAR'] }
+    ],
+    result: function(){
+      return '<div class="g2">' + rc('Distribution Agent', 'AGENT', H(D.agent) + '<br>created ≠ authorized: no capability yet', 'hl', ['CAT']) +
+        rc('Execution wallet · Privy EVM', H(D.w.agent, hx(D.w.agent, 4, 4)), 'private <code>AGENT_EXECUTION</code> binding<br>its Privy policy allows no ATS contract, no SPV wallet, no other chain', 'hl', ['PRIVY']) + '</div>' +
+        policyView('json-agent', { foot: 'Privy policy · agent-policy.json · stage 92 read-back: “Agent policy exactly the approved boundary: true.”' });
+    }
+  }, {
+    id: 'req', neg: true, label: 'Request distribution', did: 'DENY shown', am: 'negative', needs: ['create'], before: 'deleg',
+    rec: 'stage 70 · 22:10 UTC', out: T('DENY'), sum: 'CAPABILITY_MISSING',
+    pipe: [
+      { s: 'CAT', t: 'Agent requests a distribution', d: 'spv:catenor-demo-001 · no delegation yet' },
+      { s: 'CAT', t: 'Look for EXECUTE_DISTRIBUTION', d: 'none held by the Agent', k: 'deny', log: ['22:10', 'Agent requests a distribution before delegation → DENY CAPABILITY_MISSING', 'deny'] }
+    ],
+    result: function(){ return denyRes('CAPABILITY_MISSING', 'The Agent exists and has a wallet, but no authority. Created ≠ authorized. Recorded as a <code>DISTRIBUTION_REQUEST_DENIED</code> audit event.'); }
+  }, {
+    id: 'rel', label: 'Add relationship', did: 'Relationship added', am: 'AGENT_OF', req: true, needs: ['create'],
+    rec: 'stage 71 · 22:19 UTC', out: T('valid') + ' ' + T('DENY'), sum: 'AGENT_OF valid · still CAPABILITY_MISSING',
+    pipe: [
+      { s: 'CAT', t: 'Sponsor signs a Relationship Credential', d: 'urn:uuid:87eb74d1…6794 · Agent AGENT_OF Sponsor', log: ['22:18:58', 'Stage 71 · Relationship AGENT_OF Sponsor · valid'] },
+      { s: 'CAT', t: 'Verify it', d: 'signature valid · issuer: the Sponsor' },
+      { s: 'CAT', t: 'Agent asks again, with only the relationship', d: 'still no EXECUTE_DISTRIBUTION', k: 'deny', log: ['22:19', 'Request with only the relationship → still DENY CAPABILITY_MISSING', 'deny'] }
+    ],
+    result: function(){
+      return '<div class="g2">' + rc('Relationship Credential', '<span class="okc">valid</span>', '<code>AGENT_OF</code> Sponsor · ' + H(D.relAgent, 'urn:uuid:87eb74d1…6794') + '<br>predicate [REF-IMPL]: the protocol vocabulary is an open item', 'hl', ['CAT']) +
+        denyRes('CAPABILITY_MISSING', 'Still DENY. Relationship ≠ Capability.') + '</div>' + chainHTML(false);
+    }
+  }, {
+    id: 'deleg', label: 'Delegate EXECUTE_DISTRIBUTION', did: 'Delegated · chain ALLOW', am: 'Sponsor → Agent', req: true, needs: ['rel'],
+    rec: 'stage 72 · 22:20 UTC', out: T('ALLOW'), sum: 'Trust Anchor → Sponsor → Agent',
+    pipe: [
+      { s: 'CAT', t: 'Is EXECUTE_DISTRIBUTION explicitly delegable?', d: 'yes' },
+      { s: 'CAT', t: 'Does the Sponsor hold CREATE_DISTRIBUTION?', d: 'capability-grant:34fd209d… · from the ACTIVE Trust Anchor · until 2026-10-12' },
+      { s: 'CAT', t: '…and DELEGATE_DISTRIBUTION_AUTHORITY?', d: 'capability-grant:e250671b… · same resource · until 2026-10-12' },
+      { s: 'CAT', t: 'Sponsor signs the delegated grant', d: 'capability-grant:7bd93930… · EXECUTE_DISTRIBUTION · until 2026-10-02 (20 days, inside its 30)', log: ['22:19:50', 'Stage 72 · Sponsor → Agent grant 7bd93930… EXECUTE_DISTRIBUTION'] },
+      { s: 'CAT', t: 'Evaluate the authority chain', d: 'Trust Anchor → Sponsor → Agent · ALLOW', log: [['22:20', 'Authority chain Trust Anchor → Sponsor → Agent → ALLOW', 'ok'], ['22:28', 'Testnet bootstrap funding: treasury → Agent wallet 12 ℏ · 0x229a…c5a2 (not a distribution)', '', 'HEDERA']] }
+    ],
+    result: function(){
+      return '<div class="allowres"><div class="dtop"><div class="huge">ALLOW</div>' + by(['CAT']) + '</div><div class="capl" style="margin-top:6px">delegated authority stays inside the delegator’s</div></div>' + chainHTML(true) +
+        '<div class="rc by-cat">' + caprow('Grants in the chain', '', ['CAT']) + '<ul class="caps">' +
+        [[D.gCreate, 'Trust Anchor → Sponsor', 'CREATE_DISTRIBUTION', '2026-10-12 20:00:46'], [D.gDeleg, 'Trust Anchor → Sponsor', 'DELEGATE_DISTRIBUTION_AUTHORITY', '2026-10-12 20:00:46'], [D.gExec, 'Sponsor → Agent', 'EXECUTE_DISTRIBUTION', '2026-10-02 22:19:50']].map(function(g){
+          return '<li><span><code>' + g[2] + '</code><br><span class="r">' + g[1] + ' · ' + H(g[0], g[0].slice(0, 25) + '…') + '</span></span><span class="r">until ' + g[3] + '</span>' + T('ALLOW') + '</li>';
+        }).join('') + '</ul></div>';
+    }
+  }, {
+    id: 'nodeleg', neg: true, label: 'Delegate TOKENIZE_ASSET', did: 'Refused', am: 'negative', needs: ['create'],
+    rec: 'stage 72 · 22:20 UTC', out: T('DENY'), sum: 'ACTION_NOT_DELEGABLE',
+    pipe: [
+      { s: 'CAT', t: 'Sponsor tries to delegate TOKENIZE_ASSET', d: 'to the Distribution Agent' },
+      { s: 'CAT', t: 'Is TOKENIZE_ASSET delegable?', d: 'no · refused before any signature request', k: 'deny', log: ['22:20', 'Delegating TOKENIZE_ASSET → refused ACTION_NOT_DELEGABLE · no signature requested', 'deny'] }
+    ],
+    result: function(){ return '<div class="denyres"><div class="dtop"><div class="huge">REFUSED</div>' + by(['CAT']) + '</div><div class="dcode">ACTION_NOT_DELEGABLE</div><p>Delegability must be explicit. The Sponsor holds <code>TOKENIZE_ASSET</code>, but it cannot pass it on. No signature was requested.</p></div>'; }
+  }]
+});
+
+/* 8 · The twist --------------------------------------------------------- */
+STEPS.push({
+  id: 'twist', name: 'The twist', sub: 'Stage 80 · Sumsub', when: 'Stage 80 · 22:29 UTC', who: ['SUMSUB', 'HEDERA', 'CAT'],
+  role: 'External evidence', roleNote: '· Sumsub sandbox operator',
+  title: 'Bart is sanctioned. Nothing else changes.',
+  lede: 'Catenor does nothing here: the current external evidence changes. Bart still owns his units and still holds a validly signed credential.',
+  real: ['sandbox', 'testnet'],
+  inv: ['Invariant', 'Signature validity ≠ current eligibility', 'A valid signature proves who issued a claim and that it was not altered. It does not prove the claim is still true today.'],
+  proofs: ['80-after-sumsub-bart-red', '80-terminal'],
+  actions: [{
+    id: 'sanction', bad: true, label: 'Sanction Bart (Sumsub sandbox)', did: 'Bart is RED', am: 'provider state change', req: true,
+    rec: 'stage 80 · 22:29 UTC', out: '<span class="tag deny">RED · SANCTIONS</span>', sum: 'still 400 units · credential still ACTIVE',
+    pipe: [
+      { s: 'SUMSUB', t: 'Operator sets Bart’s sandbox review', d: 'RED · reject label SANCTIONS · FINAL · Lisa stays Approved', k: 'deny', log: ['22:29:47', 'Stage 80 · Bart (Sumsub sandbox) → RED · SANCTIONS · FINAL', 'deny'] },
+      { s: 'CAT', t: 'Catenor does nothing', d: 'no Catenor state changes · the world changed', k: 'info' },
+      { s: 'HEDERA', t: 'Read holdings (read-only)', d: 'Bart still holds 400 units · dividend entitlement 4' },
+      { s: 'CAT', t: 'Check his credential', d: 'urn:uuid:9c25804e-…4530 · ACTIVE · signature valid', log: ['22:29', 'Bart still holds 400 units and a validly signed, ACTIVE credential'] }
+    ],
+    result: function(){
+      return '<div class="g2">' + invCard('a', { by: ['SUMSUB'], body: '<div class="units">600<small>units · entitlement 6</small></div><div class="rs">Sumsub sandbox review unchanged: Approved.</div>' }) +
+        invCard('b', { red: true, by: ['SUMSUB'], body: '<div class="units">400<small>units · entitlement 4 · unchanged</small></div><div class="rs">Sumsub sandbox: <b>Rejected · SANCTIONS · FINAL</b>.</div>' }) + '</div>' +
+        '<div class="g3">' + rc('Hedera ATS · read-only', '400 units', 'still owned by Bart · equity 0xf37A…7ABC', 'hl', ['HEDERA']) +
+        rc('His credential', '<span class="okc">ACTIVE</span>', 'urn:uuid:9c25804e-…4530 · issuer-signed · <b>signature valid</b>', 'hl', ['CAT']) +
+        rc('Current evidence', '<span class="noc">RED</span>', 'SANCTIONS · FINAL · read only inside the TEE at distribution time', 'hl', ['SUMSUB']) + '</div>' +
+        '<div class="rs"><b>Ownership ≠ current eligibility.</b> Nothing on-chain or in the credential says “sanctioned”. Catenor re-checks eligibility confidentially when it matters: at distribution time.</div>';
+    }
+  }]
+});
+
+/* 9 · Confidential distribution (dark) ---------------------------------- */
+STEPS.push({
+  id: 'dist', name: 'Confidential distribution', sub: 'Stages 81–83 · CRE', when: 'Stages 81–83 · 22:37–22:45 UTC', dark: true, who: ['CRE', 'CAT', 'PRIVY', 'HEDERA'],
+  role: 'Distribution Agent', roleNote: '· the TEE decides',
+  title: 'The TEE re-checks today. PAY 6. HOLD 4.',
+  lede: 'One sealed run on the deployed workflow reads today’s evidence and computes the whole plan. Then the Agent pays exactly the PAY holders.',
+  real: ['cre', 'sandbox', 'privy', 'testnet'],
+  inv: ['Invariant', 'Possession ≠ current eligibility', 'Bart’s presentation is still cryptographically valid (7/7), yet he is not eligible today. Only minimized conclusions leave the TEE: no Sumsub response, name or document.'],
+  proofs: ['82-terminal', '82-after-cre-execution-events', '83-terminal', '83-after-hashscan-payout-tx'],
+  actions: [{
+    id: 'run', label: 'Run distribution in the TEE (CRE)', did: 'Plan computed', am: '1 deployed execution', req: true,
+    rec: 'stages 81–82 · 22:37–22:40 UTC', out: '<span class="tag allow">PAY 6</span> <span class="tag deny">HOLD 4</span>', sum: '0xfd2a…2d0b · executed: false',
+    pipe: [
+      { s: 'CAT', t: 'SPV revenue event', d: 'revenue-event:a2400be4…2355 · REVENUE_RECEIVED 10 HBAR · audit event only, no funds move', log: ['22:37:40', 'Stage 81 · REVENUE_RECEIVED 10 HBAR for spv:catenor-demo-001 (audit event; no funds move)'] },
+      { s: 'CAT', t: 'Lisa asks to run the distribution', d: 'DENY CAPABILITY_MISSING · only the Agent holds EXECUTE_DISTRIBUTION', k: 'deny', log: ['22:39:44', 'Investor A requests the distribution → DENY CAPABILITY_MISSING', 'deny'] },
+      { s: 'CAT', t: 'Agent’s chain re-verified', d: 'Trust Anchor → Sponsor → Agent · ALLOW' },
+      { s: 'CRE', t: 'Trigger CONFIDENTIAL_DISTRIBUTION', d: 'deployed workflow 0000e58d…25c8 · execution 0xfd2a…2d0b', log: ['22:40:08', 'CONFIDENTIAL_DISTRIBUTION on the deployed workflow · execution 0xfd2a…2d0b'] },
+      { s: 'TEE', tee: 1, t: 'Vault secrets · holdings from ATS', d: 'secrets fetched · balanceOf on 0xf37A…7ABC → A 600 · B 400' },
+      { s: 'TEE', tee: 1, t: 'Verify each VP, VC and status statement', d: '7/7 checks for both · issuer = the pinned Trust Anchor key' },
+      { s: 'TEE', tee: 1, t: 'Read current evidence · 3 × Sumsub SendRequest', d: 'reconcile with each credential → Lisa CONSISTENT · Bart MISMATCH' },
+      { s: 'TEE', tee: 1, t: 'Apply policy:distribution-eligibility:v2', d: '10 HBAR × units / 1000 → Lisa PAY 6 · Bart HOLD 4', log: ['22:40:16', 'SUCCESS · 8 s · plan out of the TEE: Lisa PAY 6 · Bart HOLD 4 (FINAL, SANCTIONS)', 'ok'] },
+      { s: 'CAT', t: 'Verify and record the plan', d: 'HMAC · commitment · arithmetic · holder set · one Decision per holder · executed: false', log: ['22:40', 'Plan distribution-plan:034ffe82… recorded · pay 6.0 · hold 4.0 · executed: false'] }
+    ],
+    result: function(){
+      return '<div class="reveal">' +
+        '<div class="rvb pay by-tee"><div class="rkr"><div class="who">Lisa · Investor A · 600 units · share 6 HBAR</div>' + by(['TEE'], 'decided in') + '</div><div class="dec">PAY 6</div><div class="tr">' + T('ALLOW') + ' every requirement TRUE · 7/7 checks · reconciliation <b>CONSISTENT</b> · no reason codes</div><div class="then">commitment ' + H(D.payCommitA, hx(D.payCommitA, 6, 4)) + '</div></div>' +
+        '<div class="rvb hold by-tee"><div class="rkr"><div class="who">Bart · Investor B · 400 units · share 4 HBAR</div>' + by(['TEE'], 'decided in') + '</div><div class="dec">HOLD 4</div><div class="tr">' + T('DENY') + ' presentation valid 7/7 — but</div><div class="chips">' + chk('INVESTOR_IDENTITY_VERIFIED = FALSE', 1) + chk('INVESTOR_AML_CLEAR = FALSE', 1) + '<span class="chip">MISMATCH</span><span class="chip">FINAL</span><span class="chip">SANCTIONS</span></div><div class="then">commitment ' + H(D.holdCommitB, hx(D.holdCommitB, 6, 4)) + '</div></div></div>' +
+        '<div class="rc by-cre">' + caprow('Deployed CRE execution · CONFIDENTIAL_DISTRIBUTION', '', ['CRE']) + '<div class="foot-k" style="margin-top:8px"><span><b>Execution</b> ' + H(D.ex.dist, hx(D.ex.dist, 8, 6)) + '</span><span><b>CRE UUID</b> ' + H(D.uuid.dist) + '</span><span><b>Window</b> 22:40:08–22:40:16 UTC · 8 s · 0 credits</span>' +
+        '<span><b>Plan</b> ' + H(D.plan, 'distribution-plan:034ffe82…') + ' · pay 6.0 · hold 4.0 · <code>executed: false</code></span><span><b>Evidence commitment</b> ' + H(D.distCommit, hx(D.distCommit, 4, 4)) + '</span></div></div>';
+    }
+  }, {
+    id: 'payout', label: 'Execute payout (Privy Agent → Hedera)', did: 'Lisa paid · Bart held', am: 'only PAY holders', req: true, needs: ['run'],
+    rec: 'stage 83 · 22:45 UTC', out: T('SUCCESS') + ' <span class="tag deny">0 for Bart</span>', sum: '0x4781…ff24 · 6 ℏ → Lisa',
+    pipe: [
+      { s: 'CAT', t: 'Catenor signer boundary', d: 'PAY only · to = Lisa’s privately bound account · amount = plan (6 HBAR) · empty calldata · chain 296', log: ['22:45:05', 'Stage 83 · executing plan distribution-plan:034ffe82… through the signer boundary'] },
+      { s: 'CAT', t: 'Bart: HOLD', d: 'never reaches the executor · no transaction built · 0 signature requests', k: 'info', log: ['22:45', 'Bart HOLD 4 · no transaction constructed · 0 Privy signature requests', 'deny'] },
+      { s: 'PRIVY', t: 'The Agent’s Privy policy allows the transfer', d: PP('catenor-one-distribution-agent-3d8dc074') + ' rule allow-distribution-payout-hedera · to ∈ {A, B} ∧ value ≤ 20 HBAR · 1 signature request (Lisa)' },
+      { s: 'HEDERA', t: 'Transfer 6 HBAR to Lisa', d: '0.0.10511413 → 0.0.10509881 · 0x4781…ff24 · SUCCESS · block 40440606 · 21,000 gas', log: ['22:45', 'Payout 6.00000000 ℏ → Lisa · 0x4781…ff24 SUCCESS · block 40440606', 'ok'] },
+      { s: 'HEDERA', t: 'Agent nonce 0 → 1', d: 'exactly one transaction was sent' }
+    ],
+    result: function(){
+      return '<div class="reveal">' +
+        '<div class="rvb pay by-hedera"><div class="rkr"><div class="who">Lisa · 0.0.10509881</div>' + by(['PRIVY', 'HEDERA']) + '</div><div class="dec">+6 ℏ</div><div class="tr">Agent 0.0.10511413 → Lisa · 6.00000000 ℏ · fee 0.024 ℏ · 21,000 gas · block 40440606</div><div class="then">entitled to 6 · received 6</div></div>' +
+        '<div class="rvb hold by-cat"><div class="rkr"><div class="who">Bart · 0.0.10509882</div>' + by(['CAT'], 'held by') + '</div><div class="dec">0</div><div class="tr"><b>No transaction built · 0 signature requests.</b> A HOLD holder never reaches the executor; the Agent’s Privy policy was a second fence that was never needed.</div><div class="then">entitled to 4 · received 0</div></div></div>' +
+        '<div class="rc by-hedera">' + txRow('Payout · Distribution Agent → Lisa · <b>6 HBAR</b>', D.tx.pay, 'signed under the Privy policy rule allow-distribution-payout-hedera · Agent nonce 0 → 1') + '</div>';
+    }
+  }]
+});
+
+/* 10 · Verify (dashboard) ----------------------------------------------- */
+var TXS = [
+  ['deployEquity → ATS v8 Factory', D.tx.deploy, 'stage 60 · SPV · 6,898,334 gas'],
+  ['issueByPartition → Lisa · 600', D.tx.issA, 'stage 61 · SPV · 456,629 gas'],
+  ['issueByPartition → Bart · 400', D.tx.issB, 'stage 62 · SPV · 405,329 gas'],
+  ['grantRole(ROLE_CORPORATE_ACTION, SPV)', D.tx.role, 'stage 63 · SPV · 179,949 gas'],
+  ['setDividend(amount 1, decimals 2)', D.tx.div, 'stage 63 · SPV · 532,107 gas'],
+  ['Payout → Lisa · 6 HBAR', D.tx.pay, 'stage 83 · Agent · 21,000 gas']
+];
+var CRE5 = [
+  ['11', 'TRUST_ANCHOR_ADMISSION', D.ex.adm, D.uuid.adm, '19:18:37–45', T('ALLOW')],
+  ['42', 'INVESTOR_ELIGIBILITY (A)', D.ex.a, D.uuid.a, '20:34:36–45', 'identity ✓ AML ✓'],
+  ['42', 'INVESTOR_ELIGIBILITY (B)', D.ex.b, D.uuid.b, '20:35:39–47', 'identity ✓ AML ✓'],
+  ['44', 'OFFERING_ELIGIBILITY', D.ex.off, D.uuid.off, '20:45:11–19', 'A 600 · B 400'],
+  ['82', 'CONFIDENTIAL_DISTRIBUTION', D.ex.dist, D.uuid.dist, '22:40:08–16', '<span class="okc">PAY 6</span> · <span class="noc">HOLD 4</span>']
+];
+function verifyAll(){
+  if (verifyAll.busy) return; verifyAll.busy = true;
+  var btns = Array.prototype.slice.call(elCanvas.querySelectorAll('[data-verify]'));
+  var ok = 0, i = 0;
+  (function next(){
+    if (i >= btns.length) {
+      addLog('live', 'HEDERA', 'Verify all: ' + ok + ' / ' + btns.length + ' transactions SUCCESS on the Mirror Node', ok === btns.length ? 'ok' : 'warn');
+      var s = $('va-sum'); if (s) s.innerHTML = ok === btns.length ? '<span class="okc">✓ ' + ok + ' / ' + btns.length + ' SUCCESS · live</span>' : ok + ' / ' + btns.length + ' confirmed live · see HashScan for the rest';
+      checkBalances().then(function(){ verifyAll.busy = false; });
+      return;
+    }
+    verifyTx(btns[i++]).then(function(v){ if (v) ok++; next(); });
+  })();
+}
+STEPS.push({
+  id: 'verify', name: 'Verify', sub: 'Stages 90–99 · verify', when: 'Stages 90–99 · 22:53–22:59 UTC', who: ['CRE', 'HEDERA', 'PRIVY', 'CAT'],
+  role: 'Anyone', roleNote: '· read-only verification',
+  title: 'Verify it yourself.',
+  lede: 'Everything in this replay is from the recorded run. The Hedera side is public: check every transaction and both balances on the Mirror Node, now.',
+  real: ['cre', 'testnet', 'privy'],
+  inv: ['The thesis, on public data', 'Bart: entitled to 4, received 0. Lisa: entitled to 6, received 6.', 'Wallets are accounts. Credentials are claims. Authority is scoped. Identity persists.'],
+  proofs: ['99-verify-complete-demo-stages', '99-after-cre-five-executions', '91-verify-hedera-final', '92-verify-privy', '93-verify-catenor-audit'],
+  dashboard: function(){
+    return '<div class="kpis"><div class="kpi by-cat"><b>24/24</b><span>stages ran, all <code>ok: true</code></span>' + by(['CAT'], '') + '</div><div class="kpi by-cre"><b>5</b><span>DEPLOYED CRE executions, all SUCCESS</span>' + by(['CRE'], '') + '</div>' +
+      '<div class="kpi by-hedera"><b>6</b><span>Hedera testnet transactions, all SUCCESS</span>' + by(['HEDERA'], '') + '</div><div class="kpi by-cat"><b>79</b><span>audit events · hash chain valid</span>' + by(['CAT'], '') + '</div><div class="kpi by-cat"><b class="noc">0</b><span>Privy signature requests for Bart</span>' + by(['CAT'], 'held by') + '</div></div>' +
+      '<div class="dash"><div>' +
+        '<div class="pan by-cre"><div class="pan-h"><b>Five deployed CRE executions</b>' + by(['CRE']) + '<span>identity-confidential-production · 0 credits</span></div>' +
+        CRE5.map(function(r){ return '<div class="crer"><span class="sg">' + r[0] + '</span><div><div class="op">' + r[1] + '</div><div class="id">' + H(r[2], hx(r[2], 6, 4)) + ' · ' + H(r[3], r[3].slice(0, 8) + '…') + ' · ' + r[4] + '</div></div><div class="rr">' + r[5] + '</div></div>'; }).join('') + '</div>' +
+        '<div class="pan by-cat"><div class="pan-h"><b>Catenor audit · stage 93</b>' + by(['CAT']) + '<span>re-verified from signed documents</span></div><ul class="aud">' +
+        [['Audit hash chain', '<span class="okc">valid · 79 events, 28 types</span>'], ['Trust Anchor', '<span class="okc">TRUST_ANCHOR_VALID</span>'], ['Sponsor', 'relationship valid · 5 × ALLOW'], ['Agent', 'delegated chain ALLOW'], ['Investor credentials', '2 × ACTIVE (Bart’s too)'], ['DISTRIBUTION_REQUEST_DENIED', '3 events'], ['Privy · stage 92', 'Agent’s Privy policy = approved boundary']].map(function(x){ return '<li><span>' + x[0] + '</span><span>' + x[1] + '</span></li>'; }).join('') + '</ul></div>' +
+      '</div><div>' +
+        '<div class="pan by-hedera"><div class="pan-h"><b>Six Hedera testnet transactions</b>' + by(['HEDERA']) + '<span id="va-sum">recorded: all SUCCESS</span></div>' + TXS.map(function(t){ return txRow(t[0], t[1], t[2]); }).join('') + '</div>' +
+        '<div class="pan by-hedera"><div class="pan-h"><b>Live balances</b>' + by(['HEDERA'], 'Mirror Node ·') + '<span>recorded at 22:54: Lisa 7.0 ℏ · Bart 1.0 ℏ</span></div><div class="bals" id="bal-out">' +
+        '<div class="balc"><div class="n">Lisa · ' + D.acct.a + '</div><b>7.0 ℏ</b><p>recorded · 1 activation + 6 payout</p></div><div class="balc"><div class="n">Bart · ' + D.acct.b + '</div><b>1.0 ℏ</b><p>recorded · activation only</p></div></div></div>' +
+      '</div></div>' +
+      '<a class="histlink" href="history.html"><span><b>Full run history &amp; evidence</b><small>every stage, every screenshot, the incidents and the honest limits</small></span><em>→</em></a>';
+  },
+  actions: [
+    { id: 'all', custom: function(){ verifyAll(); }, label: 'Verify all on-chain', am: '6 txs + 2 balances · live' },
+    { id: 'bal', sec: true, custom: function(){ checkBalances(); }, label: 'Check live balances', am: 'Mirror Node' }
+  ]
+});
+
+/* =====================================================================
+   Engine
+   ===================================================================== */
+var $ = function(id){ return document.getElementById(id); };
+var elSteps = $('steps'), elCtl = $('ctl'), elCanvas = $('canvas'), elStage = $('stage'), elMain = $('main'), elLog = $('log-l');
+var KEY = 'catenor-console-v1';
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var SPEED = REDUCED ? 0.15 : 1;
+var state = fresh();
+function fresh(){ return { v: 1, done: {}, order: [], log: [], cur: 0 }; }
+function load(){ try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1 && s.done) return s; } catch (e) {} return null; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function k(st, a){ return st.id + '.' + a.id; }
+function isDone(st, a){ return !!state.done[k(st, a)]; }
+function complete(i){ var st = STEPS[i]; return st.actions.filter(function(a){ return a.req; }).every(function(a){ return isDone(st, a); }); }
+function unlocked(i){ for (var j = 0; j < i; j++) if (!complete(j)) return false; return true; }
+function actBy(st, id){ for (var i = 0; i < st.actions.length; i++) if (st.actions[i].id === id) return st.actions[i]; return null; }
+function blockedBy(st, a){
+  if (a.custom) return null;
+  if (isDone(st, a)) return null;
+  var miss = (a.needs || []).filter(function(n){ return !state.done[st.id + '.' + n]; });
+  if (miss.length) return 'after the action above';
+  if (a.before && state.done[st.id + '.' + a.before]) return 'recorded before delegation';
+  return null;
+}
+function nextPending(si){
+  var st = STEPS[si]; if (!unlocked(si)) return null;
+  for (var i = 0; i < st.actions.length; i++) { var a = st.actions[i]; if (a.req && !isDone(st, a) && !blockedBy(st, a)) return a; }
+  return null;
+}
+
+/* ---------- log ---------- */
+function logRow(e, isNew){
+  var d = document.createElement('div');
+  d.className = 'lg' + (e[3] ? ' ' + e[3] : '') + (isNew ? ' new' : '');
+  d.innerHTML = '<span class="tm">' + esc(e[0]) + '</span><span class="sy">' + sys(e[1]) + '</span><span class="ms">' + esc(e[2]) + '</span>';
+  return d;
+}
+function renderLog(){
+  elLog.innerHTML = '';
+  if (!state.log.length) elLog.innerHTML = '<div class="log-empty">Nothing yet. Each replayed action writes what the recorded run did, with its recorded time.</div>';
+  state.log.forEach(function(e){ elLog.appendChild(logRow(e, false)); });
+  $('log-c').textContent = state.log.length;
+  elLog.scrollTop = elLog.scrollHeight;
+}
+function addLog(t, s, m, kind){
+  var e = [t, s, m, kind || ''];
+  if (!state.log.length) elLog.innerHTML = '';
+  state.log.push(e);
+  elLog.appendChild(logRow(e, true));
+  $('log-c').textContent = state.log.length;
+  elLog.scrollTop = elLog.scrollHeight;
+}
+function pipeLogs(p){ if (!p.log) return []; return Array.isArray(p.log[0]) ? p.log : [p.log]; }
+
+/* ---------- sidebar ---------- */
+function renderSide(){
+  var n = 0;
+  elSteps.innerHTML = STEPS.map(function(st, i){
+    var c = complete(i) && st.actions.some(function(a){ return a.req; }), u = unlocked(i), cur = i === state.cur;
+    if (c) n++;
+    var cls = 'st' + (cur ? ' cur' : '') + (c ? ' done' : '') + (!u ? ' lock' : '');
+    return '<li><button type="button" class="' + cls + '" data-step="' + i + '"' + (cur ? ' aria-current="step"' : '') + (!u ? ' aria-disabled="true" title="Complete the previous step first"' : '') + '>' +
+      '<span class="n">' + (c ? '✓' : (i + 1 < 10 ? '0' : '') + (i + 1)) + '</span><span><span class="t">' + st.name + '</span><span class="s">' + dots(st.who) + st.sub + '</span></span><span class="x">' + (!u ? '<svg width="11" height="13" viewBox="0 0 11 13" aria-hidden="true"><rect x="1" y="5.5" width="9" height="7" rx="1.6" fill="currentColor"/><path d="M3 5.5V4a2.5 2.5 0 0 1 5 0v1.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>' : '') + '</span></button></li>';
+  }).join('');
+  var total = STEPS.filter(function(st){ return st.actions.some(function(a){ return a.req; }); }).length;
+  if (unlocked(STEPS.length - 1) && state.cur === STEPS.length - 1) n = total + 1;
+  $('prog-n').textContent = Math.min(n, STEPS.length) + ' / ' + STEPS.length;
+  $('prog-bar').style.width = (Math.min(n, STEPS.length) / STEPS.length * 100) + '%';
+  var curBtn = elSteps.querySelector('.cur');
+  if (curBtn && elSteps.scrollWidth > elSteps.clientWidth) elSteps.scrollLeft = curBtn.parentNode.offsetLeft - 16;
+}
+function dots(who){ return who && who.length ? '<span class="dts" aria-hidden="true">' + who.map(function(w){ return '<i class="' + (SYS[w] ? 's-' + SYS[w][0] : '') + '" style="background:var(--c-' + ({ CAT: 'cat', PRIVY: 'privy', CRE: 'cre', TEE: 'tee', SUMSUB: 'sum', HEDERA: 'hed' })[w] + ')"></i>'; }).join('') + '</span>' : ''; }
+function renderLegend(){
+  var h = '<div class="k">Who acts</div><div class="bys" style="margin-bottom:14px">' + ['CAT', 'PRIVY', 'CRE', 'HEDERA', 'SUMSUB'].map(sys).join('') + '</div>' +
+    '<div class="k">What’s real here</div><ul>' + ['cre', 'privy', 'sandbox', 'mock', 'testnet'].map(function(x){ return '<li>' + rl(x) + '</li>'; }).join('') +
+    '</ul><div class="kbd-h"><kbd>→</kbd> next step · <kbd>←</kbd> back · <kbd>↵</kbd> run the next action<br>Results are the recorded ones; nothing here calls Privy, Sumsub or CRE.</div>';
+  $('legend').innerHTML = h; $('legend-m').innerHTML = h;
+}
+
+/* ---------- control column ---------- */
+function renderCtl(){
+  var st = STEPS[state.cur], i = state.cur, np = nextPending(i);
+  var h = '<div class="meta"><span class="sn">Step ' + (i + 1 < 10 ? '0' : '') + (i + 1) + ' / ' + STEPS.length + '</span><span>' + st.when + '</span></div>' +
+    '<div class="role"><b>Role</b>' + st.role + (st.roleNote ? ' <span style="color:var(--fg4)">' + st.roleNote + '</span>' : '') + '</div>' +
+    '<h1 class="ttl">' + st.title + '</h1><p class="lede">' + st.lede + '</p>' +
+    '<div class="reals">' + st.real.map(rl).join('') + '</div><div class="acts">';
+  var negHead = false;
+  st.actions.forEach(function(a){
+    if (a.neg && !negHead) { h += '<div class="grp">Negative paths</div>'; negHead = true; }
+    var d = isDone(st, a), b = blockedBy(st, a), run = running === k(st, a);
+    var cls = 'act ' + (a.neg ? 'neg' : a.sec ? 'sec' : 'pri') + (d && !a.custom ? ' did' + (a.neg || a.bad ? ' negd' : '') : '') + (run ? ' run' : '');
+    var dis = run || (d && !a.custom) || !!b || (!!running && !run);
+    var lab = run ? '<span><span class="spin"></span>&nbsp; Replaying…</span>' : (d && !a.custom ? (a.neg ? '✕ ' : a.bad ? '● ' : '✓ ') + a.did : a.label + (np === a && !running ? '<span class="kb" aria-hidden="true">↵</span>' : ''));
+    var meta = run ? '' : (b ? b : (d && !a.custom ? a.rec : a.am || ''));
+    h += '<button type="button" class="' + cls + '" data-act="' + a.id + '"' + (dis ? ' disabled' : '') + '><span>' + lab + '</span><span class="am">' + esc(meta) + '</span></button>';
+  });
+  h += '</div>';
+  var last = i === STEPS.length - 1, canNext = !last && unlocked(i + 1);
+  h += '<div class="navb"><button type="button" class="bk" data-nav="-1"' + (i === 0 ? ' disabled' : '') + ' aria-label="Previous step">←</button>' +
+    (last ? '<a class="nx" style="display:grid;place-items:center" href="history.html">Full run history &amp; evidence ↗</a>'
+          : '<button type="button" class="nx" data-nav="1"' + (canNext ? '' : ' disabled') + '>Next step: ' + STEPS[i + 1].name + ' →</button>') + '</div>';
+  h += '<div class="inv"><div class="k">' + st.inv[0] + '</div><div class="v">' + st.inv[1] + '</div><div class="s">' + st.inv[2] + '</div></div>';
+  if (st.note) h += '<div class="note">' + st.note + '</div>';
+  if (st.proofs && st.proofs.length) {
+    h += '<div class="proofs"><div class="k">Proof from the run · ' + st.proofs.length + ' screenshot' + (st.proofs.length > 1 ? 's' : '') + '</div><div class="thumbs">' +
+      st.proofs.map(function(p){ var m = IMG[p]; return '<button type="button" class="thumb" data-lb="' + p + '" data-group="s' + i + '" aria-label="Enlarge screenshot: ' + esc(m[2]) + '"><img src="assets/' + p + '.jpg" alt="' + esc(m[2]) + '" width="' + m[0] + '" height="' + m[1] + '" loading="lazy" decoding="async"></button>'; }).join('') + '</div></div>';
+  }
+  elCtl.innerHTML = h;
+}
+
+/* ---------- canvas ---------- */
+function pipeHTML(a, instant){
+  var h = '<ol class="pipe">', inTee = false;
+  a.pipe.forEach(function(p){
+    if (p.tee && !inTee) h += '<li class="tee-h" aria-hidden="true">Inside handlerInTee · deployed Chainlink CRE</li>';
+    inTee = !!p.tee;
+    h += '<li class="ps ' + (instant ? (p.k || 'ok') : 'wait') + (p.tee ? ' tee' : '') + '"><span class="ic" aria-hidden="true"></span><div><div class="pl">' + sys(p.s) + p.t + '</div><div class="dt">' + p.d + '</div>' +
+      (p.pace ? '<div class="pace" style="--ms:' + (p.ms || 1300) * SPEED + 'ms"><i></i></div><div class="pacetx">60 s rate-limit window · fast-forwarded in the replay</div>' : '') + '</div></li>';
+  });
+  return h + '</ol>';
+}
+function blockHTML(st, a, instant, collapsed){
+  return '<section class="blk' + (collapsed ? ' col' : '') + (a.solo ? ' solo' : '') + '" data-key="' + k(st, a) + '">' +
+    '<header class="bh"><button type="button" class="bh-t" data-toggle-blk aria-expanded="' + (!collapsed) + '"><span class="chev" aria-hidden="true">▾</span>' +
+    (a.neg ? '<span class="ng">Negative path</span>' : '') + '<span>' + a.label + '</span><span class="bo">' + (instant ? a.out : '') + '</span>' +
+    (instant && a.sum ? '<span class="sum">' + a.sum + '</span>' : '') + '</button><span class="bh-m">recorded · ' + a.rec + '</span></header>' +
+    '<div class="bb">' + pipeHTML(a, instant) + '<div class="res' + (instant ? ' in' : '') + '">' + (instant ? a.result() : '<div class="res-wait">Replaying the recorded run…</div>') + '</div></div></section>';
+}
+function nextbarHTML(i){
+  if (i >= STEPS.length - 1 || !complete(i)) return '';
+  return '<div class="nextbar"><div class="l">✓ Step complete <span>· all results are from the recorded run</span></div><button type="button" data-nav="1">Next: ' + STEPS[i + 1].name + ' →</button></div>';
+}
+function renderCanvas(){
+  var st = STEPS[state.cur], i = state.cur;
+  if (st.dashboard) { elCanvas.innerHTML = '<div class="fade">' + st.dashboard() + '</div>'; return; }
+  var keys = state.order.filter(function(x){ return x.indexOf(st.id + '.') === 0; });
+  var intro = st.intro ? introHTML(st.intro) : '';
+  if (!keys.length) {
+    var np = nextPending(i) || st.actions[0];
+    elCanvas.innerHTML = intro + '<div class="idle fade' + (intro ? ' sm' : '') + '"><div><div class="big">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</div><div class="t1">Nothing replayed yet</div>' +
+      '<div class="t2">Press <b>' + np.label + '</b>. It replays ' + np.rec + ' exactly as recorded: same IDs, same hashes, same decisions.</div><div class="t3">↵ Enter runs the next action · → moves on when the step is complete</div></div></div>';
+    return;
+  }
+  var h = '';
+  keys.forEach(function(key, j){ var a = actBy(st, key.split('.')[1]); if (a) h += blockHTML(st, a, true, j < keys.length - 1); });
+  elCanvas.innerHTML = intro + h + nextbarHTML(i);
+}
+function renderStage(anim){
+  var st = STEPS[state.cur];
+  elStage.classList.toggle('dark', !!st.dark);
+  elMain.classList.toggle('dark', !!st.dark);
+  renderCtl(); renderCanvas();
+  if (anim) { elCtl.classList.remove('fade'); elCanvas.classList.remove('fade'); void elCtl.offsetWidth; elCtl.classList.add('fade'); elCanvas.classList.add('fade'); }
+  var blks = elCanvas.querySelectorAll('.blk');
+  elCanvas.scrollTop = blks.length ? Math.max(0, blks[blks.length - 1].offsetTop - 20) : 0;
+}
+function render(anim){ renderSide(); renderStage(anim); }
+
+/* ---------- navigation ---------- */
+var pendingNav = null;
+function go(i, fromUser){
+  if (i < 0 || i >= STEPS.length) return;
+  if (!unlocked(i)) { var b = elSteps.querySelector('[data-step="' + i + '"]'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } toast('Complete “' + STEPS[i - 1].name + '” first'); return; }
+  if (running) { pendingNav = i; fastForward(); return; }
+  var changed = i !== state.cur;
+  state.cur = i; save();
+  if (history.replaceState) history.replaceState(null, '', '#step-' + (i + 1));
+  render(changed);
+  if (changed && fromUser && window.innerWidth <= 1000) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---------- replay runner ---------- */
+var running = null, ff = false, timers = [], runToken = 0;
+function wait(ms){
+  if (ff) return Promise.resolve();
+  return new Promise(function(r){ var t = { r: r }; t.id = setTimeout(function(){ timers = timers.filter(function(x){ return x !== t; }); r(); }, ms * SPEED); timers.push(t); });
+}
+function fastForward(){ ff = true; timers.forEach(function(t){ clearTimeout(t.id); t.r(); }); timers = []; }
+function perRow(a){ var n = a.pipe.length, total = Math.min(4000, Math.max(1800, n * 520)); return Math.max(380, Math.min(800, total / n)); }
+
+async function runAction(si, a){
+  var st = STEPS[si];
+  if (running || isDone(st, a) || blockedBy(st, a) || !unlocked(si)) return;
+  var tok = ++runToken; running = k(st, a); ff = false;
+  renderCtl();
+  Array.prototype.forEach.call(elCanvas.querySelectorAll('.blk'), function(b){ b.classList.add('col'); var t = b.querySelector('[data-toggle-blk]'); if (t) t.setAttribute('aria-expanded', 'false'); });
+  var nb = elCanvas.querySelector('.nextbar'); if (nb) nb.remove();
+  var idle = elCanvas.querySelector('.idle'); if (idle) idle.remove();
+  var wrap = document.createElement('div'); wrap.innerHTML = blockHTML(st, a, false, false);
+  var blk = wrap.firstChild; elCanvas.appendChild(blk);
+  scrollIntoCanvas(blk);
+  var rows = blk.querySelectorAll('.ps'), ms = perRow(a);
+  for (var r = 0; r < a.pipe.length; r++) {
+    var p = a.pipe[r], row = rows[r];
+    row.className = 'ps run' + (p.tee ? ' tee' : '');
+    await wait(p.pace ? (p.ms || 1300) : ms);
+    if (tok !== runToken) return;
+    row.className = 'ps ' + (p.k || 'ok') + (p.tee ? ' tee' : '');
+    pipeLogs(p).forEach(function(l){ addLog(l[0], l[3] || p.s, l[1], l[2] || (p.k === 'deny' ? 'deny' : '')); });
+    if (!ff && window.innerWidth <= 1000) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  await wait(160);
+  if (tok !== runToken) return;
+  var res = blk.querySelector('.res'); res.innerHTML = a.result(); void res.offsetWidth; res.classList.add('in');
+  blk.querySelector('.bo').innerHTML = a.out;
+  if (a.sum) { var s = document.createElement('span'); s.className = 'sum'; s.innerHTML = a.sum; blk.querySelector('.bh-t').appendChild(s); }
+  state.done[k(st, a)] = true; state.order.push(k(st, a)); save();
+  running = null; ff = false;
+  renderSide(); renderCtl();
+  if (complete(si)) elCanvas.insertAdjacentHTML('beforeend', nextbarHTML(si));
+  scrollIntoCanvas(blk, true);
+  if (pendingNav !== null) { var n = pendingNav; pendingNav = null; go(n, true); }
+}
+function scrollIntoCanvas(el, toTop){
+  if (window.innerWidth <= 1000) { el.scrollIntoView({ block: toTop ? 'start' : 'nearest', behavior: 'smooth' }); return; }
+  var top = el.offsetTop - 20;
+  elCanvas.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+/* instant completion (used by ?done=N for screenshots / jumping ahead) */
+function completeInstantly(si, withNeg){
+  var st = STEPS[si];
+  st.actions.forEach(function(a){
+    if (a.custom || isDone(st, a) || (a.neg && !withNeg)) return;
+    a.pipe.forEach(function(p){ pipeLogs(p).forEach(function(l){ state.log.push([l[0], l[3] || p.s, l[1], l[2] || (p.k === 'deny' ? 'deny' : '')]); }); });
+    state.done[k(st, a)] = true; state.order.push(k(st, a));
+  });
+}
+
+/* ---------- reset ---------- */
+var armT = null;
+$('reset').addEventListener('click', function(){
+  var b = this;
+  if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = 'Click again to reset'; armT = setTimeout(function(){ b.classList.remove('arm'); b.textContent = 'Reset replay'; }, 3000); return; }
+  clearTimeout(armT); b.classList.remove('arm'); b.textContent = 'Reset replay';
+  runToken++; fastForward(); running = null; ff = false; pendingNav = null;
+  state = fresh(); save(); renderLog(); go(0); render(true); toast('Replay reset');
+});
+
+/* ---------- toast / tooltip ---------- */
+var toastT = null;
+function toast(m){ var t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('on'); }, 1600); }
+var tip = $('tip');
+function showTip(el){
+  tip.innerHTML = el.getAttribute('data-tip'); tip.classList.add('on');
+  var r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  var x = Math.max(8, Math.min(window.innerWidth - tw - 8, r.left + r.width / 2 - tw / 2));
+  var y = r.top - th - 8; if (y < 8) y = r.bottom + 8;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function hideTip(){ tip.classList.remove('on'); }
+document.addEventListener('mouseover', function(e){ var t = e.target.closest && e.target.closest('[data-tip]'); if (t) showTip(t); });
+document.addEventListener('mouseout', function(e){ var t = e.target.closest && e.target.closest('[data-tip]'); if (t && !t.contains(e.relatedTarget)) hideTip(); });
+document.addEventListener('focusin', function(e){ var t = e.target.closest && e.target.closest('[data-tip]'); if (t) showTip(t); else hideTip(); });
+window.addEventListener('scroll', hideTip, true);
+
+/* ---------- copy ---------- */
+function copy(txt){
+  var ok = function(){ toast('Copied'); };
+  try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(txt).then(ok, fallback); return; } } catch (e) {}
+  fallback();
+  function fallback(){ try { var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); ok(); } catch (e) { toast(txt); } }
+}
+
+/* ---------- Hedera Mirror Node (read-only, public) ---------- */
+var MIRROR = 'https://testnet.mirrornode.hedera.com/api/v1/';
+var KNOWN = {
+  '10509879': 'SPV', '10511413': 'Distribution Agent', '10509881': 'Investor A', '10509882': 'Investor B',
+  '10509855': 'Treasury', '10510175': 'ATS equity', '9213391': 'ATS v8 Factory'
+};
+[['spv', 'SPV'], ['agent', 'Distribution Agent'], ['a', 'Investor A'], ['b', 'Investor B'], ['treasury', 'Treasury'], ['equity', 'ATS equity'], ['factory', 'ATS v8 Factory']].forEach(function(x){ KNOWN[D.w[x[0]].toLowerCase()] = x[1]; });
+function describeAddr(a){
+  if (!a || typeof a !== 'string') return '—';
+  var s = a.toLowerCase(), label = KNOWN[s], extra = '';
+  if (/^0x0{24}[0-9a-f]{16}$/.test(s)) { var num = parseInt(s.slice(-16), 16); if (isFinite(num)) { extra = ' = 0.0.' + num; label = label || KNOWN[String(num)]; } }
+  return hx(a, 4, 6) + extra + (label ? ' (' + label + ')' : '');
+}
+function fetchJson(url){
+  var ctl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = setTimeout(function(){ if (ctl) ctl.abort(); }, 12000);
+  return fetch(url, { headers: { 'Accept': 'application/json' }, signal: ctl ? ctl.signal : undefined, mode: 'cors' })
+    .then(function(r){ clearTimeout(timer); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }, function(e){ clearTimeout(timer); throw e; });
+}
+function verifyTx(btn){
+  var hash = btn.getAttribute('data-verify'), out = btn.closest('.txr').querySelector('.vout');
+  if (!/^0x[0-9a-fA-F]{64}$/.test(hash)) return Promise.resolve(false);
+  btn.disabled = true; btn.textContent = 'Checking…'; out.textContent = '';
+  return fetchJson(MIRROR + 'contracts/results/' + hash).then(function(d){
+    out.innerHTML = '';
+    var ok = d.result === 'SUCCESS', l1 = document.createElement('div'), l2 = document.createElement('div');
+    var r = document.createElement('span'); r.className = ok ? 'ok' : 'bad'; r.textContent = (ok ? '✓ ' : '✕ ') + (d.result || '—');
+    l1.appendChild(r);
+    var bits = [];
+    if (d.block_number != null) bits.push('block ' + d.block_number);
+    if (d.gas_used != null) bits.push('gas ' + Number(d.gas_used).toLocaleString('en-US'));
+    if (d.timestamp) { var t = parseFloat(d.timestamp); if (isFinite(t)) bits.push(new Date(t * 1000).toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC')); }
+    l1.appendChild(document.createTextNode(' · live from the Mirror Node · ' + bits.join(' · ')));
+    l2.textContent = 'from ' + describeAddr(d.from) + ' → to ' + describeAddr(d.to);
+    out.appendChild(l1); out.appendChild(l2);
+    addLog('live', 'HEDERA', 'Mirror Node: ' + hx(hash, 4, 4) + ' → ' + (d.result || '—') + (d.block_number != null ? ' · block ' + d.block_number : ''), ok ? 'ok' : 'warn');
+    return ok;
+  }).catch(function(e){
+    out.innerHTML = '';
+    var s = document.createElement('span'); s.className = 'err';
+    s.appendChild(document.createTextNode('Could not reach the Mirror Node from this browser (' + (e && e.name === 'AbortError' ? 'timeout' : (e && e.message) || 'network or CORS error') + '). '));
+    var a = document.createElement('a'); a.className = 'lnk'; a.rel = 'noopener'; a.target = '_blank'; a.href = hs(hash); a.textContent = 'Open it on HashScan ↗';
+    s.appendChild(a); out.appendChild(s);
+    addLog('live', 'HEDERA', 'Mirror Node unreachable for ' + hx(hash, 4, 4) + ' — use HashScan', 'warn');
+    return false;
+  }).then(function(v){ btn.disabled = false; btn.textContent = 'Verify again'; return v; });
+}
+function checkBalances(){
+  var box = $('bal-out'); if (!box) return Promise.resolve();
+  var accts = [[D.acct.a, 'Lisa · Investor A', '7.0 ℏ at the end of the run (1 activation + 6 payout)'], [D.acct.b, 'Bart · Investor B', '1.0 ℏ at the end of the run (activation only)']];
+  box.innerHTML = accts.map(function(a){ return '<div class="balc"><div class="n">' + a[1] + ' · ' + a[0] + '</div><b>…</b><p>Checking the Mirror Node…</p></div>'; }).join('');
+  return Promise.all(accts.map(function(a){ return fetchJson(MIRROR + 'accounts/' + a[0]).then(function(d){ return { a: a, d: d }; }, function(e){ return { a: a, e: e }; }); })).then(function(res){
+    box.innerHTML = '';
+    res.forEach(function(r){
+      var c = document.createElement('div'); c.className = 'balc';
+      var n = document.createElement('div'); n.className = 'n'; n.textContent = r.a[1] + ' · ' + r.a[0];
+      var b = document.createElement('b'), p = document.createElement('p');
+      if (r.d && r.d.balance && typeof r.d.balance.balance === 'number') {
+        b.textContent = (r.d.balance.balance / 1e8).toFixed(8).replace(/0+$/, '').replace(/\.$/, '.0') + ' ℏ';
+        p.textContent = 'Live now. Recorded: ' + r.a[2] + '.';
+        addLog('live', 'HEDERA', 'Mirror Node balance ' + r.a[0] + ' (' + r.a[1] + '): ' + b.textContent, 'ok');
+      } else {
+        b.textContent = '—';
+        p.textContent = 'Could not read the Mirror Node (' + ((r.e && r.e.message) || 'unexpected response') + '). ';
+        var l = document.createElement('a'); l.className = 'lnk'; l.rel = 'noopener'; l.target = '_blank'; l.href = 'https://hashscan.io/testnet/account/' + r.a[0]; l.textContent = 'HashScan ↗'; p.appendChild(l);
+        addLog('live', 'HEDERA', 'Mirror Node unreachable for ' + r.a[0] + ' — use HashScan', 'warn');
+      }
+      c.appendChild(n); c.appendChild(b); c.appendChild(p); box.appendChild(c);
+    });
+  });
+}
+
+/* ---------- lightbox ---------- */
+var lb = $('lb'), lbImg = $('lb-img'), lbCap = $('lb-cap'), lbClose = $('lb-close'), lbPrev = $('lb-prev'), lbNext = $('lb-next');
+var lbGroup = [], lbIdx = 0, lbLast = null;
+function lbShow(){
+  var id = lbGroup[lbIdx], m = IMG[id];
+  lbImg.src = 'assets/' + id + '.jpg'; lbImg.alt = m[2];
+  lbCap.innerHTML = esc(m[2]) + '<span class="cnt">' + (lbGroup.length > 1 ? (lbIdx + 1) + ' / ' + lbGroup.length + ' · ← → to browse · ' : '') + 'Esc to close · screenshot from the recorded run</span>';
+  lbPrev.hidden = lbNext.hidden = lbGroup.length < 2;
+}
+function lbOpen(btn){
+  var g = btn.getAttribute('data-group');
+  lbGroup = Array.prototype.map.call(document.querySelectorAll('[data-lb][data-group="' + g + '"]'), function(b){ return b.getAttribute('data-lb'); });
+  lbIdx = Math.max(0, lbGroup.indexOf(btn.getAttribute('data-lb')));
+  lbLast = btn; lbShow(); lb.hidden = false; document.documentElement.style.overflow = 'hidden'; lbClose.focus();
+}
+function lbHide(){ lb.hidden = true; lbImg.src = 'data:,'; document.documentElement.style.overflow = ''; if (lbLast && document.body.contains(lbLast)) lbLast.focus(); }
+function lbStep(d){ lbIdx = (lbIdx + d + lbGroup.length) % lbGroup.length; lbShow(); }
+lbClose.addEventListener('click', lbHide);
+lbPrev.addEventListener('click', function(){ lbStep(-1); });
+lbNext.addEventListener('click', function(){ lbStep(1); });
+lb.addEventListener('click', function(e){ if (e.target === lb || e.target.id === 'lb-fig') lbHide(); });
+
+/* ---------- events ---------- */
+document.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target : null; if (!t) return;
+  var el;
+  if ((el = t.closest('[data-step]'))) { go(+el.getAttribute('data-step'), true); return; }
+  if ((el = t.closest('[data-go]'))) { e.preventDefault(); go(+el.getAttribute('data-go'), true); return; }
+  if ((el = t.closest('[data-nav]'))) { go(state.cur + (+el.getAttribute('data-nav')), true); return; }
+  if ((el = t.closest('[data-act]'))) {
+    var st = STEPS[state.cur], a = actBy(st, el.getAttribute('data-act'));
+    if (a && a.custom) a.custom(el); else if (a) runAction(state.cur, a);
+    return;
+  }
+  if ((el = t.closest('[data-toggle-blk]'))) { var b = el.closest('.blk'); b.classList.toggle('col'); el.setAttribute('aria-expanded', String(!b.classList.contains('col'))); return; }
+  if ((el = t.closest('[data-pvmode]'))) {
+    var pv = el.closest('.pv'), json = el.getAttribute('data-pvmode') === 'json';
+    pv.querySelector('.pv-rules').hidden = json; pv.querySelector('.pv-json').hidden = !json;
+    Array.prototype.forEach.call(pv.querySelectorAll('[data-pvmode]'), function(x){ var on = x === el; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
+    return;
+  }
+  if ((el = t.closest('[data-verify]'))) { verifyTx(el); return; }
+  if ((el = t.closest('[data-lb]'))) { lbOpen(el); return; }
+  if ((el = t.closest('[data-copy]'))) { copy(el.getAttribute('data-copy')); return; }
+});
+$('log-tg').addEventListener('click', function(){
+  var min = elMain.classList.toggle('logmin');
+  this.textContent = min ? 'Show' : 'Hide'; this.setAttribute('aria-expanded', String(!min));
+});
+document.addEventListener('keydown', function(e){
+  if (!lb.hidden) {
+    if (e.key === 'Escape') { e.preventDefault(); lbHide(); }
+    else if (e.key === 'ArrowRight' && lbGroup.length > 1) lbStep(1);
+    else if (e.key === 'ArrowLeft' && lbGroup.length > 1) lbStep(-1);
+    else if (e.key === 'Tab') { var f = [lbClose, lbPrev, lbNext].filter(function(b){ return !b.hidden; }), i = f.indexOf(document.activeElement); e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus(); }
+    return;
+  }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  var tg = e.target, tag = tg && tg.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (tg && tg.isContentEditable)) return;
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (state.cur < STEPS.length - 1 && unlocked(state.cur + 1)) go(state.cur + 1, true);
+    else if (state.cur < STEPS.length - 1) { var np = nextPending(state.cur); toast(np ? 'Next action: ' + np.label + ' (↵)' : 'Complete this step first'); }
+  } else if (e.key === 'ArrowLeft') { e.preventDefault(); go(state.cur - 1, true); }
+  else if (e.key === 'Enter') {
+    if (tag === 'BUTTON' || tag === 'A') return;
+    var a = nextPending(state.cur);
+    if (a) { e.preventDefault(); runAction(state.cur, a); }
+    else if (STEPS[state.cur].actions[0] && STEPS[state.cur].actions[0].custom && !running) { e.preventDefault(); STEPS[state.cur].actions[0].custom(); }
+  }
+});
+
+/* ---------- init ---------- */
+(function init(){
+  var saved = load(); if (saved) state = saved;
+  var q = location.search.match(/[?&]done=(\d+)/);
+  if (q) {
+    state = fresh();
+    var n = Math.min(+q[1], STEPS.length);
+    for (var i = 0; i < n; i++) completeInstantly(i, true);
+    state.cur = Math.min(Math.max(n - 1, 0), STEPS.length - 1);
+    var o = location.search.match(/[?&]open=(\d+)/); if (o) state.cur = Math.min(+o[1] - 1, STEPS.length - 1);
+    save();
+  }
+  var hm = location.hash.match(/^#step-(\d+)$/);
+  if (hm && !q) { var hi = +hm[1] - 1; if (hi >= 0 && hi < STEPS.length && unlocked(hi)) state.cur = hi; }
+  if (!unlocked(state.cur)) state.cur = 0;
+  renderLegend(); renderLog(); render(false);
+  if (history.replaceState) history.replaceState(null, '', location.pathname + location.search + '#step-' + (state.cur + 1));
+})();
+})();
+</script>
+</body>
+</html>

@@ -851,7 +851,7 @@ Evidence: `artifacts/final-demo/`, `artifacts/chainlink/final-demo/deployed-run-
 
 **Demo site and video assets (2026-09-13).**
 
-- **The site:** `apps/web/demo-site/` holds `index.html` (the replay console), `history.html` (the run history and
+- **The site:** `apps/web/demo-site/` holds `index.html` (the landing), `console.html` (the replay console), `history.html` (the run history and
   evidence) and `assets/`. It is original code written by Claude Code subagents under the maintainer's direction, and
   it shows only public-safe data taken from the committed artifacts.
 - **Logos** in `apps/web/demo-site/assets/logos/` and in the video cards:

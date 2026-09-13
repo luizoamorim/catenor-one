@@ -18,7 +18,7 @@ Wallets are accounts.  Credentials are claims.  Authority is scoped.  Identity p
 |---|---|
 | **Demo video** | [youtube.com/watch?v=EbxR1HgVIx0](https://www.youtube.com/watch?v=EbxR1HgVIx0) — the replay console, narrated |
 | **Technical walkthrough** | [youtube.com/watch?v=X3nXRfowpfk](https://www.youtube.com/watch?v=X3nXRfowpfk) — the real terminals and dashboards, and the prompts behind the build |
-| **Replay console + evidence site** | [`apps/web/demo-site/`](apps/web/demo-site/): open `index.html` (a click-through replay of the real run) and `history.html` (full run history and evidence per sponsor) |
+| **Demo site** | [`apps/web/demo-site/`](apps/web/demo-site/): `index.html` (landing), `console.html` (a click-through replay of the real run) and `history.html` (full run history and evidence per sponsor) |
 | **Reproducible runbook** | [`DEMO.md`](DEMO.md): every step is a numbered script under [`scripts/demo/`](scripts/demo/) |
 | **Run log of the final demo** | [`artifacts/final-demo/RUN-LOG.md`](artifacts/final-demo/RUN-LOG.md) and the [screenshots](artifacts/final-demo/screenshots/) |
 | **Protocol** | [github.com/luizoamorim/catenor](https://github.com/luizoamorim/catenor) · [catenor.xyz](https://catenor.xyz) |
