@@ -10,6 +10,8 @@
 :root{
   --bg:#fff;--text:#1d1d1f;--muted:#6e6e73;--muted2:#86868b;--hair:#d2d2d7;--hair2:#e8e8ed;--soft:#f5f5f7;--soft2:#fbfbfd;
   --blue:#0071e3;--green:#16883f;--red:#d70015;--ink:#000;--max:1280px;
+  /* sponsor identity: the same accents as the console */
+  --c-cat:#1d1d1f;--c-cre:#375bd2;--c-privy:#6d35e8;--c-hed:#0a7a7e;--c-sum:#a8245a;--t-privy:#f3eefe;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Monaco,Consolas,monospace;
 }
 *{box-sizing:border-box}
@@ -129,16 +131,46 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
 
 /* pills and tags */
 .pill{display:inline-block;font-size:10.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap;line-height:1.3}
-.p-cre{background:#1d1d1f;color:#fff}
-.p-net{background:#e3f4e8;color:#0f6b31}
+.p-cre{background:var(--c-cre);color:#fff}
+.p-net{background:var(--c-hed);color:#fff}
+.p-privy{background:var(--c-privy);color:#fff}
 .p-live{background:#e8f1fc;color:#0058b0}
 .p-local{background:#efeff2;color:#515154}
 .p-mock{background:#fff3e0;color:#9a5b00}
-.p-sand{background:#f3ecfb;color:#6e2bb3}
+.p-sand{background:var(--c-sum);color:#fff}
 .tag{display:inline-block;font-weight:700;font-size:.82em;letter-spacing:.03em;padding:1px 7px;border-radius:6px}
 .allow{color:var(--green);background:#e9f6ee}
 .deny{color:var(--red);background:#fdecee}
 .okt{color:var(--green);font-weight:650}
+
+/* sponsor chips */
+.sp{display:inline-flex;align-items:center;gap:5px;font:700 10.5px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:.01em;padding:4px 8px 4px 7px;border-radius:6px;color:#fff;background:var(--c-cat);white-space:nowrap;vertical-align:2px;text-transform:none}
+.sp:before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
+.sp-cat{background:var(--c-cat)}
+.sp-privy{background:var(--c-privy)}
+.sp-cre{background:var(--c-cre)}
+.sp-hed{background:var(--c-hed)}
+.sp-sum{background:var(--c-sum)}
+.private .sp-cat{background:#f5f5f7;color:#000}
+.who{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
+.who-k{flex-basis:100%;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2)}
+.pp{display:inline-flex;align-items:stretch;border:1px solid rgba(109,53,232,.45);background:var(--t-privy);border-radius:6px;overflow:hidden;vertical-align:1px;max-width:100%;line-height:1.5}
+.pp b{flex:none;display:flex;align-items:center;font:700 9.5px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;background:var(--c-privy);color:#fff;padding:2px 6px}
+.pp span{padding:0 7px;font-family:var(--mono);font-size:.9em;color:#1d1d1f;overflow-wrap:anywhere;min-width:0}
+.privy-frame{margin-top:26px;border:1.5px solid var(--c-privy);border-radius:18px;box-shadow:0 0 0 4px var(--t-privy);padding:4px 20px 8px;background:#fff}
+.privy-band{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:0 -20px;padding:10px 20px;background:var(--t-privy);border-bottom:1px solid rgba(109,53,232,.22);border-radius:16px 16px 0 0;font-size:14px;color:var(--c-privy)}
+.privy-band b{font-weight:700}
+.privy-band code{color:#1d1d1f}
+.privy-frame .tbl-wrap{border-top:0;margin-top:6px}
+.rule.privy{border:1.5px solid var(--c-privy);box-shadow:0 0 0 4px var(--t-privy);padding-top:0;overflow:hidden}
+.rule.privy .privy-band{margin:0 -30px 20px;padding:12px 30px;border-radius:0}
+.code.privy{border:1.5px solid var(--c-privy);box-shadow:0 0 0 4px var(--t-privy)}
+.tab .td{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.role b:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--acc,#1d1d1f);margin-right:8px;vertical-align:0}
+.role.r-cat{--acc:var(--c-cat)}
+.role.r-cre{--acc:var(--c-cre)}.role.r-cre b{color:var(--c-cre)}
+.role.r-privy{--acc:var(--c-privy)}.role.r-privy b{color:var(--c-privy)}
+.role.r-hed{--acc:var(--c-hed)}.role.r-hed b{color:var(--c-hed)}
 
 /* screenshots */
 .shots{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;max-width:820px}
@@ -367,6 +399,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
   .chapter{grid-template-columns:1fr;padding:60px 0;gap:18px}
   .chapter-index{padding:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
   .chapter-index .stg,.chapter-index .pill{margin-top:0}
+  .chapter-index .who{margin-top:0}
   .side-note{grid-column:auto}
   .facts li{grid-template-columns:1fr;gap:2px}
   .kv{grid-template-columns:1fr}
@@ -405,10 +438,10 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
       <strong>Possession <span class="neq">≠</span> current eligibility.</strong>
     </div>
     <div class="roles">
-      <div class="role"><b>Catenor</b><span>decides identity and authority.</span></div>
-      <div class="role"><b>Chainlink CRE</b><span>evaluates private, current state inside a TEE.</span></div>
-      <div class="role"><b>Privy</b><span>constrains what each key can sign.</span></div>
-      <div class="role"><b>Hedera ATS</b><span>executes the asset lifecycle.</span></div>
+      <div class="role r-cat"><b>Catenor</b><span>decides identity and authority.</span></div>
+      <div class="role r-cre"><b>Chainlink CRE</b><span>evaluates private, current state inside a TEE.</span></div>
+      <div class="role r-privy"><b>Privy</b><span>constrains what each key can sign, through Privy policies.</span></div>
+      <div class="role r-hed"><b>Hedera ATS</b><span>executes the asset lifecycle.</span></div>
     </div>
     <div class="hero-actions">
       <a href="#flow">Walk through the run</a>
@@ -503,21 +536,21 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act I</b><span>Trust is admitted, not assumed</span></div>
 
     <article class="chapter" id="ch-01">
-      <div class="chapter-index">01 / 16<span class="stg">Stage 10 · 17:08 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">01 / 16<span class="stg">Stage 10 · 17:08 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span><span class="sp sp-cre">Chainlink CRE</span></span></div>
       <div class="chapter-main">
         <h3>Before anyone is trusted, the rules are pinned.</h3>
         <p>
           The Privy app starts with no wallets, no key quorums and no policies. Stage 10 creates the signer
-          infrastructure for the Trust Domain: a <strong>Bootstrap Endorsement Key</strong> (Solana wallet
-          <span class="h">HKQY5…nVEk</span>) under <code>P_BOOTSTRAP</code>, the <code>P_ASSERT</code> policy for
-          credential-assertion keys, two runtime quorums and two management-owner keys that never leave the
+          infrastructure for the Trust Domain: a <strong>Bootstrap Endorsement Key</strong> (a Privy signature wallet,
+          message signing only, <span class="h">HKQY5…nVEk</span>) under the <strong>Privy policy</strong> <code>P_BOOTSTRAP</code>,
+          the <strong>Privy policy</strong> <code>P_ASSERT</code> for credential-assertion keys, two runtime quorums and two management-owner keys that never leave the
           maintainer’s machine. The acceptance rules are then hashed into the <strong>Bootstrap Configuration</strong>,
           which becomes the input to the first CRE deploy.
         </p>
         <ul class="facts">
           <li><span>Trust Domain</span><span><code>trust-domain:catenor-one-demo</code></span></li>
           <li><span>Admission policy</span><span><code>policy:trust-anchor-admission:v1</code></span></li>
-          <li><span>Policies</span><span><code>P_BOOTSTRAP</code> <span class="h">vzww22mkxmtn4f333fdqpse7</span> · <code>P_ASSERT</code> <span class="h">e8d0ndsssfq6rr7p2im0ptt4</span> — allow <code>signMessage</code>; deny <code>exportPrivateKey</code> and <code>exportSeedPhrase</code></span></li>
+          <li><span>Privy policies</span><span><span class="pp"><b>Privy policy</b><span>P_BOOTSTRAP</span></span> <span class="h">vzww22mkxmtn4f333fdqpse7</span> · <span class="pp"><b>Privy policy</b><span>P_ASSERT</span></span> <span class="h">e8d0ndsssfq6rr7p2im0ptt4</span> — allow <code>signMessage</code>; deny <code>exportPrivateKey</code> and <code>exportSeedPhrase</code></span></li>
           <li><span>Bootstrap Configuration</span><span class="h">0x88314d8bae7f81ff33c8192124f7870a4f27586beba74e9772b735a3af007fff</span></li>
         </ul>
         <div class="formula">
@@ -535,15 +568,15 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-02">
-      <div class="chapter-index">02 / 16<span class="stg">Stage 11 · 19:18 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-index">02 / 16<span class="stg">Stage 11 · 19:18 UTC</span><span class="pill p-cre">CRE · deployed</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cre">Chainlink CRE</span><span class="sp sp-sum">Sumsub · SANDBOX</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span></span></div>
       <div class="chapter-main">
         <h3>The root Trust Anchor is admitted inside a TEE.</h3>
         <p>
-          The candidate organization gets a random <code>did:catenor</code> and a Privy Ed25519 assertion key, and
-          proves it holds the key. Then the <strong>deployed</strong> Confidential Workflow opens the sealed context,
+          The candidate organization gets a random <code>did:catenor</code> and an assertion key — a Privy signature wallet
+          (message signing only) — and proves it holds the key. Then the <strong>deployed</strong> Confidential Workflow opens the sealed context,
           fetches its Vault DON secrets and makes <strong>two Sumsub sandbox calls</strong> from inside the enclave.
           Six facts come out, all true, plus a commitment. Catenor keeps no raw Sumsub response. The admission policy
-          says <span class="tag allow">ALLOW</span>, the separate <code>P_BOOTSTRAP</code> key endorses, and the
+          says <span class="tag allow">ALLOW</span>, the separate Privy signature wallet under the Privy policy <code>P_BOOTSTRAP</code> endorses, and the
           Trust Anchor becomes <strong>ACTIVE</strong>: <code>TRUST_ANCHOR_VALID: true</code>.
         </p>
         <ul class="facts">
@@ -575,7 +608,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act II</b><span>Scoped authority, then an asset</span></div>
 
     <article class="chapter" id="ch-03">
-      <div class="chapter-index">03 / 16<span class="stg">Stages 20–21 · 19:58–20:01 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">03 / 16<span class="stg">Stages 20–21 · 19:58–20:01 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span></span></div>
       <div class="chapter-main">
         <h3>The Trust Anchor authorizes the Sponsor.</h3>
         <p>
@@ -601,19 +634,19 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-04">
-      <div class="chapter-index">04 / 16<span class="stg">Stage 30 · 20:08 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">04 / 16<span class="stg">Stage 30 · 20:08 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span></span></div>
       <div class="chapter-main">
         <h3>The SPV exists only after <code>TOKENIZE_ASSET</code> says ALLOW.</h3>
         <p>
           Catenor evaluated the Sponsor’s <code>TOKENIZE_ASSET</code> on <code>spv:catenor-demo-001</code>. Only then
-          were the SPV subject, its Privy EVM execution wallet and its execution policy created. The policy is owned by
-          a management-owner key outside the runtime, so the runtime signer cannot change it. It allows
+          were the SPV subject, its Privy EVM execution wallet and its <strong>Privy policy</strong> created. The Privy policy is
+          owned by a management-owner key outside the runtime, so the runtime signer cannot change it. It allows
           <code>eth_signTransaction</code> only on chain 296 and only to the ATS v8 Factory. Everything else is denied.
         </p>
         <ul class="facts">
           <li><span>SPV</span><span class="h">did:catenor:bd7856964b7ab1cce73a0e9c4c875d44</span></li>
           <li><span>Execution wallet</span><span class="h">0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926</span></li>
-          <li><span>Policy</span><span><code>catenor-one-spv-execution-4c875d44</code> · <span class="h">cygll4bmgocqr05asp2w6f2s</span></span></li>
+          <li><span>Privy policy</span><span><span class="pp"><b>Privy policy</b><span>catenor-one-spv-execution-4c875d44</span></span> · <span class="h">cygll4bmgocqr05asp2w6f2s</span></span></li>
           <li><span>Also created</span><span>a private <code>SPV_EXECUTION</code> Account Binding, and SPV <code>SPONSORED_BY</code> Sponsor</span></li>
         </ul>
         <div class="formula">
@@ -621,7 +654,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         </div>
         <div class="shots">
           <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 30 output"><img src="assets/30-terminal.jpg" alt="Terminal output of stage 30: SPV DID and Privy EVM wallet created after TOKENIZE_ASSET ALLOW" width="1800" height="687" loading="lazy" decoding="async"></button><figcaption><b>Stage 30.</b> SPV <code>did:catenor:bd78…5d44</code> + wallet <code>0x182F…9926</code>, created after the ALLOW.</figcaption></figure>
-          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: SPV policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy dashboard policy JSON: eth_signTransaction allowed only if chain_id equals 296 and to equals the ATS v8 Factory; exports denied" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Privy.</b> <code>eth_signTransaction</code> ALLOW only if <code>chain_id</code> eq 296 AND <code>to</code> eq the ATS v8 Factory.</figcaption></figure>
+          <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: SPV Privy policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy dashboard, Privy policy JSON of the SPV wallet: eth_signTransaction allowed only if chain_id equals 296 and to equals the ATS v8 Factory; exports denied" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Privy policy of the SPV wallet.</b> <code>eth_signTransaction</code> ALLOW only if <code>chain_id</code> eq 296 AND <code>to</code> eq the ATS v8 Factory.</figcaption></figure>
         </div>
       </div>
       <aside class="side-note">
@@ -632,7 +665,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-05">
-      <div class="chapter-index">05 / 16<span class="stg">Stage 31 · 20:22 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">05 / 16<span class="stg">Stage 31 · 20:22 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>The offering pins who may invest — by hash.</h3>
         <p>
@@ -663,14 +696,14 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act III</b><span>Investors, credentials, confidential eligibility</span></div>
 
     <article class="chapter" id="ch-06">
-      <div class="chapter-index">06 / 16<span class="stg">Stages 40–41 · 20:26–20:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span></div>
+      <div class="chapter-index">06 / 16<span class="stg">Stages 40–41 · 20:26–20:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span><span class="sp sp-sum">Sumsub · SANDBOX</span></span></div>
       <div class="chapter-main">
         <h3>Two investors onboard. Both green.</h3>
         <p>
           “Lisa Simpson” and “Bart Simpson” are fictional Sumsub <strong>sandbox</strong> applicants, both forced
-          GREEN (Approved). Each gets a random <code>did:catenor</code> with no PII, an Ed25519 <strong>holder
-          key</strong> that signs presentations and never money, and a <strong>receive-only</strong> Privy wallet: an
-          owner key, no signer, no policy. The link from DID to wallet is a <strong>private</strong> Account Binding,
+          GREEN (Approved). Each gets a random <code>did:catenor</code> with no PII, a <strong>holder key</strong> — a Privy
+          signature wallet (message signing only) that signs presentations and never money — and a
+          <strong>receive-only</strong> Privy wallet: an owner key, no signer, no Privy policy. The link from DID to wallet is a <strong>private</strong> Account Binding,
           never published in the DID Document. There is no CRE call here, by design: the evidence is read only inside
           the TEE.
         </p>
@@ -690,7 +723,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-07">
-      <div class="chapter-index">07 / 16<span class="stg">Stages 42–43 · 20:34–20:41 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-index">07 / 16<span class="stg">Stages 42–43 · 20:34–20:41 UTC</span><span class="pill p-cre">CRE · deployed</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cre">Chainlink CRE</span><span class="sp sp-sum">Sumsub · SANDBOX</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>Credentials are issued only after the TEE has looked.</h3>
         <p>
@@ -721,7 +754,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-08">
-      <div class="chapter-index">08 / 16<span class="stg">Stage 44 · 20:45 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-index">08 / 16<span class="stg">Stage 44 · 20:45 UTC</span><span class="pill p-cre">CRE · deployed</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cre">Chainlink CRE</span><span class="sp sp-sum">Sumsub · SANDBOX</span></span></div>
       <div class="chapter-main">
         <h3>Offering eligibility, decided in the enclave.</h3>
         <p>
@@ -760,7 +793,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act IV</b><span>The asset goes live on Hedera</span></div>
 
     <article class="chapter" id="ch-09">
-      <div class="chapter-index">09 / 16<span class="stg">Stages 50–62 · 20:55–21:57 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-index">09 / 16<span class="stg">Stages 50–62 · 20:55–21:57 UTC</span><span class="pill p-net">Testnet live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-hed">Hedera ATS</span><span class="sp sp-privy">Privy</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>The SPV equity is deployed and issued — exactly 600 and 400.</h3>
         <p>
@@ -797,12 +830,12 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-10">
-      <div class="chapter-index">10 / 16<span class="stg">Stage 63 · 22:05 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-index">10 / 16<span class="stg">Stage 63 · 22:05 UTC</span><span class="pill p-net">Testnet live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-hed">Hedera ATS</span><span class="sp sp-privy">Privy</span></span></div>
       <div class="chapter-main">
         <h3>A dividend is set. ATS computes who is entitled.</h3>
         <p>
           The SPV wallet sends <code>grantRole(ROLE_CORPORATE_ACTION, SPV)</code> and then <code>setDividend</code>
-          (amount 1, decimals 2), each allowed only by its equity-pinned policy rule. ATS computes entitlements by
+          (amount 1, decimals 2), each allowed only by its equity-pinned <strong>Privy policy</strong> rule. ATS computes entitlements by
           ownership only. <strong>No funds move.</strong> Who is actually <em>paid</em> is decided later, by Catenor,
           in the TEE.
         </p>
@@ -827,12 +860,12 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act V</b><span>An Agent earns its authority</span></div>
 
     <article class="chapter" id="ch-11">
-      <div class="chapter-index">11 / 16<span class="stg">Stage 70 · 22:10 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">11 / 16<span class="stg">Stage 70 · 22:10 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span></span></div>
       <div class="chapter-main">
         <h3>The Agent has a wallet. It has no authority: DENY.</h3>
         <p>
           The Sponsor’s <code>CREATE_AGENT</code> is ALLOW. The Distribution Agent gets its own identity, its own Privy EVM
-          wallet bound privately (<code>AGENT_EXECUTION</code>), its own signer set, and a policy narrower than the
+          wallet bound privately (<code>AGENT_EXECUTION</code>), its own signer set, and a <strong>Privy policy</strong> narrower than the
           SPV’s: chain 296, <strong>only to the two investor receiving wallets</strong>, <strong>≤ 20 HBAR</strong>. Then
           it asks to run a distribution before any delegation:
           <span class="tag deny">DENY</span> <code>CAPABILITY_MISSING</code>.
@@ -840,7 +873,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         <ul class="facts">
           <li><span>Agent</span><span class="h">did:catenor:9b25f52aff6dc4cac4d0a7aa3d8dc074</span></li>
           <li><span>Wallet</span><span class="h">0x90894535F5f35271f2d4112179BF2b4e887913E3</span></li>
-          <li><span>Policy</span><span><code>catenor-one-distribution-agent-3d8dc074</code> · <span class="h">p99xe36icsfvewrovm1mczwq</span></span></li>
+          <li><span>Privy policy</span><span><span class="pp"><b>Privy policy</b><span>catenor-one-distribution-agent-3d8dc074</span></span> · <span class="h">p99xe36icsfvewrovm1mczwq</span></span></li>
         </ul>
         <div class="shots">
           <figure class="shot"><button type="button" data-lb data-group="story" aria-label="Enlarge screenshot: stage 70 output"><img src="assets/70-terminal.jpg" alt="Terminal output of stage 70: Agent created with its Privy wallet; distribution request before delegation DENY CAPABILITY_MISSING" width="1800" height="907" loading="lazy" decoding="async"></button><figcaption><b>Stage 70.</b> Agent + wallet created; request before delegation → <b>DENY <code>CAPABILITY_MISSING</code></b>.</figcaption></figure>
@@ -854,7 +887,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-12">
-      <div class="chapter-index">12 / 16<span class="stg">Stage 71 · 22:19 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">12 / 16<span class="stg">Stage 71 · 22:19 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>A relationship alone: still DENY.</h3>
         <p>
@@ -875,7 +908,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-13">
-      <div class="chapter-index">13 / 16<span class="stg">Stage 72 · 22:20 UTC</span><span class="pill p-live">Sponsor live</span></div>
+      <div class="chapter-index">13 / 16<span class="stg">Stage 72 · 22:20 UTC</span><span class="pill p-live">Sponsor live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>Delegated <code>EXECUTE_DISTRIBUTION</code>: ALLOW.</h3>
         <p>
@@ -903,7 +936,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     <div class="act"><b>Act VI</b><span>The world changes. The payout follows the present.</span></div>
 
     <article class="chapter" id="ch-14">
-      <div class="chapter-index">14 / 16<span class="stg">Stage 80 · 22:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span></div>
+      <div class="chapter-index">14 / 16<span class="stg">Stage 80 · 22:29 UTC</span><span class="pill p-sand">Sumsub sandbox</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-sum">Sumsub · SANDBOX</span><span class="sp sp-hed">Hedera ATS</span></span></div>
       <div class="chapter-main">
         <h3>Bart is sanctioned. Nothing else changes.</h3>
         <p>
@@ -927,7 +960,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-15">
-      <div class="chapter-index">15 / 16<span class="stg">Stages 81–82 · 22:37–22:40 UTC</span><span class="pill p-cre">CRE · deployed</span></div>
+      <div class="chapter-index">15 / 16<span class="stg">Stages 81–82 · 22:37–22:40 UTC</span><span class="pill p-cre">CRE · deployed</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cre">Chainlink CRE</span><span class="sp sp-sum">Sumsub · SANDBOX</span><span class="sp sp-cat">Catenor</span></span></div>
       <div class="chapter-main">
         <h3>The TEE re-checks today. PAY 6. HOLD 4.</h3>
         <p>
@@ -957,7 +990,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
     </article>
 
     <article class="chapter" id="ch-16">
-      <div class="chapter-index">16 / 16<span class="stg">Stage 83 · 22:45 UTC</span><span class="pill p-net">Testnet live</span></div>
+      <div class="chapter-index">16 / 16<span class="stg">Stage 83 · 22:45 UTC</span><span class="pill p-net">Testnet live</span><span class="who" aria-label="Who acts"><span class="who-k">Who acts</span><span class="sp sp-cat">Catenor</span><span class="sp sp-privy">Privy</span><span class="sp sp-hed">Hedera ATS</span></span></div>
       <div class="chapter-main">
         <h3>One signature. One payout. Zero for Bart.</h3>
         <p>
@@ -988,7 +1021,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
 
 <section class="private" id="tee" aria-labelledby="tee-title">
   <div class="wrap">
-    <div class="kicker">Chainlink CRE Confidential · deployed</div>
+    <div class="kicker"><span class="sp sp-cre">Chainlink CRE</span> Confidential · deployed</div>
     <div class="display" id="tee-title">Private in.<br>Minimum out.</div>
     <div class="lead">
       The distribution decision runs inside the <strong>deployed</strong> Confidential Workflow
@@ -1065,10 +1098,10 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
 
     <div class="tablist" role="tablist" aria-label="Evidence by system">
       <button class="tab" role="tab" id="tab-overview" aria-controls="ev-overview" aria-selected="true" tabindex="0">Overview</button>
-      <button class="tab" role="tab" id="tab-cre" aria-controls="ev-cre" aria-selected="false" tabindex="-1">Chainlink CRE</button>
-      <button class="tab" role="tab" id="tab-privy" aria-controls="ev-privy" aria-selected="false" tabindex="-1">Privy</button>
-      <button class="tab" role="tab" id="tab-hedera" aria-controls="ev-hedera" aria-selected="false" tabindex="-1">Hedera</button>
-      <button class="tab" role="tab" id="tab-catenor" aria-controls="ev-catenor" aria-selected="false" tabindex="-1">Catenor</button>
+      <button class="tab" role="tab" id="tab-cre" aria-controls="ev-cre" aria-selected="false" tabindex="-1"><i class="td" style="background:var(--c-cre)" aria-hidden="true"></i>Chainlink CRE</button>
+      <button class="tab" role="tab" id="tab-privy" aria-controls="ev-privy" aria-selected="false" tabindex="-1"><i class="td" style="background:var(--c-privy)" aria-hidden="true"></i>Privy</button>
+      <button class="tab" role="tab" id="tab-hedera" aria-controls="ev-hedera" aria-selected="false" tabindex="-1"><i class="td" style="background:var(--c-hed)" aria-hidden="true"></i>Hedera ATS</button>
+      <button class="tab" role="tab" id="tab-catenor" aria-controls="ev-catenor" aria-selected="false" tabindex="-1"><i class="td" style="background:var(--c-cat)" aria-hidden="true"></i>Catenor</button>
       <button class="tab" role="tab" id="tab-runlog" aria-controls="ev-runlog" aria-selected="false" tabindex="-1">Run log</button>
     </div>
 
@@ -1126,14 +1159,14 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
 
       <h4 class="sub">Key public references</h4>
       <div class="evidence-list">
-        <div class="e-row"><div class="e-system">Chainlink CRE <span class="dep">· DEPLOYED</span></div><div class="e-proof">Confidential distribution · A PAY 6 / B HOLD 4</div><div class="e-ref">0xfd2a96fb…2d0b</div></div>
-        <div class="e-row"><div class="e-system">Chainlink CRE <span class="dep">· DEPLOYED</span></div><div class="e-proof">Root Trust Anchor admission · ALLOW</div><div class="e-ref">0x394f6622…4bd8</div></div>
-        <div class="e-row"><div class="e-system">Hedera ATS <span class="real">· TESTNET</span></div><div class="e-proof">Equity deployment · <code>deployEquity</code></div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570" rel="noopener">0x2396ad88…c570 ↗</a></div></div>
-        <div class="e-row"><div class="e-system">Hedera ATS <span class="real">· TESTNET</span></div><div class="e-proof">Issuance · Investor A 600 / Investor B 400</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e" rel="noopener">0x59359ae9…fa4e ↗</a><br><a href="https://hashscan.io/testnet/transaction/0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62" rel="noopener">0x9c6c4cb2…0d62 ↗</a></div></div>
-        <div class="e-row"><div class="e-system">Hedera <span class="real">· TESTNET</span></div><div class="e-proof">Approved payout · Investor A · 6 HBAR</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24" rel="noopener">0x4781f6ef…ff24 ↗</a></div></div>
-        <div class="e-row"><div class="e-system">Privy <span class="real">· REAL dev app</span></div><div class="e-proof">SPV execution wallet · policy <code>cygll4bmgocqr05asp2w6f2s</code></div><div class="e-ref">0x182F8c7D…9926</div></div>
-        <div class="e-row"><div class="e-system">Privy <span class="real">· REAL dev app</span></div><div class="e-proof">Distribution Agent wallet · policy <code>p99xe36icsfvewrovm1mczwq</code></div><div class="e-ref">0x90894535…13E3</div></div>
-        <div class="e-row"><div class="e-system">Catenor</div><div class="e-proof">Audit hash chain valid · 79 events · Trust Anchor VALID</div><div class="e-ref">scripts/demo/93-verify-catenor-audit.sh</div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-cre">Chainlink CRE</span> <span class="dep">· DEPLOYED</span></div><div class="e-proof">Confidential distribution · A PAY 6 / B HOLD 4</div><div class="e-ref">0xfd2a96fb…2d0b</div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-cre">Chainlink CRE</span> <span class="dep">· DEPLOYED</span></div><div class="e-proof">Root Trust Anchor admission · ALLOW</div><div class="e-ref">0x394f6622…4bd8</div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-hed">Hedera ATS</span> <span class="real">· TESTNET</span></div><div class="e-proof">Equity deployment · <code>deployEquity</code></div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570" rel="noopener">0x2396ad88…c570 ↗</a></div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-hed">Hedera ATS</span> <span class="real">· TESTNET</span></div><div class="e-proof">Issuance · Investor A 600 / Investor B 400</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e" rel="noopener">0x59359ae9…fa4e ↗</a><br><a href="https://hashscan.io/testnet/transaction/0x9c6c4cb2677e6687e38a5e1b6125aaf6533fa600fe26b00e08d23a006ff00d62" rel="noopener">0x9c6c4cb2…0d62 ↗</a></div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-hed">Hedera ATS</span> <span class="real">· TESTNET</span></div><div class="e-proof">Approved payout · Investor A · 6 HBAR</div><div class="e-ref"><a href="https://hashscan.io/testnet/transaction/0x4781f6efc538e291a95f3ea56e10629a5d25401bf53c4e992b41fccd3adbff24" rel="noopener">0x4781f6ef…ff24 ↗</a></div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-privy">Privy</span> <span class="real">· REAL dev app</span></div><div class="e-proof">SPV execution wallet · Privy policy <code>cygll4bmgocqr05asp2w6f2s</code></div><div class="e-ref">0x182F8c7D…9926</div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-privy">Privy</span> <span class="real">· REAL dev app</span></div><div class="e-proof">Distribution Agent wallet · Privy policy <code>p99xe36icsfvewrovm1mczwq</code></div><div class="e-ref">0x90894535…13E3</div></div>
+        <div class="e-row"><div class="e-system"><span class="sp sp-cat">Catenor</span></div><div class="e-proof">Audit hash chain valid · 79 events · Trust Anchor VALID</div><div class="e-ref">scripts/demo/93-verify-catenor-audit.sh</div></div>
       </div>
       <div class="shots wide">
         <figure class="shot"><button type="button" data-lb data-group="overview" aria-label="Enlarge screenshot: stage 99 stage table"><img src="assets/99-verify-complete-demo-stages.jpg" alt="Stage 99 output: a table of all 24 stages, each ran true and ok true, with its mode and time" width="1800" height="1071" loading="lazy" decoding="async"></button><figcaption><b>Stage 99.</b> All 24 stages ran and are <code>ok: true</code>, each with its mode.</figcaption></figure>
@@ -1232,29 +1265,30 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         <h3>Catenor decides whether. Privy bounds what.</h3>
         <p>Development app <code>catenor-one-ethonline-2026</code>, created empty for this run. Every execution wallet has its
           own management-owner key, kept on the maintainer’s machine and never in the runtime, and its own runtime signer: a
-          1-of-1 key quorum, override-scoped to the wallet’s policy. The runtime can request signatures; it cannot change a policy.</p>
+          1-of-1 key quorum, override-scoped to the wallet’s Privy policy. The runtime can request signatures; it cannot change a Privy policy.</p>
       </div>
 
-      <h4 class="sub">Wallets and policies</h4>
+      <h4 class="sub">Wallets and Privy policies</h4>
       <p class="subp">Read back live in stage 92 and checked against the dashboard. Everything not listed is denied; exports are denied everywhere.</p>
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th scope="col">Wallet</th><th scope="col">Chain</th><th scope="col">Policy</th><th scope="col">What it allows</th></tr></thead>
+          <thead><tr><th scope="col">Wallet</th><th scope="col">Kind</th><th scope="col">Privy policy</th><th scope="col">What it allows</th></tr></thead>
           <tbody>
-            <tr><td><b>Bootstrap Endorsement Key</b><br><span class="h">HKQY5…nVEk</span></td><td>Solana (Ed25519)</td><td class="m">P_BOOTSTRAP<br>vzww22mkxmtn4f333fdqpse7</td><td><code>signMessage</code> only. Endorses the root Trust Anchor after an ALLOW; its own owner and runtime quorum</td></tr>
-            <tr><td><b>Assertion keys</b><br>Trust Anchor <span class="h">9PvXY…PGkT</span>, Sponsor <span class="h">GLHPd…oTdX</span>, investor holder keys, 3 abandoned stage 11 attempts</td><td>Solana (Ed25519)</td><td class="m">P_ASSERT<br>e8d0ndsssfq6rr7p2im0ptt4<br>(7 wallets)</td><td><code>signMessage</code> only: credentials, grants, presentations. <b>Never a financial key</b></td></tr>
-            <tr class="hl"><td><b>SPV</b><br><span class="h">0x182F…9926</span></td><td>EVM</td><td class="m">catenor-one-spv-execution-4c875d44<br>cygll4bmgocqr05asp2w6f2s</td><td><code>eth_signTransaction</code> on chain 296 to the ATS v8 Factory; after <code>deployEquity</code>, three owner-added rules pinned to equity <span class="h">0xf37A…7ABC</span></td></tr>
-            <tr class="hl"><td><b>Distribution Agent</b><br><span class="h">0x9089…13E3</span></td><td>EVM</td><td class="m">catenor-one-distribution-agent-3d8dc074<br>p99xe36icsfvewrovm1mczwq</td><td><code>eth_signTransaction</code> on chain 296 <b>only to Investor A’s or B’s receiving wallet, value ≤ 20 HBAR</b></td></tr>
-            <tr><td><b>Testnet treasury</b><br><span class="h">0x49e9…5210</span></td><td>EVM</td><td class="m">catenor-one-clean-room-testnet-treasury<br>zqr5ynnrd3mi6o9snqq8ex8g</td><td>chain 296 transfers ≤ 30 HBAR. Bootstrap funding only</td></tr>
-            <tr><td><b>Investor A / Investor B</b><br><span class="h">0x7de5…2473</span> · <span class="h">0xCfCa…Da73</span></td><td>EVM</td><td>none</td><td><b>Receive-only</b>: an owner key, no signer, no policy. Catenor cannot sign for them</td></tr>
+            <tr><td><b>Bootstrap Endorsement Key</b><br><span class="h">HKQY5…nVEk</span></td><td>Privy signature wallet (message signing only)</td><td class="m"><span class="pp"><b>Privy policy</b><span>P_BOOTSTRAP</span></span><br>vzww22mkxmtn4f333fdqpse7</td><td><code>signMessage</code> only. Endorses the root Trust Anchor after an ALLOW; its own owner and runtime quorum</td></tr>
+            <tr><td><b>Assertion keys</b><br>Trust Anchor <span class="h">9PvXY…PGkT</span>, Sponsor <span class="h">GLHPd…oTdX</span>, investor holder keys, 3 abandoned stage 11 attempts</td><td>Privy signature wallets (message signing only)</td><td class="m"><span class="pp"><b>Privy policy</b><span>P_ASSERT</span></span><br>e8d0ndsssfq6rr7p2im0ptt4<br>(7 wallets)</td><td><code>signMessage</code> only: credentials, grants, presentations. <b>Never a financial key</b></td></tr>
+            <tr class="hl"><td><b>SPV</b><br><span class="h">0x182F…9926</span></td><td>EVM</td><td class="m"><span class="pp"><b>Privy policy</b><span>catenor-one-spv-execution-4c875d44</span></span><br>cygll4bmgocqr05asp2w6f2s</td><td><code>eth_signTransaction</code> on chain 296 to the ATS v8 Factory; after <code>deployEquity</code>, three owner-added rules pinned to equity <span class="h">0xf37A…7ABC</span></td></tr>
+            <tr class="hl"><td><b>Distribution Agent</b><br><span class="h">0x9089…13E3</span></td><td>EVM</td><td class="m"><span class="pp"><b>Privy policy</b><span>catenor-one-distribution-agent-3d8dc074</span></span><br>p99xe36icsfvewrovm1mczwq</td><td><code>eth_signTransaction</code> on chain 296 <b>only to Investor A’s or B’s receiving wallet, value ≤ 20 HBAR</b></td></tr>
+            <tr><td><b>Testnet treasury</b><br><span class="h">0x49e9…5210</span></td><td>EVM</td><td class="m"><span class="pp"><b>Privy policy</b><span>catenor-one-clean-room-testnet-treasury</span></span><br>zqr5ynnrd3mi6o9snqq8ex8g</td><td>chain 296 transfers ≤ 30 HBAR. Bootstrap funding only</td></tr>
+            <tr><td><b>Investor A / Investor B</b><br><span class="h">0x7de5…2473</span> · <span class="h">0xCfCa…Da73</span></td><td>EVM</td><td>none</td><td><b>Receive-only</b>: an owner key, no signer, no Privy policy. Catenor cannot sign for them</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h4 class="sub">The Agent’s boundary, rule by rule</h4>
+      <h4 class="sub">The Agent’s Privy policy, rule by rule</h4>
       <p class="subp">Stage 92 read-back: <b>“Agent policy exactly the approved boundary: true.”</b></p>
-      <div class="rule">
-        <div class="rule-top"><span class="pill p-net">Allow</span><span class="rn">allow-distribution-payout-hedera</span><span class="rm">method <code>eth_signTransaction</code> · rule <code>fxxhjsvbzc7dl9xx9lhybkqz</code></span></div>
+      <div class="rule privy" role="group" aria-label="Privy policy catenor-one-distribution-agent-3d8dc074">
+        <div class="privy-band"><span class="sp sp-privy">Privy</span><b>Privy policy</b><span aria-hidden="true">·</span><code>catenor-one-distribution-agent-3d8dc074</code><span aria-hidden="true">·</span><code>p99xe36icsfvewrovm1mczwq</code></div>
+        <div class="rule-top"><span class="pill p-privy">Allow</span><span class="rn">allow-distribution-payout-hedera</span><span class="rm">method <code>eth_signTransaction</code> · rule <code>fxxhjsvbzc7dl9xx9lhybkqz</code></span></div>
         <div class="conds">
           <div class="cond"><div class="f">chain_id eq</div><div class="v">296<small>Hedera testnet</small></div></div>
           <div class="and" aria-label="and">∧</div>
@@ -1265,8 +1299,10 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         <div class="rule-deny"><span class="tag deny">DENY</span> <code>exportPrivateKey</code> · <span class="tag deny">DENY</span> <code>exportSeedPhrase</code> · everything else denied by default: no ATS contract, no SPV wallet, no other chain.</div>
       </div>
 
-      <h4 class="sub">The SPV policy after the equity existed</h4>
-      <p class="subp">The factory rule came first. After <code>deployEquity</code>, the SPV management-owner key (outside the runtime) added three rules, each pinned to the new equity. Six rules in all.</p>
+      <h4 class="sub">The SPV’s Privy policy after the equity existed</h4>
+      <p class="subp">The factory rule came first. After <code>deployEquity</code>, the SPV management-owner key (outside the runtime) added three Privy policy rules, each pinned to the new equity. Six rules in all.</p>
+      <div class="privy-frame" role="group" aria-label="Privy policy catenor-one-spv-execution-4c875d44">
+      <div class="privy-band"><span class="sp sp-privy">Privy</span><b>Privy policy</b><span aria-hidden="true">·</span><code>catenor-one-spv-execution-4c875d44</code><span aria-hidden="true">·</span><code>cygll4bmgocqr05asp2w6f2s</code></div>
       <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr><th scope="col">Rule</th><th scope="col">Action</th><th scope="col">Conditions</th></tr></thead>
@@ -1280,14 +1316,15 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
           </tbody>
         </table>
       </div>
+      </div>
 
       <div class="grid2" style="margin-top:72px">
         <div>
           <h4 class="sub" style="margin-top:0">Controls in action</h4>
           <ul class="list">
-            <li><b>Created only after authorization.</b> The SPV wallet and policy exist only because <code>TOKENIZE_ASSET</code> was ALLOW; the Agent’s, under <code>CREATE_AGENT</code>.</li>
+            <li><b>Created only after authorization.</b> The SPV wallet and its Privy policy exist only because <code>TOKENIZE_ASSET</code> was ALLOW; the Agent’s, under <code>CREATE_AGENT</code>.</li>
             <li><b>Still not authorized.</b> Before delegation, and with the relationship alone, the Agent’s requests were DENY <code>CAPABILITY_MISSING</code>.</li>
-            <li><b>Every signature fit one rule.</b> Each Hedera transaction was dry-signed first (signature discarded), then signed live under exactly one rule: five by the SPV, the payout by the Agent.</li>
+            <li><b>Every signature fit one Privy policy rule.</b> Each Hedera transaction was dry-signed first (signature discarded), then signed live under exactly one rule: five by the SPV, the payout by the Agent.</li>
             <li><b>The HOLD holder got nothing.</b> No transaction built for Investor B, no Privy signature requested: <code>investorBSignatureRequests: 0</code>, Agent nonce 0 → 1.</li>
           </ul>
         </div>
@@ -1295,10 +1332,10 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
           <h4 class="sub" style="margin-top:0">Separate signer sets</h4>
           <ul class="list">
             <li><b>Bootstrap</b>: its own owner key and runtime quorum <code>…-bootstrap</code>, signer for one wallet only.</li>
-            <li><b>Assertion keys</b>: one owner and the <code>…-assertion</code> quorum for the signMessage-only Ed25519 keys.</li>
+            <li><b>Assertion keys</b>: one owner and the <code>…-assertion</code> quorum for the signMessage-only Privy signature wallets.</li>
             <li><b>SPV</b>: a new, separate management-owner key and runtime quorum <code>…-spv-runtime</code>.</li>
             <li><b>Agent</b>: a new, separate owner key and runtime quorum <code>…-agent-runtime</code>. The treasury has its own pair.</li>
-            <li><b>Investors</b>: one owner key per receiving wallet, no signer, no policy.</li>
+            <li><b>Investors</b>: one owner key per receiving wallet, no signer, no Privy policy.</li>
           </ul>
         </div>
       </div>
@@ -1306,7 +1343,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
       <h4 class="sub">Stage 92 read-back, as stored by Privy</h4>
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th scope="col">Wallet</th><th scope="col">Owner</th><th scope="col">Additional signer</th><th scope="col">Policy (owner matches the wallet)</th><th scope="col">Rules</th></tr></thead>
+          <thead><tr><th scope="col">Wallet</th><th scope="col">Owner</th><th scope="col">Additional signer</th><th scope="col">Privy policy (owner matches the wallet)</th><th scope="col">Rules</th></tr></thead>
           <tbody>
             <tr><td>SPV <span class="h">0x182F…9926</span></td><td>set</td><td>1, override-scoped</td><td class="m">catenor-one-spv-execution-4c875d44</td><td>Factory (chain ∧ to); DENY both exports; issueByPartition (chain ∧ to ∧ function ∧ partition); grantRole (chain ∧ to ∧ function ∧ role ∧ account); setDividend (chain ∧ to ∧ function)</td></tr>
             <tr><td>Agent <span class="h">0x9089…13E3</span></td><td>set</td><td>1, override-scoped</td><td class="m">catenor-one-distribution-agent-3d8dc074</td><td>ALLOW <code>eth_signTransaction</code> [chain ∧ to ∈ ∧ value ≤]; DENY both exports</td></tr>
@@ -1317,8 +1354,8 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         </table>
       </div>
 
-      <div class="code-head"><b>agent-policy.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
-<pre class="code" data-json tabindex="0" aria-label="Agent policy JSON">{
+      <div class="code-head"><b>Privy policy · agent-policy.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
+<pre class="code privy" data-json tabindex="0" aria-label="Privy policy JSON of the Distribution Agent wallet">{
   "id": "p99xe36icsfvewrovm1mczwq",
   "version": "1.0",
   "name": "catenor-one-distribution-agent-3d8dc074",
@@ -1346,8 +1383,8 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
   "_note": "Transcribed from the Privy dashboard (policy JSON tab) on 2026-09-12 after stage 70, final-demo instance c1-202609121659. 0x1158e460913d00000 = 20 HBAR (18-decimal weibar). The two addresses are the investors' receiving wallets. Public data only."
 }</pre>
 
-      <div class="code-head"><b>spv-policy-after-equity.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
-<pre class="code" data-json tabindex="0" aria-label="SPV policy JSON after the equity rules">{
+      <div class="code-head"><b>Privy policy · spv-policy-after-equity.json</b><span>artifacts/privy/final-demo/clean-room-c1-202609121659/</span></div>
+<pre class="code privy" data-json tabindex="0" aria-label="Privy policy JSON of the SPV wallet after the equity rules">{
   "id": "cygll4bmgocqr05asp2w6f2s",
   "version": "1.0",
   "name": "catenor-one-spv-execution-4c875d44",
@@ -1411,10 +1448,10 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
 
       <h4 class="sub">Screenshots</h4>
       <div class="shots wide">
-        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy SPV policy JSON after stage 30: factory rule and export denials" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Stage 30.</b> SPV policy: <code>eth_signTransaction</code> ALLOW only if chain 296 AND <code>to</code> = ATS v8 Factory.</figcaption></figure>
-        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV policy rules"><img src="assets/60-after-privy-spv-policy-rules.jpg" alt="Privy SPV policy rules view after stage 60: factory rule plus three equity-pinned rules, exports denied" width="1800" height="1641" loading="lazy" decoding="async"></button><figcaption><b>Stage 60.</b> Factory rule + <b>the three equity-pinned rules</b>; exports denied; default deny.</figcaption></figure>
-        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Agent policy JSON"><img src="assets/70-after-privy-agent-policy-json.jpg" alt="Privy Agent policy JSON: chain 296, to in the two investor wallets, value at most 20 HBAR" width="1800" height="2233" loading="lazy" decoding="async"></button><figcaption><b>Stage 70.</b> Agent policy: chain 296 <b>AND <code>to</code> in [A, B]</b> AND <code>value</code> ≤ 20 HBAR.</figcaption></figure>
-        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Privy verification"><img src="assets/92-verify-privy.jpg" alt="Stage 92 output: each execution wallet has exactly one Catenor-created policy and an override-scoped runtime signer; investor wallets have no signer and no policy" width="1800" height="2525" loading="lazy" decoding="async"></button><figcaption><b>Stage 92.</b> One policy per execution wallet; override-scoped signers; <b>Agent policy exactly the approved boundary: true</b>.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV Privy policy JSON"><img src="assets/30-after-privy-policy-spv-json.jpg" alt="Privy policy JSON of the SPV wallet after stage 30: factory rule and export denials" width="1800" height="1621" loading="lazy" decoding="async"></button><figcaption><b>Stage 30.</b> SPV Privy policy: <code>eth_signTransaction</code> ALLOW only if chain 296 AND <code>to</code> = ATS v8 Factory.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: SPV Privy policy rules"><img src="assets/60-after-privy-spv-policy-rules.jpg" alt="Privy policy rules view of the SPV wallet after stage 60: factory rule plus three equity-pinned rules, exports denied" width="1800" height="1641" loading="lazy" decoding="async"></button><figcaption><b>Stage 60.</b> SPV Privy policy: factory rule + <b>the three equity-pinned rules</b>; exports denied; default deny.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Agent Privy policy JSON"><img src="assets/70-after-privy-agent-policy-json.jpg" alt="Privy policy JSON of the Distribution Agent wallet: chain 296, to in the two investor wallets, value at most 20 HBAR" width="1800" height="2233" loading="lazy" decoding="async"></button><figcaption><b>Stage 70.</b> The Agent’s Privy policy: chain 296 <b>AND <code>to</code> in [A, B]</b> AND <code>value</code> ≤ 20 HBAR.</figcaption></figure>
+        <figure class="shot"><button type="button" data-lb data-group="privy" aria-label="Enlarge screenshot: Privy verification"><img src="assets/92-verify-privy.jpg" alt="Stage 92 output: each execution wallet has exactly one Catenor-created Privy policy and an override-scoped runtime signer; investor wallets have no signer and no policy" width="1800" height="2525" loading="lazy" decoding="async"></button><figcaption><b>Stage 92.</b> One Privy policy per execution wallet; override-scoped signers; <b>Agent policy exactly the approved boundary: true</b>.</figcaption></figure>
       </div>
     </div>
 
@@ -1432,11 +1469,11 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         <table class="tbl">
           <thead><tr><th scope="col">Role</th><th scope="col">EVM address</th><th scope="col">Hedera ID</th><th scope="col">Signer</th></tr></thead>
           <tbody>
-            <tr><td><b>SPV execution wallet</b></td><td class="m">0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509879" rel="noopener">0.0.10509879 ↗</a></td><td>Privy, <code>catenor-one-spv-execution-4c875d44</code></td></tr>
-            <tr><td><b>Distribution Agent wallet</b></td><td class="m">0x90894535F5f35271f2d4112179BF2b4e887913E3</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10511413" rel="noopener">0.0.10511413 ↗</a></td><td>Privy, <code>catenor-one-distribution-agent-3d8dc074</code></td></tr>
+            <tr><td><b>SPV execution wallet</b></td><td class="m">0x182F8c7DDbDa1b5f295893E2c4f6D55abBdB9926</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509879" rel="noopener">0.0.10509879 ↗</a></td><td>Privy policy <code>catenor-one-spv-execution-4c875d44</code></td></tr>
+            <tr><td><b>Distribution Agent wallet</b></td><td class="m">0x90894535F5f35271f2d4112179BF2b4e887913E3</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10511413" rel="noopener">0.0.10511413 ↗</a></td><td>Privy policy <code>catenor-one-distribution-agent-3d8dc074</code></td></tr>
             <tr><td><b>Investor A receiving wallet</b></td><td class="m">0x7de572532820B22040B561e68543419419b72473</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509881" rel="noopener">0.0.10509881 ↗</a></td><td>receive-only</td></tr>
             <tr><td><b>Investor B receiving wallet</b></td><td class="m">0xCfCa833A8e6b7651E44480b92822576BcB78Da73</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509882" rel="noopener">0.0.10509882 ↗</a></td><td>receive-only</td></tr>
-            <tr><td><b>Testnet treasury</b> (funding only)</td><td class="m">0x49e969483fEd8b2419D60EcB23D34C89af2E5210</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509855" rel="noopener">0.0.10509855 ↗</a></td><td>Privy, chain 296, ≤ 30 HBAR</td></tr>
+            <tr><td><b>Testnet treasury</b> (funding only)</td><td class="m">0x49e969483fEd8b2419D60EcB23D34C89af2E5210</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/account/0.0.10509855" rel="noopener">0.0.10509855 ↗</a></td><td>Privy policy: chain 296, ≤ 30 HBAR</td></tr>
             <tr class="hl"><td><b>ATS equity</b> “Catenor One Demo SPV 001 (SYNTHETIC)”, <code>C1SPV001</code></td><td class="m">0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/contract/0.0.10510175" rel="noopener">0.0.10510175 ↗</a></td><td>—</td></tr>
             <tr><td><b>ATS v8 Factory</b></td><td class="m">0xd1F118A40f3b02883D35909eF2517e7EDd78379d</td><td class="nw"><a class="link" href="https://hashscan.io/testnet/contract/0.0.9213391" rel="noopener">0.0.9213391 ↗</a></td><td>—</td></tr>
           </tbody>
@@ -1446,7 +1483,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
       <h4 class="sub">The asset lifecycle, each step gated by Catenor</h4>
       <div class="tbl-wrap">
         <table class="tbl">
-          <thead><tr><th scope="col">#</th><th scope="col">Transaction</th><th scope="col">Catenor gate</th><th scope="col">Signer (Privy rule)</th><th scope="col">Hash</th><th scope="col">Recorded result</th><th scope="col">Live check</th></tr></thead>
+          <thead><tr><th scope="col">#</th><th scope="col">Transaction</th><th scope="col">Catenor gate</th><th scope="col">Signer (Privy policy rule)</th><th scope="col">Hash</th><th scope="col">Recorded result</th><th scope="col">Live check</th></tr></thead>
           <tbody>
             <tr><td>1</td><td><code>deployEquity</code> (Factory)</td><td>Sponsor <code>TOKENIZE_ASSET</code> → ALLOW</td><td>SPV · <code>allow-ats-factory-hedera-testnet</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570" rel="noopener">0x2396ad88…c570 ↗</a></td><td><span class="okt">SUCCESS</span> · 6,898,334 gas · 7.86 ℏ fee</td><td><button type="button" class="mn-btn" data-hash="0x2396ad88874aec78419dfc5138fbdb5004f2cf3170adc3fbd1e0f8d701b4c570">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
             <tr><td>2</td><td><code>issueByPartition</code> → A, <b>600</b></td><td>A’s <code>SUBSCRIBE_OFFERING</code> ALLOW from the deployed CRE (stage 44)</td><td>SPV · <code>allow-issueByPartition-equity</code></td><td class="m"><a class="link" href="https://hashscan.io/testnet/transaction/0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e" rel="noopener">0x59359ae9…fa4e ↗</a></td><td><span class="okt">SUCCESS</span> · 456,629 gas</td><td><button type="button" class="mn-btn" data-hash="0x59359ae9eeba4e6ab54bdf7acd6a60d398bd2b79f3838e419c88e4508a0efa4e">Check on the Mirror Node</button><div class="mn-out" aria-live="polite"></div></td></tr>
@@ -1630,7 +1667,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
         <li><b>Stage 60 recorded the asset reference instead of the address</b>, after a successful <code>deployEquity</code>,
           and failed with <code>invalid equity or SPV address</code>. The runner now records the checksummed address and the
           reference separately, and never redeploys an existing equity. The 21:25 UTC re-run reported “already deployed …
-          no new deployment” and completed the owner-authorized SPV policy extension. The equity was not deployed twice.</li>
+          no new deployment” and completed the owner-authorized SPV Privy policy extension. The equity was not deployed twice.</li>
         <li><b>A transient CLI account error</b> after deploy #2 (“unable to retrieve organization info… try again in a few
           minutes”). A re-run a few minutes later was clean; deployed triggers do not depend on the CLI session.</li>
         <li><b>An unneeded 25 HBAR SPV top-up</b> in the second funding run: the script tops up any wallet below its
@@ -1657,7 +1694,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
           <thead><tr><th scope="col">System</th><th scope="col">Label</th><th scope="col">What that means here</th></tr></thead>
           <tbody>
             <tr><td><b>Chainlink CRE</b></td><td><span class="pill p-cre">Deployed</span></td><td>The Confidential Workflow <code>identity-confidential-production</code> on the Chainlink-hosted private registry, admission included. Not <code>cre workflow simulate</code></td></tr>
-            <tr><td><b>Privy</b></td><td><span class="pill p-live">Real development app</span></td><td>New app <code>catenor-one-ethonline-2026</code>: real server wallets, policies and key quorums in a development environment</td></tr>
+            <tr><td><b>Privy</b></td><td><span class="pill p-privy">Real development app</span></td><td>New app <code>catenor-one-ethonline-2026</code>: real server wallets, Privy policies and key quorums in a development environment</td></tr>
             <tr><td><b>Sumsub</b></td><td><span class="pill p-sand">Sandbox</span></td><td>Synthetic applicants, level <code>id-only</code>; reviews set by the operator. “Lisa Simpson” and “Bart Simpson” are fictional</td></tr>
             <tr><td><b>Company KYB</b></td><td><span class="pill p-mock">Synthetic mock</span></td><td>Used only for the root Trust Anchor admission</td></tr>
             <tr><td><b>Hedera</b></td><td><span class="pill p-net">Testnet</span></td><td>Chain 296. HBAR came from the portal faucet. Nothing ran on mainnet</td></tr>
@@ -1697,7 +1734,7 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
       </details>
       <details>
         <summary>Why Privy if Catenor already handles authority?</summary>
-        <p>Catenor gives the semantic decision: this Agent may distribute for this SPV, and this holder is PAY. Privy constrains what a specific key can physically sign, whatever the application asks: the Agent’s key can only send on chain 296, to Lisa’s or Bart’s receiving wallet, up to 20 HBAR. Two independent fences. <strong>Policy Decision ≠ Execution Authorization.</strong></p>
+        <p>Catenor gives the semantic decision: this Agent may distribute for this SPV, and this holder is PAY. Privy constrains what a specific key can physically sign, whatever the application asks, through its Privy policy: the Agent’s key can only send on chain 296, to Lisa’s or Bart’s receiving wallet, up to 20 HBAR. Two independent fences. <strong>Policy Decision ≠ Execution Authorization.</strong></p>
       </details>
       <details>
         <summary>What exactly happens inside CRE?</summary>
@@ -1717,11 +1754,11 @@ h1{margin:0;max-width:1050px;font-size:clamp(52px,8.2vw,132px);line-height:.91;l
       </details>
       <details>
         <summary>Why does Bart get no signature request, rather than a refused one?</summary>
-        <p>Because a HOLD holder never reaches the executor. The Catenor signer boundary builds a transfer only for a PAY holder, to that holder’s privately bound account, for exactly the plan amount. Privy’s policy is a second fence that was never needed for Bart: <code>investorBSignatureRequests: 0</code>, and the Agent’s nonce went from 0 to 1.</p>
+        <p>Because a HOLD holder never reaches the executor. The Catenor signer boundary builds a transfer only for a PAY holder, to that holder’s privately bound account, for exactly the plan amount. The Agent’s Privy policy is a second fence that was never needed for Bart: <code>investorBSignatureRequests: 0</code>, and the Agent’s nonce went from 0 to 1.</p>
       </details>
       <details>
         <summary>Is this production?</summary>
-        <p>No, and the page says so everywhere. The CRE workflow is really <strong>deployed</strong> on Chainlink’s private registry, and the Privy wallets and policies are real — in a <strong>development</strong> app. The investors are synthetic Sumsub <strong>sandbox</strong> applicants with fictional names, the company KYB is a <strong>synthetic mock</strong>, and the asset lives on Hedera <strong>testnet</strong>. Catenor did not independently verify an enclave attestation, and <code>reportFromDon</code> verification is not implemented yet.</p>
+        <p>No, and the page says so everywhere. The CRE workflow is really <strong>deployed</strong> on Chainlink’s private registry, and the Privy wallets and Privy policies are real — in a <strong>development</strong> app. The investors are synthetic Sumsub <strong>sandbox</strong> applicants with fictional names, the company KYB is a <strong>synthetic mock</strong>, and the asset lives on Hedera <strong>testnet</strong>. Catenor did not independently verify an enclave attestation, and <code>reportFromDon</code> verification is not implemented yet.</p>
       </details>
     </div>
   </div>
