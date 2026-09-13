@@ -119,6 +119,11 @@ def card(kind):
                     if cand.exists():
                         logo = Image.open(cand).convert('RGBA'); break
             if logo is not None:
+                from PIL import ImageOps
+                gray = ImageOps.invert(logo.convert('RGB').convert('L'))
+                bbox = gray.point(lambda v: 255 if v > 24 else 0).getbbox()
+                if bbox:
+                    logo = logo.crop(bbox)
                 logo.thumbnail((130, 130), Image.LANCZOS)
                 im.paste(logo, (x, 270), logo if logo.mode == 'RGBA' else None)
             else:
