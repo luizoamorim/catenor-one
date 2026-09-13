@@ -1670,6 +1670,22 @@ Work completed:
   - the living status docs now say DEPLOYED: `FINAL-DEMO.md` (§4 labels, the prize mapping, FD-10 closed), `DEMO.md`
     (the run-all note, the judge matrix, the §15 blockers), and the S001 PLAN B1 and TASKS T0.2 notes;
   - prompts, spikes and dated BUILD_LOG entries are historical records and stay as written.
+- **Checklist audit.** `SUBMISSION_CHECKLIST.md` had stopped being updated on 2026-09-12. Each item was re-checked
+  against the final run, the tests and the code: 119 are done with evidence, and 36 stay open with a stated reason.
+  The open ones:
+  - out of scope: S002 Subject Continuity; the operator email login and allowlist gate; a public DID resolver;
+    `ISSUE_CREDENTIAL` / `AUTHORIZE_ISSUER`; `reportFromDon`;
+  - not built: a live Judge Inspector;
+  - the ETHGlobal form fields;
+  - the CRE simulation suite (see the fix below).
+- **Lint fix.** `pnpm check` failed on Prettier formatting of the static `apps/web/demo-site/*.html`, so CI would have
+  failed on push. The folder is now in `.prettierignore`, like `docs/` and `artifacts/`.
+- **Re-run on 2026-09-13:**
+  - `pnpm check` green (428 unit tests);
+  - `pnpm test:integration` 118/118;
+  - the workflow `bunx tsc` green;
+  - `pnpm test:cre-sim` failed before simulating, with Privy "Wallet not found": its bootstrap wallet belongs to the
+    earlier Privy app. This is an environment issue; the suite last passed on 2026-09-11.
 
 Both YouTube videos (the submission demo and the technical walkthrough) are linked from the README.
 

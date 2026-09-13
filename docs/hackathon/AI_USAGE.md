@@ -3,7 +3,7 @@
 > Catenor One uses AI-assisted development as part of a human-directed, spec-driven engineering workflow.
 
 **Status:** Living document  
-**Last updated:** 2026-09-10
+**Last updated:** 2026-09-13
 
 ## Principles
 
@@ -393,3 +393,17 @@ confirmed every live action. Claude Code:
 **One mistake, corrected in the session.** A wrong Desktop file (an unredacted Sumsub screenshot) was briefly
 committed. The commit was removed from local history before any push.
 
+
+## 2026-09-13 — Demo site, video and submission preparation
+
+- **Demo site and video.** Claude Code subagents wrote `apps/web/demo-site/` (the replay console and the evidence
+  site) and the video tooling in `docs/hackathon/demo/video/`, under the maintainer's direction. The site shows only
+  public-safe data from the committed artifacts. Both videos are narrated in the maintainer's own voice: no AI voice and
+  no speed-up, as the ETHGlobal rules require. Details and asset sources are in `PROVENANCE.md` §30.
+- **Submission check (main session only).** Claude Code:
+  - read the ETHOnline 2026 prize requirements live and checked each selected prize against the repository;
+  - rewrote `README.md`;
+  - marked the simulation-era artifacts as superseded, without changing their evidence labels;
+  - audited `SUBMISSION_CHECKLIST.md` against the final run, re-running `pnpm check` and `pnpm test:integration`.
+
+  The maintainer decides the prize selection and the submission text.

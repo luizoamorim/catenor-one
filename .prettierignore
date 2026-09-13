@@ -13,3 +13,4 @@ schemas/catenor-protocol
 test-vectors/s001/*.json
 # CRE project keeps the official cre-templates formatting (typechecked by its own compiler)
 workflows
+apps/web/demo-site
