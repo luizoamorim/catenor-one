@@ -1369,8 +1369,8 @@ function blockedBy(st, a){
   if (a.custom) return null;
   if (isDone(st, a)) return null;
   var miss = (a.needs || []).filter(function(n){ return !state.done[st.id + '.' + n]; });
-  if (miss.length) return 'after ' + actBy(st, miss[0]).label;
-  if (a.before && state.done[st.id + '.' + a.before]) return 'recorded before ' + actBy(st, a.before).label;
+  if (miss.length) return 'after the action above';
+  if (a.before && state.done[st.id + '.' + a.before]) return 'recorded before delegation';
   return null;
 }
 function nextPending(si){
