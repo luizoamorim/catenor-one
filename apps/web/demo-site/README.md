@@ -28,6 +28,11 @@ framework, no build step.
 - **Honest labels:** a persistent header badge (“Replay of the recorded run c1-202609121659 · results are real, actions
   are replayed · verify on-chain”) and per-step “What’s real here” labels with tooltips: Chainlink CRE **DEPLOYED**,
   Privy **REAL development app**, Sumsub **SANDBOX**, company KYB **SYNTHETIC MOCK**, Hedera **TESTNET**.
+- **Sponsor chips:** every sub-step, result card and log line names the system that acted — Catenor (ink),
+  Chainlink CRE (blue; “Chainlink CRE · TEE” inside `handlerInTee`), Privy (violet), Hedera ATS (teal),
+  Sumsub · SANDBOX (rose) — with the same accents on `history.html`. The first step where a sponsor appears shows a
+  “What it is · why we use it” callout (Catenor, Privy and Chainlink CRE in step 1; Hedera ATS in step 6). Every
+  Privy policy is labeled “Privy policy” and framed in the Privy accent.
 
 ## Network use
 
