@@ -30,7 +30,7 @@ About 370 words: roughly 2:50 of speech at a calm pace, plus pauses on the key s
 |---|---|---|---|
 | 1 | 0:00–0:15 | **Card:** "Catenor One — possession ≠ current eligibility" · Catenor Protocol reference implementation · Chainlink CRE · Privy · Hedera ATS | "This is Catenor One, the first reference implementation of Catenor Protocol. Tokenized assets prove who *holds* them. They don't prove who may be *paid* today. We fix that." |
 | 2 | 0:15–0:35 | **Card:** four layers. Catenor = identity + scoped authority · Chainlink CRE TEE = confidential *current* eligibility · Privy = policy-bounded signing · Hedera ATS = the asset lifecycle | "Four layers. Catenor decides who has authority. A Chainlink Confidential Workflow checks private evidence inside a TEE. Privy policies bound what each wallet can sign. And Hedera's Asset Tokenization Studio runs the asset." |
-| 3 | 0:35–1:00 | `11-before-cre-workflow` → `11-after-terminal` → `11-after-cre-execution-events` | "Trust starts with admission. The organization's KYC evidence is read inside our **deployed** Confidential Workflow. The secrets come from the Vault DON, the Sumsub calls happen in the enclave, and only facts and a commitment come out. The policy says ALLOW, a separate bootstrap key endorses, and the Trust Anchor is valid." |
+| 3 | 0:35–1:00 | `11-before-cre-workflow` → `11-after-terminal` → `11-after-cre-execution-events` | "Trust starts with admission. The representative's KYC, from the Sumsub sandbox, plus a mocked company check, is read inside our **deployed** Confidential Workflow. The secrets come from the Vault DON, the Sumsub calls happen in the enclave, and only facts and a commitment come out. The policy says ALLOW, a separate bootstrap key endorses, and the Trust Anchor is valid." |
 | 4 | 1:00–1:20 | `21-terminal` (five capabilities + the DENY) → `30-after-privy-policy-spv-json` | "The Trust Anchor grants the Sponsor five scoped capabilities. Outside that scope it's DENY. Only after `TOKENIZE_ASSET` is allowed does the SPV get a Privy wallet, and its policy can only sign on Hedera testnet, to the ATS Factory." |
 | 5 | 1:20–1:45 | `44-after-sumsub-both-green` → `42-after-cre-executions` → `44-terminal` (crop: the two ALLOW decisions) | "Two investors, Lisa and Bart, pass KYC in the Sumsub sandbox. The TEE verifies their evidence, and the Trust Anchor issues W3C credentials. Their presentations are then checked confidentially against the offering policy: Lisa may buy 600 units, Bart 400." |
 | 6 | 1:45–2:10 | `60-after-hashscan-deploy-tx` → `63-after-verify-hedera-entitlements` | "On Hedera testnet, the SPV's Privy wallet deploys an ATS equity, issues exactly the approved units, 600 and 400, and sets a dividend. ATS computes the entitlements by ownership: Lisa 6, Bart 4." |
@@ -45,8 +45,7 @@ Every narrated claim above is labeled accurately:
 
 - **"deployed"** is true for all five CRE executions;
 - **"Sumsub sandbox"** is said out loud: the investors are synthetic sandbox applicants;
-- the admission's company evidence is a **SYNTHETIC MOCK**. It is not narrated as real KYB; the card can carry a small
-  "company KYB: mock" note;
+- the admission's company evidence is a **SYNTHETIC MOCK**, and the narration says "a mocked company check";
 - **"on-chain"** means Hedera **testnet**;
 - **"raw evidence never leaves the enclave"**: coarse reason codes (`FINAL`, `SANCTIONS`) do reach Catenor, and the
   narration does not claim otherwise.
