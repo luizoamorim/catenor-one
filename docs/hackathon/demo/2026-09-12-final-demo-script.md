@@ -233,3 +233,28 @@ Legenda: 🎥 = gravar · ⏸ = parar e mandar a saída ao Claude antes de segui
 - **Relay:** não fazer redeploy da Railway durante uma execução CRE (o resultado ainda não buscado se perde).
 - **Faucet:** o limite diário do faucet Hedera pode atrasar a fase H.
 - **Disco:** gravações grandes. Liberar espaço antes (A2).
+
+## 6. O que aconteceu de fato (execução de 2026-09-12, instância `c1-202609121659`)
+
+**Resultado:** 24/24 stages `ok`: 5 execuções no CRE implantado, 6 transações na Hedera testnet, o Bart em HOLD sem
+nenhuma transação. Registro completo: `artifacts/final-demo/RUN-LOG.md`.
+
+**Lições incorporadas ao código e aos scripts:**
+
+- **Banco:** a demo gravou no Postgres da Railway (`RAILWAY_DATABASE_PUBLIC_URL`). O `02` nunca mexe nele, e o `01`
+  recusa um banco com dados de outra instância.
+- **Secrets do CRE:** o CLI lê o `CRE_ETH_PRIVATE_KEY` do `.env` mesmo com `--secrets-auth browser`. Com o
+  placeholder do template, dá `invalid hex character 'Y'`; basta uma chave aleatória sem fundos.
+- **Deploy e redeploy:** no registro privado, o deploy já sai **Active**, então o `activate` não é necessário. O
+  redeploy (deploy #2) **atualiza no lugar**, depois de uma confirmação.
+- **Gateway:** o endereço da documentação (`01.enterprise-gateway.zone-a…`) respondeu "Workflow not found" para esta
+  organização. O certo é **`01.gateway.zone-a.cre.chain.link`**, o que o próprio CLI usa. Descoberto com um workflow
+  de controle sem TEE; agora é o padrão, e `DEMO_CRE_GATEWAY_URL` permite trocar.
+- **Stage 60:** o runner guardava a referência do ativo em vez do endereço. Agora guarda o endereço e completa a
+  policy do SPV sem novo deploy.
+- **Financiamento:** uma treasury no Privy (`50 --setup-treasury` → faucet → `50 --live --from-treasury`) evita várias
+  idas ao faucet. O script recarrega qualquer wallet abaixo do valor sugerido, inclusive o SPV depois de usado.
+- **Logs:** no CRE implantado, os logs de usuário aparecem por nó do DON. O workflow só registra marcadores neutros.
+- **Vídeo:** o material bruto são prints, porque as regras da ETHGlobal proíbem acelerar e voz de IA. O corte usa os
+  prints mais cartões, com narração do maintainer.
+
