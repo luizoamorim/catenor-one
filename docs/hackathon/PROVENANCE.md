@@ -849,3 +849,18 @@ Evidence: `artifacts/final-demo/`, `artifacts/chainlink/final-demo/deployed-run-
 `artifacts/hedera/final-demo/clean-room-c1-202609121659.md`, and
 `artifacts/privy/final-demo/clean-room-c1-202609121659/`.
 
+**Demo site and video assets (2026-09-13).**
+
+- **The site:** `apps/web/demo-site/` holds `index.html` (the replay console), `history.html` (the run history and
+  evidence) and `assets/`. It is original code written by Claude Code subagents under the maintainer's direction, and
+  it shows only public-safe data taken from the committed artifacts.
+- **Logos** in `apps/web/demo-site/assets/logos/` and in the video cards:
+  - the Catenor mark and lockup come from the maintainer's own Catenor social-preview image;
+  - the Chainlink icon comes from the official `chainlink-cre-skill` assets (§12);
+  - the Hedera logo comes from Simple Icons (`simple-icons` on jsDelivr, CC0);
+  - the Privy symbol is the official file `Privy_Symbol_Black.svg`, supplied by the maintainer.
+
+  The sponsor logos are used only to identify each sponsor's technology in this hackathon demo.
+- **Video tooling:** in `docs/hackathon/demo/video/`, written for this project; it uses Pillow and ffmpeg. The console
+  recordings were made with Playwright driving a local Chrome, and that recorder stays in the git-ignored scratchpad.
+

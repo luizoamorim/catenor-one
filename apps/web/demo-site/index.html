@@ -183,7 +183,9 @@ kbd{font:600 10.5px var(--sans);border:1px solid var(--hair);border-bottom-width
 .spc.k-cre{--acc:var(--c-cre);--tint:var(--t-cre)}
 .spc.k-hedera{--acc:var(--c-hed);--tint:var(--t-hed)}
 .spc-t{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.spc-n{font-size:22px;font-weight:700;letter-spacing:-.035em;color:var(--acc)}
+.spc-n{display:inline-flex;align-items:center;gap:9px;font-size:22px;font-weight:700;letter-spacing:-.035em;color:var(--acc)}
+.spc-lg{width:24px;height:24px;object-fit:contain;flex:none}
+.spc-lg.sq{border-radius:6px}
 .spc-f{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:2px 8px;white-space:nowrap}
 .spc-k{margin-top:10px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg4)}
 .spc p{margin:3px 0 0;font-size:13.5px;line-height:1.45;color:var(--fg2)}
@@ -507,6 +509,11 @@ kbd{font:600 10.5px var(--sans);border:1px solid var(--hair);border-bottom-width
   .dash{grid-template-columns:1fr}
   .badge-in .bt .opt{display:none}
 }
+@media(max-width:1280px) and (min-width:1001px){
+  /* three narrow result columns: stack the Privy policy chip instead of breaking its name mid-word */
+  .g3 .ppol{flex-wrap:wrap}
+  .g3 .ppol b{flex-basis:100%;padding:3px 6px}
+}
 @media(max-width:1000px){
   body{overflow:auto;overflow-x:hidden}
   .app{display:block;height:auto}
@@ -792,13 +799,13 @@ var SYS = {
   SUMSUB: ['sumsub', 'Sumsub · SANDBOX'], HEDERA: ['hedera', 'Hedera ATS']
 };
 var SPONSOR = {
-  CAT: { name: 'Catenor', what: 'The identity and authority layer: canonical identity (<code>did:catenor</code>), W3C credentials, scoped capabilities and delegation, policy decisions, and a hash-chained audit.',
+  CAT: { name: 'Catenor', logo: 'catenor-mark.png', what: 'The identity and authority layer: canonical identity (<code>did:catenor</code>), W3C credentials, scoped capabilities and delegation, policy decisions, and a hash-chained audit.',
     why: '<ul><li>Every actor gets its own identity, and a wallet is only an account bound to it.</li><li>Every action needs explicit, scoped authority; delegation can never exceed the delegator.</li><li>Decisions land in a hash-chained audit that anyone can re-verify (79 events, valid).</li></ul>' },
-  PRIVY: { name: 'Privy', what: 'Server wallets whose <b>Privy policies</b> constrain which key can sign what.',
+  PRIVY: { name: 'Privy', logo: 'privy.svg', what: 'Server wallets whose <b>Privy policies</b> constrain which key can sign what.',
     why: '<ul><li><b>Trust Anchor &amp; Sponsor signature wallets</b>: message signing only, never money.</li><li><b>SPV wallet</b>: the ATS Factory and its own equity only.</li><li><b>Distribution Agent wallet</b>: only Lisa or Bart, ≤ 20 HBAR.</li><li><b>Investor wallets</b>: receive-only.</li><li>Owner keys stay outside the runtime; the runtime signer cannot change a policy.</li></ul>' },
-  CRE: { name: 'Chainlink CRE', what: 'A <b>deployed</b> Confidential Workflow. Its secrets come from the Vault DON, and its Sumsub sandbox calls run inside the TEE.',
+  CRE: { name: 'Chainlink CRE', logo: 'chainlink.png', sq: 1, what: 'A <b>deployed</b> Confidential Workflow. Its secrets come from the Vault DON, and its Sumsub sandbox calls run inside the TEE.',
     why: '<p>It decides admission, credential issuance, offering eligibility and PAY/HOLD on private, current evidence. Only facts and commitments leave the enclave.</p>' },
-  HEDERA: { name: 'Hedera ATS', what: 'Asset Tokenization Studio on testnet: the tokenized SPV equity lifecycle — <code>deployEquity</code>, <code>issueByPartition</code>, the corporate-action role, dividend entitlements — and the payout.',
+  HEDERA: { name: 'Hedera ATS', logo: 'hedera.svg', what: 'Asset Tokenization Studio on testnet: the tokenized SPV equity lifecycle — <code>deployEquity</code>, <code>issueByPartition</code>, the corporate-action role, dividend entitlements — and the payout.',
     why: '<p>Execution is public: every transaction can be verified on HashScan and the Mirror Node.</p>' }
 };
 
@@ -864,7 +871,7 @@ function txRow(label, hash, meta, signer){
 function denyRes(code, text, extra, who){ return '<div class="denyres"><div class="dtop"><div class="huge">DENY</div>' + by(who || ['CAT']) + '</div><div class="dcode">' + code + '</div><p>' + text + '</p>' + (extra || '') + '</div>'; }
 function introHTML(keys){
   return '<section class="intro" aria-label="First appearance: what it is and why we use it"><div class="intro-h"><b>First appearance</b><span>what it is · why we use it</span></div><div class="intro-g">' +
-    keys.map(function(k){ var s = SPONSOR[k]; return '<article class="spc k-' + SYS[k][0] + '"><div class="spc-t"><span class="spc-n">' + s.name + '</span><span class="spc-f">First appearance</span></div>' +
+    keys.map(function(k){ var s = SPONSOR[k]; return '<article class="spc k-' + SYS[k][0] + '"><div class="spc-t"><span class="spc-n">' + (s.logo ? '<img class="spc-lg' + (s.sq ? ' sq' : '') + '" src="assets/logos/' + s.logo + '" width="24" height="24" alt="">' : '') + s.name + '</span><span class="spc-f">First appearance</span></div>' +
       '<div class="spc-k">What it is</div><p>' + s.what + '</p><div class="spc-k">Why we use it</div>' + s.why + '</article>'; }).join('') + '</div></section>';
 }
 function chk(t, bad){ return '<span class="chip' + (bad ? ' bad' : '') + '">' + (bad ? '<span class="n0">✕</span>' : '<span class="y">✓</span>') + t + '</span>'; }
