@@ -28,7 +28,7 @@ def font(size, path=SF):
     return ImageFont.truetype(path, size)
 
 NARR = {
- 1: "This is Catenor One, the first reference implementation of Catenor Protocol. Tokenized assets prove who holds them. They don't prove who may be paid today. We fix that.",
+ 1: "This is Catenor One, the first reference implementation of Catenor Protocol. Tokenized assets prove who holds them. They don't prove who may be paid today. In our demo, one investor is entitled to 4 HBAR and is paid zero: he still holds his tokens, but he is no longer eligible. Here's how.",
  2: "Four technologies, each with one job. Catenor holds identity and scoped authority. Chainlink's Confidential Workflow reads private KYC evidence inside a TEE, and decides. Privy constrains which key can sign what: the Trust Anchor's signing keys, the SPV and Agent wallets, and the investors' receive-only wallets. And Hedera's Asset Tokenization Studio runs the asset, verifiable by anyone.",
  3: "Trust starts with admission. The representative's KYC, from the Sumsub sandbox, plus a mocked company check, is read inside our deployed Confidential Workflow. The secrets come from the Vault DON, the Sumsub calls happen in the enclave, and only facts and a commitment come out. The policy says ALLOW, a separate bootstrap key endorses, and the Trust Anchor is valid.",
  4: "The Trust Anchor grants the Sponsor five scoped capabilities. Outside that scope it's DENY. Only after TOKENIZE_ASSET is allowed does the SPV get a Privy wallet, and its policy can only sign on Hedera testnet, to the ATS Factory.",
@@ -43,8 +43,8 @@ NARR = {
 # (block, source, seconds, crop box as fractions or None)
 SHOTS = [
  (1, 'card:logo', 5, None),
- (1, 'logos/hero.png', 5, None),
- (1, 'logos/thesis.png', 5, None),
+ (1, 'logos/hero.png', 7, None),
+ (1, 'logos/thesis.png', 10, None),
  (2, 'card:partners', 25, None),
  (3, '11-before-cre-workflow.png', 6, None),
  (3, '11-after-terminal.png', 9, None),
