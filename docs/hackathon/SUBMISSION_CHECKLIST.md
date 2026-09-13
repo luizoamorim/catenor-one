@@ -251,7 +251,7 @@ numbering (S001–S008); the delivered scope is described in `docs/hackathon/dem
       technical evidence walkthrough, 3:25, same narration over the real terminals and dashboards). Uploaded:
       submission https://www.youtube.com/watch?v=EbxR1HgVIx0 · technical https://www.youtube.com/watch?v=X3nXRfowpfk;
       both linked from the README.
-- [ ] Public deployment URL added. (The replay console on Vercel; then add it to the README and the form.)
+- [x] Public deployment URL added (https://catenor-one.vercel.app — static demo site on Vercel; API on Railway). (The replay console on Vercel; then add it to the README and the form.)
 - [ ] Repository URL added. (ETHGlobal form.)
 - [ ] Catenor Protocol URL added. (ETHGlobal form.)
 - [x] Screenshots/assets prepared (`artifacts/final-demo/screenshots/`).
