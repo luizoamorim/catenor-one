@@ -812,3 +812,40 @@ Original Catenor One code, written by Claude Code in the main session:
 - `docs/deployment/RAILWAY.md`.
 
 No sponsor resource was created or changed (Railway, Privy, Sumsub, Hedera, Chainlink).
+
+
+## 30. 2026-09-12 — Final demo run on the deployed CRE workflow (prompt 2026-09-12-025)
+
+No new npm dependency; `pnpm-lock.yaml` is unchanged.
+
+Original Catenor One code, written by Claude Code in the main session during the run:
+
+- **The Railway database mode** in `apps/api/scripts/demo/clean-room/stages/setup.ts`, and the database label in
+  `run-stage.ts`.
+- **Gateway handling** in `apps/api/src/infrastructure/confidential-compute/cre-gateway-verifier.ts`: it surfaces the
+  gateway's JSON-RPC error (`gatewayErrorDetail`, with a test) and defaults to `https://01.gateway.zone-a.cre.chain.link`.
+  That URL was taken from the strings of the installed CRE CLI v1.33.0 binary and confirmed with a live control
+  request. The `DEMO_CRE_GATEWAY_URL` override is in `context.ts`.
+- **Stage 60** in `stages/hedera.ts`: `equityAddressOf` and the no-redeploy completion of the SPV policy extension.
+- **Script wording:** `scripts/demo/cre/deploy.sh` and `invoke.sh`, and the `workflows/.env.example` note.
+
+**The control workflow**, `catenor-http-control` (deployed ID `0038de787580f971728b4e2599d83107eb6e8933a632b8021f67c72a3672a66f`):
+
+- a minimal non-TEE HTTP-trigger workflow, written in the git-ignored `scratch/cre-http-control/`;
+- it reuses the `identity-confidential` `node_modules` through a symlink, uses `@chainlink/cre-sdk` 1.18.0 and `zod`,
+  and is not committed;
+- it existed only to isolate the gateway problem, and is to be deleted after the demo.
+
+**Live sponsor resources created by the run** (the owner keys are outside the repository):
+
+| Sponsor | Resources |
+|---|---|
+| Privy development app `catenor-one-ethonline-2026` | the S001 signer infrastructure; assertion and holder keys; SPV, Agent and testnet-treasury EVM wallets, each with its policy and runtime quorum; two receive-only investor wallets |
+| Sumsub sandbox | synthetic applicants: four representatives from the stage 11 attempts, and investors "Lisa Simpson" and "Bart Simpson" |
+| Chainlink CRE | `identity-confidential-production` (private registry): deploy #1 and deploy #2; the Vault DON secrets; the control workflow |
+| Hedera testnet | ATS equity `0xf37A91c3aC757ac5f14e4b8BC92D4b1001D97ABC` (`0.0.10510175`), its lifecycle transactions and the payout; the funding transfers |
+
+Evidence: `artifacts/final-demo/`, `artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md`,
+`artifacts/hedera/final-demo/clean-room-c1-202609121659.md`, and
+`artifacts/privy/final-demo/clean-room-c1-202609121659/`.
+

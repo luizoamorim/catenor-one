@@ -43,7 +43,7 @@
 - [ ] S001 uses the `trust-anchor-admission` operation/handler.
 - [ ] S001 uses `handlerInTee`.
 - [ ] S001 uses exactly the required CRE persistent secrets unless an approved change is documented.
-- [ ] Sumsub sandbox is called for real from the deployed confidential workflow.
+- [x] Sumsub sandbox is called for real from the deployed confidential workflow (final demo 2026-09-12: stages 11/42/44/82, `http-actions SendRequest` events) (`artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md`).
 - [ ] Raw Sumsub responses are not persisted by Catenor.
 - [ ] S001 uses commitment-only evidence retention.
 - [ ] Deterministic verified facts are produced.
@@ -92,21 +92,21 @@
 ## Chainlink CRE evidence
 
 - [ ] `chainlink-cre-skill` usage/provenance is documented.
-- [ ] Confidential Workflows private-beta deployment enrollment is confirmed.
+- [x] Confidential Workflows private-beta deployment enrollment is confirmed (the first deploy and 5 executions succeeded; no separate step was needed).
 - [ ] `cre init` / official confidential TypeScript scaffold is used.
 - [ ] `identity-confidential` builds successfully.
 - [ ] Simulation happy path passes.
 - [ ] Simulation DENY path passes.
-- [ ] Real CRE deployment exists.
-- [ ] Workflow is activated/available according to the current CRE deployment model.
-- [ ] Real deployed `handlerInTee` execution is evidenced.
-- [ ] Vault DON secret retrieval is evidenced without exposing values.
-- [ ] Sumsub sandbox HTTPS calls execute inside the TEE.
-- [ ] Raw provider evidence does not cross the TEE as normal output.
-- [ ] Output is minimized to derived facts/commitments.
+- [x] Real CRE deployment exists (`identity-confidential-production`, private registry; deploy #1 `00e12517…`, deploy #2 `0000e58d…`).
+- [x] Workflow is activated/available according to the current CRE deployment model (Active; triggered via `01.gateway.zone-a.cre.chain.link`).
+- [x] Real deployed `handlerInTee` execution is evidenced (5 executions, all SUCCESS; dashboard screenshots and CLI execution list).
+- [x] Vault DON secret retrieval is evidenced without exposing values (`secrets_fetched` markers; successful authenticated Sumsub calls and signed callbacks).
+- [x] Sumsub sandbox HTTPS calls execute inside the TEE (made from `handlerInTee` on the deployed workflow; enclave attestation not independently verified by Catenor).
+- [x] Raw provider evidence does not cross the TEE as normal output.
+- [x] Output is minimized to derived facts/commitments (plus coarse reason codes in the distribution plan).
 - [ ] `reportFromDon` / offchain report verification is added if completed as P1.
-- [ ] Simulation vs live deployment artifacts are clearly distinguished.
-- [ ] Logs/artifacts are under `artifacts/chainlink/`.
+- [x] Simulation vs live deployment artifacts are clearly distinguished.
+- [x] Logs/artifacts are under `artifacts/chainlink/`.
 
 ## Privy evidence
 
@@ -114,24 +114,24 @@
 - [ ] Server verifies the authenticated operator identity/email.
 - [ ] Assertion signer spike confirms required signing semantics.
 - [ ] Organization Credential Assertion Key is independently verifiable.
-- [ ] Assertion signer policy blocks financial transaction signing/export where intended.
-- [ ] Separate bootstrap signing authority exists.
-- [ ] Key-purpose separation is demonstrated.
+- [x] Assertion signer policy blocks financial transaction signing/export where intended (`P_ASSERT`: signMessage only).
+- [x] Separate bootstrap signing authority exists (`P_BOOTSTRAP` wallet with its own owner and quorum).
+- [x] Key-purpose separation is demonstrated (Ed25519 assertion keys vs. EVM execution wallets; separate signer sets).
 - [ ] User wallet/account binding works in the later investor flow.
-- [ ] Organization/institutional wallet exists where later execution requires it.
-- [ ] Agent wallet/signer exists where later delegated execution requires it.
-- [ ] Wallet policies/limits/approvals demonstrated where applicable.
-- [ ] Relevant screenshots/logs are under `artifacts/privy/`.
+- [x] Organization/institutional wallet exists where later execution requires it (SPV execution wallet).
+- [x] Agent wallet/signer exists where later delegated execution requires it.
+- [x] Wallet policies/limits/approvals demonstrated where applicable (Agent: `to` ∈ {A, B}, ≤ 20 HBAR; SPV rules pinned to the equity).
+- [x] Relevant screenshots/logs are under `artifacts/privy/` (`final-demo/clean-room-c1-202609121659/`; screenshots in `artifacts/final-demo/screenshots/`).
 
 ## Hedera ATS evidence
 
-- [ ] Hedera ATS is integrated as the RWA tokenization/compliance/execution layer.
-- [ ] Real asset/SPV scenario is mapped to ATS.
-- [ ] Tokenized asset is created/deployed on the required Hedera network for the selected prize.
-- [ ] Catenor authorization/eligibility decision is connected to ATS lifecycle/compliance behavior.
-- [ ] At least one real ATS lifecycle operation is demonstrated.
-- [ ] At least one unauthorized/ineligible operation is visibly blocked.
-- [ ] Transaction/deployment evidence is preserved under `artifacts/hedera/`.
+- [x] Hedera ATS is integrated as the RWA tokenization/compliance/execution layer.
+- [x] Real asset/SPV scenario is mapped to ATS (synthetic real-estate SPV, equity `C1SPV001`).
+- [x] Tokenized asset is created/deployed on the required Hedera network for the selected prize (testnet `0.0.10510175`).
+- [x] Catenor authorization/eligibility decision is connected to ATS lifecycle/compliance behavior (issuance only for TEE-backed offering ALLOW decisions; payout only for PAY holders).
+- [x] At least one real ATS lifecycle operation is demonstrated (`grantRole` + `setDividend`, entitlements A 6 / B 4).
+- [x] At least one unauthorized/ineligible operation is visibly blocked (Investor B HOLD: no transaction, no signature request).
+- [x] Transaction/deployment evidence is preserved under `artifacts/hedera/` (`final-demo/clean-room-c1-202609121659.md`).
 - [ ] README explains Hedera ATS as execution/tokenization infrastructure, not canonical identity or authority.
 
 ## Subject Continuity evidence
@@ -157,9 +157,9 @@
 - [ ] CRE workflow simulations pass.
 - [ ] Build passes.
 - [x] Railway deployment is reachable (`https://catenor-one-production.up.railway.app/v1/health`, 2026-09-12; API only — web not deployed).
-- [ ] Real CRE deployed workflow is reachable/invokable.
+- [x] Real CRE deployed workflow is reachable/invokable.
 - [ ] No unsafe demo bypass remains in judge path.
-- [ ] Secret/privacy scan passes over repo and artifacts.
+- [x] Secret/privacy scan passes over repo and artifacts (`pnpm secret-scan`, 2026-09-12; screenshots redacted for investor DIDs and applicant IDs).
 
 ## Judge experience
 
@@ -168,11 +168,11 @@
 - [ ] Product UI remains simple.
 - [ ] Technical Judge Inspector exists for key slices.
 - [ ] Happy path is deterministic.
-- [ ] At least one compelling DENY path is shown live.
+- [x] At least one compelling DENY path is shown live (Agent without capability; relationship ≠ capability; Investor B HOLD).
 - [ ] Audit/explanation view shows why action was allowed/denied.
 - [ ] Database indexes are described as lookup/current-state projections, not proof.
-- [ ] Every sponsor claim is backed by real functionality or clearly labeled as planned/mock.
-- [ ] Sumsub sandbox is always labeled as sandbox.
+- [x] Every sponsor claim is backed by real functionality or clearly labeled as planned/mock.
+- [x] Sumsub sandbox is always labeled as sandbox.
 - [ ] Static Judge Inspector mock is not presented as live sponsor evidence.
 
 ## Submission materials
@@ -188,7 +188,7 @@
 - [ ] Public deployment URL added.
 - [ ] Repository URL added.
 - [ ] Catenor Protocol URL added.
-- [ ] Screenshots/assets prepared.
+- [x] Screenshots/assets prepared (`artifacts/final-demo/screenshots/`).
 - [ ] AI disclosure completed.
 - [ ] Provenance disclosure completed.
 - [ ] Official submission requirements rechecked on submission day.

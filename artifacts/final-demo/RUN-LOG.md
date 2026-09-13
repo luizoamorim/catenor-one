@@ -3,6 +3,33 @@
 **Date:** 2026-09-12 (UTC). **Operator:** the maintainer, running `scripts/demo/*` by hand, one stage at a time.
 **Screenshots:** [`screenshots/`](screenshots/README.md).
 
+## Result
+
+**Instance `c1-202609121659`: 24/24 stages `ok`** (stage 99, 22:59 UTC), from an empty Privy app and an empty database
+to a paid distribution.
+
+| Layer | Evidence |
+|---|---|
+| **Chainlink CRE**: **deployed** Confidential Workflow `identity-confidential-production` | 5 executions, all SUCCESS: the admission `0x394f…4bd8`, credentials A and B `0xe66a…0b8f` and `0x6148…64f8`, the offering `0xfecb…4715`, the distribution `0xfd2a…2d0b`. Details: [`artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md`](../chainlink/final-demo/deployed-run-c1-202609121659.md) |
+| **Hedera testnet**: Asset Tokenization Studio | 6 transactions, all SUCCESS: `deployEquity` → issue A 600 / B 400 → `grantRole` + `setDividend` (entitlements A 6 / B 4) → Agent payout A 6 HBAR. Details: [`artifacts/hedera/final-demo/clean-room-c1-202609121659.md`](../hedera/final-demo/clean-room-c1-202609121659.md) |
+| **Privy**: development app | 5 policy-bounded server wallets, each with its own owner and runtime signer; receive-only investor wallets; `P_BOOTSTRAP` / `P_ASSERT` signing keys. Details: [`artifacts/privy/final-demo/clean-room-c1-202609121659/`](../privy/final-demo/clean-room-c1-202609121659/README.md) |
+| **Catenor** | Trust Anchor VALID; the authority chain Trust Anchor → Sponsor → Agent ALLOW; 2 credentials issuer-signed; audit hash chain valid (79 events, 3 of them DISTRIBUTION_REQUEST_DENIED) |
+
+**The thesis, on public data.** Investor B (Bart, Sumsub sandbox) was sanctioned after investing. He still holds 400
+units, an entitlement of 4 and a validly signed ACTIVE credential. The TEE decided from current evidence that he is
+not eligible today, so **HOLD 4: no transaction, no signature request**. Investor A (Lisa) was paid 6 HBAR.
+**Possession ≠ current eligibility.**
+
+**What went wrong, and how it was fixed** (details below):
+
+- **Stage 11 attempts 1–3:** the documented private-registry gateway does not serve this organization. Found with a
+  control workflow; fixed by switching the default gateway.
+- **`secrets.sh`:** failed on the `CRE_ETH_PRIVATE_KEY` placeholder; fixed with a fresh unfunded key.
+- **Stage 60:** the runner recorded the asset reference instead of the address, after a successful `deployEquity`;
+  fixed without redeploying.
+
+None of these consumed a set-once state or duplicated an on-chain action.
+
 This is the public, reviewed record of each stage. The full stage records stay local in `.catenor-demo/runs/`, which
 is git-ignored. This log never contains:
 

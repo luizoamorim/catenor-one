@@ -1584,6 +1584,69 @@ No Privy, Sumsub, Hedera or Chainlink action was taken.
 Docs: `RAILWAY.md` now records the dashboard configuration and the executed procedure. The `railway.toml` header marks
 the file as a record only, and T15.1 and the submission checklist are updated.
 
+## 2026-09-12 — Final demo: full clean-room run on the deployed CRE workflow (instance c1-202609121659)
+
+Goal: run the whole Catenor One story from zero with every confidential operation on the **deployed** Chainlink
+Confidential Workflow. The run used a new Privy app and the Railway backend database, and it spent HBAR on Hedera
+testnet.
+
+Executed by the maintainer, stage by stage (`scripts/demo/*`). Every `--live` action was confirmed by hand. Claude
+Code reviewed each output, fixed the runner between stages and kept the public record. It ran nothing live itself,
+apart from read-only checks: mirror-node and JSON-RPC reads, the CRE CLI list/get, and local simulations.
+
+**Result.** 24/24 stages `ok` (stage 99):
+
+- 5 DEPLOYED CRE executions, all SUCCESS: admission, 2 credentials, offering eligibility, confidential distribution;
+- 6 Hedera testnet transactions, all SUCCESS: `deployEquity`, 2× `issueByPartition`, `grantRole`, `setDividend`, and
+  the Agent payout of 6 HBAR to Investor A;
+- Investor B HELD, with no transaction and no signature request;
+- the audit hash chain valid, with 79 events.
+
+Record: `artifacts/final-demo/RUN-LOG.md`, the screenshot gallery, and the per-sponsor evidence in
+`artifacts/{chainlink,hedera,privy}/final-demo/…c1-202609121659…`.
+
+**Maintainer decisions during the run:**
+
+- Restart on a new Privy app so that the admission also runs on the deployed workflow. The earlier instance
+  `c1-202609121438`, whose admission ran on simulation, is archived in `artifacts/final-demo/aborted-c1-202609121438/`.
+- Keep the demo state in the Railway Postgres (`RAILWAY_DATABASE_PUBLIC_URL`) instead of a local Docker database.
+- Use screenshots instead of screen recordings, following the ETHGlobal video rules checked that day: 2–4 min, no
+  speed-up, no AI voice. The demo script records those rules.
+- Fund the wallets from a Privy testnet treasury instead of several faucet trips.
+- Run a non-TEE control workflow to isolate the gateway problem.
+
+**Runner and code fixes, each committed with its test or check:**
+
+- **Stage 01/02:** the Railway database mode. A new instance refuses a non-empty database; stage 02 never touches it.
+  The append-only audit log also rules out truncation.
+- **CRE gateway.** The verifier now surfaces the gateway's JSON-RPC error. The default URL moved from the documented
+  `01.enterprise-gateway.zone-a…` (answered "Workflow not found" for this organization) to
+  `01.gateway.zone-a.cre.chain.link`, the URL embedded in CRE CLI v1.33.0, with a `DEMO_CRE_GATEWAY_URL` override.
+- **`workflows/.env.example`:** documents that the CLI parses `CRE_ETH_PRIVATE_KEY` even for browser-auth secrets.
+- **`deploy.sh`:** the status wording, since the private registry reports Active and activate is only needed when
+  PAUSED.
+- **Stage 60:** stores the equity address (`DEMO_EQUITY_ADDRESS`) rather than the asset reference (`DEMO_EQUITY_REF`).
+  When the equity already exists, it completes the owner-authorized SPV policy extension without redeploying.
+
+**Observed on the platforms (reported, not worked around):**
+
+- the deployed workflow's user logs are visible per DON node, and the workflow only logs safe markers;
+- each node's copy of an execution calls back, and the relay de-duplicates the results;
+- the redeploy updated the workflow in place;
+- Privy has no balance view for chain 296.
+
+**Not done:**
+
+- `reportFromDon` / offchain report verification (P1);
+- deleting the control workflow `catenor-http-control`;
+- turning off the Railway Postgres TCP proxy;
+- the demo video.
+
+AI assistance: Claude Code main session only; no subagent in this run.
+
+Prompt: `docs/hackathon/prompts/2026-09-12-025-final-demo-deployed-cre.md`. Script:
+`docs/hackathon/demo/2026-09-12-final-demo-script.md`.
+
 ## Entry template
 
 ```md

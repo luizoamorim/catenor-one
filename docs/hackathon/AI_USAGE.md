@@ -368,3 +368,28 @@ Checkpoint 8 (same day): `hedera-engineer` researched the ATS dividend lifecycle
 - **Maintainer decision.** Server plus CRE relay, chosen over health-only or route-only (AskUserQuestion). This was
   needed because investor-operation results are awaited in the local runner's memory.
 - **External actions:** none. No Railway login, link or deploy, and no Privy, Sumsub, Hedera or CRE action.
+
+
+## 2026-09-12 — Final demo on the deployed CRE workflow (prompt 2026-09-12-025)
+
+**Main session only; no subagent.**
+
+**New usage category: an AI co-operator in a live, maintainer-run demo.** The maintainer ran every stage and
+confirmed every live action. Claude Code:
+
+- **reviewed each output** against the expected result, and stopped the flow on every failure;
+- **diagnosed failures from evidence**:
+  - the gateway's error body;
+  - the documentation;
+  - the strings of the CLI binary;
+  - a local simulation of the deployed config;
+  - a control workflow the maintainer deployed;
+  - mirror-node reads;
+- **patched the runner** between stages, each change with a test or check, and committed it locally;
+- **kept the public record:** the run log, the screenshot gallery with redacted investor DIDs and applicant IDs, and
+  the sponsor evidence;
+- **drafted the sponsor community posts** and the video plan, and **read the ETHGlobal submission rules** live.
+
+**One mistake, corrected in the session.** A wrong Desktop file (an unredacted Sumsub screenshot) was briefly
+committed. The commit was removed from local history before any push.
+
