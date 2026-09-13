@@ -184,7 +184,7 @@
 - [ ] Privy prize selection finalized.
 - [ ] Hedera prize selection finalized.
 - [ ] World prize considered only if S004/S005 scope supports it without endangering core demo.
-- [ ] Demo video recorded.
+- [x] Demo video recorded (submission: the console demo, 3:32, maintainer's voice, no speed-up; supplementary: the technical evidence walkthrough, 3:25, same narration over the real terminals and dashboards).
 - [ ] Public deployment URL added.
 - [ ] Repository URL added.
 - [ ] Catenor Protocol URL added.
