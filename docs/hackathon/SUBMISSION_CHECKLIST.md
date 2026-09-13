@@ -6,7 +6,7 @@
 
 - [ ] Catenor One repository visibility matches submission requirements.
 - [ ] Commit history clearly shows incremental hackathon development.
-- [ ] README explains Catenor One vs Catenor Protocol.
+- [x] README explains Catenor One vs Catenor Protocol.
 - [ ] `PROTOCOL-BASELINE.md` contains the exact protocol SHA.
 - [ ] `AI_USAGE.md` is current.
 - [ ] `PROVENANCE.md` is current.
@@ -132,7 +132,7 @@
 - [x] At least one real ATS lifecycle operation is demonstrated (`grantRole` + `setDividend`, entitlements A 6 / B 4).
 - [x] At least one unauthorized/ineligible operation is visibly blocked (Investor B HOLD: no transaction, no signature request).
 - [x] Transaction/deployment evidence is preserved under `artifacts/hedera/` (`final-demo/clean-room-c1-202609121659.md`).
-- [ ] README explains Hedera ATS as execution/tokenization infrastructure, not canonical identity or authority.
+- [x] README explains Hedera ATS as execution/tokenization infrastructure, not canonical identity or authority (README rewritten 2026-09-13: per-sponsor evidence, HashScan links, how Privy improves the experience, no project contracts to verify).
 
 ## Subject Continuity evidence
 
@@ -184,7 +184,7 @@
 - [ ] Privy prize selection finalized.
 - [ ] Hedera prize selection finalized.
 - [ ] World prize considered only if S004/S005 scope supports it without endangering core demo.
-- [x] Demo video recorded (submission: the console demo, 3:32, maintainer's voice, no speed-up; supplementary: the technical evidence walkthrough, 3:25, same narration over the real terminals and dashboards).
+- [x] Demo video recorded (submission: the console demo, 3:32, maintainer's voice, no speed-up; supplementary: the technical evidence walkthrough, 3:25, same narration over the real terminals and dashboards). Uploaded: submission https://www.youtube.com/watch?v=EbxR1HgVIx0 · technical https://www.youtube.com/watch?v=X3nXRfowpfk; both linked from the README.
 - [ ] Public deployment URL added.
 - [ ] Repository URL added.
 - [ ] Catenor Protocol URL added.

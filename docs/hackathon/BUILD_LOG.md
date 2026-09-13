@@ -1647,6 +1647,35 @@ AI assistance: Claude Code main session only; no subagent in this run.
 Prompt: `docs/hackathon/prompts/2026-09-12-025-final-demo-deployed-cre.md`. Script:
 `docs/hackathon/demo/2026-09-12-final-demo-script.md`.
 
+## 2026-09-13 — README rewritten for submission; prize requirements checked
+
+Goal: check each selected prize's qualification requirements (the ETHOnline 2026 prizes page, read live) against the
+repository, and fix the gaps in the public docs.
+
+Work completed:
+
+- **`README.md` rewritten.** The old one still described Arc as the settlement rail and S001 as the next step. The new
+  one covers:
+  - the thesis, the final-run results and the story;
+  - one section per sponsor, with the evidence and HashScan links (consensus timestamps taken from the Mirror Node);
+  - how Privy improves the experience, which the Privy "Best Financial Flow" track requires;
+  - a note that there is no project contract to verify on HashScan (`contracts/` is empty; only unmodified ATS v8
+    contracts are used);
+  - the REAL / SANDBOX / MOCK labels, how to run and verify, provenance, and what is not done.
+- **`DEMO.md` §11 and §15** now say the CRE workflow is DEPLOYED instead of "NOT deployed".
+- **Submission checklist:** the two README items are ticked.
+
+Both YouTube videos (the submission demo and the technical walkthrough) are linked from the README.
+
+Validation: Prettier check and `pnpm secret-scan` clean.
+
+Open:
+
+- a public URL for the replay console (Vercel, maintainer);
+- the prize selections in the ETHGlobal form.
+
+AI assistance: Claude Code main session only.
+
 ## Entry template
 
 ```md

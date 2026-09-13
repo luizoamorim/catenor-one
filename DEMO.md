@@ -365,7 +365,7 @@ Hedera explorer links for the committed rehearsal are listed in
 | Privy (every key and wallet, policies, key quorums, signatures) | **REAL** (development app) |
 | Sumsub investor + representative evidence | **REAL SANDBOX** (synthetic applicants; `sbx:` tokens only) |
 | Company / KYB evidence (S001 admission only) | **SYNTHETIC MOCK** (Sumsub KYB not entitled) |
-| Chainlink CRE Confidential Workflow | **SIMULATION** (`cre workflow simulate`, `handlerInTee`) until a real deployment succeeds; see §15. Never described as a deployed TEE before that. |
+| Chainlink CRE Confidential Workflow | **DEPLOYED** in the final run `c1-202609121659` (private registry; 5 executions, all SUCCESS; see §15). Local runs without a deployment use **SIMULATION** (`cre workflow simulate`, `handlerInTee`) and are labeled so. |
 | Hedera ATS / Testnet | **REAL** testnet (chain 296): rehearsal evidence committed; clean-room broadcasts only with `--live` |
 | Revenue event | **DEMO TRIGGER** (in production: PMS, bank webhook, schedule or reconciliation) |
 | Holdings in a non-spending run | **Catenor-authorized allocation** (labeled), not an on-chain read |
@@ -453,7 +453,9 @@ Needs Privy + Sumsub: stages 10–44, 70–82. Needs CRE deployment access: §15
 
 ## 15. Chainlink CRE deployment
 
-**Status: NOT deployed.** The demo is labeled **SIMULATION** until a real deployment and invocation succeed.
+**Status: DEPLOYED** (2026-09-12). `identity-confidential-production` runs on the private registry, and the final run
+`c1-202609121659` made all five confidential executions on it, all SUCCESS
+([evidence](artifacts/chainlink/final-demo/deployed-run-c1-202609121659.md)).
 
 Commands, verified against the installed CLI v1.33.0 `--help`. All of them run from `workflows/` with `-R workflows`
 and the `production-settings` target, which uses the private registry.
