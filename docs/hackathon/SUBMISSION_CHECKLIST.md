@@ -239,12 +239,12 @@ numbering (S001–S008); the delivered scope is described in `docs/hackathon/dem
 
 ## Submission materials
 
-- [ ] Project name: **Catenor One**. (ETHGlobal form.)
-- [ ] Short description finalized. (ETHGlobal form.)
-- [ ] Long description finalized. (ETHGlobal form; reuse the README, including "How Privy improves the experience".)
-- [ ] Chainlink prize selection finalized. (Best Confidential Workflow.)
-- [ ] Privy prize selection finalized. (Both tracks; they count as one partner.)
-- [ ] Hedera prize selection finalized. (Tokenization of Anything.)
+- [x] Project name: **Catenor One** (showcase https://ethglobal.com/showcase/catenor-one-0r9sq).
+- [x] Short description finalized.
+- [x] Long description finalized (description plus "How it's Made"; the Privy prize answer includes "How Privy improves the experience").
+- [x] Chainlink prize selection finalized (Best Confidential Workflow).
+- [x] Privy prize selection finalized (both tracks; they count as one partner).
+- [x] Hedera prize selection finalized (Tokenization of Anything).
 - [x] World prize considered only if S004/S005 scope supports it without endangering core demo (considered: not
       selected; the limit is 3 partners).
 - [x] Demo video recorded (submission: the console demo, 3:32, the maintainer's voice, no speed-up; supplementary: the
@@ -252,10 +252,10 @@ numbering (S001–S008); the delivered scope is described in `docs/hackathon/dem
       submission https://www.youtube.com/watch?v=EbxR1HgVIx0 · technical https://www.youtube.com/watch?v=X3nXRfowpfk;
       both linked from the README.
 - [x] Public deployment URL added (https://catenor-one.vercel.app — static demo site on Vercel; API on Railway). (The replay console on Vercel; then add it to the README and the form.)
-- [ ] Repository URL added. (ETHGlobal form.)
-- [ ] Catenor Protocol URL added. (ETHGlobal form.)
+- [x] Repository URL added.
+- [ ] Catenor Protocol URL added. Optional: the showcase names Catenor Protocol without a link; the README links it.
 - [x] Screenshots/assets prepared (`artifacts/final-demo/screenshots/`).
-- [ ] AI disclosure completed. (ETHGlobal form; source: `AI_USAGE.md`.)
-- [ ] Provenance disclosure completed. (ETHGlobal form; source: `PROVENANCE.md`.)
+- [x] AI disclosure completed ("How it's Made": built with Claude Code and project subagents; details in `AI_USAGE.md`).
+- [x] Provenance disclosure completed ("How it's Made" points to the prompts, plans and provenance in the repo).
 - [x] Official submission requirements rechecked on submission day (the prizes and event-details pages, read
       2026-09-13).
